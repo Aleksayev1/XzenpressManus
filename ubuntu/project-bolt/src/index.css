@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.image-zoom-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.image-zoom-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.image-zoom-wrapper:hover .image-zoom-overlay {
+  opacity: 1;
+}
+
+.image-zoom-icon,
+.image-zoom-text {
+  transition: transform 0.3s ease;
+}
+
+.image-zoom-wrapper:hover .image-zoom-icon {
+  transform: scale(1.2);
+}
+
+.image-zoom-wrapper:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}

@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://xzenpress.com/sitemap.xml
+
+# Principais páginas
+Allow: /
+Allow: /breathing
+Allow: /acupressure
+Allow: /premium
+Allow: /corporate
+
+# Páginas administrativas
+Disallow: /admin
+Disallow: /dashboard
+
+# Arquivos técnicos
+Allow: /manifest.json
+Allow: /sw.js

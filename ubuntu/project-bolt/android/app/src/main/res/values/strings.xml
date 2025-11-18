@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">XZenPress</string>
+    <string name="title_activity_main">XZenPress - Bem-estar Holístico</string>
+    <string name="package_name">com.xzenpress.app</string>
+    <string name="custom_url_scheme">com.xzenpress.app</string>
+    
+    <!-- Descrições para Google Play -->
+    <string name="app_description">Plataforma de bem-estar holístico com acupressão MTC, respiração 4-7-8 e cromoterapia</string>
+    <string name="app_short_description">Bem-estar holístico: acupressão, respiração e cromoterapia</string>
+    
+    <!-- Declaração: SEM PUBLICIDADE -->
+    <string name="no_ads_declaration">Este aplicativo não contém anúncios ou tracking publicitário</string>
+</resources>

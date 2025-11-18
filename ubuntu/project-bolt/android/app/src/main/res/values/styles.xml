@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here -->
+        <item name="colorPrimary">#059669</item>
+        <item name="colorPrimaryDark">#047857</item>
+        <item name="colorAccent">#3B82F6</item>
+        <item name="android:statusBarColor">#059669</item>
+        <item name="android:navigationBarColor">#059669</item>
+    </style>
+
+    <style name="AppTheme.NoActionBarLaunch" parent="AppTheme">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@drawable/splash</item>
+        <item name="android:windowFullscreen">false</item>
+    </style>
+</resources>

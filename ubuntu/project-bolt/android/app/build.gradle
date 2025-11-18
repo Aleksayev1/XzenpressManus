@@ -1,0 +1,77 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'com.xzenpress.app'
+    compileSdkVersion 34
+    defaultConfig {
+        applicationId "com.xzenpress.app"
+        minSdkVersion 22
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Declaração explícita: NÃO usamos ID de publicidade
+        manifestPlaceholders = [
+            'adIdPermission': 'false'
+        ]
+    }
+    
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            // Configuração de assinatura (você deve configurar)
+            // signingConfig signingConfigs.release
+        }
+        debug {
+            debuggable true
+            minifyEnabled false
+        }
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    
+    // Configurações para PWA
+    packagingOptions {
+        pickFirst '**/libc++_shared.so'
+        pickFirst '**/libjsc.so'
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.activity:activity:1.8.2'
+    
+    // Capacitor Core
+    implementation project(':capacitor-android')
+    implementation project(':capacitor-app')
+    implementation project(':capacitor-haptics')
+    implementation project(':capacitor-keyboard')
+    implementation project(':capacitor-status-bar')
+    implementation project(':capacitor-splash-screen')
+    
+    // Explicitamente EXCLUIR bibliotecas de publicidade
+    configurations.all {
+        exclude group: 'com.google.android.gms', module: 'play-services-ads'
+        exclude group: 'com.google.android.gms', module: 'play-services-ads-lite'
+        exclude group: 'com.google.firebase', module: 'firebase-ads'
+    }
+    
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
+// Aplicar plugin do Google Services apenas se necessário (sem ads)
+// apply plugin: 'com.google.gms.google-services'

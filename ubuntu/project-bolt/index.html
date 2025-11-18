@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- PWA Essentials -->
+    <link rel="manifest" href="/manifest.json"/>
+    <link rel="icon" href="/Logo Xzenpress oficial.png"/>
+    <meta name="theme-color" content="#059669" />
+    
+    <!-- Apple PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="XZenPress" />
+    <link rel="apple-touch-icon" href="/Logo Xzenpress oficial.png" />
+    
+    <!-- SEO -->
+    <meta name="description" content="XZenPress - Plataforma de bem-estar integrativa com acupressão MTC, Craniopuntura, respiração 4-7-8 e cromoterapia" />
+    <meta name="keywords" content="acupressão, medicina tradicional chinesa, respiração 4-7-8, cromoterapia, bem-estar, saúde natural" />
+    <meta name="author" content="XZenPress" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="XZenPress - Plataforma de Bem-Estar Holística" />
+    <meta property="og:description" content="Acupressão MTC, respiração 4-7-8, cromoterapia e sons harmonizantes" />
+    <meta property="og:image" content="/Logo Xzenpress oficial.png" />
+    <meta property="og:url" content="https://xzenpress.com" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://xzenpress.com/" />
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y74MT1V5JC"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-Y74MT1V5JC');
+    </script>
+    
+    <title>XZenPress - Medicina Integrativa e Craniopuntura</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
+
+    <meta property="twitter:url" content="https://xzenpress.com/" />

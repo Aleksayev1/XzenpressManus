@@ -1,0 +1,96 @@
+{
+  "name": "xzenpress-holistic-wellness",
+  "version": "2.5.0",
+  "description": "🚀 LANÇAMENTO OFICIAL - Plataforma completa de bem-estar integrativa com Craniopuntura, acupressão MTC, respiração 4-7-8, cromoterapia e sons harmonizantes",
+  "homepage": "https://xzenpress.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Aleksayev1/XZenpressbolt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Aleksayev1/XZenpressbolt/issues"
+  },
+  "private": true,
+  "keywords": [
+    "acupressão",
+    "craniopuntura",
+    "medicina tradicional chinesa",
+    "respiração 4-7-8",
+    "cromoterapia",
+    "bem-estar",
+    "medicina integrativa",
+    "saúde natural",
+    "integrativa",
+    "mindfulness"
+  ],
+  "author": {
+    "name": "XZenPress Team",
+    "email": "contato@xzenpress.com",
+    "url": "https://xzenpress.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@stripe/stripe-js": "^7.8.0",
+    "@supabase/supabase-js": "^2.53.0",
+    "@testing-library/jest-dom": "^6.1.4",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.5.1",
+    "axios": "^1.6.2",
+    "framer-motion": "^10.16.16",
+    "i18next": "^23.7.6",
+    "i18next-browser-languagedetector": "^7.2.0",
+    "i18next-http-backend": "^2.4.2",
+    "lucide-react": "^0.344.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^13.5.0",
+    "react-router-dom": "^6.8.1",
+    "react-scripts": "5.0.1",
+    "react-spring": "^9.7.3",
+    "web-vitals": "^3.5.0",
+    "workbox-webpack-plugin": "^7.0.0",
+    "workbox-window": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "typescript": "~4.9.5",
+    "vite": "^5.4.2"
+  },
+  "scripts": {
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "serve": "npx serve -s dist -l 3000",
+    "analyze": "npm run build && npx serve -s build",
+    "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "proxy": "http://localhost:8001"
+}

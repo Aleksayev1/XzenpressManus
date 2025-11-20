@@ -1,8 +1,10 @@
 [build]
-  publish = "dist"
+  publish = "project/dist"
   command = "npm run build"
 
-# Variáveis removidas daqui - usar apenas as da UI do Netlify
+[context.production]
+  command = "npm run build"
+  environment = { VITE_SUPABASE_URL = "https://peicfjwigfxnhkobpgmw.supabase.co", VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBlaWNmandpZ2Z4bmhrb2JwZ213Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2MDg1ODcsImV4cCI6MjA3ODE4NDU4N30.pceUoCyhp3mBbLPdsPbfo6kReBn1ZIrzHZWaK-41gwg" }
 
 [[redirects]]
   from = "/*"
@@ -18,7 +20,7 @@
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Permissions-Policy = "camera=( ), microphone=(), geolocation=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://peicfjwigfxnhkobpgmw.supabase.co; connect-src 'self' https://www.google-analytics.com https://peicfjwigfxnhkobpgmw.supabase.co; upgrade-insecure-requests; block-all-mixed-content"
 
@@ -38,7 +40,7 @@
 
 # Static assets caching
 [[headers]]
-  for = "/assets/*" # Targeting Vite's asset directory
+  for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 

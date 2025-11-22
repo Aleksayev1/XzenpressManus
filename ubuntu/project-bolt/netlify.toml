@@ -1,6 +1,7 @@
 [build]
   publish = "dist"
   command = "npm run build"
+  environment = { NODE_VERSION = "20" }
 
 # Variáveis removidas daqui - usar apenas as da UI do Netlify
 

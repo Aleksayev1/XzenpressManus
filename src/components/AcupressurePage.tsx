@@ -19,7 +19,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
 
   // Helper function to get translated content
   const getTranslatedField = (point: any, field: string) => {
-    const langSuffix = language === 'pt' ? '' : language.charAt(0).toUpperCase() + language.slice(1);
+    const langSuffix = (!language || language === 'pt') ? '' : language.charAt(0).toUpperCase() + language.slice(1);
     const translatedField = `${field}${langSuffix}`;
     return point[translatedField] || point[field];
   };

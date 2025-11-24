@@ -22,7 +22,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
   // Helper function to get translated content
   const getTranslatedField = (post: BlogPost, field: 'title' | 'content' | 'excerpt'): string => {
     if (!language || language === 'pt') return post[field] || '';
-    const langSuffix = language.charAt(0).toUpperCase() + language.slice(1);
+    const langSuffix = (!language || language === 'pt') ? '' : language.charAt(0).toUpperCase() + language.slice(1);
     const translatedField = `${field}${langSuffix}` as keyof BlogPost;
     return (post[translatedField] as string) || post[field] || '';
   };

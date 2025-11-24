@@ -17,7 +17,7 @@ export class BlogService {
 
     try {
       let query = supabase
-        .from('blog_posts')
+        .from('posts_do_blog')
         .select('*')
         // .eq('published', true)
         .order('published_at', { ascending: false });
@@ -60,10 +60,10 @@ export class BlogService {
 
     try {
       const { data, error } = await supabase
-        .from('blog_posts')
+        .from('posts_do_blog')
         .select('*')
         .eq('slug', slug)
-       // .eq(\'published\', true)        .single();
+      // .eq(\'published\', true)        .single();
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -92,9 +92,9 @@ export class BlogService {
 
     try {
       const { data, error } = await supabase
-        .from('blog_posts')
+        .from('posts_do_blog')
         .select('category')
-        // .eq('published', true);
+      // .eq('published', true);
 
       if (error) {
         throw error;
@@ -134,7 +134,7 @@ export class BlogService {
 
     try {
       const { data, error } = await supabase
-        .from('blog_posts')
+        .from('posts_do_blog')
         .select('*')
         // .eq('published', true)
         .eq('category', category)
@@ -159,7 +159,7 @@ export class BlogService {
   static async searchPosts(searchTerm: string): Promise<BlogPost[]> {
     if (!supabase) {
       const mockPosts = this.getMockPosts();
-      return mockPosts.filter(post => 
+      return mockPosts.filter(post =>
         post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         post.content.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -167,7 +167,7 @@ export class BlogService {
 
     try {
       const { data, error } = await supabase
-        .from('blog_posts')
+        .from('posts_do_blog')
         .select('*')
         // .eq('published', true)
         .or(`title.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%`)

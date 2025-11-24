@@ -14,6 +14,7 @@ export default defineConfig({
     port: 4173,
     strictPort: true
   },
+  publicDir: 'public',
   build: {
     outDir: 'dist',
     sourcemap: false,

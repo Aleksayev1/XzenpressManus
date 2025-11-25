@@ -1,161 +1,41 @@
--- INSERIR POST SOBRE PREVENÇÃO E SAÚDE MENTAL NO BLOG
+-- ============================================
+-- SCRIPT PARA CRIAR TABELA E INSERIR POST
+-- Execute isso no SQL Editor do Supabase
+-- ============================================
 
-INSERT INTO blog_posts (
-  title,
-  slug,
-  content,
-  excerpt,
-  author,
-  author_email,
-  category,
-  tags,
-  published,
-  published_at,
-  reading_time
-) VALUES (
-  'Cuidando da Saúde Mental: Prevenção e Apoio em Momentos Difíceis',
-  'prevencao-saude-mental-apoio',
-  '# Cuidando da Saúde Mental: Prevenção e Apoio em Momentos Difíceis
-
-## 🌟 Introdução
-
-A saúde mental é um pilar fundamental do bem-estar integral. Em momentos de dificuldade emocional intensa, é essencial saber que **você não está sozinho** e que **existem recursos e pessoas dispostas a ajudar**.
-
-## 💚 A Importância de Buscar Ajuda
-
-Buscar ajuda é um sinal de força, não de fraqueza. Falar sobre nossos sentimentos e dificuldades é o primeiro passo para encontrar alívio e soluções.
-
-### Quando Procurar Apoio Profissional:
-
-- Sentimentos persistentes de tristeza, desesperança ou vazio
-- Perda de interesse em atividades que antes traziam prazer
-- Mudanças significativas no sono ou apetite
-- Dificuldade em executar tarefas do dia a dia
-- Pensamentos recorrentes sobre morte ou autolesão
-- Isolamento social prolongado
-
-## 🆘 Recursos de Apoio Imediato
-
-### Centro de Valorização da Vida (CVV)
-- **Telefone:** 188 (ligação gratuita, 24 horas, todos os dias)
-- **Chat Online:** www.cvv.org.br
-- **E-mail:** Atendimento por e-mail disponível no site
-- **Presencial:** Postos de atendimento em várias cidades
-
-### CAPS - Centros de Atenção Psicossocial
-- Atendimento gratuito pelo SUS
-- Equipes multidisciplinares especializadas
-- Disponível em todo o Brasil
-
-### Outros Recursos:
-- **SAMU (Emergências):** 192
-- **UBS - Unidades Básicas de Saúde:** Atendimento psicológico gratuito
-- **Psicólogos online:** Plataformas de terapia à distância
-
-## 🧘 Práticas de Autocuidado e Bem-Estar
-
-### 1. Técnicas de Respiração
-
-A respiração consciente pode ajudar a acalmar a mente e reduzir a ansiedade:
-
-**Respiração 4-7-8:**
-- Inspire pelo nariz contando até 4
-- Segure a respiração contando até 7
-- Expire pela boca contando até 8
-- Repita 4 vezes
-
-### 2. Acupressão para Alívio Emocional
-
-Alguns pontos de acupressão podem auxiliar no equilíbrio emocional:
-
-**Ponto Shenmen (Coração 7):**
-- Localização: Dobra do pulso, lado do dedo mínimo
-- Benefícios: Acalma a mente, reduz ansiedade
-- Como usar: Pressione suavemente por 1-2 minutos
-
-**Ponto Yintang (Terceiro Olho):**
-- Localização: Entre as sobrancelhas
-- Benefícios: Promove calma mental
-- Como usar: Massageie em movimentos circulares
-
-### 3. Conexão com a Natureza
-
-- Caminhe em áreas verdes
-- Observe o céu e as nuvens
-- Cuide de plantas
-- Sinta o sol na pele (com proteção adequada)
-
-### 4. Cromoterapia
-
-**Verde:** Cor do equilíbrio e harmonia  
-**Azul:** Promove calma e tranquilidade  
-**Violeta:** Conexão espiritual e transformação
-
-## 🤝 Como Apoiar Alguém em Dificuldade
-
-### O que fazer:
-- ✅ Ouça sem julgamentos
-- ✅ Demonstre empatia e compreensão
-- ✅ Pergunte: "Como posso ajudar?"
-- ✅ Sugira buscar ajuda profissional
-- ✅ Mantenha contato regular
-- ✅ Leve a situação a sério
-
-### O que evitar:
-- ❌ Minimizar os sentimentos ("não é para tanto")
-- ❌ Oferecer soluções simplistas
-- ❌ Julgar ou criticar
-- ❌ Prometer segredo se houver risco iminente
-- ❌ Deixar a pessoa sozinha em crise
-
-## 🌈 Mensagem de Esperança
-
-Momentos difíceis são temporários, mesmo quando parecem intermináveis. A dor que você sente hoje pode diminuir com o apoio adequado e o tempo.
-
-**Lembre-se:**
-- Você é importante e sua vida tem valor
-- Suas emoções são válidas, mas não definem quem você é
-- Mudanças positivas são possíveis
-- Há pessoas e recursos disponíveis para ajudar
-- Amanhã pode ser diferente
-
-## 📚 Recursos Adicionais
-
-### Livros Recomendados:
-- "Pequeno Manual Antidepressão" - Ana Beatriz Barbosa Silva
-- "O Demônio do Meio-Dia" - Andrew Solomon
-- "Ansiedade: Como Enfrentar o Mal do Século" - Augusto Cury
-
-### Aplicativos Úteis:
-- **Vittude:** Terapia online acessível
-- **Zen:** Meditação guiada em português
-- **Headspace:** Mindfulness e bem-estar mental
-
-### Sites e Organizações:
-- **CVV (Centro de Valorização da Vida):** www.cvv.org.br
-- **ABRATA (Associação Brasileira de Familiares):** www.abrata.org.br
-- **Mapa da Saúde Mental:** www.mapadasaudemental.com.br
-
-## 💙 Conclusão
-
-Cuidar da saúde mental é um ato de amor próprio e coragem. Se você está passando por um momento difícil, saiba que buscar ajuda é o caminho para dias melhores. Você merece viver uma vida plena e feliz.
-
-**Não hesite em pedir ajuda. Sua vida importa.**
-
----
-
-### 🆘 Emergência?
-**Ligue agora: CVV 188 (gratuito, 24h)**
-
----
-
-*Este conteúdo tem caráter informativo e não substitui acompanhamento profissional. Em caso de crise, procure ajuda imediata.*',
-  'A saúde mental é tão importante quanto a saúde física. Conheça recursos, técnicas e apoio disponível para momentos de dificuldade emocional.',
-  'XZenPress Team',
-  'contato@xzenpress.com',
-  'bem-estar-corporativo',
-  ARRAY['saúde mental', 'prevenção', 'apoio emocional', 'CVV', 'autocuidado', 'bem-estar'],
-  true,
-  NOW(),
-  8
+-- 1. Criar tabela de posts (se não existir)
+CREATE TABLE IF NOT EXISTS blog_posts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  excerpt TEXT,
+  content TEXT NOT NULL,
+  category TEXT DEFAULT 'Bem-estar',
+  published_at TIMESTAMP DEFAULT NOW(),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
 );
+
+-- 2. Habilitar RLS (Row Level Security)
+ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
+
+-- 3. Permitir leitura pública (drop se existir e recria)
+DROP POLICY IF EXISTS "Permitir leitura pública de posts" ON blog_posts;
+CREATE POLICY "Permitir leitura pública de posts"
+  ON blog_posts FOR SELECT
+  TO public
+  USING (true);
+
+-- 4. Inserir o post "Vida Após a Morte"
+INSERT INTO blog_posts (title, slug, excerpt, content, category)
+VALUES (
+  'Vida Após a Morte: Argumentos Científicos Contra o Suicídio',
+  'vida-apos-morte-argumentos-cientificos',
+  'Descubra por que a ciência e a probabilidade mostram que sua vida é preciosa demais para ser interrompida. Com base em neuroplasticidade, estudos de reencarnação e o mistério da consciência. 🆘 Em crise? Ligue 188 (CVV)',
+  E'# Vida Após a Morte: Argumentos Científicos Contra o Suicídio\n\n> **🆘 Se você está em crise, ligue AGORA: 188 (CVV - Gratuito, 24h)**  \n> Ou acesse: [cvv.org.br](https://www.cvv.org.br)\n\n---\n\n## Há muito tempo, numa galáxia não tão distante assim...\n\nA Terra, um planeta repleto de mistérios e maravilhas, onde a vida floresce em meio a probabilidades astronômicas. No entanto, uma sombra escura paira sobre a humanidade: **o suicídio**, uma escolha trágica que interrompe futuros e silencia vozes únicas.\n\nMas, será que essa é realmente a única saída?\n\n**A ciência e a probabilidade nos mostram que NÃO.**\n\n---\n\n## 🧬 A Improbabilidade Estatística da Sua Existência\n\nImagine a vastidão do universo, um oceano infinito de possibilidades onde cada evento é uma onda singular. **Você é o resultado de uma sequência de eventos tão improvável que desafia a compreensão.**\n\nDesde o Big Bang, passando pela formação da Terra, a evolução da vida, até o encontro exato de seus pais naquele momento específico - a chance de você existir é de aproximadamente:\n\n### **1 em 400 TRILHÕES**\n\nCada ancestral seu teve que sobreviver, encontrar um parceiro, e conceber no momento exato. Uma única mudança em qualquer ponto dessa cadeia de 3,8 bilhões de anos, e você não estaria aqui.\n\n**Interromper essa existência única seria como apagar uma estrela rara em um cosmos de infinitas possibilidades - um "milagre estatístico" que jamais se repetirá.**\n\n---\n\n## 🧠 A Neuroplasticidade: Seu Cérebro Pode Se Reinventar\n\nA neurociência moderna nos trouxe uma das descobertas mais esperançosas da medicina: **o cérebro humano não é fixo**.\n\nEle é uma galáxia em constante transformação, capaz de:\n\n- 🔄 **Reorganizar conexões neurais** durante toda a vida\n- 💪 **Criar novos caminhos** que contornam áreas danificadas\n- ✨ **Formar novas sinapses** até na terceira idade\n\n**O que isso significa para você?**\n\nEstados depressivos, pensamentos suicidas e desesperança **não são sentenças permanentes**. São configurações neurais temporárias que podem ser literalmente "recabeadas" através de:\n\n- Terapia (TCC, EMDR, Terapia Dialética Comportamental)\n- Medicação adequada\n- Práticas de mindfulness e meditação\n- Exercício físico regular\n- Conexões sociais significativas\n\n**Estudos comprovam:** Pessoas que sobreviveram a tentativas de suicídio, em sua grande maioria (mais de 90%), relatam que se sentem gratas por estarem vivas anos depois. O sofrimento que parecia eterno era, de fato, temporário.\n\n---\n\n## 🔬 O Paradoxo do Conhecimento Futuro\n\nA ciência é uma jornada constante. O que hoje parece sem solução pode ter a resposta descoberta amanhã.\n\n**Exemplos reais:**\n\n- **Depressão resistente:** Em 2019, a FDA aprovou a cetamina nasal para depressão grave - algo impensável 10 anos antes\n- **Estimulação magnética transcraniana (EMT):** Terapia não-invasiva que mostrou resultados promissores onde medicamentos falharam\n- **Psiquiatria personalizada:** Testes genéticos agora podem prever qual antidepressivo funcionará melhor para você\n- **Psicodélicos assistidos:** Pesquisas com psilocibina e MDMA mostram taxas de remissão de 60-80% em depressão resistente\n\n**Desistir agora é como queimar uma biblioteca antes de ler todos os livros** - você nunca saberá quais capítulos de cura e esperança estavam por vir.\n\nTratamentos que podem salvar sua vida podem estar sendo desenvolvidos NESTE EXATO MOMENTO em algum laboratório.\n\n---\n\n## ♻️ As Evidências Estatísticas de Reencarnação\n\nEsta seção pode parecer controversa, mas os dados científicos são surpreendentes.\n\nO Dr. Ian Stevenson, psiquiatra da Universidade da Virgínia, dedicou 40 anos de sua carreira documentando mais de **3.000 casos** de crianças que relatavam memórias de vidas passadas.\n\n**Os resultados são estatisticamente impressionantes:**\n\n- ✅ **90% de precisão** em detalhes verificáveis sobre pessoas falecidas\n- ✅ Informações que as crianças **não teriam como conhecer** (nomes, lugares, eventos específicos)\n- ✅ Probabilidade de acerto por puro acaso: **menos de 1 em 1 milhão**\n\n**Casos documentados incluem:**\n- Crianças que descreveram com precisão casas onde "viveram" (nunca visitadas)\n- Detalhes de como "morreram" (confirmados por autópsias antigas)\n- Reconhecimento de familiares "da vida passada"\n- Até marcas de nascença correspondendo a ferimentos fatais\n\n**E se isso for real?**\n\nSe a reencarnação existir, o suicídio pode não resolver seus problemas - apenas **transferi-los para uma próxima existência**, desperdiçando a oportunidade única de evolução que esta vida específica oferece.\n\nVocê estaria perdendo a chance de completar um ciclo evolutivo que levou eras para se formar.\n\n---\n\n## 🌌 O Enigma Insondável da Consciência\n\nA consciência humana é, possivelmente, **o maior mistério do universo**.\n\nCientistas, filósofos e neurocientistas ainda não conseguem explicar:\n- Por que temos experiências subjetivas?\n- Como neurônios geram sentimentos?\n- Por que somos "alguém" e não apenas máquinas biológicas?\n\n**Experiências de Quase Morte (EQM):**\n\nEstudos com mais de 2.000 casos documentaram fenômenos inexplicáveis:\n- 🔍 Pacientes clinicamente mortos relatando detalhes precisos de procedimentos médicos\n- 👁️ Relatos de visão "de cima" durante paradas cardíacas (confirmados por médicos)\n- 🕰️ Percepção de tempo expandida durante momentos de morte clínica\n\n**Documentário na Netflix:** "Sobreviver à Morte" (Surviving Death) - 6 episódios explorando evidências científicas\n\nSe existe algo além da morte física - e as evidências sugerem que pode haver - **interromper artificialmente este ciclo pode significar perder oportunidades que só esta existência pode oferecer.**\n\n---\n\n## 📊 A Matemática das Infinitas Possibilidades\n\nPense nisso:\n\n- 📅 Você viverá aproximadamente **30.000 dias** (se viver até os 82 anos)\n- ⏰ Cada dia tem **86.400 segundos**\n- 🎲 Em cada segundo, milhões de variáveis interagem\n\n**A probabilidade de eventos extraordinários aumenta exponencialmente com o tempo.**\n\n### Histórias Reais de Viradas Impossíveis:\n\n**J.K. Rowling** - Aos 25 anos: mãe solteira, desempregada, com depressão clínica, considerando suicídio. Aos 35 anos: autora da saga mais vendida da história.\n\n**Abraham Lincoln** - Perdeu 8 eleições, faliu 2 vezes, teve colapso nervoso. Tornou-se um dos maiores presidentes dos EUA.\n\n**Stephen Hawking** - Aos 21 anos recebeu diagnóstico terminal (2 anos de vida). Viveu 55 anos a mais e revolucionou a física.\n\n**Você não sabe quais capítulos incríveis sua história ainda reserva** - mas só poderá lê-los se continuar aqui.\n\n---\n\n## 💔 A Realidade do Suicídio: Dados que Importam\n\n### No Mundo:\n- 🌍 Mais de **700.000 pessoas** morrem por suicídio por ano (OMS, 2023)\n- 👥 Para cada suicídio, 135 pessoas são profundamente afetadas\n- 🏥 É a **4ª causa de morte** entre jovens de 15-29 anos\n\n### No Brasil:\n- 📈 Casos aumentaram **43% em uma década**\n- ⏰ 1 suicídio a cada **46 minutos**\n- 🤯 90% dos casos estavam relacionados a transtornos mentais **tratáveis**\n\n**A palavra-chave é: TRATÁVEIS.**\n\n---\n\n## 🆘 VOCÊ NÃO ESTÁ SOZINHO - AJUDA ESTÁ DISPONÍVEL\n\n### CVV - Centro de Valorização da Vida\n- 📞 **Telefone: 188** (Gratuito, 24h, todo o Brasil)\n- 💬 **Chat:** [cvv.org.br](https://www.cvv.org.br)\n- 📧 **E-mail:** Disponível no site\n- Atendimento sigiloso, anônimo e voluntário\n\n### Outros Recursos:\n- **Caps (Centro de Atenção Psicossocial):** Atendimento gratuito pelo SUS\n- **UBS (Unidade Básica de Saúde):** Encaminhamento para psicólogo/psiquiatra\n- **Emergência:** SAMU 192 ou Bombeiros 193\n\n### Se você é familiar ou amigo:\n- ✅ Ouça sem julgar\n- ✅ Leve a sério qualquer menção a suicídio\n- ✅ Não deixe a pessoa sozinha\n- ✅ Retire meios letais do ambiente\n- ✅ Busque ajuda profissional imediatamente\n\n---\n\n## 💙 Mensagem Final\n\n**Sua vida não é apenas sua.** Você é parte de uma teia cósmica de conexões - passadas, presentes e futuras.\n\nVocê é o resultado de bilhões de anos de evolução, sobrevivência e amor.\n\n**O sofrimento que você sente agora é REAL** - eu não estou minimizando. Mas também é **temporário e tratável**, mesmo que não pareça agora.\n\nCérebros podem se curar. Terapias funcionam. Medicamentos evoluem. Futuros mudam.\n\n**Estatisticamente, milagres acontecem.** Mas você precisa estar vivo para testemunhá-los.\n\n---\n\n> ✨ **"Que a Força esteja com você... sempre."** ✨\n\n---\n\n## 📚 Referências Científicas\n\n1. [OMS - Prevenção do Suicídio](https://www.who.int/news-room/fact-sheets/detail/suicide)\n2. [Ministério da Saúde - Dados Brasil](https://www.gov.br/saude/pt-br/assuntos/noticias/2022/setembro/anualmente-mais-de-700-mil-pessoas-cometem-suicidio-segundo-oms)\n3. [Universidade da Virgínia - Estudos de Reencarnação](https://med.virginia.edu/perceptual-studies/)\n4. [Dr. Ian Stevenson - Biografia](https://www.oespiritoresponde.com.br/biografias/ian-stevenson/)\n5. [Netflix - Sobreviver à Morte](https://www.netflix.com/title/80998853)\n\n---\n\n**Compartilhe este texto com alguém que precisa ler. Você pode salvar uma vida hoje.** 💚\n\n---\n\n*Este conteúdo é educativo e baseado em evidências científicas. Não substitui ajuda profissional. Se você está em risco imediato, procure emergência médica ou ligue 188.*',
+  'Saúde Mental'
+)
+ON CONFLICT (slug) DO UPDATE
+SET 
+  content = EXCLUDED.content,
+  updated_at = NOW();

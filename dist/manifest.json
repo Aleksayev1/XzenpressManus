@@ -1,0 +1,111 @@
+{
+  "name": "XZenPress - Plataforma de Bem-Estar Integrativa",
+  "short_name": "XZenPress",
+  "description": "Plataforma de bem-estar integrativa com acupressão MTC, Craniopuntura, respiração 4-7-8 e cromoterapia",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#059669",
+  "background_color": "#ffffff",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "id": "com.xzenpress.app",
+  "categories": ["health", "medical", "wellness", "lifestyle"],
+  "icons": [
+    {
+      "src": "/Logo Xzenpress oficial.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Logo Xzenpress oficial.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/Logo Xzenpress oficial.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Logo Xzenpress oficial.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/Logo Xzenpress oficial.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "XZenPress - Tela Principal"
+    },
+    {
+      "src": "/Logo Xzenpress oficial.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "XZenPress - Mobile"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Respiração 4-7-8",
+      "short_name": "Respiração",
+      "description": "Exercício de respiração com cromoterapia",
+      "url": "/breathing",
+      "icons": [
+        {
+          "src": "/Logo Xzenpress oficial.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Pontos de Acupressão",
+      "short_name": "Acupressão",
+      "description": "Mapa de pontos terapêuticos MTC",
+      "url": "/acupressure",
+      "icons": [
+        {
+          "src": "/Logo Xzenpress oficial.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Área Premium",
+      "short_name": "Premium",
+      "description": "Recursos exclusivos e consultas",
+      "url": "/premium",
+      "icons": [
+        {
+          "src": "/Logo Xzenpress oficial.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://xzenpress.com/manifest.json"
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

@@ -83,7 +83,7 @@ self.addEventListener('fetch', event => {
         if (cachedResponse) {
           return cachedResponse;
         }
-        
+
         try {
           const networkResponse = await fetch(request);
           if (networkResponse.ok) {
@@ -127,8 +127,10 @@ self.addEventListener('fetch', event => {
       const cachedResponse = await caches.match(request);
       const fetchPromise = fetch(request).then(networkResponse => {
         if (networkResponse.ok) {
-          const cache = caches.open(DYNAMIC_CACHE);
-          cache.then(c => c.put(request, networkResponse.clone()));
+          const responseToCache = networkResponse.clone();
+          caches.open(DYNAMIC_CACHE).then(cache => {
+            cache.put(request, responseToCache);
+          });
         }
         return networkResponse;
       }).catch(() => cachedResponse);
@@ -141,11 +143,11 @@ self.addEventListener('fetch', event => {
 // Background sync for offline functionality
 self.addEventListener('sync', event => {
   console.log('XZenPress SW: Background sync triggered:', event.tag);
-  
+
   if (event.tag === 'xzenpress-sync') {
     event.waitUntil(syncUserData());
   }
-  
+
   if (event.tag === 'xzenpress-breathing-session') {
     event.waitUntil(syncBreathingSession());
   }
@@ -186,7 +188,7 @@ async function syncBreathingSession() {
 // Push notification handling
 self.addEventListener('push', event => {
   console.log('XZenPress SW: Push notification received');
-  
+
   let notificationData = {
     title: 'XZenPress',
     body: 'Nova técnica de bem-estar disponível!',
@@ -224,7 +226,7 @@ self.addEventListener('push', event => {
 // Notification click handling
 self.addEventListener('notificationclick', event => {
   console.log('XZenPress SW: Notification clicked:', event.action);
-  
+
   event.notification.close();
 
   if (event.action === 'open' || !event.action) {
@@ -248,11 +250,11 @@ self.addEventListener('notificationclick', event => {
 // Message handling from main app
 self.addEventListener('message', event => {
   console.log('XZenPress SW: Message received:', event.data);
-  
+
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
-  
+
   if (event.data && event.data.type === 'CACHE_BREATHING_SESSION') {
     // Cache breathing session data for offline use
     caches.open(DYNAMIC_CACHE).then(cache => {

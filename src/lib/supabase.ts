@@ -6,16 +6,21 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 // Create client - ready for production
 const isSupabaseConfigured = supabaseUrl && supabaseAnonKey
 
-export const supabase = (supabaseUrl && supabaseAnonKey) 
+export const supabase = (supabaseUrl && supabaseAnonKey)
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null
 
 // Log configuration status
 if (typeof window !== 'undefined') {
+  console.log('🔍 DEBUG - Variáveis de ambiente:')
+  console.log('VITE_SUPABASE_URL:', supabaseUrl ? '✅ Definida' : '❌ Undefined')
+  console.log('VITE_SUPABASE_ANON_KEY:', supabaseAnonKey ? '✅ Definida' : '❌ Undefined')
+
   if (supabaseUrl && supabaseAnonKey) {
     console.log('✅ Supabase configurado e ativo:', supabaseUrl.substring(0, 30) + '...')
   } else {
     console.log('⚠️ Supabase não configurado - usando modo local')
+    console.log('URL completa esperada:', 'https://dqjcbwjqremubdzllcy.supabase.co')
   }
 }
 
@@ -39,10 +44,10 @@ export const submitCorporateLead = async (leadData: CorporateLeadData) => {
   if (!supabase) {
     console.warn('Supabase not configured. Lead data:', leadData)
     // Simulate success for development
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: { id: 'mock-' + Date.now() },
-      message: 'Supabase não configurado - dados simulados para desenvolvimento' 
+      message: 'Supabase não configurado - dados simulados para desenvolvimento'
     }
   }
 

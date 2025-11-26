@@ -44,7 +44,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
               Monitore seu progresso com analytics detalhados, metas personalizadas e insights baseados em IA
             </p>
-            
+
             {/* Premium Features Preview */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
@@ -59,7 +59,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                   <li>• Comparativo de períodos</li>
                 </ul>
               </div>
-              
+
               <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
                 <div className="flex items-center space-x-3 mb-3">
                   <Target className="w-6 h-6 text-blue-600" />
@@ -72,7 +72,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                   <li>• Recomendações de melhoria</li>
                 </ul>
               </div>
-              
+
               <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
                 <div className="flex items-center space-x-3 mb-3">
                   <Award className="w-6 h-6 text-purple-600" />
@@ -85,7 +85,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                   <li>• Certificados de conquistas</li>
                 </ul>
               </div>
-              
+
               <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-xl p-6 border border-indigo-200">
                 <div className="flex items-center space-x-3 mb-3">
                   <Brain className="w-6 h-6 text-indigo-600" />
@@ -99,22 +99,22 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                 </ul>
               </div>
             </div>
-            
+
             <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-xl p-6 mb-8 border border-green-300">
               <h3 className="font-semibold text-green-800 mb-2">📊 Acompanhamento Científico</h3>
               <p className="text-green-700 text-sm">
-                Transforme sua prática em dados científicos. Monitore tendências, 
+                Transforme sua prática em dados científicos. Monitore tendências,
                 identifique o que funciona melhor e otimize seus resultados de bem-estar.
               </p>
             </div>
-            
+
             <button
               onClick={() => onPageChange('premium')}
               className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-green-600 hover:to-blue-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >
               📈 Ativar Acompanhamento Premium
             </button>
-            
+
             <p className="text-sm text-gray-500 mt-4">
               Analytics profissionais • Dados seguros • Insights únicos
             </p>
@@ -176,50 +176,50 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
     } else {
       // Metas padrão quando não há dados
       const defaultGoals: Goal[] = [
-      {
-        id: 'daily-breathing',
-        title: 'Respiração Diária',
-        description: 'Praticar respiração 4-7-8 todos os dias',
-        target: 1,
-        current: 0,
-        unit: 'sessão/dia',
-        category: 'daily',
-        icon: <Brain className="w-5 h-5" />,
-        color: 'blue'
-      },
-      {
-        id: 'weekly-acupressure',
-        title: 'Acupressão Semanal',
-        description: 'Aplicar pontos de acupressão regularmente',
-        target: 7,
-        current: 0,
-        unit: 'sessões/semana',
-        category: 'weekly',
-        icon: <Target className="w-5 h-5" />,
-        color: 'green'
-      },
-      {
-        id: 'total-time',
-        title: 'Tempo de Prática',
-        description: 'Meta de tempo semanal de prática',
-        target: 1800,
-        current: 0,
-        unit: 'segundos/semana',
-        category: 'weekly',
-        icon: <Heart className="w-5 h-5" />,
-        color: 'purple'
-      },
-      {
-        id: 'effectiveness',
-        title: 'Efetividade',
-        description: 'Manter avaliação média acima de 4.0',
-        target: 4.0,
-        current: 0,
-        unit: 'pontos',
-        category: 'daily',
-        icon: <Zap className="w-5 h-5" />,
-        color: 'indigo'
-      }
+        {
+          id: 'daily-breathing',
+          title: 'Respiração Diária',
+          description: 'Praticar respiração 4-7-8 todos os dias',
+          target: 1,
+          current: 0,
+          unit: 'sessão/dia',
+          category: 'daily',
+          icon: <Brain className="w-5 h-5" />,
+          color: 'blue'
+        },
+        {
+          id: 'weekly-acupressure',
+          title: 'Acupressão Semanal',
+          description: 'Aplicar pontos de acupressão regularmente',
+          target: 7,
+          current: 0,
+          unit: 'sessões/semana',
+          category: 'weekly',
+          icon: <Target className="w-5 h-5" />,
+          color: 'green'
+        },
+        {
+          id: 'total-time',
+          title: 'Tempo de Prática',
+          description: 'Meta de tempo semanal de prática',
+          target: 1800,
+          current: 0,
+          unit: 'segundos/semana',
+          category: 'weekly',
+          icon: <Heart className="w-5 h-5" />,
+          color: 'purple'
+        },
+        {
+          id: 'effectiveness',
+          title: 'Efetividade',
+          description: 'Manter avaliação média acima de 4.0',
+          target: 4.0,
+          current: 0,
+          unit: 'pontos',
+          category: 'daily',
+          icon: <Zap className="w-5 h-5" />,
+          color: 'indigo'
+        }
       ];
       setGoals(defaultGoals);
     }
@@ -274,7 +274,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Acompanhamento de Progresso</h1>
-              <p className="text-gray-600 mt-2">Monitore sua evolução no bem-estar holístico</p>
+              <p className="text-gray-600 mt-2">Monitore sua evolução no bem-estar integrativo</p>
             </div>
             <div className="flex items-center space-x-4">
               <select
@@ -300,17 +300,17 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
               </div>
             </div>
           )}
-          
+
           {error && (
             <div className="col-span-full bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-red-700">Erro ao carregar dados: {error}</p>
             </div>
           )}
-          
+
           {goals.map((goal) => {
             const percentage = getProgressPercentage(goal);
             const colorClasses = getColorClasses(goal.color).split(' ');
-            
+
             return (
               <div key={goal.id} className={`bg-white rounded-2xl p-6 shadow-lg border ${colorClasses[3]}`}>
                 <div className="flex items-center justify-between mb-4">
@@ -321,23 +321,23 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                     {goal.category}
                   </div>
                 </div>
-                
+
                 <h3 className="font-bold text-gray-800 mb-2">{goal.title}</h3>
                 <p className="text-sm text-gray-600 mb-4">{goal.description}</p>
-                
+
                 <div className="mb-3">
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-gray-600">Progresso</span>
                     <span className="font-semibold">{goal.current}/{goal.target} {goal.unit}</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className={`${colorClasses[0]} h-2 rounded-full transition-all duration-500`}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
                 </div>
-                
+
                 <div className="text-center">
                   <span className={`text-lg font-bold ${colorClasses[1]}`}>
                     {Math.round(percentage)}%
@@ -352,27 +352,26 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
           {/* Progress Chart */}
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-6">Histórico de Sessões</h2>
-            
+
             {sessions.length > 0 ? (
               <div className="space-y-4">
                 {sessions.slice(0, 10).map((session, index) => (
                   <div key={session.id || index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className={`w-3 h-3 rounded-full ${
-                        session.sessionType === 'breathing' ? 'bg-blue-500' :
-                        session.sessionType === 'acupressure' ? 'bg-green-500' :
-                        session.sessionType === 'integrated' ? 'bg-purple-500' :
-                        'bg-gray-500'
-                      }`}></div>
+                      <div className={`w-3 h-3 rounded-full ${session.sessionType === 'breathing' ? 'bg-blue-500' :
+                          session.sessionType === 'acupressure' ? 'bg-green-500' :
+                            session.sessionType === 'integrated' ? 'bg-purple-500' :
+                              'bg-gray-500'
+                        }`}></div>
                       <div>
                         <div className="font-medium text-gray-800 text-sm">
                           {session.sessionType === 'breathing' ? 'Respiração 4-7-8' :
-                           session.sessionType === 'acupressure' ? 'Acupressão' :
-                           session.sessionType === 'integrated' ? 'Terapia Integrada' :
-                           'Cromoterapia'}
+                            session.sessionType === 'acupressure' ? 'Acupressão' :
+                              session.sessionType === 'integrated' ? 'Terapia Integrada' :
+                                'Cromoterapia'}
                         </div>
                         <div className="text-xs text-gray-600">
-                          {new Date(session.completedAt || session.createdAt || '').toLocaleDateString('pt-BR')} • 
+                          {new Date(session.completedAt || session.createdAt || '').toLocaleDateString('pt-BR')} •
                           {Math.floor(session.durationSeconds / 60)}min {session.durationSeconds % 60}s
                         </div>
                         {session.pointsUsed && session.pointsUsed.length > 0 && (
@@ -391,9 +390,8 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                           {[...Array(5)].map((_, i) => (
                             <div
                               key={i}
-                              className={`w-2 h-2 rounded-full ${
-                                i < Math.floor(session.effectivenessRating || 0) ? 'bg-yellow-400' : 'bg-gray-200'
-                              }`}
+                              className={`w-2 h-2 rounded-full ${i < Math.floor(session.effectivenessRating || 0) ? 'bg-yellow-400' : 'bg-gray-200'
+                                }`}
                             />
                           ))}
                         </div>
@@ -432,7 +430,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                     </div>
                     <span className="text-blue-600 font-bold">{stats.totalSessions}</span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <TrendingUp className="w-5 h-5 text-green-600" />
@@ -442,7 +440,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                       {Math.floor(stats.totalTime / 60)}min
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <Target className="w-5 h-5 text-purple-600" />
@@ -452,7 +450,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                       {getFavoritePointName(stats.favoritePoint)}
                     </span>
                   </div>
-                  
+
                   {stats.averageEffectiveness > 0 && (
                     <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
                       <div className="flex items-center space-x-3">
@@ -476,105 +474,105 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
             {/* Achievements */}
             {stats && stats.totalSessions > 0 && (
               <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-200">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <Award className="w-5 h-5 text-yellow-600 mr-2" />
-                Conquistas
-              </h3>
-              <div className="space-y-3">
-                {stats.totalSessions >= 1 && (
-                  <div className="flex items-center space-x-3 p-3 bg-white rounded-lg">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <span className="text-green-600 text-lg">🌱</span>
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                  <Award className="w-5 h-5 text-yellow-600 mr-2" />
+                  Conquistas
+                </h3>
+                <div className="space-y-3">
+                  {stats.totalSessions >= 1 && (
+                    <div className="flex items-center space-x-3 p-3 bg-white rounded-lg">
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <span className="text-green-600 text-lg">🌱</span>
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-800">Primeira Sessão</div>
+                        <div className="text-xs text-gray-600">Iniciou sua jornada de bem-estar</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-semibold text-gray-800">Primeira Sessão</div>
-                      <div className="text-xs text-gray-600">Iniciou sua jornada de bem-estar</div>
+                  )}
+
+                  {stats.totalSessions >= 5 && (
+                    <div className="flex items-center space-x-3 p-3 bg-white rounded-lg">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-blue-600 text-lg">🎯</span>
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-800">Praticante Dedicado</div>
+                        <div className="text-xs text-gray-600">Completou 5+ sessões</div>
+                      </div>
                     </div>
-                  </div>
-                )}
-                
-                {stats.totalSessions >= 5 && (
-                  <div className="flex items-center space-x-3 p-3 bg-white rounded-lg">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 text-lg">🎯</span>
+                  )}
+
+                  {stats.streakDays >= 3 && (
+                    <div className="flex items-center space-x-3 p-3 bg-white rounded-lg">
+                      <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                        <span className="text-orange-600 text-lg">🔥</span>
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-800">Sequência de {stats.streakDays} dias</div>
+                        <div className="text-xs text-gray-600">Consistência impressionante!</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-semibold text-gray-800">Praticante Dedicado</div>
-                      <div className="text-xs text-gray-600">Completou 5+ sessões</div>
+                  )}
+
+                  {stats.totalSessions >= 10 && (
+                    <div className="flex items-center space-x-3 p-3 bg-white rounded-lg">
+                      <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <span className="text-yellow-600 text-lg">🏆</span>
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-800">Mestre do Bem-estar</div>
+                        <div className="text-xs text-gray-600">Completou 10+ sessões</div>
+                      </div>
                     </div>
-                  </div>
-                )}
-                
-                {stats.streakDays >= 3 && (
-                  <div className="flex items-center space-x-3 p-3 bg-white rounded-lg">
-                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                      <span className="text-orange-600 text-lg">🔥</span>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-800">Sequência de {stats.streakDays} dias</div>
-                      <div className="text-xs text-gray-600">Consistência impressionante!</div>
-                    </div>
-                  </div>
-                )}
-                
-                {stats.totalSessions >= 10 && (
-                  <div className="flex items-center space-x-3 p-3 bg-white rounded-lg">
-                    <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                      <span className="text-yellow-600 text-lg">🏆</span>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-800">Mestre do Bem-estar</div>
-                      <div className="text-xs text-gray-600">Completou 10+ sessões</div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
               </div>
             )}
 
             {/* Next Recommendations */}
             {stats && (
               <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-200">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <Brain className="w-5 h-5 text-purple-600 mr-2" />
-                Recomendações Baseadas no seu Progresso
-              </h3>
-              <div className="space-y-3">
-                {stats.totalSessions === 0 && (
-                  <div className="bg-white rounded-lg p-3">
-                    <div className="font-semibold text-sm text-gray-800">🌟 Comece Agora</div>
-                    <div className="text-xs text-gray-600">Faça sua primeira sessão de respiração 4-7-8</div>
-                  </div>
-                )}
-                
-                {stats.totalSessions > 0 && stats.totalSessions < 5 && (
-                  <div className="bg-white rounded-lg p-3">
-                    <div className="font-semibold text-sm text-gray-800">🎯 Continue Praticando</div>
-                    <div className="text-xs text-gray-600">Tente fazer pelo menos 1 sessão por dia</div>
-                  </div>
-                )}
-                
-                {stats.sessionsByType['breathing'] > 0 && !stats.sessionsByType['acupressure'] && (
-                  <div className="bg-white rounded-lg p-3">
-                    <div className="font-semibold text-sm text-gray-800">🫴 Explore Acupressão</div>
-                    <div className="text-xs text-gray-600">Experimente o ponto Yintang para potencializar os resultados</div>
-                  </div>
-                )}
-                
-                {stats.averageEffectiveness > 0 && stats.averageEffectiveness < 4.0 && (
-                  <div className="bg-white rounded-lg p-3">
-                    <div className="font-semibold text-sm text-gray-800">📈 Melhore a Efetividade</div>
-                    <div className="text-xs text-gray-600">Tente sessões mais longas ou combine técnicas</div>
-                  </div>
-                )}
-                
-                {stats.streakDays >= 3 && (
-                  <div className="bg-white rounded-lg p-3">
-                    <div className="font-semibold text-sm text-gray-800">🔥 Excelente Consistência!</div>
-                    <div className="text-xs text-gray-600">Você está no caminho certo, continue assim!</div>
-                  </div>
-                )}
-              </div>
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                  <Brain className="w-5 h-5 text-purple-600 mr-2" />
+                  Recomendações Baseadas no seu Progresso
+                </h3>
+                <div className="space-y-3">
+                  {stats.totalSessions === 0 && (
+                    <div className="bg-white rounded-lg p-3">
+                      <div className="font-semibold text-sm text-gray-800">🌟 Comece Agora</div>
+                      <div className="text-xs text-gray-600">Faça sua primeira sessão de respiração 4-7-8</div>
+                    </div>
+                  )}
+
+                  {stats.totalSessions > 0 && stats.totalSessions < 5 && (
+                    <div className="bg-white rounded-lg p-3">
+                      <div className="font-semibold text-sm text-gray-800">🎯 Continue Praticando</div>
+                      <div className="text-xs text-gray-600">Tente fazer pelo menos 1 sessão por dia</div>
+                    </div>
+                  )}
+
+                  {stats.sessionsByType['breathing'] > 0 && !stats.sessionsByType['acupressure'] && (
+                    <div className="bg-white rounded-lg p-3">
+                      <div className="font-semibold text-sm text-gray-800">🫴 Explore Acupressão</div>
+                      <div className="text-xs text-gray-600">Experimente o ponto Yintang para potencializar os resultados</div>
+                    </div>
+                  )}
+
+                  {stats.averageEffectiveness > 0 && stats.averageEffectiveness < 4.0 && (
+                    <div className="bg-white rounded-lg p-3">
+                      <div className="font-semibold text-sm text-gray-800">📈 Melhore a Efetividade</div>
+                      <div className="text-xs text-gray-600">Tente sessões mais longas ou combine técnicas</div>
+                    </div>
+                  )}
+
+                  {stats.streakDays >= 3 && (
+                    <div className="bg-white rounded-lg p-3">
+                      <div className="font-semibold text-sm text-gray-800">🔥 Excelente Consistência!</div>
+                      <div className="text-xs text-gray-600">Você está no caminho certo, continue assim!</div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

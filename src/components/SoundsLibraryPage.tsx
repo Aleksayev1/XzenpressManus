@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Music, Heart, Waves, CloudRain, Wind, Flame, Leaf, Star, Lock, Crown, ExternalLink } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { createSpotifyService } from '../services/spotifyService';
 
 interface SoundsLibraryPageProps {
   onPageChange: (page: string) => void;
@@ -20,7 +21,6 @@ interface Sound {
 
 export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChange }) => {
   const { user } = useAuth();
-  const [spotifyConnected, setSpotifyConnected] = useState(true); // Sempre ativo para links diretos
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentSound, setCurrentSound] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -249,13 +249,12 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
                 disabled={category.premium && !user?.isPremium}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${
-                  selectedCategory === category.id
-                    ? 'bg-purple-500 text-white shadow-lg'
-                    : category.premium && !user?.isPremium
+                className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${selectedCategory === category.id
+                  ? 'bg-purple-500 text-white shadow-lg'
+                  : category.premium && !user?.isPremium
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 <span>{category.icon}</span>
                 <span>{category.name}</span>
@@ -291,15 +290,14 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
               <div className="flex items-center justify-center space-x-4">
                 <button
                   onClick={togglePlayback}
-                  className={`p-3 rounded-full transition-all ${
-                    isPlaying 
-                      ? 'bg-red-500 hover:bg-red-600 text-white' 
-                      : 'bg-purple-500 hover:bg-purple-600 text-white'
-                  }`}
+                  className={`p-3 rounded-full transition-all ${isPlaying
+                    ? 'bg-red-500 hover:bg-red-600 text-white'
+                    : 'bg-purple-500 hover:bg-purple-600 text-white'
+                    }`}
                 >
                   {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
                 </button>
-                
+
                 {currentSoundData.spotifyUrl && (
                   <a
                     href={currentSoundData.spotifyUrl}
@@ -317,7 +315,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
               {currentSoundData.src && duration > 0 && (
                 <div className="space-y-2">
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-purple-500 h-2 rounded-full transition-all"
                       style={{ width: `${(currentTime / duration) * 100}%` }}
                     />
@@ -355,15 +353,13 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
           {filteredSounds.map((sound) => (
             <div
               key={sound.id}
-              className={`bg-white rounded-2xl p-6 shadow-lg transition-all duration-300 border-2 ${
-                currentSound === sound.id
-                  ? 'border-purple-500 shadow-xl'
-                  : 'border-gray-200 hover:border-gray-300'
-              } ${
-                sound.isPremium && !user?.isPremium
+              className={`bg-white rounded-2xl p-6 shadow-lg transition-all duration-300 border-2 ${currentSound === sound.id
+                ? 'border-purple-500 shadow-xl'
+                : 'border-gray-200 hover:border-gray-300'
+                } ${sound.isPremium && !user?.isPremium
                   ? 'opacity-60'
                   : 'hover:shadow-xl cursor-pointer'
-              }`}
+                }`}
               onClick={() => handleSoundSelect(sound)}
             >
               <div className="flex items-center justify-between mb-4">
@@ -389,7 +385,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
 
               <h3 className="text-lg font-bold text-gray-800 mb-2">{sound.name}</h3>
               <p className="text-gray-600 text-sm mb-4">{sound.description}</p>
-              
+
               <div className="flex items-center justify-between text-sm text-gray-500">
                 <span className="capitalize">{sound.category}</span>
                 <span>{sound.duration}</span>
@@ -451,7 +447,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
                 <div className="text-sm opacity-80">Integração completa</div>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => onPageChange('premium')}
               className="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >
@@ -499,12 +495,26 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
                 <div className="text-sm text-gray-600">Concentração</div>
               </a>
             </div>
+          </div>
+          {createSpotifyService() ? (
+            <button
+              onClick={() => {
+                const service = createSpotifyService();
+                if (service) window.location.href = service.getAuthUrl();
+              }}
+              className="bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition-colors flex items-center justify-center mx-auto space-x-2"
+            >
+              <Music className="w-5 h-5" />
+              <span>Conectar Conta Spotify</span>
+            </button>
+          ) : (
             <button className="bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition-colors">
               ✅ Links Spotify Oficiais Ativos
             </button>
-          </div>
+          )}
         </div>
       </div>
     </div>
+
   );
 };

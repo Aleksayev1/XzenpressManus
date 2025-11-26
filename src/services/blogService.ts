@@ -136,9 +136,8 @@ export class BlogService {
       const { data, error } = await supabase
         .from('posts_do_blog')
         .select('*')
-        // .eq('published', true)
         .eq('category', category)
-        .neq('slug', currentSlug)
+        .neq('lesma', currentSlug) // Usando 'lesma' que é o nome da coluna no banco
         .order('published_at', { ascending: false })
         .limit(limit);
 
@@ -149,9 +148,26 @@ export class BlogService {
       return (data || []).map(this.mapDatabaseToPost);
     } catch (error) {
       console.error('Erro ao buscar posts relacionados:', error);
+      // Fallback para buscar posts recentes se não houver relacionados na mesma categoria
+      try {
+        const { data, error } = await supabase
+          .from('posts_do_blog')
+          .select('*')
+          .neq('lesma', currentSlug)
+          .order('published_at', { ascending: false })
+          .limit(limit);
+
+        if (!error && data) {
+          return data.map(this.mapDatabaseToPost);
+        }
+      } catch (e) {
+        console.error('Erro no fallback de posts relacionados:', e);
+      }
       return [];
     }
   }
+
+
 
   /**
    * Busca posts por termo de pesquisa
@@ -204,7 +220,28 @@ export class BlogService {
       views: data.visualizacoes || data.views || 0,
       readingTime: data.tempo_leitura || data.reading_time || 5,
       createdAt: data.criado_em || data.created_at,
-      updatedAt: data.atualizado_em || data.updated_at
+      updatedAt: data.atualizado_em || data.updated_at,
+
+      // Mapeamento de Traduções
+      titleEn: data.title_en,
+      contentEn: data.content_en,
+      excerptEn: data.excerpt_en,
+
+      titleEs: data.title_es,
+      contentEs: data.content_es,
+      excerptEs: data.excerpt_es,
+
+      titleFr: data.title_fr,
+      contentFr: data.content_fr,
+      excerptFr: data.excerpt_fr,
+
+      titleIt: data.title_it,
+      contentIt: data.content_it,
+      excerptIt: data.excerpt_it,
+
+      titleDe: data.title_de,
+      contentDe: data.content_de,
+      excerptDe: data.excerpt_de
     };
   }
 
@@ -293,7 +330,7 @@ A acupressão é uma ferramenta poderosa e acessível para o gerenciamento do es
         excerpt: 'Descubra 5 pontos de acupressão fundamentais para combater o estresse diário de forma natural e eficaz.',
         author: 'Dr. XZenPress',
         authorEmail: 'aleksayevacupress@gmail.com',
-        imageUrl: '/ponto-da-acupuntura-que-tira-ex-hn-yintang-EX HN3.jpg',
+        imageUrl: 'https://dqjcbwjqrenubdzalicy.supabase.co/storage/v1/object/public/acupressure-images/Logo-Xzenpress-oficial.png',
         category: 'acupressao',
         tags: ['acupressão', 'estresse', 'ansiedade', 'medicina-tradicional-chinesa'],
         published: true,
@@ -404,7 +441,7 @@ A respiração 4-7-8 é uma ferramenta poderosa, gratuita e sempre disponível p
         excerpt: 'Aprenda a técnica de respiração 4-7-8 com base científica para reduzir ansiedade e melhorar o bem-estar.',
         author: 'Equipe XZenPress',
         authorEmail: 'aleksayevacupress@gmail.com',
-        imageUrl: 'https://peicfjwigfxnhkobpgmw.supabase.co/storage/v1/object/public/acupressure-images/Logo-Xzenpress-oficial.png',
+        imageUrl: 'https://dqjcbwjqrenubdzalicy.supabase.co/storage/v1/object/public/acupressure-images/Logo-Xzenpress-oficial.png',
         category: 'respiracao',
         tags: ['respiração', '4-7-8', 'ansiedade', 'ciência', 'bem-estar'],
         published: true,
@@ -533,7 +570,7 @@ A adequação à Lei 14.831/2024 não é apenas uma obrigação legal, mas uma o
         excerpt: 'Entenda como a Lei 14.831/2024 pode transformar sua empresa em uma Promotora da Saúde Mental e os benefícios práticos dessa adequação.',
         author: 'Consultoria XZenPress',
         authorEmail: 'aleksayevacupress@gmail.com',
-        imageUrl: 'https://peicfjwigfxnhkobpgmw.supabase.co/storage/v1/object/public/acupressure-images/Logo-Xzenpress-oficial.png',
+        imageUrl: 'https://dqjcbwjqrenubdzalicy.supabase.co/storage/v1/object/public/acupressure-images/Logo-Xzenpress-oficial.png',
         category: 'bem-estar-corporativo',
         tags: ['lei-14831', 'saúde-mental', 'corporativo', 'compliance', 'nr-1'],
         published: true,
@@ -691,9 +728,9 @@ A cromoterapia é uma ferramenta poderosa e não invasiva para promover bem-esta
 
 *Experimente a cromoterapia integrada na nossa plataforma XZenPress!*`,
         excerpt: 'Descubra como a cromoterapia funciona cientificamente e como as cores podem ser usadas terapeuticamente para melhorar seu bem-estar.',
-        author: 'Dr. Terapia Holística',
+        author: 'Dr. Terapia Integrativa',
         authorEmail: 'aleksayevacupress@gmail.com',
-        imageUrl: 'https://peicfjwigfxnhkobpgmw.supabase.co/storage/v1/object/public/acupressure-images/Logo-Xzenpress-oficial.png',
+        imageUrl: 'https://dqjcbwjqrenubdzalicy.supabase.co/storage/v1/object/public/acupressure-images/Logo-Xzenpress-oficial.png',
         category: 'cromoterapia',
         tags: ['cromoterapia', 'cores', 'terapia', 'neurociência', 'bem-estar'],
         published: true,

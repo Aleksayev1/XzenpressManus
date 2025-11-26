@@ -14,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const { user, logout } = useAuth();
   const { currentLanguage, setLanguage, t } = useLanguage();
-  
+
   const handlePageChange = (page: string) => {
     onPageChange(page);
     trackPageView(page, t(`nav.${page}`));
@@ -44,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
     { id: 'personalization' },
   ];
 
-  const allNavItems = user?.isPremium 
+  const allNavItems = user?.isPremium
     ? [...navItems.slice(0, 3), ...premiumNavItems, ...navItems.slice(3)]
     : navItems;
 
@@ -63,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
               className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
             >
               <img
-                src="https://peicfjwigfxnhkobpgmw.supabase.co/storage/v1/object/public/acupressure-images/Logo-Xzenpress-oficial.png"
+                src="/Logo Xzenpress oficial.png"
                 alt="XZenPress Logo"
                 className="w-10 h-10 object-contain"
                 onError={(e) => {
@@ -89,11 +89,10 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
               <button
                 key={item.id}
                 onClick={() => handlePageChange(item.id)}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
-                  currentPage === item.id
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                }`}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${currentPage === item.id
+                  ? 'text-blue-600 bg-blue-50'
+                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
               >
                 <span>{t(`nav.${item.id}`)}</span>
                 {premiumNavItems.some(p => p.id === item.id) && (
@@ -112,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                 className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-green-600 transition-all duration-200 shadow-lg"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
                 </svg>
                 <span>Consulta</span>
               </button>
@@ -135,11 +134,10 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                       onClick={() => {
                         handleLanguageChange(lang);
                       }}
-                      className={`flex items-center space-x-3 w-full px-4 py-2 text-sm transition-colors ${
-                        currentLanguage.code === lang.code 
-                          ? 'bg-blue-50 text-blue-700 font-medium' 
-                          : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+                      className={`flex items-center space-x-3 w-full px-4 py-2 text-sm transition-colors ${currentLanguage.code === lang.code
+                        ? 'bg-blue-50 text-blue-700 font-medium'
+                        : 'text-gray-700 hover:bg-gray-100'
+                        }`}
                     >
                       <span>{lang.flag}</span>
                       <span>{lang.name}</span>
@@ -196,7 +194,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                   <Trash2 className="w-4 h-4" />
                   <span>Excluir Dados</span>
                 </button>
-                
+
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
@@ -235,13 +233,12 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                   key={item.id}
                   onClick={() => {
                     onPageChange(item.id);
-                    setIsMenuOpen(false); 
+                    setIsMenuOpen(false);
                   }}
-                  className={`flex items-center justify-between w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                    currentPage === item.id
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
-                  }`}
+                  className={`flex items-center justify-between w-full text-left px-3 py-2 rounded-md text-base font-medium ${currentPage === item.id
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+                    }`}
                 >
                   <span>{t(`nav.${item.id}`)}</span>
                   {premiumNavItems.some(p => p.id === item.id) && (
@@ -249,13 +246,13 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                   )}
                 </button>
               ))}
-              
+
               {/* Mobile Language Selector */}
               <div className="mt-2 pt-2 border-t border-gray-200">
                 <button
                   onClick={() => {
-                    if (typeof window.toggleGoogleTranslate === 'function') {
-                      window.toggleGoogleTranslate();
+                    if (typeof (window as any).toggleGoogleTranslate === 'function') {
+                      (window as any).toggleGoogleTranslate();
                     } else {
                       console.warn('Google Translate não carregado ainda');
                     }
@@ -266,7 +263,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                   <span>🌐 Tradução Automática</span>
                 </button>
               </div>
-              
+
               {/* Mobile User Actions */}
               {user ? (
                 <div className="px-3 py-2 border-t border-gray-200">
@@ -280,12 +277,12 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                       className="flex items-center space-x-2 w-full px-3 py-2 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 mb-2"
                     >
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
                       </svg>
                       <span>Consulta WhatsApp</span>
                     </button>
                   )}
-                  
+
                   {/* User Info */}
                   <div className="flex items-center space-x-2 mb-2">
                     <User className="w-4 h-4 text-gray-600" />
@@ -297,7 +294,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                       <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full ml-2">ADMIN</span>
                     )}
                   </div>
-                  
+
                   {/* Data Deletion Link - Mobile */}
                   <button
                     onClick={() => {
@@ -309,7 +306,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                     <Trash2 className="w-4 h-4" />
                     <span>Excluir Dados</span>
                   </button>
-                  
+
                   {/* Logout Button */}
                   <button
                     onClick={() => {

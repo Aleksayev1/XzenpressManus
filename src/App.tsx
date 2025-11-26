@@ -20,10 +20,17 @@ import { TutorialModal } from './components/TutorialModal';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { GoogleAnalytics } from './components/GoogleAnalytics';
+import { SpotifyCallback } from './components/SpotifyCallback';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [showTutorial, setShowTutorial] = useState(false);
+
+  React.useEffect(() => {
+    if (window.location.hash.includes('access_token')) {
+      setCurrentPage('spotify-callback');
+    }
+  }, []);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -55,6 +62,8 @@ function App() {
         return <BlogPage onPageChange={setCurrentPage} />;
       case 'blog-admin':
         return <BlogAdminPage onPageChange={setCurrentPage} />;
+      case 'spotify-callback':
+        return <SpotifyCallback onConnect={() => setCurrentPage('sounds')} />;
       default:
         return <HomePage onPageChange={setCurrentPage} />;
     }
@@ -64,22 +73,22 @@ function App() {
     <LanguageProvider>
       <AuthProvider>
         <GoogleAnalytics />
-        <div className="min-h-screen bg-gray-50">
-          <Header currentPage={currentPage} onPageChange={setCurrentPage} />
-          {renderPage()}
-          
-          {/* First Time Banner */}
-          <FirstTimeBanner onStartTutorial={() => setShowTutorial(true)} />
-          
-          {/* Tutorial Modal */}
-          <TutorialModal 
-            isVisible={showTutorial}
-            onClose={() => setShowTutorial(false)}
-            onPageChange={setCurrentPage}
-          />
-        </div>
+        <div className="aurora-overlay"></div>
+        <Header currentPage={currentPage} onPageChange={setCurrentPage} />
+        {renderPage()}
+
+        {/* First Time Banner */}
+        <FirstTimeBanner onStartTutorial={() => setShowTutorial(true)} />
+
+        {/* Tutorial Modal */}
+        <TutorialModal
+          isVisible={showTutorial}
+          onClose={() => setShowTutorial(false)}
+          onPageChange={setCurrentPage}
+        />
+
       </AuthProvider>
-    </LanguageProvider>
+    </LanguageProvider >
   );
 }
 

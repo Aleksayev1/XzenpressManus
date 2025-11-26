@@ -3,6 +3,8 @@ import { BookOpen, Calendar, User, Eye, Clock, Search, Filter, ArrowRight, Tag, 
 import { useLanguage } from '../contexts/LanguageContext';
 import { BlogService } from '../services/blogService';
 import { BlogPost } from '../types';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface BlogPageProps {
   onPageChange: (page: string) => void;
@@ -42,7 +44,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
   const loadBlogData = async () => {
     setLoading(true);
     setError('');
-    
+
     try {
       const [postsData, categoriesData] = await Promise.all([
         BlogService.getPublishedPosts({
@@ -51,7 +53,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
         }),
         BlogService.getCategories()
       ]);
-      
+
       setPosts(postsData);
       setCategories(categoriesData);
     } catch (err) {
@@ -81,7 +83,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
 
   const handlePostClick = async (post: BlogPost) => {
     setSelectedPost(post);
-    
+
     // Carregar posts relacionados
     try {
       const related = await BlogService.getRelatedPosts(post.slug, post.category, 3);
@@ -150,7 +152,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
                 />
               </div>
             )}
-            
+
             <div className="p-8">
               {/* Post Meta */}
               <div className="flex flex-wrap items-center gap-4 mb-6">
@@ -183,18 +185,15 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
                 </div>
                 <div>
                   <div className="font-semibold text-gray-800">{selectedPost.author}</div>
-                  <div className="text-sm text-gray-600">Especialista em Bem-estar Holístico</div>
+                  <div className="text-sm text-gray-600">Especialista em Bem-estar Integrativo</div>
                 </div>
               </div>
 
               {/* Content */}
-              <div className="prose prose-lg max-w-none">
-                <div
-                  className="text-gray-700 leading-relaxed"
-                  style={{ whiteSpace: 'pre-line', textAlign: 'justify' }}
-                >
+              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {getTranslatedField(selectedPost, 'content')}
-                </div>
+                </ReactMarkdown>
               </div>
 
               {/* Tags */}
@@ -301,7 +300,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
             </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Conteúdo especializado sobre bem-estar holístico, acupressão, respiração e saúde mental
+            Conteúdo especializado sobre bem-estar integrativo, acupressão, respiração e saúde mental
           </p>
         </div>
 
@@ -447,9 +446,9 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
                   {searchTerm ? 'Nenhum artigo encontrado' : 'Nenhum artigo disponível'}
                 </h3>
                 <p className="text-gray-500">
-                  {searchTerm 
+                  {searchTerm
                     ? 'Tente pesquisar com outros termos ou explore diferentes categorias'
-                    : 'Em breve teremos conteúdo incrível sobre bem-estar holístico'
+                    : 'Em breve teremos conteúdo incrível sobre bem-estar integrativo'
                   }
                 </p>
                 {searchTerm && (
@@ -469,7 +468,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
         <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-3xl p-8 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">📧 Receba Conteúdo Exclusivo</h2>
           <p className="text-xl mb-6 opacity-90">
-            Artigos semanais sobre bem-estar holístico direto no seu email
+            Artigos semanais sobre bem-estar integrativo direto no seu email
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
             <input

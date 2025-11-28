@@ -10,7 +10,8 @@
   for = "/*"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
-    X-Frame-Options = "DENY"
+    X-Frame-Options = "SAMEORIGIN"
+    Access-Control-Allow-Origin = "*"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"

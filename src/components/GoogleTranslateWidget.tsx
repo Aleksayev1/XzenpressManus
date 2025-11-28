@@ -14,24 +14,30 @@ export const GoogleTranslateWidget = () => {
         window.googleTranslateElementInit = () => {
             if (window.google && window.google.translate) {
                 try {
-                    const element = document.getElementById('google_translate_element');
-                    if (element) {
-                        // Clear any existing content
-                        element.innerHTML = '';
+                    // Give the DOM a moment to be ready
+                    setTimeout(() => {
+                        const element = document.getElementById('google_translate_element');
+                        if (element) {
+                            // Clear any existing content
+                            element.innerHTML = '';
 
-                        // Initialize the widget
-                        new window.google.translate.TranslateElement(
-                            {
-                                pageLanguage: 'pt',
-                                includedLanguages: 'en,es,fr,de,it,ru,zh-CN,ja,ko,ar,hi,bn,ur,id,tr,vi,te,mr,th',
-                                layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-                                autoDisplay: false,
-                            },
-                            'google_translate_element'
-                        );
+                            console.log('🔧 Initializing Google Translate with languages:', 'en,es,fr,de,it,ru,zh-CN,ja,ko,ar,hi,bn,ur,id,tr,vi,te,mr,th');
 
-                        console.log('✅ Google Translate initialized successfully');
-                    }
+                            // Initialize the widget
+                            new window.google.translate.TranslateElement(
+                                {
+                                    pageLanguage: 'pt',
+                                    includedLanguages: 'en,es,fr,de,it,ru,zh-CN,ja,ko,ar,hi,bn,ur,id,tr,vi,te,mr,th',
+                                    layout: window.google.translate.TranslateElement.InlineLayout.HORIZONTAL
+                                },
+                                'google_translate_element'
+                            );
+
+                            console.log('✅ Google Translate initialized successfully');
+                        } else {
+                            console.error('❌ Element google_translate_element not found');
+                        }
+                    }, 100);
                 } catch (error) {
                     console.error('❌ Error initializing Google Translate:', error);
                 }

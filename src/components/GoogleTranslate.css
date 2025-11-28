@@ -47,12 +47,8 @@ body {
     margin-right: 4px !important;
 }
 
-/* Remove Google branding if needed (be respectful) */
+/* Remove Google branding */
 .goog-logo-link {
-    display: none !important;
-}
-
-.goog-te-gadget span {
     display: none !important;
 }
 

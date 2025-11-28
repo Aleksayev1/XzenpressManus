@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Menu, X, Globe, User, LogOut, Crown, Trash2, BookOpen, Play } from 'lucide-react';
+import { Menu, X, User, LogOut, Crown, Trash2, BookOpen, Play } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useLanguage, languages } from '../contexts/LanguageContext';
-import { trackPageView, trackLanguageChange } from './GoogleAnalytics';
+import { useLanguage } from '../contexts/LanguageContext';
+import { trackPageView } from './GoogleAnalytics';
 
 interface HeaderProps {
   currentPage: string;
@@ -11,20 +11,12 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const { user, logout } = useAuth();
-  const { currentLanguage, setLanguage, t } = useLanguage();
+  const { t } = useLanguage();
 
   const handlePageChange = (page: string) => {
     onPageChange(page);
     trackPageView(page, t(`nav.${page}`));
-  };
-
-  const handleLanguageChange = (newLanguage: any) => {
-    const oldLanguage = currentLanguage.code;
-    setLanguage(newLanguage);
-    setIsLanguageOpen(false);
-    trackLanguageChange(oldLanguage, newLanguage.code);
   };
 
   const navItems = [
@@ -117,35 +109,9 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
               </button>
             )}
 
-            {/* Language Selector */}
-            <div className="relative">
-              <button
-                onClick={() => setIsLanguageOpen(!isLanguageOpen)}
-                className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-              >
-                <Globe className="w-4 h-4" />
-                <span>{currentLanguage.flag}</span>
-              </button>
-              {isLanguageOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-                  {languages.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => {
-                        handleLanguageChange(lang);
-                      }}
-                      className={`flex items-center space-x-3 w-full px-4 py-2 text-sm transition-colors ${currentLanguage.code === lang.code
-                        ? 'bg-blue-50 text-blue-700 font-medium'
-                        : 'text-gray-700 hover:bg-gray-100'
-                        }`}
-                    >
-                      <span>{lang.flag}</span>
-                      <span>{lang.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+
+
+
 
             {/* User Actions */}
             {user ? (
@@ -247,22 +213,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                 </button>
               ))}
 
-              {/* Mobile Language Selector */}
-              <div className="mt-2 pt-2 border-t border-gray-200">
-                <button
-                  onClick={() => {
-                    if (typeof (window as any).toggleGoogleTranslate === 'function') {
-                      (window as any).toggleGoogleTranslate();
-                    } else {
-                      console.warn('Google Translate não carregado ainda');
-                    }
-                  }}
-                  className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-                >
-                  <Globe className="w-4 h-4" />
-                  <span>🌐 Tradução Automática</span>
-                </button>
-              </div>
+
 
               {/* Mobile User Actions */}
               {user ? (

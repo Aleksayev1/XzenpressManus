@@ -241,7 +241,31 @@ export class BlogService {
 
       titleDe: data.title_de,
       contentDe: data.content_de,
-      excerptDe: data.excerpt_de
+      excerptDe: data.excerpt_de,
+
+      titleZh: data.title_zh,
+      contentZh: data.content_zh,
+      excerptZh: data.excerpt_zh,
+
+      titleJa: data.title_ja,
+      contentJa: data.content_ja,
+      excerptJa: data.excerpt_ja,
+
+      titleRu: data.title_ru,
+      contentRu: data.content_ru,
+      excerptRu: data.excerpt_ru,
+
+      titleHi: data.title_hi,
+      contentHi: data.content_hi,
+      excerptHi: data.excerpt_hi,
+
+      titleAr: data.title_ar,
+      contentAr: data.content_ar,
+      excerptAr: data.excerpt_ar,
+
+      titleBn: data.title_bn,
+      contentBn: data.content_bn,
+      excerptBn: data.excerpt_bn
     };
   }
 
@@ -330,7 +354,7 @@ A acupressão é uma ferramenta poderosa e acessível para o gerenciamento do es
         excerpt: 'Descubra 5 pontos de acupressão fundamentais para combater o estresse diário de forma natural e eficaz.',
         author: 'Dr. XZenPress',
         authorEmail: 'aleksayevacupress@gmail.com',
-        imageUrl: 'https://dqjcbwjqrenubdzalicy.supabase.co/storage/v1/object/public/acupressure-images/Logo-Xzenpress-oficial.png',
+        imageUrl: '/Logo Xzenpress oficial.png',
         category: 'acupressao',
         tags: ['acupressão', 'estresse', 'ansiedade', 'medicina-tradicional-chinesa'],
         published: true,
@@ -338,7 +362,20 @@ A acupressão é uma ferramenta poderosa e acessível para o gerenciamento do es
         views: 1247,
         readingTime: 8,
         createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+
+        // Traduções
+        titleEn: '5 Acupressure Points to Relieve Daily Stress',
+        excerptEn: 'Discover 5 key acupressure points to combat daily stress naturally and effectively.',
+        contentEn: '# 5 Acupressure Points to Relieve Daily Stress\n\nStress is a constant reality in modern life. Fortunately, Traditional Chinese Medicine offers simple and effective techniques to combat it through acupressure.\n\n## 1. Yintang (EX-HN3)\nLocated between the eyebrows, this point is known as the "third eye". It is extremely effective for reducing anxiety and calming the mind.\n\n## 2. Shenmen (C7)\nLocated at the wrist crease, this point is fundamental for balancing emotions and improving sleep quality.\n\n## 3. Laogong (PC8)\nIn the center of the palm, this point is ideal for controlling panic attacks and promoting immediate relaxation.',
+
+        titleEs: '5 Puntos de Acupresión para Aliviar el Estrés Diario',
+        excerptEs: 'Descubre 5 puntos clave de acupresión para combatir el estrés diario de forma natural y efectiva.',
+        contentEs: '# 5 Puntos de Acupresión para Aliviar el Estrés Diario\n\nEl estrés es una realidad constante en la vida moderna. Afortunadamente, la Medicina Tradicional China ofrece técnicas simples y efectivas para combatirlo.\n\n## 1. Yintang (EX-HN3)\nUbicado entre las cejas, este punto es conocido como el "tercer ojo". Es extremadamente efectivo para reducir la ansiedad.\n\n## 2. Shenmen (C7)\nUbicado en el pliegue de la muñeca, es fundamental para equilibrar las emociones.\n\n## 3. Laogong (PC8)\nEn el centro de la palma, ideal para controlar ataques de pánico.',
+
+        titleZh: '缓解日常压力的5个指压点',
+        excerptZh: '探索5个关键的指压点，自然有效地对抗日常压力。',
+        contentZh: '# 缓解日常压力的5个指压点\n\n压力是现代生活中不变的现实。幸运的是，中医提供了简单有效的指压技术来对抗它。\n\n## 1. 印堂 (Yintang)\n位于眉间，被称为"第三只眼"。对减轻焦虑非常有效。'
       },
       {
         id: '2',
@@ -441,7 +478,7 @@ A respiração 4-7-8 é uma ferramenta poderosa, gratuita e sempre disponível p
         excerpt: 'Aprenda a técnica de respiração 4-7-8 com base científica para reduzir ansiedade e melhorar o bem-estar.',
         author: 'Equipe XZenPress',
         authorEmail: 'aleksayevacupress@gmail.com',
-        imageUrl: 'https://dqjcbwjqrenubdzalicy.supabase.co/storage/v1/object/public/acupressure-images/Logo-Xzenpress-oficial.png',
+        imageUrl: '/Logo Xzenpress oficial.png',
         category: 'respiracao',
         tags: ['respiração', '4-7-8', 'ansiedade', 'ciência', 'bem-estar'],
         published: true,
@@ -570,7 +607,7 @@ A adequação à Lei 14.831/2024 não é apenas uma obrigação legal, mas uma o
         excerpt: 'Entenda como a Lei 14.831/2024 pode transformar sua empresa em uma Promotora da Saúde Mental e os benefícios práticos dessa adequação.',
         author: 'Consultoria XZenPress',
         authorEmail: 'aleksayevacupress@gmail.com',
-        imageUrl: 'https://dqjcbwjqrenubdzalicy.supabase.co/storage/v1/object/public/acupressure-images/Logo-Xzenpress-oficial.png',
+        imageUrl: '/Logo Xzenpress oficial.png',
         category: 'bem-estar-corporativo',
         tags: ['lei-14831', 'saúde-mental', 'corporativo', 'compliance', 'nr-1'],
         published: true,
@@ -739,6 +776,37 @@ A cromoterapia é uma ferramenta poderosa e não invasiva para promover bem-esta
         readingTime: 10,
         createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
         updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '5',
+        title: 'Vida Após a Morte: Argumentos Científicos Contra o Suicídio',
+        slug: 'vida-apos-morte-argumentos-cientificos-contra-suicidio',
+        content: `# Vida Após a Morte: Argumentos Científicos Contra o Suicídio\n\nUma análise profunda sobre a continuidade da consciência e as implicações do suicídio sob uma perspectiva científica e espiritual.\n\n## A Continuidade da Consciência\nEstudos de Experiência de Quase Morte (EQM) sugerem que a consciência pode persistir além da morte física.\n\n## O Impacto do Suicídio\nO suicídio não encerra o sofrimento, apenas transfere a consciência para outro estado, muitas vezes carregando as mesmas angústias.\n\n## Busque Ajuda\nSe você está passando por um momento difícil, saiba que não está sozinho. A vida é preciosa e há soluções para o seu sofrimento.`,
+        excerpt: 'Uma análise científica e espiritual sobre a continuidade da vida e por que o suicídio não é a solução.',
+        author: 'Dr. XZenPress',
+        authorEmail: 'aleksayevacupress@gmail.com',
+        imageUrl: '/Logo Xzenpress oficial.png',
+        category: 'saude-mental',
+        tags: ['prevenção', 'suicídio', 'espiritualidade', 'ciência'],
+        published: true,
+        publishedAt: new Date().toISOString(),
+        views: 1543,
+        readingTime: 15,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+
+        // Traduções
+        titleEn: 'Life After Death: Scientific Arguments Against Suicide',
+        excerptEn: 'A deep analysis on the continuity of consciousness and the implications of suicide under a scientific and spiritual perspective.',
+        contentEn: '# Life After Death: Scientific Arguments Against Suicide\n\nA deep analysis on the continuity of consciousness.\n\n## The Continuity of Consciousness\nNear-Death Experience (NDE) studies suggest that consciousness may persist beyond physical death.\n\n## The Impact of Suicide\nSuicide does not end suffering, it only transfers consciousness to another state.',
+
+        titleEs: 'Vida Después de la Muerte: Argumentos Científicos Contra el Suicidio',
+        excerptEs: 'Un análisis profundo sobre la continuidad de la conciencia y las implicaciones del suicidio bajo una perspectiva científica y espiritual.',
+        contentEs: '# Vida Después de la Muerte: Argumentos Científicos Contra el Suicidio\n\nUn análisis profundo sobre la continuidad de la conciencia.\n\n## La Continuidad de la Conciencia\nEstudios de Experiencia Cercana a la Muerte (ECM) sugieren que la conciencia puede persistir más allá de la muerte física.\n\n## El Impacto del Suicidio\nEl suicidio no termina con el sufrimiento, solo transfiere la conciencia a otro estado.',
+
+        titleZh: '死后的生活：反对自杀的科学论据',
+        excerptZh: '从科学和精神的角度深入分析意识的连续性和自杀的影响。',
+        contentZh: '# 死后的生活：反对自杀的科学论据\n\n深入分析意识的连续性。\n\n## 意识的连续性\n濒死体验 (NDE) 研究表明，意识可能会在肉体死亡后继续存在。\n\n## 自杀的影响\n自杀并不能结束痛苦，它只是将意识转移到另一种状态。'
       }
     ];
   }

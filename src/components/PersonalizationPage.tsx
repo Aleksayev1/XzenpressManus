@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Target, Clock, Brain, Heart, Zap, Save, RefreshCw, Palette, Volume2, Bell } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface PersonalizationPageProps {
   onPageChange: (page: string) => void;
@@ -22,6 +23,7 @@ interface UserPreferences {
 
 export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPageChange }) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   // Verificar se usuário é Premium
   if (!user?.isPremium) {
@@ -35,12 +37,12 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
               </div>
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Personalização Premium
+              {t('personalization.premium.title')}
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Configure sua experiência personalizada com recomendações baseadas em IA e preferências avançadas
+              {t('personalization.premium.subtitle')}
             </p>
-            
+
             {/* Premium Features Preview */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
@@ -55,7 +57,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                   <li>• Pontos mais eficazes para você</li>
                 </ul>
               </div>
-              
+
               <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
                 <div className="flex items-center space-x-3 mb-3">
                   <Palette className="w-6 h-6 text-blue-600" />
@@ -68,7 +70,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                   <li>• Cores baseadas no seu estado</li>
                 </ul>
               </div>
-              
+
               <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
                 <div className="flex items-center space-x-3 mb-3">
                   <Volume2 className="w-6 h-6 text-green-600" />
@@ -81,7 +83,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                   <li>• Playlists adaptativas</li>
                 </ul>
               </div>
-              
+
               <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">
                 <div className="flex items-center space-x-3 mb-3">
                   <Bell className="w-6 h-6 text-orange-600" />
@@ -95,22 +97,22 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                 </ul>
               </div>
             </div>
-            
+
             <div className="bg-gradient-to-r from-purple-100 to-blue-100 rounded-xl p-6 mb-8 border border-purple-300">
-              <h3 className="font-semibold text-purple-800 mb-2">🧠 Personalização Baseada em IA</h3>
+              <h3 className="font-semibold text-purple-800 mb-2">🧠 {t('personalization.ai.title')}</h3>
               <p className="text-purple-700 text-sm">
-                Nossa IA analisa seus padrões de uso, preferências e efetividade para criar 
+                Nossa IA analisa seus padrões de uso, preferências e efetividade para criar
                 uma experiência única e otimizada especificamente para o seu perfil de bem-estar.
               </p>
             </div>
-            
+
             <button
               onClick={() => onPageChange('premium')}
               className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-purple-600 hover:to-blue-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >
-              🔓 Desbloquear Personalização Premium
+              🔓 {t('personalization.premium.unlock')}
             </button>
-            
+
             <p className="text-sm text-gray-500 mt-4">
               Experiência única • IA personalizada • Recursos avançados
             </p>
@@ -221,14 +223,14 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
   const savePreferences = async () => {
     setIsSaving(true);
     setSaveStatus('idle');
-    
+
     try {
       // Simular salvamento
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       // Salvar no localStorage para demonstração
       localStorage.setItem('userPreferences', JSON.stringify(preferences));
-      
+
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
@@ -293,19 +295,19 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
               <User className="w-12 h-12 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Personalização</h1>
-          <p className="text-gray-600">Configure sua experiência para máxima efetividade</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('personalization.title')}</h1>
+          <p className="text-gray-600">{t('personalization.subtitle')}</p>
         </div>
 
         <div className="space-y-8">
           {/* Basic Profile */}
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-6">Perfil de Bem-estar</h2>
-            
+            <h2 className="text-xl font-bold text-gray-800 mb-6">{t('personalization.profile.title')}</h2>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Nível de Estresse Atual
+                  {t('personalization.stress_level')}
                 </label>
                 <div className="space-y-2">
                   {[
@@ -330,7 +332,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Qualidade do Sono
+                  {t('personalization.sleep_quality')}
                 </label>
                 <div className="space-y-2">
                   {[
@@ -358,17 +360,16 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
 
           {/* Main Concerns */}
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-6">Principais Preocupações</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-6">{t('personalization.concerns.title')}</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {concernsOptions.map((concern) => (
                 <button
                   key={concern}
                   onClick={() => handleConcernToggle(concern)}
-                  className={`p-3 rounded-lg text-sm font-medium transition-all ${
-                    preferences.mainConcerns.includes(concern)
+                  className={`p-3 rounded-lg text-sm font-medium transition-all ${preferences.mainConcerns.includes(concern)
                       ? 'bg-blue-500 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   {concern}
                 </button>
@@ -378,17 +379,16 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
 
           {/* Goals */}
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-6">Objetivos</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-6">{t('personalization.goals.title')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {goalsOptions.map((goal) => (
                 <button
                   key={goal}
                   onClick={() => handleGoalToggle(goal)}
-                  className={`p-3 rounded-lg text-sm font-medium transition-all text-left ${
-                    preferences.goals.includes(goal)
+                  className={`p-3 rounded-lg text-sm font-medium transition-all text-left ${preferences.goals.includes(goal)
                       ? 'bg-green-500 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   {goal}
                 </button>
@@ -398,12 +398,12 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
 
           {/* Session Preferences */}
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-6">Preferências de Sessão</h2>
-            
+            <h2 className="text-xl font-bold text-gray-800 mb-6">{t('personalization.session.title')}</h2>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Horário Preferido
+                  {t('personalization.session.time')}
                 </label>
                 <select
                   value={preferences.preferredTime}
@@ -419,7 +419,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Duração da Sessão
+                  {t('personalization.session.duration')}
                 </label>
                 <select
                   value={preferences.sessionDuration}
@@ -436,7 +436,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Nível de Experiência
+                  {t('personalization.session.level')}
                 </label>
                 <select
                   value={preferences.experienceLevel}
@@ -451,7 +451,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Ritmo de Respiração
+                  {t('personalization.session.pace')}
                 </label>
                 <select
                   value={preferences.breathingPace}
@@ -470,20 +470,19 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
               <Palette className="w-6 h-6 text-purple-600 mr-2" />
-              Cores Terapêuticas Preferidas
+              {t('personalization.colors.title')}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {colorOptions.map((colorOption) => (
                 <button
                   key={colorOption.color}
                   onClick={() => handleColorToggle(colorOption.color)}
-                  className={`p-4 rounded-xl border-2 transition-all ${
-                    preferences.preferredColors.includes(colorOption.color)
+                  className={`p-4 rounded-xl border-2 transition-all ${preferences.preferredColors.includes(colorOption.color)
                       ? 'border-gray-800 shadow-lg'
                       : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                    }`}
                 >
-                  <div 
+                  <div
                     className="w-12 h-12 rounded-full mx-auto mb-3 shadow-md"
                     style={{ backgroundColor: colorOption.color }}
                   />
@@ -498,18 +497,17 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
               <Volume2 className="w-6 h-6 text-blue-600 mr-2" />
-              Sons Preferidos
+              {t('personalization.sounds.title')}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {soundOptions.map((sound) => (
                 <button
                   key={sound}
                   onClick={() => handleSoundToggle(sound)}
-                  className={`p-3 rounded-lg text-sm font-medium transition-all ${
-                    preferences.soundPreferences.includes(sound)
+                  className={`p-3 rounded-lg text-sm font-medium transition-all ${preferences.soundPreferences.includes(sound)
                       ? 'bg-blue-500 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   {sound}
                 </button>
@@ -521,12 +519,12 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
               <Bell className="w-6 h-6 text-orange-600 mr-2" />
-              Lembretes e Notificações
+              {t('personalization.notifications.title')}
             </h2>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Frequência de Lembretes
+                {t('personalization.notifications.frequency')}
               </label>
               <div className="space-y-2">
                 {[
@@ -555,7 +553,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
           <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-200">
             <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
               <Brain className="w-6 h-6 text-purple-600 mr-2" />
-              Recomendações Baseadas no seu Perfil
+              {t('personalization.ai.title')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-white rounded-lg p-4">
@@ -572,7 +570,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                   )}
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-lg p-4">
                 <h3 className="font-semibold text-gray-800 mb-2">⏰ Rotina Sugerida</h3>
                 <div className="text-sm text-gray-600">
@@ -592,9 +590,9 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                 className="flex items-center justify-center space-x-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
               >
                 <RefreshCw className="w-5 h-5" />
-                <span>Resetar</span>
+                <span>{t('personalization.reset')}</span>
               </button>
-              
+
               <button
                 onClick={savePreferences}
                 disabled={isSaving}
@@ -603,12 +601,12 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                 {isSaving ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Salvando...</span>
+                    <span>{t('personalization.saving')}</span>
                   </>
                 ) : (
                   <>
                     <Save className="w-5 h-5" />
-                    <span>Salvar Preferências</span>
+                    <span>{t('personalization.save')}</span>
                   </>
                 )}
               </button>
@@ -616,13 +614,13 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
 
             {saveStatus === 'success' && (
               <div className="mt-4 text-center text-green-600 font-medium">
-                ✅ Preferências salvas com sucesso!
+                ✅ {t('personalization.success')}
               </div>
             )}
 
             {saveStatus === 'error' && (
               <div className="mt-4 text-center text-red-600 font-medium">
-                ❌ Erro ao salvar. Tente novamente.
+                ❌ {t('personalization.error')}
               </div>
             )}
           </div>

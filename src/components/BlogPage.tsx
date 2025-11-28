@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Calendar, User, Eye, Clock, Search, Filter, ArrowRight, Tag, Star } from 'lucide-react';
+import { BookOpen, Calendar, User, Eye, Clock, Search, Filter, ArrowRight, ArrowLeft, Tag, Star } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { BlogService } from '../services/blogService';
 import { BlogPost } from '../types';
@@ -11,7 +11,8 @@ interface BlogPageProps {
 }
 
 export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
-  const { t, language } = useLanguage();
+  const { t, currentLanguage } = useLanguage();
+  const language = currentLanguage.code;
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -21,17 +22,55 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
+
   // Helper function to get translated content
   const getTranslatedField = (post: BlogPost, field: 'title' | 'content' | 'excerpt'): string => {
+    // If Portuguese or no language, return original
     if (!language || language === 'pt') return post[field] || '';
-    const langSuffix = (!language || language === 'pt') ? '' : language.charAt(0).toUpperCase() + language.slice(1);
+
+    // Map language code to the exact field name in database/BlogPost type
+    const langMap: Record<string, string> = {
+      'en': 'En',
+      'es': 'Es',
+      'it': 'It',
+      'fr': 'Fr',
+      'de': 'De',
+      'zh': 'Zh',
+      'ja': 'Ja',
+      'ru': 'Ru',
+      'hi': 'Hi',
+      'ar': 'Ar',
+      'bn': 'Bn'
+    };
+
+    const langSuffix = langMap[language] || langMap['en']; // Fallback to English
     const translatedField = `${field}${langSuffix}` as keyof BlogPost;
+
     return (post[translatedField] as string) || post[field] || '';
   };
 
+  // Force Google Translate to re-scan after posts load
+  useEffect(() => {
+    if (posts.length > 0) {
+      // Trigger Google Translate to re-translate the page
+      setTimeout(() => {
+        const event = new Event('DOMContentLoaded', { bubbles: true, cancelable: true });
+        document.dispatchEvent(event);
+
+        // Also try triggering the translate element directly if it exists
+        if (typeof (window as any).google !== 'undefined' && (window as any).google.translate) {
+          const translateElement = (window as any).google.translate.TranslateElement;
+          if (translateElement) {
+            console.log('🔄 Forcing Google Translate re-scan...');
+          }
+        }
+      }, 500);
+    }
+  }, [posts]);
+
   useEffect(() => {
     loadBlogData();
-  }, [selectedCategory]);
+  }, [selectedCategory, language]); // Reload when language changes!
 
   useEffect(() => {
     if (searchTerm) {
@@ -72,93 +111,104 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
 
     setLoading(true);
     try {
-      const searchResults = await BlogService.searchPosts(searchTerm);
-      setPosts(searchResults);
+      const results = await BlogService.searchPosts(searchTerm);
+      setPosts(results);
     } catch (err) {
-      setError('Erro na pesquisa');
+      setError('Erro na busca');
     } finally {
       setLoading(false);
     }
   };
 
   const handlePostClick = async (post: BlogPost) => {
-    setSelectedPost(post);
-
-    // Carregar posts relacionados
     try {
-      const related = await BlogService.getRelatedPosts(post.slug, post.category, 3);
+      await BlogService.incrementViews(post.id);
+      setSelectedPost({ ...post, views: post.views + 1 });
+
+      // Carregar posts relacionados
+      const related = await BlogService.getRelatedPosts(post.id, post.category);
       setRelatedPosts(related);
-    } catch (err) {
-      console.error('Erro ao carregar posts relacionados:', err);
+
+      window.scrollTo(0, 0);
+    } catch (error) {
+      console.error('Erro ao abrir post:', error);
+      setSelectedPost(post);
     }
   };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
-      year: 'numeric',
+      day: 'numeric',
       month: 'long',
-      day: 'numeric'
+      year: 'numeric'
     });
   };
 
-  const getCategoryName = (category: string) => {
-    const categoryNames: Record<string, string> = {
+  const getCategoryName = (slug: string) => {
+    const names: Record<string, string> = {
+      'saude-mental': 'Saúde Mental',
       'acupressao': 'Acupressão',
       'respiracao': 'Respiração',
       'cromoterapia': 'Cromoterapia',
-      'bem-estar-corporativo': 'Bem-estar Corporativo',
-      'medicina-tradicional-chinesa': 'Medicina Tradicional Chinesa',
-      'Saúde Mental': 'Saúde Mental',
-      'saude-mental': 'Saúde Mental'
+      'bem-estar-corporativo': 'Bem-estar Corporativo'
     };
-    return categoryNames[category] || category;
+    return names[slug] || slug;
   };
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
+      'saude-mental': 'bg-blue-100 text-blue-800',
       'acupressao': 'bg-green-100 text-green-800',
-      'respiracao': 'bg-blue-100 text-blue-800',
-      'cromoterapia': 'bg-purple-100 text-purple-800',
-      'bem-estar-corporativo': 'bg-orange-100 text-orange-800',
-      'medicina-tradicional-chinesa': 'bg-indigo-100 text-indigo-800',
-      'Saúde Mental': 'bg-teal-100 text-teal-800',
-      'saude-mental': 'bg-teal-100 text-teal-800'
+      'respiracao': 'bg-purple-100 text-purple-800',
+      'cromoterapia': 'bg-pink-100 text-pink-800',
+      'bem-estar-corporativo': 'bg-orange-100 text-orange-800'
     };
     return colors[category] || 'bg-gray-100 text-gray-800';
   };
 
+  if (loading && !posts.length) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-24">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   // Visualização de post individual
   if (selectedPost) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen bg-white pt-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Back Button */}
           <button
             onClick={() => setSelectedPost(null)}
-            className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 mb-8 transition-colors"
+            className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 mb-8 transition-colors"
           >
-            <ArrowRight className="w-4 h-4 rotate-180" />
-            <span>Voltar ao blog</span>
+            <ArrowLeft className="w-5 h-5" />
+            <span>Voltar para o Blog</span>
           </button>
 
           {/* Post Header */}
-          <article className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+          <article>
+            {/* Hero Image */}
             {selectedPost.imageUrl && (
-              <div className="h-64 md:h-80 overflow-hidden">
-                <img
-                  src={selectedPost.imageUrl}
-                  alt={getTranslatedField(selectedPost, 'title')}
-                  className="w-full h-full object-cover"
-                />
+              <div className="rounded-2xl overflow-hidden shadow-xl mb-8">
+                <div className="h-64 md:h-80 overflow-hidden">
+                  <img
+                    src={selectedPost.imageUrl}
+                    alt={getTranslatedField(selectedPost, 'title')}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
             )}
 
-            <div className="p-8">
-              {/* Post Meta */}
-              <div className="flex flex-wrap items-center gap-4 mb-6">
-                <div className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(selectedPost.category)}`}>
-                  {getCategoryName(selectedPost.category)}
-                </div>
+            {/* Meta Header */}
+            <div className="flex flex-wrap items-center gap-4 mb-6">
+              <div className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(selectedPost.category)}`}>
+                {getCategoryName(selectedPost.category)}
+              </div>
+              <div className="flex items-center space-x-4 text-gray-500 text-sm">
                 <div className="flex items-center space-x-2 text-gray-600 text-sm">
                   <Calendar className="w-4 h-4" />
                   <span>{formatDate(selectedPost.publishedAt || selectedPost.createdAt)}</span>
@@ -172,50 +222,46 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
                   <span>{selectedPost.views} visualizações</span>
                 </div>
               </div>
-
-              {/* Title */}
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                {getTranslatedField(selectedPost, 'title')}
-              </h1>
-
-              {/* Author */}
-              <div className="flex items-center space-x-3 mb-8 pb-8 border-b border-gray-200">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                  <User className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-800">{selectedPost.author}</div>
-                  <div className="text-sm text-gray-600">Especialista em Bem-estar Integrativo</div>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {getTranslatedField(selectedPost, 'content')}
-                </ReactMarkdown>
-              </div>
-
-              {/* Tags */}
-              {selectedPost.tags.length > 0 && (
-                <div className="mt-8 pt-8 border-t border-gray-200">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <Tag className="w-5 h-5 text-gray-600" />
-                    <span className="font-semibold text-gray-800">Tags:</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedPost.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
+
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              {getTranslatedField(selectedPost, 'title')}
+            </h1>
+
+            {/* Author */}
+            <div className="flex items-center space-x-3 mb-8 pb-8 border-b border-gray-200">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                <User className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <div className="font-semibold text-gray-800">{selectedPost.author}</div>
+                <div className="text-sm text-gray-600">Especialista em Bem-estar Integrativo</div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {getTranslatedField(selectedPost, 'content')}
+              </ReactMarkdown>
+            </div>
+
+            {/* Tags */}
+            {selectedPost.tags.length > 0 && (
+              <div className="mt-12 pt-8 border-t border-gray-200">
+                <div className="flex flex-wrap gap-2">
+                  {selectedPost.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </article>
 
           {/* Related Posts */}
@@ -284,8 +330,16 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
     );
   }
 
+  // Filter posts for main view
+  const filteredPosts = posts.filter(post => {
+    const matchesSearch = getTranslatedField(post, 'title').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      getTranslatedField(post, 'excerpt')?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center mb-12">
@@ -299,42 +353,35 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
               Blog XZenPress
             </span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Conteúdo especializado sobre bem-estar integrativo, acupressão, respiração e saúde mental
           </p>
         </div>
 
-        {/* Search and Filters */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Pesquisar artigos..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Category Filter */}
-            <div className="flex items-center space-x-2">
-              <Filter className="w-5 h-5 text-gray-500" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="all">Todas as Categorias</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {getCategoryName(category)}
-                  </option>
-                ))}
-              </select>
-            </div>
+        {/* Search and Filter */}
+        <div className="bg-white rounded-xl shadow-md p-4 mb-12 flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Pesquisar artigos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+            />
+          </div>
+          <div className="flex items-center space-x-2 w-full md:w-auto">
+            <Filter className="text-gray-400 w-5 h-5" />
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full md:w-48 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none cursor-pointer bg-white"
+            >
+              <option value="all">Todas as Categorias</option>
+              {categories.map(cat => (
+                <option key={cat} value={cat}>{getCategoryName(cat)}</option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -358,32 +405,42 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
         {/* Posts Grid */}
         {!loading && !error && (
           <>
-            {posts.length > 0 ? (
+            {filteredPosts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                {posts.map((post) => (
+                {filteredPosts.map((post) => (
                   <article
                     key={post.id}
                     onClick={() => handlePostClick(post)}
-                    className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group"
+                    className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group transform hover:-translate-y-1"
                   >
                     {/* Featured Image */}
                     {post.imageUrl && (
-                      <div
-                        className="h-48 overflow-hidden cursor-pointer"
-                        onClick={() => handlePostClick(post)}
-                      >
+                      <div className="h-48 overflow-hidden relative">
+                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300 z-10" />
                         <img
                           src={post.imageUrl}
                           alt={getTranslatedField(post, 'title')}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
+                        <div className="absolute top-4 left-4 z-20">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-md ${getCategoryColor(post.category)}`}>
+                            {getCategoryName(post.category)}
+                          </span>
+                        </div>
                       </div>
                     )}
 
                     <div className="p-6">
-                      {/* Category Badge */}
-                      <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-3 ${getCategoryColor(post.category)}`}>
-                        {getCategoryName(post.category)}
+                      {/* Meta */}
+                      <div className="flex items-center space-x-4 text-xs text-gray-500 mb-4">
+                        <div className="flex items-center space-x-1">
+                          <Calendar className="w-3 h-3" />
+                          <span>{formatDate(post.publishedAt || post.createdAt)}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Clock className="w-3 h-3" />
+                          <span>{post.readingTime} min</span>
+                        </div>
                       </div>
 
                       {/* Title */}
@@ -393,47 +450,21 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
 
                       {/* Excerpt */}
                       {getTranslatedField(post, 'excerpt') && (
-                        <p className="text-gray-600 mb-4 line-clamp-3">
+                        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
                           {getTranslatedField(post, 'excerpt')}
                         </p>
                       )}
 
-                      {/* Meta Info */}
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>{formatDate(post.publishedAt || post.createdAt)}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{post.readingTime} min</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-1">
+                      {/* Footer */}
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <span className="text-blue-600 text-sm font-medium group-hover:translate-x-1 transition-transform flex items-center">
+                          Ler artigo completo
+                          <ArrowRight className="w-4 h-4 ml-1" />
+                        </span>
+                        <div className="flex items-center space-x-1 text-gray-400">
                           <Eye className="w-4 h-4" />
-                          <span>{post.views}</span>
+                          <span className="text-xs">{post.views}</span>
                         </div>
-                      </div>
-
-                      {/* Tags */}
-                      {post.tags.length > 0 && (
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          {post.tags.slice(0, 3).map((tag, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
-                            >
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Read More */}
-                      <div className="mt-4 flex items-center text-blue-600 font-medium group-hover:text-blue-700">
-                        <span>Ler artigo completo</span>
-                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
                   </article>

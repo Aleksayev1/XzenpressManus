@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, ArrowRight, ArrowLeft, CheckCircle, Target, Brain, Heart, Crown, Play, Zap } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface TutorialModalProps {
   isVisible: boolean;
@@ -20,103 +21,104 @@ interface TutorialStep {
   color: string;
 }
 
-export const TutorialModal: React.FC<TutorialModalProps> = ({ 
-  isVisible, 
-  onClose, 
-  onPageChange 
+export const TutorialModal: React.FC<TutorialModalProps> = ({
+  isVisible,
+  onClose,
+  onPageChange
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const { t } = useLanguage();
 
   const tutorialSteps: TutorialStep[] = [
     {
       id: 1,
-      title: '🌟 Bem-vindo ao XZenPress!',
-      description: 'Sua plataforma completa de bem-estar integrativa que combina Medicina Tradicional Chinesa, Craniopuntura, respiração científica e cromoterapia.',
+      title: t('tutorial.step1.title'),
+      description: t('tutorial.step1.description'),
       icon: <Heart className="w-8 h-8 text-red-500" />,
       tips: [
-        'Plataforma 100% baseada em evidências científicas',
-        'Mais de 15 anos de experiência clínica',
-        'Técnicas aprovadas pela Medicina Tradicional Chinesa',
-        'Resultados comprovados em milhares de usuários'
+        t('tutorial.step1.tip1'),
+        t('tutorial.step1.tip2'),
+        t('tutorial.step1.tip3'),
+        t('tutorial.step1.tip4')
       ],
       color: 'red'
     },
     {
       id: 2,
-      title: '🫴 Pontos de Acupressão',
-      description: 'Comece explorando nossos 20 pontos terapêuticos. 9 pontos são gratuitos e 11 são premium para casos específicos.',
+      title: t('tutorial.step2.title'),
+      description: t('tutorial.step2.description'),
       icon: <Target className="w-8 h-8 text-green-500" />,
       action: {
-        text: 'Explorar Pontos',
+        text: t('tutorial.step2.action'),
         page: 'acupressure'
       },
       tips: [
-        'Clique em qualquer ponto para ver detalhes',
-        'Leia as instruções antes de aplicar',
-        'Use o timer integrado para duração correta',
-        'Combine com respiração para potencializar efeitos'
+        t('tutorial.step2.tip1'),
+        t('tutorial.step2.tip2'),
+        t('tutorial.step2.tip3'),
+        t('tutorial.step2.tip4')
       ],
       color: 'green'
     },
     {
       id: 3,
-      title: '🧘 Respiração 4-7-8',
-      description: 'Técnica científica que combina 4 segundos de inspiração, 7 de retenção e 8 de expiração com cromoterapia sincronizada.',
+      title: t('tutorial.step3.title'),
+      description: t('tutorial.step3.description'),
       icon: <Brain className="w-8 h-8 text-blue-500" />,
       action: {
-        text: 'Praticar Respiração',
+        text: t('tutorial.step3.action'),
         page: 'breathing'
       },
       tips: [
-        'Azul na inspiração (4s) - ativa sistema parassimpático',
-        'Verde na retenção (7s) - equilibra sistema nervoso',
-        'Roxo na expiração (8s) - libera tensões',
-        'Pratique 3-4 ciclos para começar'
+        t('tutorial.step3.tip1'),
+        t('tutorial.step3.tip2'),
+        t('tutorial.step3.tip3'),
+        t('tutorial.step3.tip4')
       ],
       color: 'blue'
     },
     {
       id: 4,
-      title: '⚡ Terapia Integrada',
-      description: 'O diferencial do XZenPress: combine acupressão + respiração + cromoterapia + sons em uma única sessão.',
+      title: t('tutorial.step4.title'),
+      description: t('tutorial.step4.description'),
       icon: <Zap className="w-8 h-8 text-purple-500" />,
       tips: [
-        'Escolha um ponto de acupressão',
-        'Clique "Iniciar Terapia Integrada"',
-        'Siga a respiração 4-7-8 enquanto pressiona o ponto',
-        'As cores mudam automaticamente com sua respiração'
+        t('tutorial.step4.tip1'),
+        t('tutorial.step4.tip2'),
+        t('tutorial.step4.tip3'),
+        t('tutorial.step4.tip4')
       ],
       color: 'purple'
     },
     {
       id: 5,
-      title: '👑 Recursos Premium',
-      description: 'Desbloqueie pontos especializados, consulta WhatsApp, sons exclusivos e recomendações de IA.',
+      title: t('tutorial.step5.title'),
+      description: t('tutorial.step5.description'),
       icon: <Crown className="w-8 h-8 text-yellow-500" />,
       action: {
-        text: 'Ver Premium',
+        text: t('tutorial.step5.action'),
         page: 'premium'
       },
       tips: [
-        '11 pontos premium para casos específicos',
-        'Consulta personalizada via WhatsApp',
-        'Biblioteca completa de 50+ sons',
-        'Recomendações baseadas em IA'
+        t('tutorial.step5.tip1'),
+        t('tutorial.step5.tip2'),
+        t('tutorial.step5.tip3'),
+        t('tutorial.step5.tip4')
       ],
       color: 'yellow'
     },
     {
       id: 6,
-      title: '🎯 Dicas para Máximo Resultado',
-      description: 'Siga estas recomendações para obter os melhores resultados com o XZenPress.',
+      title: t('tutorial.step6.title'),
+      description: t('tutorial.step6.description'),
       icon: <CheckCircle className="w-8 h-8 text-green-600" />,
       tips: [
-        '🕐 Pratique no mesmo horário todos os dias',
-        '🧘 Comece com 5 minutos e aumente gradualmente',
-        '📱 Use sem pressa, foque na qualidade',
-        '💡 Combine técnicas para potencializar efeitos',
-        '📊 Acompanhe seu progresso (Premium)',
-        '🎵 Use sons harmonizantes durante a prática'
+        t('tutorial.step6.tip1'),
+        t('tutorial.step6.tip2'),
+        t('tutorial.step6.tip3'),
+        t('tutorial.step6.tip4'),
+        t('tutorial.step6.tip5'),
+        t('tutorial.step6.tip6')
       ],
       color: 'green'
     }
@@ -173,7 +175,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
           >
             <X className="w-5 h-5" />
           </button>
-          
+
           <div className="text-center">
             <div className="flex justify-center mb-4">
               <div className="p-3 bg-white bg-opacity-20 rounded-full backdrop-blur-sm">
@@ -192,20 +194,19 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
             {tutorialSteps.map((_, index) => (
               <div
                 key={index}
-                className={`w-3 h-3 rounded-full transition-all ${
-                  index === currentStep
+                className={`w-3 h-3 rounded-full transition-all ${index === currentStep
                     ? `bg-gradient-to-r ${getColorClasses(currentStepData.color).split(' ')[0]} ${getColorClasses(currentStepData.color).split(' ')[1]}`
                     : index < currentStep
-                    ? 'bg-green-500'
-                    : 'bg-gray-200'
-                }`}
+                      ? 'bg-green-500'
+                      : 'bg-gray-200'
+                  }`}
               />
             ))}
           </div>
 
           {/* Step Content */}
           <div className={`${getColorClasses(currentStepData.color).split(' ')[2]} border ${getColorClasses(currentStepData.color).split(' ')[3]} rounded-xl p-6 mb-6`}>
-            <h3 className="font-bold text-gray-800 mb-4">💡 Dicas importantes:</h3>
+            <h3 className="font-bold text-gray-800 mb-4">💡 {t('tutorial.tips')}:</h3>
             <div className="space-y-3">
               {currentStepData.tips.map((tip, index) => (
                 <div key={index} className="flex items-start space-x-3">
@@ -239,11 +240,11 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
               className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Anterior</span>
+              <span>{t('tutorial.previous')}</span>
             </button>
 
             <div className="text-sm text-gray-500">
-              {currentStep + 1} de {tutorialSteps.length}
+              {currentStep + 1} {t('tutorial.of')} {tutorialSteps.length}
             </div>
 
             {currentStep === tutorialSteps.length - 1 ? (
@@ -252,14 +253,14 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
                 className="flex items-center space-x-2 bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors font-semibold"
               >
                 <CheckCircle className="w-4 h-4" />
-                <span>Finalizar</span>
+                <span>{t('tutorial.finish')}</span>
               </button>
             ) : (
               <button
                 onClick={nextStep}
                 className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
               >
-                <span>Próximo</span>
+                <span>{t('tutorial.next')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}

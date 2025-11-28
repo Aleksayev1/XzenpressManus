@@ -1,0 +1,78 @@
+/* Google Translate Widget Styling */
+
+/* Hide the top banner that Google adds */
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
+}
+
+body {
+    top: 0 !important;
+}
+
+/* Style the widget container */
+.google-translate-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Clean up Google's default styles */
+.goog-te-gadget {
+    font-family: inherit !important;
+    font-size: 14px !important;
+}
+
+.goog-te-gadget-simple {
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    font-family: inherit !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value {
+    color: #374151 !important;
+    font-family: inherit !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value span {
+    color: #6b7280 !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value:hover {
+    text-decoration: none !important;
+}
+
+.goog-te-gadget-icon {
+    margin-right: 4px !important;
+}
+
+/* Remove Google branding if needed (be respectful) */
+.goog-logo-link {
+    display: none !important;
+}
+
+.goog-te-gadget span {
+    display: none !important;
+}
+
+/* Style the dropdown */
+.goog-te-combo {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    padding: 4px 8px !important;
+    font-size: 14px !important;
+    background-color: white !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+}
+
+.goog-te-combo:hover {
+    border-color: #9ca3af !important;
+}
+
+.goog-te-combo:focus {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}

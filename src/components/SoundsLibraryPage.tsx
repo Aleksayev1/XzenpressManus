@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, Music, Heart, Waves, CloudRain, Wind, Flame, Leaf, Star, Lock, Crown, ExternalLink } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Music, Heart, Waves, CloudRain, Wind, Flame, Leaf, Star, Lock, Crown, ExternalLink, Zap, Cloud } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { createSpotifyService } from '../services/spotifyService';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface SoundsLibraryPageProps {
   onPageChange: (page: string) => void;
@@ -21,6 +22,7 @@ interface Sound {
 
 export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChange }) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentSound, setCurrentSound] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -36,11 +38,11 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
   }, []);
 
   const categories = [
-    { id: 'all', name: 'Todos os Sons', icon: '🎵' },
-    { id: 'nature', name: 'Natureza', icon: '🌿' },
-    { id: 'ambient', name: 'Ambiente', icon: '🏠' },
-    { id: 'binaural', name: 'Binaurais', icon: '🧠', premium: true },
-    { id: 'mantras', name: 'Mantras', icon: '🕉️', premium: true },
+    { id: 'all', name: t('sounds.category.all'), icon: <Volume2 className="w-4 h-4" /> },
+    { id: 'nature', name: t('sounds.category.nature'), icon: <Cloud className="w-4 h-4" /> },
+    { id: 'ambient', name: t('sounds.category.ambient'), icon: <Wind className="w-4 h-4" /> },
+    { id: 'binaural', name: t('sounds.category.binaural'), icon: <Zap className="w-4 h-4" />, premium: true },
+    { id: 'mantras', name: t('sounds.category.mantras'), icon: <Music className="w-4 h-4" />, premium: true },
   ];
 
   const sounds: Sound[] = [
@@ -208,7 +210,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
   const currentSoundData = sounds.find(s => s.id === currentSound);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 pt-16">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 pt-16">
       {/* Audio Element */}
       {currentSound && currentSoundData?.src && (
         <audio
@@ -233,11 +235,11 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Biblioteca de Sons
+              {t('sounds.title')}
             </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Sons harmonizantes e frequências terapêuticas para potencializar sua prática
+            {t('sounds.subtitle')}
           </p>
         </div>
 
@@ -248,17 +250,17 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                disabled={category.premium && !user?.isPremium}
+                disabled={(category as any).premium && !user?.isPremium}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${selectedCategory === category.id
                   ? 'bg-purple-500 text-white shadow-lg'
-                  : category.premium && !user?.isPremium
+                  : (category as any).premium && !user?.isPremium
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
               >
                 <span>{category.icon}</span>
                 <span>{category.name}</span>
-                {category.premium && !user?.isPremium && (
+                {(category as any).premium && !user?.isPremium && (
                   <Lock className="w-4 h-4" />
                 )}
               </button>
@@ -421,24 +423,24 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
         {/* Premium CTA */}
         {!user?.isPremium && (
           <div className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-3xl p-8 text-center text-white">
-            <h2 className="text-3xl font-bold mb-4">🔒 Biblioteca Premium</h2>
+            <h2 className="text-3xl font-bold mb-4">{t('sounds.premium.title')}</h2>
             <p className="text-xl mb-6 opacity-90">
-              Desbloqueie mais de 50 sons exclusivos + integração Spotify
+              {t('sounds.premium.subtitle')}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-white bg-opacity-20 rounded-lg p-4">
                 <div className="text-2xl mb-2">🧠</div>
-                <div className="font-semibold">Binaurais</div>
+                <div className="font-semibold">{t('sounds.category.binaural')}</div>
                 <div className="text-sm opacity-80">Frequências terapêuticas</div>
               </div>
               <div className="bg-white bg-opacity-20 rounded-lg p-4">
                 <div className="text-2xl mb-2">🕉️</div>
-                <div className="font-semibold">Mantras</div>
+                <div className="font-semibold">{t('sounds.category.mantras')}</div>
                 <div className="text-sm opacity-80">Vibrações sagradas</div>
               </div>
               <div className="bg-white bg-opacity-20 rounded-lg p-4">
                 <div className="text-2xl mb-2">🌿</div>
-                <div className="font-semibold">Natureza HD</div>
+                <div className="font-semibold">{t('sounds.category.nature')}</div>
                 <div className="text-sm opacity-80">Alta qualidade</div>
               </div>
               <div className="bg-white bg-opacity-20 rounded-lg p-4">
@@ -451,7 +453,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
               onClick={() => onPageChange('premium')}
               className="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >
-              🔓 Desbloquear Biblioteca Completa
+              {t('sounds.premium.unlock')}
             </button>
           </div>
         )}
@@ -459,9 +461,9 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
         {/* Spotify Integration */}
         <div className="mt-8 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-200">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">🎵 Integração Spotify Premium</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">🎵 {t('sounds.spotify.title')}</h2>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              Conecte sua conta Spotify Premium para acessar playlists curadas especialmente para meditação e bem-estar
+              {t('sounds.spotify.subtitle')}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <a
@@ -505,16 +507,15 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
               className="bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition-colors flex items-center justify-center mx-auto space-x-2"
             >
               <Music className="w-5 h-5" />
-              <span>Conectar Conta Spotify</span>
+              <span>{t('sounds.spotify.connect')}</span>
             </button>
           ) : (
             <button className="bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition-colors">
-              ✅ Links Spotify Oficiais Ativos
+              ✅ {t('sounds.spotify.active')}
             </button>
           )}
         </div>
       </div>
     </div>
-
   );
 };

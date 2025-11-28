@@ -35,7 +35,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
   const [viewingPoint, setViewingPoint] = useState<string | null>(null);
   const [showZoomModal, setShowZoomModal] = useState(false);
   const [zoomImageUrl, setZoomImageUrl] = useState<string | null>(null);
-  
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const totalTimeRef = useRef<NodeJS.Timeout | null>(null);
   const breathingTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -72,27 +72,27 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     if (isTimerActive && timeLeft > 0) {
       const startTime = Date.now();
       expectedPhaseTimeRef.current = startTime + 1000;
-      
+
       const tick = () => {
         const now = Date.now();
         const drift = now - expectedPhaseTimeRef.current;
-        
+
         setTimeLeft(prev => {
           if (prev <= 1) {
             return 0;
           }
           return prev - 1;
         });
-        
+
         if (timeLeft > 1) {
           expectedPhaseTimeRef.current += 1000;
           const nextDelay = Math.max(0, 1000 - drift);
           timerRef.current = setTimeout(tick, nextDelay);
         }
       };
-      
+
       timerRef.current = setTimeout(tick, 1000);
-      
+
       return () => {
         if (timerRef.current) {
           clearTimeout(timerRef.current);
@@ -109,23 +109,23 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     if (isTimerActive) {
       const startTime = Date.now();
       expectedTotalTimeRef.current = startTime + 1000;
-      
+
       const totalTick = () => {
         const now = Date.now();
         const drift = now - expectedTotalTimeRef.current;
-        
+
         setTotalSessionTime(prev => prev + 1);
-        
+
         expectedTotalTimeRef.current += 1000;
         const nextDelay = Math.max(0, 1000 - drift);
-        
+
         if (isTimerActive) {
           totalTimeRef.current = setTimeout(totalTick, nextDelay);
         }
       };
-      
+
       totalTimeRef.current = setTimeout(totalTick, 1000);
-      
+
       return () => {
         if (totalTimeRef.current) {
           clearTimeout(totalTimeRef.current);
@@ -140,11 +140,11 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     if (isTimerActive) {
       const startTime = Date.now();
       expectedBreathingTimeRef.current = startTime + 1000;
-      
+
       const breathingTick = () => {
         const now = Date.now();
         const drift = now - expectedBreathingTimeRef.current;
-        
+
         setBreathingTimeLeft(prev => {
           if (prev <= 1) {
             const currentPhase = breathingPhases[breathingPhase];
@@ -155,17 +155,17 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
           }
           return prev - 1;
         });
-        
+
         expectedBreathingTimeRef.current += 1000;
         const nextDelay = Math.max(0, 1000 - drift);
-        
+
         if (isTimerActive) {
           breathingTimerRef.current = setTimeout(breathingTick, nextDelay);
         }
       };
-      
+
       breathingTimerRef.current = setTimeout(breathingTick, 1000);
-      
+
       return () => {
         if (breathingTimerRef.current) {
           clearTimeout(breathingTimerRef.current);
@@ -194,9 +194,9 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     setBreathingTimeLeft(4);
     setCurrentColor('#1E40AF');
     sessionStartTime.current = Date.now();
-    
+
     trackAcupressureSession(pointId, point.duration || 120, true);
-    
+
     if (!usedPoints.includes(pointId)) {
       setUsedPoints(prev => [...prev, pointId]);
     }
@@ -204,7 +204,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
 
   const stopTimer = () => {
     setIsTimerActive(false);
-    
+
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
@@ -217,7 +217,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
       clearTimeout(breathingTimerRef.current);
       breathingTimerRef.current = null;
     }
-    
+
     if (user && sessionStartTime.current && totalSessionTime > 30) {
       recordSessionData();
     }
@@ -232,7 +232,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     setBreathingTimeLeft(4);
     setCurrentColor('#1E40AF');
     sessionStartTime.current = null;
-    
+
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
@@ -264,7 +264,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
         },
         completedAt: new Date().toISOString()
       });
-      
+
       console.log('✅ Sessão de terapia integrada registrada com sucesso');
     } catch (error) {
       console.error('❌ Erro ao registrar sessão de terapia integrada:', error);
@@ -352,9 +352,8 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
           <img
             src={imageUrl}
             alt="Ponto de acupressão ampliado"
-            className={`max-w-full max-h-[95vh] object-contain rounded-xl shadow-2xl transition-opacity duration-300 cursor-pointer ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`max-w-full max-h-[95vh] object-contain rounded-xl shadow-2xl transition-opacity duration-300 cursor-pointer ${imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
             onClick={onClose}
             onLoad={() => {
               console.log('Imagem carregada com sucesso!');
@@ -388,16 +387,16 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
   };
 
   return (
-    <div 
-      className="min-h-screen transition-all duration-1000 ease-in-out pt-16 relative"
-      style={{ 
+    <div
+      className="min-h-screen transition-all duration-1000 ease-in-out pt-24 relative"
+      style={{
         background: isTimerActive
           ? `radial-gradient(circle at center, ${currentColor}40, ${currentColor}20, ${currentColor}10, white)`
           : 'linear-gradient(135deg, #f0f9ff, #e0f2fe, white)'
       }}
     >
       {/* Compact Sound Player - Fixed Position */}
-      <CompactSoundPlayer 
+      <CompactSoundPlayer
         currentColor={currentColor}
         onNavigateToLibrary={() => onPageChange('sounds')}
       />
@@ -431,13 +430,12 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
                   disabled={category.premium && !user?.isPremium}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${
-                    selectedCategory === category.id
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${selectedCategory === category.id
                       ? 'bg-green-500 text-white shadow-lg'
                       : category.premium && !user?.isPremium
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
                 >
                   <span>{category.icon}</span>
                   <span>{t(`acupressure.categories.${category.id}`)}</span>
@@ -454,9 +452,9 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
         {isTimerActive && selectedPointData && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* LEFT COLUMN: Breathing Circle & Timers - CORES DINÂMICAS */}
-            <div 
+            <div
               className="rounded-3xl shadow-2xl p-6 border-2 transition-all duration-1000"
-              style={{ 
+              style={{
                 borderColor: currentColor + '60',
                 background: `linear-gradient(135deg, ${currentColor}25, ${currentColor}15, ${currentColor}08, white)`
               }}
@@ -464,9 +462,9 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
               {/* Compact Header */}
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Terapia Integrada Ativa</h2>
-                <div 
+                <div
                   className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold"
-                  style={{ 
+                  style={{
                     backgroundColor: currentColor + '30',
                     color: currentColor,
                     borderColor: currentColor + '50'
@@ -512,16 +510,16 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                     className="transition-all duration-500 ease-in-out"
                   />
                 </svg>
-                
+
                 {/* Center content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <div 
+                  <div
                     className="text-5xl font-bold mb-2 transition-colors duration-500"
                     style={{ color: currentColor }}
                   >
                     {breathingTimeLeft}
                   </div>
-                  <div 
+                  <div
                     className="text-xl font-semibold uppercase tracking-wider transition-colors duration-500"
                     style={{ color: currentColor }}
                   >
@@ -532,12 +530,11 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
 
               {/* Breathing Phase Indicators - CORES HARMONIOSAS */}
               <div className="grid grid-cols-3 gap-3 text-center mb-6">
-                <div 
-                  className={`p-4 rounded-xl transition-all duration-500 border-2 ${
-                    breathingPhase === 'inhale' 
-                      ? 'text-white shadow-xl transform scale-110' 
+                <div
+                  className={`p-4 rounded-xl transition-all duration-500 border-2 ${breathingPhase === 'inhale'
+                      ? 'text-white shadow-xl transform scale-110'
                       : 'border-2'
-                  }`}
+                    }`}
                   style={breathingPhase === 'inhale' ? {
                     backgroundColor: '#1E40AF',
                     borderColor: '#1E40AF'
@@ -551,12 +548,11 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                   <div className="text-sm">Inspire</div>
                   <div className="text-xs mt-1 font-bold">Azul Intenso</div>
                 </div>
-                <div 
-                  className={`p-4 rounded-xl transition-all duration-500 border-2 ${
-                    breathingPhase === 'hold' 
-                      ? 'text-white shadow-xl transform scale-110' 
+                <div
+                  className={`p-4 rounded-xl transition-all duration-500 border-2 ${breathingPhase === 'hold'
+                      ? 'text-white shadow-xl transform scale-110'
                       : 'border-2'
-                  }`}
+                    }`}
                   style={breathingPhase === 'hold' ? {
                     backgroundColor: '#047857',
                     borderColor: '#047857'
@@ -570,12 +566,11 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                   <div className="text-sm">Segure</div>
                   <div className="text-xs mt-1 font-bold">Verde Intenso</div>
                 </div>
-                <div 
-                  className={`p-4 rounded-xl transition-all duration-500 border-2 ${
-                    breathingPhase === 'exhale' 
-                      ? 'text-white shadow-xl transform scale-110' 
+                <div
+                  className={`p-4 rounded-xl transition-all duration-500 border-2 ${breathingPhase === 'exhale'
+                      ? 'text-white shadow-xl transform scale-110'
                       : 'border-2'
-                  }`}
+                    }`}
                   style={breathingPhase === 'exhale' ? {
                     backgroundColor: '#6B21A8',
                     borderColor: '#6B21A8'
@@ -593,7 +588,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
 
               {/* Timer Info - CORES DINÂMICAS */}
               <div className="text-center mb-6">
-                <div 
+                <div
                   className="text-4xl font-bold mb-2 transition-colors duration-500"
                   style={{ color: currentColor }}
                 >
@@ -622,7 +617,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                 <button
                   onClick={() => onPageChange('sounds')}
                   className="flex items-center justify-center space-x-2 px-6 py-3 rounded-full font-semibold transition-all shadow-lg"
-                  style={{ 
+                  style={{
                     backgroundColor: currentColor,
                     color: 'white'
                   }}
@@ -634,9 +629,9 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
             </div>
 
             {/* RIGHT COLUMN: Point Details - CORES HARMONIOSAS */}
-            <div 
+            <div
               className="rounded-3xl shadow-2xl p-6 border-2 transition-all duration-1000"
-              style={{ 
+              style={{
                 borderColor: currentColor + '40',
                 background: `linear-gradient(135deg, ${currentColor}15, ${currentColor}08, ${currentColor}05, white)`
               }}
@@ -697,7 +692,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                 <div className="space-y-2 mb-4">
                   {getTranslatedField(selectedPointData, 'benefits').slice(0, 4).map((benefit, index) => (
                     <div key={index} className="flex items-start space-x-2">
-                      <div 
+                      <div
                         className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                         style={{ backgroundColor: currentColor }}
                       >
@@ -712,9 +707,9 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
               {/* Point Description - SEGUNDO */}
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-800 mb-2">Localização & Como aplicar:</h4>
-                <div 
+                <div
                   className="rounded-lg p-3 border"
-                  style={{ 
+                  style={{
                     backgroundColor: currentColor + '15',
                     borderColor: currentColor + '40'
                   }}
@@ -726,16 +721,16 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
               </div>
 
               {/* Active Session Status - CORES HARMONIOSAS */}
-              <div 
+              <div
                 className="text-center p-4 rounded-xl border-2"
-                style={{ 
+                style={{
                   backgroundColor: currentColor + '20',
                   borderColor: currentColor + '50'
                 }}
               >
                 <div className="flex items-center justify-center space-x-2 mb-2">
                   <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: currentColor }}></div>
-                  <span 
+                  <span
                     className="font-semibold"
                     style={{ color: currentColor }}
                   >
@@ -745,7 +740,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                 <div className="text-sm text-gray-600">
                   Respiração 4-7-8 + Acupressão + Cromoterapia
                 </div>
-                
+
                 {/* Botão para voltar aos pontos */}
                 <button
                   onClick={() => {
@@ -759,7 +754,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                     setBreathingTimeLeft(4);
                     setCurrentColor('#1E40AF');
                     sessionStartTime.current = null;
-                    
+
                     // Limpar todos os timers
                     if (timerRef.current) {
                       clearTimeout(timerRef.current);
@@ -775,7 +770,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                     }
                   }}
                   className="mt-4 w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all border-2"
-                  style={{ 
+                  style={{
                     backgroundColor: 'white',
                     borderColor: currentColor + '40',
                     color: currentColor
@@ -792,11 +787,11 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
         {/* DEFAULT VIEW: Points List + Details Panel */}
         {!isTimerActive && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
             {/* COLUNA ESQUERDA: Lista de Pontos */}
             <div className="lg:col-span-2">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">Pontos Terapêuticos</h2>
-            
+
               {/* Points Grid */}
               <div className="space-y-4">
                 {filteredPoints.map((point) => (
@@ -809,17 +804,15 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                         setViewingPoint(point.id);
                       }
                     }}
-                    className={`bg-white rounded-xl shadow-lg transition-all duration-300 border-2 cursor-pointer p-4 ${
-                      selectedPoint === point.id
+                    className={`bg-white rounded-xl shadow-lg transition-all duration-300 border-2 cursor-pointer p-4 ${selectedPoint === point.id
                         ? 'border-green-500 shadow-xl bg-green-50'
-                      : viewingPoint === point.id
-                        ? 'border-blue-500 shadow-xl bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:shadow-xl'
-                    } ${
-                      point.isPremium && !user?.isPremium
+                        : viewingPoint === point.id
+                          ? 'border-blue-500 shadow-xl bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300 hover:shadow-xl'
+                      } ${point.isPremium && !user?.isPremium
                         ? 'opacity-60'
                         : ''
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center space-x-4">
                       {/* Point Image */}
@@ -879,17 +872,16 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
 
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
-                            <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              point.category === 'general' ? 'bg-blue-100 text-blue-800' :
-                              point.category === 'cranio' ? 'bg-purple-100 text-purple-800' :
-                              point.category === 'septicemia' ? 'bg-red-100 text-red-800' :
-                              point.category === 'atm' ? 'bg-orange-100 text-orange-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}>
-                              {point.category === 'general' ? 'MTC Geral' : 
-                               point.category === 'cranio' ? 'Cranio' :
-                               point.category === 'septicemia' ? 'Septicemia' :
-                               point.category === 'atm' ? 'ATM' : point.category}
+                            <div className={`px-2 py-1 rounded-full text-xs font-medium ${point.category === 'general' ? 'bg-blue-100 text-blue-800' :
+                                point.category === 'cranio' ? 'bg-purple-100 text-purple-800' :
+                                  point.category === 'septicemia' ? 'bg-red-100 text-red-800' :
+                                    point.category === 'atm' ? 'bg-orange-100 text-orange-800' :
+                                      'bg-gray-100 text-gray-800'
+                              }`}>
+                              {point.category === 'general' ? 'MTC Geral' :
+                                point.category === 'cranio' ? 'Cranio' :
+                                  point.category === 'septicemia' ? 'Septicemia' :
+                                    point.category === 'atm' ? 'ATM' : point.category}
                             </div>
                             {point.isPremium && (
                               <div className="flex items-center space-x-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
@@ -898,7 +890,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                               </div>
                             )}
                           </div>
-                        
+
                           <div className="text-green-600 text-sm font-medium">
                             Ver detalhes →
                           </div>
@@ -1133,7 +1125,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                 <div className="text-sm opacity-80">Sempre Ativa</div>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => onPageChange('premium')}
               className="bg-white text-orange-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >

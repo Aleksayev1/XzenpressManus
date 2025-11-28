@@ -3,6 +3,7 @@ import { TrendingUp, Calendar, Target, Award, BarChart3, PieChart, Activity, Zap
 import { useAuth } from '../contexts/AuthContext';
 import { useSessionHistory } from '../hooks/useSessionHistory';
 import { acupressurePoints } from '../data/acupressurePoints';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface ProgressTrackingPageProps {
   onPageChange: (page: string) => void;
@@ -23,6 +24,7 @@ interface Goal {
 
 export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPageChange }) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter'>('week');
   const { sessions, stats, loading, error } = useSessionHistory(selectedPeriod);
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -39,10 +41,10 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
               </div>
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Acompanhamento Premium
+              {t('progress.premium.title')}
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Monitore seu progresso com analytics detalhados, metas personalizadas e insights baseados em IA
+              {t('progress.premium.subtitle')}
             </p>
 
             {/* Premium Features Preview */}
@@ -112,7 +114,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
               onClick={() => onPageChange('premium')}
               className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-green-600 hover:to-blue-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >
-              📈 Ativar Acompanhamento Premium
+              📈 {t('progress.premium.activate')}
             </button>
 
             <p className="text-sm text-gray-500 mt-4">
@@ -129,7 +131,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
       const updatedGoals: Goal[] = [
         {
           id: 'daily-breathing',
-          title: 'Respiração Diária',
+          title: t('progress.goals.daily_breathing'),
           description: 'Praticar respiração 4-7-8 todos os dias',
           target: 1,
           current: stats.sessionsByType['breathing'] || 0,
@@ -140,7 +142,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
         },
         {
           id: 'weekly-acupressure',
-          title: 'Acupressão Semanal',
+          title: t('progress.goals.weekly_acupressure'),
           description: 'Aplicar pontos de acupressão regularmente',
           target: 7,
           current: (stats.sessionsByType['acupressure'] || 0) + (stats.sessionsByType['integrated'] || 0),
@@ -151,7 +153,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
         },
         {
           id: 'total-time',
-          title: 'Tempo de Prática',
+          title: t('progress.goals.total_time'),
           description: 'Meta de tempo semanal de prática',
           target: 1800, // 30 minutos
           current: stats.totalTime,
@@ -162,7 +164,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
         },
         {
           id: 'effectiveness',
-          title: 'Efetividade',
+          title: t('progress.goals.effectiveness'),
           description: 'Manter avaliação média acima de 4.0',
           target: 4.0,
           current: stats.averageEffectiveness,
@@ -178,7 +180,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
       const defaultGoals: Goal[] = [
         {
           id: 'daily-breathing',
-          title: 'Respiração Diária',
+          title: t('progress.goals.daily_breathing'),
           description: 'Praticar respiração 4-7-8 todos os dias',
           target: 1,
           current: 0,
@@ -189,7 +191,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
         },
         {
           id: 'weekly-acupressure',
-          title: 'Acupressão Semanal',
+          title: t('progress.goals.weekly_acupressure'),
           description: 'Aplicar pontos de acupressão regularmente',
           target: 7,
           current: 0,
@@ -200,7 +202,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
         },
         {
           id: 'total-time',
-          title: 'Tempo de Prática',
+          title: t('progress.goals.total_time'),
           description: 'Meta de tempo semanal de prática',
           target: 1800,
           current: 0,
@@ -211,7 +213,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
         },
         {
           id: 'effectiveness',
-          title: 'Efetividade',
+          title: t('progress.goals.effectiveness'),
           description: 'Manter avaliação média acima de 4.0',
           target: 4.0,
           current: 0,
@@ -273,8 +275,8 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Acompanhamento de Progresso</h1>
-              <p className="text-gray-600 mt-2">Monitore sua evolução no bem-estar integrativo</p>
+              <h1 className="text-3xl font-bold text-gray-900">{t('progress.title')}</h1>
+              <p className="text-gray-600 mt-2">{t('progress.subtitle')}</p>
             </div>
             <div className="flex items-center space-x-4">
               <select
@@ -282,9 +284,9 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                 onChange={(e) => setSelectedPeriod(e.target.value as 'week' | 'month' | 'quarter')}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
-                <option value="week">Última Semana</option>
-                <option value="month">Último Mês</option>
-                <option value="quarter">Último Trimestre</option>
+                <option value="week">{t('progress.period.week')}</option>
+                <option value="month">{t('progress.period.month')}</option>
+                <option value="quarter">{t('progress.period.quarter')}</option>
               </select>
             </div>
           </div>
@@ -296,14 +298,14 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
             <div className="col-span-full text-center py-8">
               <div className="inline-flex items-center space-x-2">
                 <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-gray-600">Carregando progresso...</span>
+                <span className="text-gray-600">{t('progress.loading')}</span>
               </div>
             </div>
           )}
 
           {error && (
             <div className="col-span-full bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-700">Erro ao carregar dados: {error}</p>
+              <p className="text-red-700">{t('progress.error')}: {error}</p>
             </div>
           )}
 
@@ -359,9 +361,9 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                   <div key={session.id || index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className={`w-3 h-3 rounded-full ${session.sessionType === 'breathing' ? 'bg-blue-500' :
-                          session.sessionType === 'acupressure' ? 'bg-green-500' :
-                            session.sessionType === 'integrated' ? 'bg-purple-500' :
-                              'bg-gray-500'
+                        session.sessionType === 'acupressure' ? 'bg-green-500' :
+                          session.sessionType === 'integrated' ? 'bg-purple-500' :
+                            'bg-gray-500'
                         }`}></div>
                       <div>
                         <div className="font-medium text-gray-800 text-sm">
@@ -426,7 +428,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                   <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <Activity className="w-5 h-5 text-blue-600" />
-                      <span className="font-medium text-blue-800">Total de Sessões</span>
+                      <span className="font-medium text-blue-800">{t('progress.stats.total_sessions')}</span>
                     </div>
                     <span className="text-blue-600 font-bold">{stats.totalSessions}</span>
                   </div>
@@ -434,7 +436,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                   <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <TrendingUp className="w-5 h-5 text-green-600" />
-                      <span className="font-medium text-green-800">Tempo Total</span>
+                      <span className="font-medium text-green-800">{t('progress.stats.total_time')}</span>
                     </div>
                     <span className="text-green-600 font-bold">
                       {Math.floor(stats.totalTime / 60)}min
@@ -444,7 +446,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                   <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <Target className="w-5 h-5 text-purple-600" />
-                      <span className="font-medium text-purple-800">Ponto Favorito</span>
+                      <span className="font-medium text-purple-800">{t('progress.stats.favorite_point')}</span>
                     </div>
                     <span className="text-purple-600 font-bold text-sm">
                       {getFavoritePointName(stats.favoritePoint)}
@@ -455,7 +457,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                     <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
                       <div className="flex items-center space-x-3">
                         <Star className="w-5 h-5 text-yellow-600" />
-                        <span className="font-medium text-yellow-800">Efetividade</span>
+                        <span className="font-medium text-yellow-800">{t('progress.stats.effectiveness')}</span>
                       </div>
                       <span className="text-yellow-600 font-bold">
                         {stats.averageEffectiveness.toFixed(1)}/5.0
@@ -476,7 +478,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
               <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-200">
                 <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
                   <Award className="w-5 h-5 text-yellow-600 mr-2" />
-                  Conquistas
+                  {t('progress.achievements.title')}
                 </h3>
                 <div className="space-y-3">
                   {stats.totalSessions >= 1 && (
@@ -535,7 +537,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
               <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-200">
                 <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
                   <Brain className="w-5 h-5 text-purple-600 mr-2" />
-                  Recomendações Baseadas no seu Progresso
+                  {t('progress.recommendations.title')}
                 </h3>
                 <div className="space-y-3">
                   {stats.totalSessions === 0 && (
@@ -583,7 +585,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
             <div>
               {/* Wellness Score baseado em dados reais */}
               <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">Índice de Bem-estar</h3>
+                <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">{t('progress.wellness_index')}</h3>
                 <div className="text-center">
                   <div className="text-4xl font-bold text-green-600 mb-2">
                     {Math.min(100, Math.round((stats.averageEffectiveness / 5) * 100))}

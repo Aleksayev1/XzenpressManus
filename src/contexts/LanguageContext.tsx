@@ -315,7 +315,62 @@ const translations = {
     'whatsapp.form.notice.title': 'Importante',
     'whatsapp.form.notice.text': 'Este formulário será enviado diretamente para nosso especialista via WhatsApp',
     'whatsapp.form.submit': 'Enviar para WhatsApp',
-    'whatsapp.form.redirect': 'Você será redirecionado para o WhatsApp com sua mensagem pronta'
+    'whatsapp.form.redirect': 'Você será redirecionado para o WhatsApp com sua mensagem pronta',
+
+    // Tutorial
+    'tutorial.tips': 'Dicas',
+    'tutorial.previous': 'Anterior',
+    'tutorial.next': 'Próximo',
+    'tutorial.of': 'de',
+    'tutorial.finish': 'Finalizar',
+
+    'tutorial.step1.title': 'Bem-vindo ao XZenPress!',
+    'tutorial.step1.description': 'Sua jornada para o bem-estar integrativo começa aqui',
+    'tutorial.step1.tip1': 'Combine técnicas milenares com ciência moderna',
+    'tutorial.step1.tip2': 'Acesse ferramentas terapêuticas gratuitas 24/7',
+    'tutorial.step1.tip3': 'Acompanhe seu progresso e evolução',
+    'tutorial.step1.tip4': 'Descubra o poder da medicina integrativa',
+
+    'tutorial.step2.title': 'Acupressão MTC',
+    'tutorial.step2.description': 'Pontos terapêuticos para alívio natural e imediato',
+    'tutorial.step2.action': 'Explorar Pontos',
+    'tutorial.step2.tip1': '20 pontos baseados em Medicina Tradicional Chinesa',
+    'tutorial.step2.tip2': 'Terapia integrada: acupressão + respiração + cromoterapia',
+    'tutorial.step2.tip3': 'Cada ponto tem indicações e contraindicações',
+    'tutorial.step2.tip4': 'Resultados visíveis em minutos',
+
+    'tutorial.step3.title': 'Respiração 4-7-8',
+    'tutorial.step3.description': 'Técnica científica com cromoterapia sincronizada',
+    'tutorial.step3.action': 'Experimentar Agora',
+    'tutorial.step3.tip1': 'Reduz ansiedade e melhora o sono',
+    'tutorial.step3.tip2': 'Cores terapêuticas potencializam os efeitos',
+    'tutorial.step3.tip3': 'Ativa o sistema parassimpático',
+    'tutorial.step3.tip4': 'Use quando sentir estresse ou tensão',
+
+    'tutorial.step4.title': 'Sons Harmonizantes',
+    'tutorial.step4.description': 'Biblioteca relaxante + integração Spotify',
+    'tutorial.step4.tip1': 'Mais de 20 sons relaxantes gratuitos',
+    'tutorial.step4.tip2': 'Integração com Spotify Premium (assinantes)',
+    'tutorial.step4.tip3': 'Combine sons com respiração e acupressão',
+    'tutorial.step4.tip4': 'Crie seu ambiente terapêutico ideal',
+
+    'tutorial.step5.title': 'Recursos Premium',
+    'tutorial.step5.description': 'Desbloqueie todo o potencial terapêutico',
+    'tutorial.step5.action': 'Ver Planos',
+    'tutorial.step5.tip1': 'Consulta especializada via WhatsApp',
+    'tutorial.step5.tip2': '11 pontos exclusivos para casos complexos',
+    'tutorial.step5.tip3': 'Cromoterapia avançada personalizada',
+    'tutorial.step5.tip4': 'Suporte prioritário e acompanhamento',
+
+    'tutorial.step6.title': 'Pronto para Começar!',
+    'tutorial.step6.description': 'Você tem tudo que precisa para transformar seu bem-estar',
+    'tutorial.step6.tip1': 'Explore os pontos de acupressão',
+    'tutorial.step6.tip2': 'Pratique a respiração 4-7-8 diariamente',
+    'tutorial.step6.tip3': 'Acompanhe seu progresso no dashboard',
+    'tutorial.step6.tip4': 'Use sons para potencializar as sessões',
+    'tutorial.step6.tip5': 'Personalize sua experiência',
+    'tutorial.step6.tip6': 'Considere o Premium para casos específicos'
+
   },
 
   en: {

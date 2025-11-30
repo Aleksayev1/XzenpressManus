@@ -39,7 +39,7 @@ const translations = {
 
     // Home Page
     'home.hero.title': 'XZenPress Wellness',
-    'home.hero.subtitle': 'Plataforma completa de bem-estar integrativa com acupressão MTC, Craniopuntura, respiração 4-7-8 e cromoterapia avançada',
+    'home.hero.subtitle': 'Plataforma completa de bem-estar integrativa com acupressão MTC, Craniopuntura, respiração 4-7-8, cromoterapia avançada e sons terapêuticos harmonizantes',
     'home.hero.startNow': 'Começar Agora',
     'home.hero.createAccount': 'Criar Conta',
 

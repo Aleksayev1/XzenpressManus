@@ -1,0 +1,49 @@
+# 🎵 VARIÁVEL DE AMBIENTE SPOTIFY
+
+Cole isso no Netlify (Site Configuration → Environment Variables):
+
+## Nome da Variável:
+```
+VITE_SPOTIFY_CLIENT_ID
+```
+
+## Valor:
+```
+[Cole aqui o Client ID do https://developer.spotify.com/dashboard]
+```
+
+## Exemplo do que vai ficar:
+```
+VITE_SPOTIFY_CLIENT_ID=a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+```
+
+---
+
+## Passo a passo rápido:
+
+1. **Spotify Developer Dashboard**
+   - Acesse: https://developer.spotify.com/dashboard
+   - Faça login
+   - Clique em "Create App"
+   - Nome: `XZenPress Wellness`
+   - Redirect URIs: 
+     - `https://xzenpress-app.netlify.app/spotify-callback`
+   - Copie o **Client ID**
+
+2. **Netlify**
+   - Site Configuration → Environment Variables
+   - Add a variable
+   - Key: `VITE_SPOTIFY_CLIENT_ID`
+   - Value: [Cole o Client ID aqui]
+   - Save
+
+3. **Deploy**
+   - Faça um novo deploy
+   - Pronto! 🎉
+
+---
+
+**Opcional:** Se quiser testar localmente antes, descomente esta linha no arquivo `.env`:
+```
+# VITE_SPOTIFY_CLIENT_ID=seu_spotify_client_id_aqui
+```

@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.xzenpress.app",
+      "sha256_cert_fingerprints": [
+        "F9:DC:82:C1:DE:7E:5C:4A:9E:74:67:6C:00:02:C3:A9:47:05:55:F1:EC:BC:36:11:0D:04:0B:D8:93:FF:C9:3C"
+      ]
+    }
+  }
+]

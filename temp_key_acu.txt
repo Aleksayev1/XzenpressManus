@@ -1,0 +1,5 @@
+﻿erro de keytool: java.lang.Exception: O arquivo da ßrea de armazenamento de chaves nÒo existe. C:\Users\Alexandre\Downloads\app acupressÒo\signing.keystore
+java.lang.Exception: O arquivo da ßrea de armazenamento de chaves nÒo existe. C:\Users\Alexandre\Downloads\app acupressÒo\signing.keystore
+	at java.base/sun.security.tools.keytool.Main.doCommands(Unknown Source)
+	at java.base/sun.security.tools.keytool.Main.run(Unknown Source)
+	at java.base/sun.security.tools.keytool.Main.main(Unknown Source)

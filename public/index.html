@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y74MT1V5JC"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-Y74MT1V5JC');
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#059669" />
+    <meta name="description" content="XZenPress - Plataforma completa de bem-estar holístico com acupressão MTC, respiração 4-7-8, cromoterapia e sons harmonizantes" />
+    <!-- Force cache refresh -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    
+    <meta name="keywords" content="acupressão, medicina tradicional chinesa, respiração 4-7-8, cromoterapia, bem-estar, saúde natural" />
+    <meta name="author" content="XZenPress" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://xzenpress.com/" />
+    <meta property="og:title" content="XZenPress - Bem-estar Holístico" />
+    <meta property="og:description" content="Transforme sua vida com terapias holísticas: acupressão, respiração 4-7-8, cromoterapia e sons harmonizantes" />
+    <meta property="og:image" content="/og-image.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://xzenpress.com/" />
+    <meta property="twitter:title" content="XZenPress - Bem-estar Holístico" />
+    <meta property="twitter:description" content="Transforme sua vida com terapias holísticas: acupressão, respiração 4-7-8, cromoterapia e sons harmonizantes" />
+    <meta property="twitter:image" content="/og-image.png" />
+
+    <!-- PWA -->
+    <link rel="apple-touch-icon" href="/logo192.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="XZenPress" />
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <title>XZenPress - Plataforma de Bem-Estar Holística</title>
+  </head>
+  <body>
+    <noscript>
+      <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h2>JavaScript é necessário</h2>
+        <p>Por favor, habilite o JavaScript no seu navegador para usar o XZenPress.</p>
+      </div>
+    </noscript>
+    
+    <div id="root"></div>
+    
+    <!-- Google Translate Integration -->
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+🔍 VERIFICAÇÃO PÓS-DEPLOY
+=========================
+
+📡 Testando site...
+[0;32m✅ Site acessível (HTTP 200)[0m
+
+🖼️ Testando imagens do Supabase Storage...
+[0;32m✅ Logo-Xzenpress-oficial.png[0m
+[0;32m✅ ponto-da-acupuntura-que-tira-ex-hn-yintang-EX-HN3.jpg[0m
+[0;32m✅ VG20Baihui.jpg[0m
+[0;32m✅ R1-Acalma-a-mente-Vertigem-Tontura-Agitacao.jpg[0m
+[0;32m✅ C-7-Shenmen-Acalma-a-mente-Estresse.jpg[0m
+
+🔧 PRÓXIMOS PASSOS:
+1. Abra o site no navegador
+2. Pressione F12 (Console)
+3. Procure por: '✅ Supabase configurado e ativo'
+
+Se aparecer '⚠️ Supabase não configurado':
+→ As variáveis de ambiente no Netlify NÃO têm o prefixo VITE_
+
+📖 Leia RESUMO_FINAL.md para mais detalhes

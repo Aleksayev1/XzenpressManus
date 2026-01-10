@@ -1,0 +1,252 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Aurora Effect Overlay - Moldura Azul Ciano/Celeste nas 4 Bordas */
+.aurora-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+  background:
+    /* Superior */
+    linear-gradient(to bottom,
+      rgba(0, 139, 191, 0.7) 0%,
+      /* Ciano escuro na borda */
+      rgba(0, 191, 255, 0.5) 20%,
+      /* Ciano médio */
+      rgba(93, 173, 226, 0.3) 40%,
+      /* Azul celeste */
+      rgba(135, 206, 235, 0.15) 60%,
+      /* Azul céu claro */
+      transparent 100%
+      /* Transparente no centro */
+    ),
+    /* Inferior */
+    linear-gradient(to top,
+      rgba(0, 139, 191, 0.7) 0%,
+      /* Ciano escuro na borda */
+      rgba(0, 191, 255, 0.5) 20%,
+      /* Ciano médio */
+      rgba(93, 173, 226, 0.3) 40%,
+      /* Azul celeste */
+      rgba(135, 206, 235, 0.15) 60%,
+      /* Azul céu claro */
+      transparent 100%
+      /* Transparente no centro */
+    );
+  background-size: 100% 100px, 100% 100px;
+  background-position: top center, bottom center;
+  background-repeat: no-repeat;
+  filter: blur(12px);
+}
+
+/* Borda Esquerda - Azul Ciano/Celeste */
+.aurora-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(to right,
+      rgba(0, 139, 191, 0.7) 0%,
+      /* Ciano escuro na borda */
+      rgba(0, 191, 255, 0.5) 20%,
+      /* Ciano médio */
+      rgba(93, 173, 226, 0.3) 40%,
+      /* Azul celeste */
+      rgba(135, 206, 235, 0.15) 60%,
+      /* Azul céu claro */
+      transparent 100%
+      /* Transparente no centro */
+    );
+  filter: blur(12px);
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+/* Borda Direita - Azul Ciano/Celeste */
+.aurora-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(to left,
+      rgba(0, 139, 191, 0.7) 0%,
+      /* Ciano escuro na borda */
+      rgba(0, 191, 255, 0.5) 20%,
+      /* Ciano médio */
+      rgba(93, 173, 226, 0.3) 40%,
+      /* Azul celeste */
+      rgba(135, 206, 235, 0.15) 60%,
+      /* Azul céu claro */
+      transparent 100%
+      /* Transparente no centro */
+    );
+  filter: blur(12px);
+  animation: glow-pulse 4s ease-in-out infinite 0.5s;
+}
+
+/* Animação sutil de brilho */
+@keyframes glow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.image-zoom-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.image-zoom-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.image-zoom-wrapper:hover .image-zoom-overlay {
+  opacity: 1;
+}
+
+.image-zoom-icon,
+.image-zoom-text {
+  transition: transform 0.1s ease;
+}
+
+/* Google Translate Widget - Default Style */
+/* Google Translate Widget - Internal Styling */
+
+/* COMPLETELY hide Google's top banner frame */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+body {
+  top: 0px !important;
+}
+
+/* Hide Google branding */
+.goog-te-gadget img {
+  display: none !important;
+}
+
+.goog-te-gadget {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+  color: #4b5563 !important;
+  /* Gray-600 to match nav */
+  display: flex !important;
+  align-items: center !important;
+}
+
+.goog-te-gadget-simple {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: 14px !important;
+}
+
+/* Hide "Powered by Google" */
+.goog-te-gadget span {
+  display: none !important;
+}
+
+/* Style the dropdown button */
+.goog-te-gadget .goog-te-combo {
+  margin: 0 !important;
+  padding: 6px 12px !important;
+  border: 1px solid #e5e7eb !important;
+  /* Gray-200 */
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #4b5563 !important;
+  /* Gray-600 */
+  background-color: #ffffff !important;
+  outline: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.goog-te-gadget .goog-te-combo:hover {
+  border-color: #3b82f6 !important;
+  /* Blue-500 */
+  color: #2563eb !important;
+  /* Blue-600 */
+  background-color: #eff6ff !important;
+  /* Blue-50 */
+}
+
+.image-zoom-wrapper:hover .image-zoom-icon {
+  transform: scale(1.2);
+}
+
+.image-zoom-wrapper:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Spotify December Promo Animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.5s ease-out;
+}
+
+.animate-slideDown {
+  animation: slideDown 0.4s ease-out;
+}

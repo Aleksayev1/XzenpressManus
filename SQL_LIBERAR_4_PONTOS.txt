@@ -1,0 +1,56 @@
+-- ✅ LIBERAR 4 PONTOS GRATUITOS FOCADOS EM ANSIEDADE E ESTRESSE
+-- Execute este script no Supabase SQL Editor
+
+-- 🎯 ESTRATÉGIA: Apenas 4 pontos poderosos para ansiedade/estresse
+-- Resto permanece premium para conversão
+
+-- 1. Yintang (EX-HN3) - Terceiro Olho
+UPDATE acupressure_points
+SET is_premium = FALSE
+WHERE id = 'yintang-ex-hn3';
+
+-- 2. Shenmen (C7) - Porta do Espírito  
+UPDATE acupressure_points
+SET is_premium = FALSE
+WHERE id IN ('shenmen-c7-he7', 'shenmen-c7');
+
+-- 3. Neiguan (PC6) - Portão Interno
+UPDATE acupressure_points
+SET is_premium = FALSE
+WHERE id IN ('neiguan-pc6', 'pericardio-6-neiguan');
+
+-- 4. Hegu (IG4) - Vale de União
+UPDATE acupressure_points
+SET is_premium = FALSE
+WHERE id IN ('hegu-ig4', 'hegu-li4', 'intestino-grosso-4');
+
+-- ✅ VERIFICAR MUDANÇAS
+SELECT 
+    id,
+    name,
+    category,
+    is_premium,
+    CASE 
+        WHEN NOT is_premium THEN '🆓 GRATUITO'
+        ELSE '👑 PREMIUM'
+    END as status
+FROM acupressure_points
+WHERE id IN (
+    'yintang-ex-hn3',
+    'shenmen-c7-he7', 
+    'shenmen-c7',
+    'neiguan-pc6',
+    'pericardio-6-neiguan',
+    'hegu-ig4',
+    'hegu-li4',
+    'intestino-grosso-4'
+)
+ORDER BY is_premium, name;
+
+-- 📊 ESTATÍSTICAS
+SELECT 
+    CASE WHEN is_premium THEN '👑 Premium' ELSE '🆓 Gratuito' END as tipo,
+    COUNT(*) as total_pontos
+FROM acupressure_points
+GROUP BY is_premium
+ORDER BY is_premium;

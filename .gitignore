@@ -1,0 +1,67 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist */
+dist-*/
+build/
+.npm/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+~$*
+*.tmp
+*.temp
+
+# Large deployment archives (keep locally, exclude from Git)
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Backup folders
+backup*/
+BACKUP*/
+*_backup/
+
+# Android build artifacts
+android/build/
+android/.gradle/
+android/app/build/
+*.apk
+*.aab
+
+# Documentation large files
+*.docx
+*.doc
+*.pdf
+GDV_Historical_Data/
+
+# SQL scripts (keep only in database, not in Git)
+*.sql
+
+# Marketing materials (large images)
+VIRAL_*/
+
+# Specific large directories
+DEPLOY_NETLIFY_READY/
+ENTREGA_ANDROID_FINAL/
+XZENPRESS_*/
+deploy-ready/

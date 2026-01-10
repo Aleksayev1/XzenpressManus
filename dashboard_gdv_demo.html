@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XZenPress | GDV AI Analysis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8a2be2;
+            --secondary: #00f2fe;
+            --accent: #ff007f;
+            --bg-dark: #0f0c29;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --glass: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--glass);
+            padding-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-badge {
+            background: rgba(0, 255, 127, 0.2);
+            color: #00ff7f;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            border: 1px solid #00ff7f55;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid var(--glass);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 0;
+            opacity: 0.8;
+            color: var(--secondary);
+        }
+
+        .stats-main {
+            font-size: 48px;
+            font-weight: 800;
+            margin: 10px 0;
+        }
+
+        .trend {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .trend.up {
+            color: #00ff7f;
+        }
+
+        .trend.down {
+            color: #ff007f;
+        }
+
+        .prediction-box {
+            grid-column: span 2;
+            background: linear-gradient(rgba(138, 43, 226, 0.1), rgba(0, 242, 254, 0.1));
+        }
+
+        @media (max-width: 900px) {
+            .prediction-box {
+                grid-column: span 1;
+            }
+        }
+
+        canvas {
+            margin-top: 20px;
+            max-height: 250px;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 12px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <div class="logo">XZenPress GDV-AI</div>
+            <div class="status-badge">● Sistema de Análise Ativo</div>
+        </header>
+
+        <div class="grid">
+            <!-- Stress Level Card -->
+            <div class="card">
+                <h2>Nível de Estresse (Campo Etéreo)</h2>
+                <div class="stats-main">2.43</div>
+                <div class="trend down">▼ Estado preditivo: Efeito em 7 dias</div>
+                <canvas id="stressChart"></canvas>
+            </div>
+
+            <!-- Energy Field Card -->
+            <div class="card">
+                <h2>Campo Físico (Captura com Filtro)</h2>
+                <div class="stats-main">18.5k</div>
+                <div class="trend up">▲ Fluxo de energia atual: Estável</div>
+                <canvas id="energyChart"></canvas>
+            </div>
+
+            <!-- Prediction Card -->
+            <div class="card prediction-box">
+                <h2>🔮 Janela de Manifestação Preditiva (7 Dias)</h2>
+                <p style="font-size: 14px; opacity: 0.7;">Relação lógica entre o campo etéreo e o corpo físico. Lacunas
+                    no etéreo tendem a se materializar se não houver ajuste.</p>
+                <canvas id="predictionChart" style="max-height: 200px;"></canvas>
+                <div
+                    style="margin-top: 15px; font-size: 13px; color: var(--secondary); background: rgba(0, 242, 254, 0.1); padding: 12px; border-radius: 12px; border: 1px solid var(--secondary);">
+                    <strong>Análise Fática:</strong> Ruptura detectada no setor gastrointestinal (Campo Etéreo).
+                    Manifestação física provável em 5 a 7 dias caso o baseline se mantenha.
+                </div>
+            </div>
+
+            <!-- Symmetry Card -->
+            <div class="card">
+                <h2>Simetria Energética (D/E)</h2>
+                <div class="stats-main">92%</div>
+                <div class="trend up">▲ Alinhamento Ótimo</div>
+                <p style="font-size: 12px; opacity: 0.6; line-height: 1.5;">O equilíbrio entre os hemisférios está
+                    estável. Recomendado manter as práticas de respiração atuais.</p>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            Tecnologia GDV-AI by XZenPress.com | "Medindo a saúde antes que ela se manifeste."
+        </div>
+    </div>
+
+    <script>
+        // Configurações Globais dos Gráficos
+        Chart.defaults.color = '#ffffff55';
+        Chart.defaults.font.family = 'Inter';
+
+        // Stress Chart
+        new Chart(document.getElementById('stressChart'), {
+            type: 'line',
+            data: {
+                labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+                datasets: [{
+                    label: 'Nível de Estresse',
+                    data: [3.5, 3.2, 4.1, 3.8, 2.9, 2.5, 2.4],
+                    borderColor: '#ff007f',
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { display: false }, x: { grid: { display: false } } }
+            }
+        });
+
+        // Energy Chart
+        new Chart(document.getElementById('energyChart'), {
+            type: 'bar',
+            data: {
+                labels: ['D1', 'D2', 'D3', 'D4', 'D5'],
+                datasets: [{
+                    label: 'Área por Dedo',
+                    data: [15, 18, 16, 19, 17],
+                    backgroundColor: '#00f2fe',
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { display: false }, x: { grid: { display: false } } }
+            }
+        });
+
+        // Prediction Chart
+        new Chart(document.getElementById('predictionChart'), {
+            type: 'line',
+            data: {
+                labels: ['Hoje', '+1d', '+2d', '+3d', '+4d', '+5d', '+6d', '+7d'],
+                datasets: [{
+                    label: 'Predição de Equilíbrio',
+                    data: [75, 78, 82, 85, 84, 88, 91, 93],
+                    borderColor: '#8a2be2',
+                    backgroundColor: 'rgba(138, 43, 226, 0.2)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { display: false }, x: { grid: { borderDash: [5, 5] } } }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

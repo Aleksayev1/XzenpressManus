@@ -191,7 +191,7 @@ export const PartnershipModal: React.FC<PartnershipModalProps> = ({ isOpen, onCl
                             {t('partnership.contact.text')}
                         </p>
                         <a
-                            href="mailto:alexandre@xzenpress.com"
+                            href="mailto:aleksayevacupress@gmail.com"
                             className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
                         >
                             <span>{t('partnership.contact.button')}</span>

@@ -606,7 +606,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 <span className="font-medium">{t('partnership.title')}</span>
               </button>
               <a
-                href="mailto:alexandre@xzenpress.com"
+                href="mailto:aleksayevacupress@gmail.com"
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 Contato

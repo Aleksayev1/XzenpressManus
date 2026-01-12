@@ -4,6 +4,7 @@ import { Lock, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface StripeCardFormProps {
     amount: number;
+    currency?: string; // ✅ Nova prop
     description: string;
     orderId: string;
     customerEmail?: string;
@@ -14,6 +15,7 @@ interface StripeCardFormProps {
 
 export const StripeCardForm: React.FC<StripeCardFormProps> = ({
     amount,
+    currency = 'USD',
     description,
     orderId,
     customerEmail,
@@ -26,6 +28,14 @@ export const StripeCardForm: React.FC<StripeCardFormProps> = ({
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+
+    // Formatter
+    const formatAmount = (val: number) => {
+        return new Intl.NumberFormat(currency === 'BRL' ? 'pt-BR' : 'en-US', {
+            style: 'currency',
+            currency: currency
+        }).format(val);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -58,20 +68,21 @@ export const StripeCardForm: React.FC<StripeCardFormProps> = ({
             });
 
             if (pmError) {
+                // Se for erro do Stripe (validação, etc), repassa mensagem
                 throw new Error(pmError.message);
             }
 
             console.log('✅ PaymentMethod criado:', paymentMethod?.id);
 
             // 2. Enviar para backend processar
-            console.log('📡 Enviando para backend...');
+            console.log('📡 Enviando para backend...', { amount, currency });
             const response = await fetch('/.netlify/functions/process-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     paymentMethodId: paymentMethod?.id,
                     amount,
-                    currency: 'usd',
+                    currency: currency, // ✅ Usando moeda dinâmica
                     description,
                     orderId,
                     customerEmail,
@@ -82,7 +93,11 @@ export const StripeCardForm: React.FC<StripeCardFormProps> = ({
             const result = await response.json();
 
             if (!response.ok) {
-                throw new Error(result.error || 'Erro ao processar pagamento');
+                throw new Error(result.message || result.error || 'Erro ao processar pagamento');
+            }
+
+            if (result.success === false) {
+                throw new Error(result.message || 'Pagamento recusado');
             }
 
             console.log('✅ Pagamento processado:', result);
@@ -156,7 +171,7 @@ export const StripeCardForm: React.FC<StripeCardFormProps> = ({
                 <div className="flex justify-between items-center mb-2">
                     <span className="text-gray-700">Total a Pagar:</span>
                     <span className="text-2xl font-bold text-gray-900">
-                        ${amount.toFixed(2)}
+                        {formatAmount(amount)}
                     </span>
                 </div>
                 <p className="text-sm text-gray-600">{description}</p>
@@ -167,8 +182,8 @@ export const StripeCardForm: React.FC<StripeCardFormProps> = ({
                 type="submit"
                 disabled={!stripe || isProcessing}
                 className={`w-full py-4 rounded-xl font-semibold text-white transition-all duration-200 flex items-center justify-center space-x-2 ${!stripe || isProcessing
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl'
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl'
                     }`}
             >
                 {isProcessing ? (
@@ -179,7 +194,7 @@ export const StripeCardForm: React.FC<StripeCardFormProps> = ({
                 ) : (
                     <>
                         <Lock className="w-5 h-5" />
-                        <span>Pagar ${amount.toFixed(2)}</span>
+                        <span>Pagar {formatAmount(amount)}</span>
                     </>
                 )}
             </button>

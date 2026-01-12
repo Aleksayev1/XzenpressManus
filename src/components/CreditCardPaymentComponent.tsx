@@ -6,6 +6,7 @@ import { AlertCircle } from 'lucide-react';
 
 interface CreditCardPaymentComponentProps {
   amount: number;
+  currency?: string; // ✅ Adicionado
   description: string;
   orderId: string;
   customerEmail?: string;
@@ -55,7 +56,10 @@ export const CreditCardPaymentComponent: React.FC<CreditCardPaymentComponentProp
   // Renderizar formulário dentro do Elements provider
   return (
     <Elements stripe={stripePromise}>
-      <StripeCardForm {...props} />
+      <StripeCardForm
+        {...props}
+        currency={props.currency || 'USD'} // ✅ Passando moeda
+      />
     </Elements>
   );
 };

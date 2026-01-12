@@ -592,6 +592,7 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
                 {pixPaymentData && (
                   <CreditCardPaymentComponent
                     amount={pixPaymentData.amount}
+                    currency={regionalPricing?.currency || 'USD'} // ✅ Passando moeda para BRL/USD
                     description={pixPaymentData.description}
                     orderId={pixPaymentData.orderId}
                     customerEmail={user?.email}

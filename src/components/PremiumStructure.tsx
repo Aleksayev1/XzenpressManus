@@ -64,32 +64,33 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
 
           {/* Premium Features Access */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {/* AI Assistant Coming Soon */}
+            {/* AI Assistant - ACTIVE */}
             <div
-              className="group bg-white rounded-2xl p-8 shadow-lg transition-all duration-300 border-2 border-purple-200 opacity-90"
+              onClick={() => setShowAIPanel(true)}
+              className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-purple-200 hover:border-purple-300"
             >
               <div className="flex items-center mb-6">
-                <div className="p-3 bg-purple-100 rounded-xl">
+                <div className="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
                   <Brain className="w-8 h-8 text-purple-600" />
                 </div>
                 <div className="ml-4">
                   <h3 className="text-xl font-bold text-gray-900">🤖 Assistente IA Especializado</h3>
-                  <p className="font-medium text-purple-600">
-                    EM BREVE - 24/7
+                  <p className="font-medium text-green-600">
+                    DISPONÍVEL - 24/7
                   </p>
                 </div>
               </div>
               <p className="text-gray-600 mb-4">
                 Chatbot inteligente baseado em protocolos YNSA e MTC validados cientificamente. Orientação personalizada 100% automatizada.
               </p>
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 mb-4">
-                <p className="text-sm text-purple-800">
-                  <strong>⚡ Em desenvolvimento:</strong> Sistema IA que combina YNSA, MTC e tecnologia de ponta para oferecer suporte educacional contínuo.
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-green-800">
+                  <strong>⚡ Ativo agora:</strong> Sistema IA que combina YNSA, MTC e tecnologia de ponta para oferecer suporte educacional contínuo.
                 </p>
               </div>
-              <div className="flex items-center font-medium text-purple-600">
-                <span>Lançamento previsto: Breve</span>
-                <Clock className="w-4 h-4 ml-2" />
+              <div className="flex items-center font-medium text-purple-600 group-hover:text-purple-700">
+                <span>Abrir Assistente</span>
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
 
@@ -289,8 +290,8 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
         'Protocolos YNSA e MTC integrados',
         'Orientação personalizada automatizada'
       ],
-      status: 'coming-soon',
-      action: () => { }
+      status: 'active',
+      action: () => setShowAIPanel(true)
     },
     {
       id: 'premium-points',

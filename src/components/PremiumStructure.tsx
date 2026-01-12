@@ -442,6 +442,13 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
   ];
 
   const handlePlanSelect = (planId: string) => {
+    // 🔒 Proteção: Exige login antes de pagar
+    if (!user) {
+      alert('Por favor, faça login ou crie uma conta para assinar o Premium.');
+      onPageChange('login');
+      return;
+    }
+
     setSelectedPlan(planId);
 
     // Preparar dados do pagamento

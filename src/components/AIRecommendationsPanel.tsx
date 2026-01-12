@@ -1,87 +1,271 @@
-import React from 'react';
-import { X, Brain, Sparkles } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { X, Brain, Send, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
 
 interface AIRecommendationsPanelProps {
   isVisible: boolean;
   onClose: () => void;
 }
 
-export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({ 
-  isVisible, 
-  onClose 
+export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
+  isVisible,
+  onClose
 }) => {
+  const { user } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [remainingQueries, setRemainingQueries] = useState<number | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll para última mensagem
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Mensagem inicial de boas-vindas
+  useEffect(() => {
+    if (isVisible && messages.length === 0) {
+      setMessages([{
+        role: 'assistant',
+        content: `Olá! Sou seu assistente especializado em YNSA e Medicina Tradicional Chinesa. 
+
+Posso ajudá-lo com:
+• Explicações sobre pontos YNSA e seus usos
+• Conceitos de MTC (Qi, Meridianos, 5 Elementos)
+• Técnicas de autoacupressão
+• Protocolos de bem-estar
+
+⚠️ **Importante:** Sou uma ferramenta educacional. Para diagnósticos e tratamentos, sempre consulte um profissional qualificado.
+
+Como posso ajudá-lo hoje?`,
+        timestamp: new Date()
+      }]);
+    }
+  }, [isVisible]);
+
+  const handleSendMessage = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: Message = {
+      role: 'user',
+      content: input.trim(),
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Preparar histórico de conversa para a API (formato OpenAI)
+      const conversationHistory = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      const response = await fetch('/.netlify/functions/ai-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: input.trim(),
+          conversationHistory,
+          userEmail: user?.email || null
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao processar mensagem');
+      }
+
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: data.reply,
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+
+      // Atualizar contador de queries restantes
+      if (data.remaining !== null && data.remaining !== undefined) {
+        setRemainingQueries(data.remaining);
+      }
+
+    } catch (err: any) {
+      console.error('Error sending message:', err);
+      setError(err.message || 'Erro ao enviar mensagem. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const handleNewConversation = () => {
+    setMessages([{
+      role: 'assistant',
+      content: `Conversa reiniciada! Como posso ajudá-lo?`,
+      timestamp: new Date()
+    }]);
+    setError(null);
+  };
+
   if (!isVisible) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Brain className="w-6 h-6 text-purple-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">Recomendações IA</h2>
+      <div className="bg-white rounded-2xl max-w-3xl w-full h-[85vh] flex flex-col shadow-2xl">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-purple-50 to-blue-50 rounded-t-2xl">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-purple-600 rounded-lg">
+              <Brain className="w-6 h-6 text-white" />
             </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Assistente IA YNSA/MTC</h2>
+              <p className="text-sm text-gray-600">Especialista em Medicina Integrativa</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleNewConversation}
+              className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+              title="Nova Conversa"
+            >
+              <RefreshCw className="w-5 h-5 text-gray-600" />
+            </button>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/50 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+        </div>
+
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+          {messages.map((msg, idx) => (
+            <div
+              key={idx}
+              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-[80%] rounded-2xl px-4 py-3 ${msg.role === 'user'
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                    : 'bg-white text-gray-800 shadow-sm border border-gray-200'
+                  }`}
+              >
+                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                  {msg.content}
+                </div>
+                <div
+                  className={`text-xs mt-2 ${msg.role === 'user' ? 'text-blue-100' : 'text-gray-400'
+                    }`}
+                >
+                  {msg.timestamp.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-200">
+                <div className="flex items-center space-x-2">
+                  <Loader2 className="w-4 h-4 text-purple-600 animate-spin" />
+                  <span className="text-sm text-gray-600">Pensando...</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {error && (
+            <div className="flex justify-center">
+              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-start space-x-2 max-w-md">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm text-red-800 font-medium">Erro</p>
+                  <p className="text-xs text-red-600 mt-1">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <div className="p-4 border-t border-gray-200 bg-white rounded-b-2xl">
+          {/* Warning Banner */}
+          <div className="mb-3 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2 flex items-start space-x-2">
+            <AlertCircle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-yellow-800">
+              <strong>Aviso:</strong> Este assistente fornece orientações educacionais.
+              Não substitui consulta médica profissional.
+            </p>
+          </div>
+
+          {/* Rate Limit Info */}
+          {remainingQueries !== null && remainingQueries < 10 && (
+            <div className="mb-2 text-xs text-gray-500 text-center">
+              {remainingQueries > 0
+                ? `${remainingQueries} perguntas restantes nesta hora`
+                : 'Limite de perguntas atingido. Aguarde 1 hora.'}
+            </div>
+          )}
+
+          {/* Input Field */}
+          <div className="flex items-end space-x-2">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Digite sua pergunta sobre YNSA ou MTC..."
+              className="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all max-h-32"
+              rows={2}
+              disabled={isLoading || remainingQueries === 0}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={!input.trim() || isLoading || remainingQueries === 0}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+            >
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
             </button>
           </div>
 
-          <div className="space-y-6">
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6">
-              <div className="flex items-center space-x-2 mb-4">
-                <Sparkles className="w-5 h-5 text-purple-600" />
-                <h3 className="font-semibold text-purple-800">Demonstração IA</h3>
-              </div>
-              <p className="text-purple-700 mb-4">
-                Esta é uma demonstração de como as recomendações de IA funcionarão no futuro.
-              </p>
-              
-              <div className="space-y-4">
-                <div className="bg-white rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-800 mb-2">🫁 Recomendação Personalizada</h4>
-                  <p className="text-gray-600 text-sm">
-                    Baseado no seu perfil, recomendamos 3 sessões de respiração 4-7-8 por dia, 
-                    focando no período da manhã para reduzir ansiedade.
-                  </p>
-                </div>
-                
-                <div className="bg-white rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-800 mb-2">🎯 Ponto Sugerido</h4>
-                  <p className="text-gray-600 text-sm">
-                    O ponto Yintang (EX-HN3) seria ideal para seu perfil de estresse atual.
-                  </p>
-                </div>
-                
-                <div className="bg-white rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-800 mb-2">⏰ Horário Otimizado</h4>
-                  <p className="text-gray-600 text-sm">
-                    Melhor horário para suas sessões: 7h-9h e 19h-21h.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-              <p className="text-yellow-800 text-sm">
-                <strong>Em Desenvolvimento:</strong> As recomendações reais de IA serão baseadas 
-                no seu histórico de uso, perfil de saúde e padrões comportamentais.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6 flex justify-end">
-            <button
-              onClick={onClose}
-              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              Fechar
-            </button>
-          </div>
+          <p className="text-xs text-gray-400 mt-2 text-center">
+            Pressione Enter para enviar • Shift+Enter para nova linha
+          </p>
         </div>
       </div>
     </div>

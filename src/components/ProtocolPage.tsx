@@ -180,6 +180,15 @@ export const ProtocolPage: React.FC<ProtocolPageProps> = ({ onPageChange }) => {
                     <div className="bg-gray-50 rounded-2xl p-6 mb-8">
                         <h3 className="font-semibold text-gray-900 mb-2">Sobre esta Jornada</h3>
                         <p className="text-gray-600 mb-4">{selectedProtocol.description}</p>
+
+                        {selectedProtocol.breathingOptimization && (
+                            <div className="mb-4 p-4 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl border-l-4 border-cyan-500">
+                                <p className="text-sm text-gray-700 leading-relaxed">
+                                    {selectedProtocol.breathingOptimization}
+                                </p>
+                            </div>
+                        )}
+
                         <h3 className="font-semibold text-gray-900 mb-2">Esta sequência ajuda com:</h3>
                         <ul className="space-y-2">
                             {selectedProtocol.benefits.map((b, i) => (

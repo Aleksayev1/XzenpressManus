@@ -52,27 +52,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Invalid credentials');
       }
 
-      // Check if user should be premium or admin (demo purposes)
-      const isPremiumUser = email.toLowerCase().includes('premium') ||
-        email.toLowerCase().includes('vip') ||
-        password.toLowerCase().includes('premium');
-
-      // Check if user is admin/developer
-      const isAdminUser = email.toLowerCase().includes('admin') ||
-        email.toLowerCase().includes('dev') ||
-        email.toLowerCase().includes('developer') ||
-        password.toLowerCase().includes('admin');
-
+      // 🔒 SECURITY: All users login as FREE tier by default
+      // Premium access requires actual payment through Stripe
+      // This prevents unauthorized access via email/password tricks
       const mockUser: User = {
         id: '1',
         email,
         name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
-        isPremium: isPremiumUser || isAdminUser,
-        isAdmin: isAdminUser,
+        isPremium: false, // ✅ Fixed: No more bypass
+        isAdmin: false,   // ✅ Fixed: No more bypass
         createdAt: new Date().toISOString(),
       };
 
-      console.log('👤 Usuário criado:', mockUser);
+      console.log('👤 Usuário criado (FREE):', mockUser);
       setUser(mockUser);
 
       // Salvar no localStorage com confirmação

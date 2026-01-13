@@ -185,6 +185,7 @@ export interface Protocol {
   iconName: string; // Lucide icon name
   colorTheme: 'blue' | 'purple' | 'green' | 'orange' | 'teal' | 'red';
   isPremium?: boolean;
+  breathingOptimization?: string; // Recommendation to use 4-7-8 breathing
   steps: ProtocolStep[];
   benefits: string[];
   soundtrack?: {

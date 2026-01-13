@@ -216,8 +216,9 @@ LIMITAÇÕES DO ASSISTENTE:
         const reply = data.choices[0].message.content;
 
         // 🔍 AUTO-DETECT LOW CONFIDENCE (Epistemic Awareness)
-        // Flags responses where AI expresses uncertainty
+        // Flags responses where AI expresses uncertainty or limitations
         const uncertaintyPhrases = [
+            // Original phrases - Scientific uncertainty
             'não há evidência',
             'estudos são limitados',
             'não é possível afirmar',
@@ -227,7 +228,16 @@ LIMITAÇÕES DO ASSISTENTE:
             'ainda não está claro',
             'evidências são fracas',
             'não há confirmação',
-            'necessita mais estudos'
+            'necessita mais estudos',
+
+            // Additional phrases - Scope limitations (respecting user's healing philosophy)
+            'não substitui',
+            'não é recomendado',
+            'resultados limitados',
+            'deve ser supervisionado',
+            'requer supervisão',
+            'consulte um profissional',
+            'procure orientação'
         ];
 
         const hasUncertainty = uncertaintyPhrases.some(phrase =>

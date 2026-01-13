@@ -215,12 +215,42 @@ LIMITAÇÕES DO ASSISTENTE:
         const data = await response.json();
         const reply = data.choices[0].message.content;
 
+        // 🔍 AUTO-DETECT LOW CONFIDENCE (Epistemic Awareness)
+        // Flags responses where AI expresses uncertainty
+        const uncertaintyPhrases = [
+            'não há evidência',
+            'estudos são limitados',
+            'não é possível afirmar',
+            'não há consenso',
+            'pesquisas são inconclusivas',
+            'dados são insuficientes',
+            'ainda não está claro',
+            'evidências são fracas',
+            'não há confirmação',
+            'necessita mais estudos'
+        ];
+
+        const hasUncertainty = uncertaintyPhrases.some(phrase =>
+            reply.toLowerCase().includes(phrase)
+        );
+
+        const qualityFlags = [];
+        if (hasUncertainty) {
+            qualityFlags.push('low_confidence');
+            console.log('⚠️ Low confidence response detected:', {
+                userEmail,
+                query: message.substring(0, 50) + '...',
+                flag: 'low_confidence'
+            });
+        }
+
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
                 reply: reply,
                 remaining: userEmail ? checkRateLimit(userEmail).remaining : null,
+                flags: qualityFlags, // Retorna flags para frontend (futuro feedback UI)
                 usage: {
                     promptTokens: data.usage.prompt_tokens,
                     completionTokens: data.usage.completion_tokens,

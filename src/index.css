@@ -170,6 +170,16 @@ body {
   /* Gray-600 to match nav */
   display: flex !important;
   align-items: center !important;
+  position: relative !important;
+  z-index: 10000 !important; /* Ensure it's above aurora */
+  pointer-events: auto !important;
+}
+
+/* Ensure the container itself is clickable */
+.google-translate-container {
+  position: relative;
+  z-index: 10000;
+  pointer-events: auto;
 }
 
 .goog-te-gadget-simple {

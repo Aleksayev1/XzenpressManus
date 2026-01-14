@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
+import { supabase } from '../lib/supabase';
 
 interface AuthContextType {
   user: User | null;
@@ -9,6 +10,12 @@ interface AuthContextType {
   upgradeToPremium: () => void;
   confirmPremiumPayment: () => void;
   isLoading: boolean;
+  // New Auth Methods
+  signInWithGoogle: () => Promise<void>;
+  signInWithApple: () => Promise<void>;
+  signInWithMagicLink: (email: string) => Promise<void>;
+  signInWithOTP: (phone: string) => Promise<void>;
+  verifyOTP: (phone: string, token: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,82 +32,203 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Initialize Auth State Listener
   useEffect(() => {
-    // Load user from localStorage
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        if (parsedUser) {
-          setUser(parsedUser);
-        }
-      } catch (error) {
+    if (!supabase) return;
+
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        mapSupabaseUserToLocalUser(session.user);
+      }
+    });
+
+    // Listen for changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        mapSupabaseUserToLocalUser(session.user);
+      } else {
+        setUser(null);
         localStorage.removeItem('user');
       }
-    }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  const mapSupabaseUserToLocalUser = (supabaseUser: any) => {
+    // Check if we have local overrides (like premium status saved locally for dev)
+    const localData = localStorage.getItem('user');
+    let isPremium = false;
+
+    if (localData) {
+      const parsed = JSON.parse(localData);
+      // Only keep premium status if emails match
+      if (parsed.email === supabaseUser.email) {
+        isPremium = parsed.isPremium;
+      }
+    }
+
+    const newUser: User = {
+      id: supabaseUser.id,
+      email: supabaseUser.email || '',
+      name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'Usuário',
+      isPremium: isPremium, // In real app, this should come from DB/Supabase claims
+      isAdmin: false,
+      createdAt: supabaseUser.created_at,
+    };
+
+    setUser(newUser);
+    // Optimization: Don't constantly overwrite if not changed, but for now it's safe
+    localStorage.setItem('user', JSON.stringify(newUser));
+  };
+
+
+  // --- Existing Methods Updated ---
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
-    console.log('🔐 Tentando fazer login:', email);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!supabase) throw new Error("Supabase não configurado");
 
-      // Simple validation
-      if (!email.includes('@') || password.length < 6) {
-        throw new Error('Invalid credentials');
-      }
-
-      // 🔒 SECURITY: All users login as FREE tier by default
-      // Premium access requires actual payment through Stripe
-      // This prevents unauthorized access via email/password tricks
-      const mockUser: User = {
-        id: '1',
+      const { error } = await supabase.auth.signInWithPassword({
         email,
-        name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
-        isPremium: false, // ✅ Fixed: No more bypass
-        isAdmin: false,   // ✅ Fixed: No more bypass
-        createdAt: new Date().toISOString(),
-      };
+        password
+      });
 
-      console.log('👤 Usuário criado (FREE):', mockUser);
-      setUser(mockUser);
-
-      // Salvar no localStorage com confirmação
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      const savedCheck = localStorage.getItem('user');
-      console.log('💾 Usuário salvo no localStorage:', savedCheck ? '✅ Sucesso' : '❌ Falhou');
-
-      // Verificar se realmente salvou
-      if (savedCheck) {
-        const parsedCheck = JSON.parse(savedCheck);
-        console.log('🔍 Verificação do salvamento:', parsedCheck);
-      }
+      if (error) throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
+  const logout = async () => {
+    try {
+      if (supabase) await supabase.auth.signOut();
+      setUser(null);
+      localStorage.removeItem('user');
+    } catch (error) {
+      console.error("Erro ao sair:", error);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    setIsLoading(true);
+    try {
+      if (!supabase) throw new Error("Supabase não configurado");
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/reset-password',
+      });
+
+      if (error) throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --- New Methods ---
+
+  const signInWithGoogle = async () => {
+    setIsLoading(true);
+    try {
+      if (!supabase) throw new Error("Supabase não configurado");
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (error) throw error;
+    } catch (err) {
+      console.error("Google Auth Error:", err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signInWithApple = async () => {
+    setIsLoading(true);
+    try {
+      if (!supabase) throw new Error("Supabase não configurado");
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (error) throw error;
+    } catch (err) {
+      console.error("Apple Auth Error:", err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signInWithMagicLink = async (email: string) => {
+    setIsLoading(true);
+    try {
+      if (!supabase) throw new Error("Supabase não configurado");
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: window.location.origin
+        }
+      });
+      if (error) throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signInWithOTP = async (phone: string) => {
+    setIsLoading(true);
+    try {
+      if (!supabase) throw new Error("Supabase não configurado");
+
+      const { error } = await supabase.auth.signInWithOtp({
+        phone
+      });
+      if (error) throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyOTP = async (phone: string, token: string) => {
+    setIsLoading(true);
+    try {
+      if (!supabase) throw new Error("Supabase não configurado");
+
+      const { error } = await supabase.auth.verifyOtp({
+        phone,
+        token,
+        type: 'sms'
+      });
+      if (error) throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  // --- Premium Simulation (Keep for now, moves to Backend later) ---
+
   const upgradeToPremium = () => {
-    console.log('⬆️ Fazendo upgrade para Premium...');
     if (user) {
       const updatedUser = { ...user, isPremium: true };
-      console.log('👑 Usuário atualizado:', updatedUser);
       setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-
-      // Verificar se o upgrade foi salvo
-      const savedUpgrade = localStorage.getItem('user');
-      if (savedUpgrade) {
-        const parsedUpgrade = JSON.parse(savedUpgrade);
-        console.log('💾 Upgrade salvo:', parsedUpgrade.isPremium ? '✅ Premium ativo' : '❌ Falhou');
-      }
+      localStorage.setItem('user', JSON.stringify(updatedUser)); // Persist locally for now
     }
   };
 
   const confirmPremiumPayment = () => {
-    console.log('💳 Confirmando pagamento Premium...');
     if (user) {
       const updatedUser = {
         ...user,
@@ -108,32 +236,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         hasPaidPremium: true,
         premiumActivatedAt: new Date().toISOString()
       };
-      console.log('💰 Pagamento confirmado:', updatedUser);
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
     }
   };
 
-  const logout = () => {
-    console.log('🚪 Fazendo logout...');
-    setUser(null);
-    localStorage.removeItem('user');
-    console.log('🗑️ Dados removidos do localStorage');
-  };
-
-  const resetPassword = async (email: string) => {
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Password reset email sent to:', email);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <AuthContext.Provider value={{ user, login, logout, resetPassword, upgradeToPremium, confirmPremiumPayment, isLoading }}>
+    <AuthContext.Provider value={{
+      user,
+      login,
+      logout,
+      resetPassword,
+      upgradeToPremium,
+      confirmPremiumPayment,
+      isLoading,
+      signInWithGoogle,
+      signInWithApple,
+      signInWithMagicLink,
+      signInWithOTP,
+      verifyOTP
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -74,8 +74,8 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
                 <div className="flex-shrink-0">
                   <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-green-500 shadow-lg">
                     <img
-                      src="/robot-assistant.jpg"
-                      alt="AI Assistant"
+                      src="/buddhist-robot.png"
+                      alt="Robo Zen - Assistente IA"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -288,7 +288,15 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
     // ✅ SUBSTITUÍDO: WhatsApp → Assistente IA (Segurança)
     {
       id: 'ai-assistant',
-      icon: <Brain className="w-8 h-8 text-purple-600" />,
+      icon: (
+        <div className="w-8 h-8 rounded-full overflow-hidden border border-purple-200">
+          <img
+            src="/buddhist-robot.png"
+            alt="Robo Zen"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      ),
       title: '🤖 Assistente IA Especializado',
       description: 'Chatbot inteligente baseado em protocolos YNSA e MTC validados cientificamente',
       benefits: [

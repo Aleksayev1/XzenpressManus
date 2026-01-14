@@ -26,17 +26,38 @@ import { AudioPlayerProvider } from './contexts/AudioPlayerContext';
 import { GlobalPlayer } from './components/GlobalPlayer';
 import SoundFusion from './components/SoundFusion';
 import { ProtocolPage } from './components/ProtocolPage';
+import { ImpactPage } from './components/ImpactPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [showTutorial, setShowTutorial] = useState(false);
 
 
+  const [isImpactMode, setIsImpactMode] = useState(false);
+
   React.useEffect(() => {
     if (window.location.hash.includes('access_token')) {
       setCurrentPage('spotify-callback');
     }
+
+    // Check for impact mode on mount and hash change
+    const checkImpactMode = () => {
+      if (window.location.hash === '#impact' || window.location.search.includes('page=impact')) {
+        setIsImpactMode(true);
+      } else {
+        setIsImpactMode(false);
+      }
+    };
+
+    checkImpactMode();
+    window.addEventListener('hashchange', checkImpactMode);
+    return () => window.removeEventListener('hashchange', checkImpactMode);
   }, []);
+
+  // Institutional Mode Bypass
+  if (isImpactMode) {
+    return <ImpactPage />;
+  }
 
   const renderPage = () => {
     switch (currentPage) {

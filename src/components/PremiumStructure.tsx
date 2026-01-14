@@ -70,12 +70,15 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
               className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-purple-200 hover:border-purple-300"
             >
               <div className="flex items-center mb-6">
-                <div className="p-3 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl group-hover:from-purple-200 group-hover:to-indigo-200 transition-colors overflow-hidden">
-                  <img
-                    src="/robot-buddha.png"
-                    alt="Robô Budista Meditando"
-                    className="w-12 h-12 object-cover rounded-lg"
-                  />
+                {/* AI Avatar */}
+                <div className="flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-green-500 shadow-lg">
+                    <img
+                      src="/robot-assistant.jpg"
+                      alt="AI Assistant"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
                 <div className="ml-4">
                   <h3 className="text-xl font-bold text-gray-900">🤖 Assistente IA Especializado</h3>

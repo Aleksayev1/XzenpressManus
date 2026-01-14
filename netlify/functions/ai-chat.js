@@ -115,24 +115,41 @@ DIRETRIZES RIGOROSAS:
 EXPERTISE - YNSA (Yamamoto New Scalp Acupuncture):
 - Desenvolvida em 1973 pelo Dr. Toshikatsu Yamamoto (neurologista japonês)
 
-**PONTOS BÁSICOS YNSA (A, B, C, D, E):**
-- Básico A: Cervical/cabeça
-- Básico B: Ombro/escápula
-- Básico C: Membro superior (braço/mão)
-- Básico D: Coluna lombar
-- Básico E: Tórax/respiração
-- Função: Estruturas músculo-esqueléticas GERAIS
+**PONTOS BÁSICOS YNSA (A-I) - Somatotopias:**
+- **Ponto A:** Cervical (C1-C7), cabeça, paralisia facial, "chicote" (whiplash).
+- **Ponto B:** Ombro, trapézio, escápula, manguito rotador.
+- **Ponto C:** Extremidade Superior (ombro ao dedo), articulações do braço.
+- **Ponto D:** Coluna Lombar, sacro, extremidade INFERIOR (perna), ciática.
+- **Ponto E:** Tórax, costelas, problemas respiratórios (asma, bronquite).
+- **Ponto F:** Retroauricular - NERVO CIÁTICO (específico para ciatalgia).
+- **Ponto G:** Joelho (dor e artrose).
+- **Ponto H:** Ponto Lombar extra (suplementar ao D).
+- **Ponto I:** Ponto Lombar/Sacral posterior (occipital).
 
-**PONTOS SENSORIAIS YNSA (CRÍTICO - Representam órgãos/estruturas anatômicas específicas):**
-- **Ponto do OLHO:** Distúrbios visuais (glaucoma, conjuntivites, estrabismo, epífora, degeneração macular), dores pós-traumáticas/pós-operatórias oculares
-- **Ponto do NARIZ:** Alergias, rinites, sinusites, entupimentos/obstruções nasais, dores pós-traumáticas/pós-operatórias nasais
-- **Ponto da BOCA:** Inflamações bucais, estomatites, dores de garganta, herpes simples, odontalgias, dor pós-extração dentária, afasia, dores pós-traumáticas/pós-operatórias orais
-- **Ponto do OUVIDO:** Distúrbios auditivos, otite externa, otite média, tinidos (zumbido), dores pós-traumáticas/pós-operatórias auriculares
-- **IMPORTANTE:** Pontos Sensoriais tratam o ÓRGÃO ESPECÍFICO + suas doenças relacionadas. NÃO confundir com Pontos Básicos!
+**DIAGNÓSTICO YNSA (Crucial):**
+1. **Palpação Cervical:** Verificar sensibilidade ou "carocinhos" no pescoço para identificar onde tratar.
+2. **Palpação Abdominal:** Técnica avançada para confirmar desequilíbrios internos.
+3. **Lateralidade (REGRAS DE OURO):**
+   - **Dor Músculo-esquelética:** Tratar o lado DA DOR (Ipsilateral). Ex: Dor joelho direito -> Ponto D direito.
+   - **Neurológico (AVC/Paralisia):** Tratar o lado SAUDÁVEL (Contralateral). Ex: Paralisia esquerda -> Ponto no lado Direito.
 
-**Y-POINTS (Zangfu):** Pontos Yin para órgãos internos
-- Rim (1), Fígado (10), Baço (8), Pulmão (4), Coração (2), etc
-- Função: Equilibrar ÓRGÃOS INTERNOS e funções emocionais
+**PONTOS SENSORIAIS YNSA (Órgãos dos Sentidos):**
+- **OLHO:** Distúrbios visuais, glaucoma, conjuntivite.
+- **NARIZ:** Rinite, sinusite, obstrução nasal, alergias.
+- **BOCA:** Estomatite, herpes, dor pós-dentária, afasia.
+- **OUVIDO:** Zumbido (tinnitus), vertigem, otites.
+
+**Y-POINTS (Órgãos Internos/Zang-Fu):**
+- **Y-Rim:** Vitalidade (Jing), medo, ossos, ouvidos.
+- **Y-Fígado:** Estresse, raiva, olhos, tendões, músculos.
+- **Y-Baço:** Digestão, preocupação, metabolismo.
+- **Y-Pulmão:** Respiração, tristeza, pele.
+- **Y-Coração:** Ansiedade, insônia, circulação.
+
+**PROGNÓSTICO & EXPECTATIVA (IA PROGNOSTICS):**
+- **Efeito Relâmpago:** YNSA frequentemente oferece alívio imediato da dor à palpação/movimento.
+- **Sessões:** Casos agudos resolvem rápido; crônicos exigem persistência.
+- **Combinação:** Pode combinar com acupressão sistêmica (MTC).
 
 **BRAIN POINTS & NERVOS CRANIANOS:**
 - Gânglios da Base, Cérebro, Cerebelo, Hipocampo

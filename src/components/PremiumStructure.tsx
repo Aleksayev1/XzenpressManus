@@ -223,17 +223,17 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                   <div className="text-4xl font-bold text-cyan-400 mb-2">100%</div>
-                  <div className="text-white font-medium">Taxa de Reversão</div>
+                  <div className="text-white font-medium">Potencial de Resiliência</div>
                   <div className="text-cyan-200 text-sm mt-1">Quando tratado na Fase 1 (Alarme)</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                   <div className="text-4xl font-bold text-green-400 mb-2">70%</div>
-                  <div className="text-white font-medium">Potencial de Reversão</div>
+                  <div className="text-white font-medium">Recuperação Sustentável</div>
                   <div className="text-cyan-200 text-sm mt-1">Na Fase 2 (Resistência)</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                   <div className="text-4xl font-bold text-red-400 mb-2">&lt;30%</div>
-                  <div className="text-white font-medium">Reversibilidade</div>
+                  <div className="text-white font-medium">Reversibilidade Natural</div>
                   <div className="text-cyan-200 text-sm mt-1">Fase 3 (Exaustão) = Alto Custo</div>
                 </div>
               </div>

@@ -171,7 +171,8 @@ body {
   display: flex !important;
   align-items: center !important;
   position: relative !important;
-  z-index: 10000 !important; /* Ensure it's above aurora */
+  z-index: 10000 !important;
+  /* Ensure it's above aurora */
   pointer-events: auto !important;
 }
 
@@ -189,9 +190,40 @@ body {
   font-size: 14px !important;
 }
 
-/* Hide "Powered by Google" */
+/* Hide "Powered by Google" text but keep dropdown visible */
 .goog-te-gadget span {
+  display: inline-block !important;
+  /* Restore visibility */
+}
+
+.goog-te-gadget span>a {
   display: none !important;
+  /* Hide 'Powered by Google' link if possible */
+}
+
+.goog-te-gadget {
+  color: transparent !important;
+  /* Hide text color */
+}
+
+.goog-te-gadget>div {
+  color: #4b5563 !important;
+  /* Restore color for dropdown container */
+}
+
+.goog-te-combo {
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  border: 1px solid #e5e7eb !important;
+  font-size: 14px !important;
+  color: #1f2937 !important;
+  /* Force dark text color */
+  background-color: white !important;
+  height: auto !important;
+  display: inline-block !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* Style the dropdown button */
@@ -236,6 +268,7 @@ body {
     transform: translateX(400px);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -247,6 +280,7 @@ body {
     transform: translateY(-100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;

@@ -114,13 +114,34 @@ DIRETRIZES RIGOROSAS:
 
 EXPERTISE - YNSA (Yamamoto New Scalp Acupuncture):
 - Desenvolvida em 1973 pelo Dr. Toshikatsu Yamamoto (neurologista japonês)
-- Pontos Básicos YNSA: A, B, C, D, E (Basic Points localizados no couro cabeludo)
-- Somatopoias: Mapeamento corporal completo no crânio (braço, perna, tronco)
-- Y-Points: Pontos Yin específicos para órgãos internos (Rim, Fígado, Baço, Pulmão, etc)
-- Brain Points: Gânglios da Base, Cérebro, Cerebelo, Hipocampo (pontos neurológicos avançados)
-- Nervos Cranianos (I-XII): Tratamento específico de funções sensoriais
-- Aplicações clínicas validadas: AVC, Parkinson, dor crônica, distúrbios neurológicos
-- Referências: Yamamoto T. "Yamamoto New Scalp Acupuncture" (1973-2023)
+
+**PONTOS BÁSICOS YNSA (A, B, C, D, E):**
+- Básico A: Cervical/cabeça
+- Básico B: Ombro/escápula
+- Básico C: Membro superior (braço/mão)
+- Básico D: Coluna lombar
+- Básico E: Tórax/respiração
+- Função: Estruturas músculo-esqueléticas GERAIS
+
+**PONTOS SENSORIAIS YNSA (CRÍTICO - Representam órgãos/estruturas anatômicas específicas):**
+- **Ponto do OLHO:** Distúrbios visuais (glaucoma, conjuntivites, estrabismo, epífora, degeneração macular), dores pós-traumáticas/pós-operatórias oculares
+- **Ponto do NARIZ:** Alergias, rinites, sinusites, entupimentos/obstruções nasais, dores pós-traumáticas/pós-operatórias nasais
+- **Ponto da BOCA:** Inflamações bucais, estomatites, dores de garganta, herpes simples, odontalgias, dor pós-extração dentária, afasia, dores pós-traumáticas/pós-operatórias orais
+- **Ponto do OUVIDO:** Distúrbios auditivos, otite externa, otite média, tinidos (zumbido), dores pós-traumáticas/pós-operatórias auriculares
+- **IMPORTANTE:** Pontos Sensoriais tratam o ÓRGÃO ESPECÍFICO + suas doenças relacionadas. NÃO confundir com Pontos Básicos!
+
+**Y-POINTS (Zangfu):** Pontos Yin para órgãos internos
+- Rim (1), Fígado (10), Baço (8), Pulmão (4), Coração (2), etc
+- Função: Equilibrar ÓRGÃOS INTERNOS e funções emocionais
+
+**BRAIN POINTS & NERVOS CRANIANOS:**
+- Gânglios da Base, Cérebro, Cerebelo, Hipocampo
+- Nervos Cranianos I-XII para funções neurológicas avançadas
+
+**Somatopoias:** Mapeamento corporal completo no crânio (braço, perna, tronco)
+
+**Aplicações validadas:** AVC, Parkinson, dor crônica, distúrbios neurológicos, sensoriais
+**Referências:** Yamamoto T. "Yamamoto New Scalp Acupuncture" (1973-2023)
 
 EXPERTISE - MTC (Medicina Tradicional Chinesa):
 - Teoria do Qi (energia vital) e fluxo pelos meridianos

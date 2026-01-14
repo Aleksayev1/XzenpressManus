@@ -1627,7 +1627,38 @@ export const useLanguage = () => {
 };
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(languages[0]);
+  // Auto-detect browser language or use default (PT)
+  const getInitialLanguage = (): Language => {
+    // Priority 1: Check localStorage (user manually changed language)
+    const saved = localStorage.getItem('selectedLanguage');
+    if (saved) {
+      const language = languages.find(lang => lang.code === saved);
+      if (language) {
+        console.log('🌐 Language from localStorage:', language.code);
+        return language;
+      }
+    }
+
+    // Priority 2: Auto-detect from browser
+    const browserLang = navigator.language.toLowerCase();
+    console.log('🌐 Browser language detected:', browserLang);
+
+    // Try exact match (e.g., "en-US" → "en")
+    const exactMatch = languages.find(lang =>
+      browserLang.startsWith(lang.code)
+    );
+
+    if (exactMatch) {
+      console.log('🌐 Auto-selected language:', exactMatch.code);
+      return exactMatch;
+    }
+
+    // Priority 3: Fallback to Portuguese (default)
+    console.log('🌐 Fallback to default: pt');
+    return languages[0]; // Portuguese
+  };
+
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(getInitialLanguage());
 
   const t = (key: string): string => {
     const langTranslations = translations[currentLanguage.code as keyof typeof translations];
@@ -1652,19 +1683,12 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   const setLanguage = (language: Language) => {
+    console.log('🌐 User manually changed language to:', language.code);
     setCurrentLanguage(language);
     localStorage.setItem('selectedLanguage', language.code);
   };
 
-  React.useEffect(() => {
-    const saved = localStorage.getItem('selectedLanguage');
-    if (saved) {
-      const language = languages.find(lang => lang.code === saved);
-      if (language) {
-        setCurrentLanguage(language);
-      }
-    }
-  }, []);
+  // No useEffect needed - getInitialLanguage() handles everything on mount
 
   return (
     <LanguageContext.Provider value={{ currentLanguage, setLanguage, t }}>

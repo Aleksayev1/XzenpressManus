@@ -40,18 +40,20 @@ function App() {
       setCurrentPage('spotify-callback');
     }
 
-    // Check for impact mode on mount and hash change
-    const checkImpactMode = () => {
-      if (window.location.hash === '#impact' || window.location.search.includes('page=impact')) {
-        setIsImpactMode(true);
-      } else {
-        setIsImpactMode(false);
-      }
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      const shouldBeImpact = hash === '#impact' || search.includes('page=impact');
+
+      setIsImpactMode(prev => {
+        if (prev !== shouldBeImpact) return shouldBeImpact;
+        return prev;
+      });
     };
 
-    checkImpactMode();
-    window.addEventListener('hashchange', checkImpactMode);
-    return () => window.removeEventListener('hashchange', checkImpactMode);
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   // Institutional Mode Bypass

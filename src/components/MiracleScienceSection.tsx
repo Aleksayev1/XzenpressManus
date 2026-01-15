@@ -10,8 +10,8 @@ export const MiracleScienceSection: React.FC = () => {
         },
         {
             icon: <Dna className="w-10 h-10 text-blue-600" />,
-            title: "Design Inteligente",
-            description: "Seu corpo possui tecnologias de auto-cura que a medicina ainda tenta compreender. Nós não te curamos; apenas ativamos o milagre que já existe em sua biologia."
+            title: "Equilíbrio Biológico",
+            description: "Seu corpo possui mecanismos de recuperação natural que a ciência moderna valoriza cada vez mais. Nós não fazemos intervenções médicas; apenas ativamos o potencial de equilíbrio que já existe em seu organismo."
         },
         {
             icon: <Sparkles className="w-10 h-10 text-amber-500" />,
@@ -30,7 +30,7 @@ export const MiracleScienceSection: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
-                        A Ciência do <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Milagre</span>
+                        A Ciência do <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Equilíbrio</span>
                     </h2>
                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                         Não acreditamos em separação. A fé é a intuição do que a ciência está começando a comprovar.

@@ -31,19 +31,8 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://xzenpress.com/" />
 
-  <!-- Google Translate Widget - AUTO TRANSLATION -->
-  <script type="text/javascript">
-    function googleTranslateElementInit() {
-      new google.translate.TranslateElement({
-        pageLanguage: 'pt',
-        includedLanguages: 'en,es,fr,de,it,ru,zh-CN,ja,ar,hi,pt,nl,tr,ko,vi,id,pl,uk,ro,sv',
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-        autoDisplay: true  // ✅ AUTO-TRANSLATION ENABLED - Site detects user language and translates automatically
-      }, 'google_translate_element');
-    }
-  </script>
-  <script type="text/javascript"
-    src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <!-- Google Translate Widget - Initialized via React component GoogleTranslateWidget.tsx -->
+  <div id="google_translate_element" style="display: none;"></div>
 
   <!-- Stripe.js - Anti-fraude avançada (recomendado pelo Stripe em TODAS as páginas) -->
   <script src="https://js.stripe.com/v3/" async></script>

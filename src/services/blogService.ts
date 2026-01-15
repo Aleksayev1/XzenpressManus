@@ -221,6 +221,7 @@ export class BlogService {
       readingTime: data.tempo_leitura || data.reading_time || 5,
       createdAt: data.criado_em || data.created_at,
       updatedAt: data.atualizado_em || data.updated_at,
+      isPremium: data.is_premium || data.isPremium || false,
 
       // Mapeamento de Traduções
       titleEn: data.title_en,
@@ -411,10 +412,11 @@ A acupressão é uma ferramenta poderosa e acessível para o gerenciamento do es
         tags: ['acupressão', 'estresse', 'ansiedade', 'medicina-tradicional-chinesa'],
         published: true,
         publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        isPremium: false,
         views: 1247,
         readingTime: 8,
         createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
 
         // Traduções
         titleEn: '5 Acupressure Points to Relieve Daily Stress',
@@ -535,6 +537,7 @@ A respiração 4-7-8 é uma ferramenta poderosa, gratuita e sempre disponível p
         tags: ['respiração', '4-7-8', 'ansiedade', 'ciência', 'bem-estar'],
         published: true,
         publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        isPremium: false,
         views: 892,
         readingTime: 6,
         createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
@@ -667,7 +670,8 @@ A adequação à Lei 14.831/2024 não é apenas uma obrigação legal, mas uma o
         views: 634,
         readingTime: 12,
         createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        isPremium: false,
       },
       {
         id: '4',
@@ -714,13 +718,13 @@ As cores influenciam diretamente:
 - Equilibra emoções
 - Harmoniza energia
 - Reduz fadiga ocular
-- Promove cura
+- Promove recuperação
 
 **Quando usar:**
 - Desequilíbrios emocionais
 - Fadiga mental
 - Necessidade de renovação
-- Processos de cura
+- Processos de bem-estar
 
 ### 🟣 Roxo - A Cor da Transformação
 **Efeitos:**
@@ -827,7 +831,8 @@ A cromoterapia é uma ferramenta poderosa e não invasiva para promover bem-esta
         views: 456,
         readingTime: 10,
         createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+        updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        isPremium: true,
       },
       {
         id: '5',
@@ -846,6 +851,7 @@ A cromoterapia é uma ferramenta poderosa e não invasiva para promover bem-esta
         readingTime: 15,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        isPremium: false,
 
         // Traduções
         titleEn: 'Life After Death: Scientific Arguments Against Suicide',

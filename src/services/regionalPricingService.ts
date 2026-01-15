@@ -42,7 +42,20 @@ export async function detectUserCountry(): Promise<string> {
     // Fallback: tentar detectar via timezone
     try {
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        if (timezone.includes('Sao_Paulo') || timezone.includes('Brasilia')) {
+        if (timezone.includes('Sao_Paulo') ||
+            timezone.includes('Brasilia') ||
+            timezone.includes('Fortaleza') ||
+            timezone.includes('Manaus') ||
+            timezone.includes('Cuiaba') ||
+            timezone.includes('Recife') ||
+            timezone.startsWith('America/Araguaina') ||
+            timezone.startsWith('America/Bahia') ||
+            timezone.startsWith('America/Belem') ||
+            timezone.startsWith('America/Boa_Vista') ||
+            timezone.startsWith('America/Campo_Grande') ||
+            timezone.startsWith('America/Maceio') ||
+            timezone.startsWith('America/Porto_Velho') ||
+            timezone.startsWith('America/Rio_Branco')) {
             cachedCountry = 'BR';
             return cachedCountry;
         }

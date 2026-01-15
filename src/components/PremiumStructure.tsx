@@ -34,9 +34,25 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
       const pricing = await getRegionalPricing();
       setRegionalPricing(pricing);
       console.log('💰 Preços carregados:', pricing.currency, pricing.countryName);
+
+      // ✅ Se for internacional (USD), define Cartão como padrão
+      if (pricing.currency === 'USD') {
+        setPaymentMethod('credit');
+      }
     };
     loadPricing();
   }, []);
+
+  if (!regionalPricing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-600 font-medium font-serif italic text-lg opacity-80">Harmonizando sua experiência...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Se o usuário já é premium, mostrar dashboard premium
   if (user?.isPremium) {
@@ -529,21 +545,23 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
                 {t('premium.payment.methods')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button
-                  onClick={() => setPaymentMethod('pix')}
-                  className={`p-4 rounded-xl border-2 transition-all ${paymentMethod === 'pix'
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                >
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <Smartphone className="w-6 h-6 text-green-600" />
+                {regionalPricing?.currency === 'BRL' && (
+                  <button
+                    onClick={() => setPaymentMethod('pix')}
+                    className={`p-4 rounded-xl border-2 transition-all ${paymentMethod === 'pix'
+                      ? 'border-green-500 bg-green-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                  >
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Smartphone className="w-6 h-6 text-green-600" />
+                      </div>
+                      <div className="font-semibold text-gray-800">PIX</div>
+                      <div className="text-sm text-gray-600">{t('premium.payment.pix.desc')}</div>
                     </div>
-                    <div className="font-semibold text-gray-800">PIX</div>
-                    <div className="text-sm text-gray-600">{t('premium.payment.pix.desc')}</div>
-                  </div>
-                </button>
+                  </button>
+                )}
 
                 <button
                   onClick={() => setPaymentMethod('credit')}

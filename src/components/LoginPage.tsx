@@ -148,13 +148,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
             <GoogleIcon />
             <span>Continuar com Google</span>
           </button>
-          <button
-            onClick={() => handleSocialLogin('apple')}
-            className="w-full flex items-center justify-center space-x-3 bg-black hover:bg-gray-900 text-white font-medium py-3 rounded-xl transition-all hover:shadow-md"
-          >
-            <AppleIcon />
-            <span>Continuar com Apple</span>
-          </button>
         </div>
 
         <div className="relative mb-8">

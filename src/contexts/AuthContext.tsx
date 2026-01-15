@@ -136,12 +136,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!supabase) throw new Error("Supabase não configurado");
 
+      // Usar URL de produção ou fallback para origin atual
+      const redirectUrl = import.meta.env.PROD
+        ? 'https://xzenpress.com'
+        : window.location.origin;
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin
+          redirectTo: redirectUrl,
+          // Forçar popup em mobile (melhor UX)
+          skipBrowserRedirect: false
         }
       });
+
       if (error) throw error;
     } catch (err) {
       console.error("Google Auth Error:", err);
@@ -156,10 +164,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!supabase) throw new Error("Supabase não configurado");
 
+      // Usar URL de produção ou fallback para origin atual
+      const redirectUrl = import.meta.env.PROD
+        ? 'https://xzenpress.com'
+        : window.location.origin;
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
         options: {
-          redirectTo: window.location.origin
+          redirectTo: redirectUrl
         }
       });
       if (error) throw error;
@@ -176,12 +189,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!supabase) throw new Error("Supabase não configurado");
 
+      const redirectUrl = import.meta.env.PROD
+        ? 'https://xzenpress.com'
+        : window.location.origin;
+
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: window.location.origin
+          emailRedirectTo: redirectUrl,
+          // Opções adicionais
+          shouldCreateUser: true, // Criar usuário automaticamente se não existir
+          data: {
+            // Metadata adicional
+            source: 'magic_link',
+            timestamp: new Date().toISOString()
+          }
         }
       });
+
       if (error) throw error;
     } finally {
       setIsLoading(false);

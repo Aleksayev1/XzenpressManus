@@ -314,9 +314,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
           )}
 
           {success && (
-            <div className="text-green-600 bg-green-50 p-3 rounded-lg text-sm flex items-start gap-2">
-              <Sparkles className="w-5 h-5 shrink-0" />
-              <span>{success}</span>
+            <div className="text-green-600 bg-green-50 border border-green-200 p-4 rounded-xl text-sm">
+              <div className="flex items-start gap-3 mb-2">
+                <Sparkles className="w-5 h-5 shrink-0 animate-pulse" />
+                <div>
+                  <div className="font-semibold mb-1">{success}</div>
+                  {loginMethod === 'magic' && formData.email && (
+                    <div className="text-xs text-green-700 space-y-1 mt-2">
+                      <p>📬 Enviamos para: <strong>{formData.email}</strong></p>
+                      <p>⏰ O link expira em 1 hora</p>
+                      <p>🔍 Verifique também a pasta de spam</p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 

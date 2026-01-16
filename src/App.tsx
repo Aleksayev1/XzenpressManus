@@ -38,8 +38,17 @@ function AppContent() {
   // Monitorar login do usuário e redirecionar
   React.useEffect(() => {
     // Se usuário acabou de fazer login e está na página de login, redirecionar para home
-    if (user && currentPage === 'login') {
-      setCurrentPage('home');
+    if (user) {
+      if (currentPage === 'login') {
+        setCurrentPage('home');
+      }
+
+      // Se tiver hash de access_token na URL e o usuário já estiver logado, limpar a URL
+      // Isso evita o problema de "loop" onde o hash era limpo antes do login completar
+      if (window.location.hash.includes('access_token')) {
+        console.log('✅ Usuário autenticado - limpando hash da URL de forma segura');
+        window.history.replaceState(null, '', window.location.pathname);
+      }
     }
   }, [user, currentPage]);
 
@@ -59,11 +68,9 @@ function AppContent() {
 
     // OAuth callback (Google/Supabase) - detecta pelo hash #access_token
     if (hash.includes('access_token') || hash.includes('type=recovery')) {
-      console.log('🔵 OAuth callback detectado - limpando URL');
-      // Limpar o hash após processar (Supabase já processou automaticamente)
-      setTimeout(() => {
-        window.history.replaceState(null, '', window.location.pathname);
-      }, 100);
+      console.log('🔵 OAuth callback detectado - aguardando processamento do Supabase...');
+      // NÃO limpar o hash imediatamente. O AuthContext/Supabase precisa dele.
+      // A limpeza será feita quando o usuário for detectado (no useEffect abaixo)
       return;
     }
 

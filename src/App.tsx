@@ -68,21 +68,45 @@ function AppContent() {
 
     // OAuth callback (Google/Supabase) - detecta pelo hash #access_token
     if (hash.includes('access_token') || hash.includes('type=recovery')) {
-      console.log('🔵 OAuth callback detectado - aguardando processamento do Supabase...');
+      console.log('🔵 OAuth callback detectado - Tentando processamento manual...');
 
-      // TENTATIVA FORÇADA DE RECUPERAR SESSÃO
-      import('./lib/supabase').then(({ supabase }) => {
-        if (supabase) {
-          console.log('🔄 Forçando verificação de sessão...');
-          supabase.auth.getSession().then(({ data, error }) => {
-            if (error) console.error('❌ Erro no getSession forçado:', error);
-            if (data.session) console.log('✅ Sessão recuperada via getSession forçado:', data.session.user.email);
-            else console.log('⚠️ Nenhuma sessão encontrada no getSession forçado.');
-          });
+      const processHash = async () => {
+        try {
+          // 1. Extrair tokens do hash manualmente
+          const params = new URLSearchParams(hash.substring(1)); // Remove o '#'
+          const accessToken = params.get('access_token');
+          const refreshToken = params.get('refresh_token');
+
+          if (accessToken && refreshToken) {
+            console.log('🗝️ Tokens encontrados manualmente no hash. Tentando setSession...');
+
+            // Dynamic import para garantir que temos o client
+            const { supabase } = await import('./lib/supabase');
+            if (!supabase) throw new Error('Cliente Supabase não inicializado');
+
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken
+            });
+
+            if (error) {
+              console.error('❌ Erro ao definir sessão manualmente:', error);
+              alert('Erro de Autenticação: ' + error.message);
+            } else if (data.session) {
+              console.log('✅ Sessão definida com sucesso!', data.user);
+              // Sucesso! O listener do AuthContext vai pegar isso e atualizar o user
+              return;
+            }
+          }
+        } catch (err: any) {
+          console.error('💥 Exceção no processamento do hash:', err);
+          alert('Erro crítico no login: ' + err.message);
         }
-      });
+      };
 
-      // NÃO limpar o hash imediatamente. O AuthContext/Supabase precisa dele.
+      processHash();
+
+      // NÃO limpar o hash ainda.
       return;
     }
 

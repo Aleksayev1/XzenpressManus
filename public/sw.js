@@ -1,9 +1,9 @@
-// XZenPress Service Worker - PWABuilder Optimized
-// VERSÃO 3.0.0 - Atualização com BuddhistGuideWidget + Cache Fix
-const CACHE_NAME = 'xzenpress-v3.0.0';
-const STATIC_CACHE = 'xzenpress-static-v3.0.0';
-const DYNAMIC_CACHE = 'xzenpress-dynamic-v3.0.0';
-const SOUNDS_CACHE = 'xzenpress-sounds-v3.0.0';
+// XZenPress Service Worker - CSP Fix Optimized
+// VERSÃO 3.0.1 - Limpeza agressiva de Cache para corrigir CSP
+const CACHE_NAME = 'xzenpress-v3.0.1-csp-fix';
+const STATIC_CACHE = 'xzenpress-static-v3.0.1';
+const DYNAMIC_CACHE = 'xzenpress-dynamic-v3.0.1';
+const SOUNDS_CACHE = 'xzenpress-sounds-v3.0.1';
 
 // Static assets to cache immediately
 const STATIC_ASSETS = [
@@ -33,36 +33,39 @@ const SOUNDS_PATTERNS = [
 
 // Install event - cache static assets
 self.addEventListener('install', event => {
-  console.log('XZenPress SW: Installing...');
+  self.skipWaiting(); // Forçar nova versão imediatamente!
+  console.log('XZenPress SW 3.0.1: Installing...');
   event.waitUntil(
     Promise.all([
       caches.open(STATIC_CACHE).then(cache => {
-        console.log('XZenPress SW: Caching static assets');
         return cache.addAll(STATIC_ASSETS);
       }),
       caches.open(DYNAMIC_CACHE),
       caches.open(SOUNDS_CACHE)
     ])
   );
-  self.skipWaiting();
 });
 
-// Activate event - clean old caches
+// Activate event - clean ALL old caches aggressively
 self.addEventListener('activate', event => {
-  console.log('XZenPress SW: Activating...');
+  console.log('XZenPress SW 3.0.1: Activating & Cleaning...');
+  const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE, SOUNDS_CACHE];
+
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE && cacheName !== SOUNDS_CACHE) {
-            console.log('XZenPress SW: Deleting old cache:', cacheName);
+          if (!currentCaches.includes(cacheName)) {
+            console.log('🗑️ Apagando cache antigo/inválido:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
+    }).then(() => {
+      console.log('✅ Caches antigos limpos. Assumindo controle.');
+      return self.clients.claim();
     })
   );
-  self.clients.claim();
 });
 
 // Fetch event - advanced caching strategy

@@ -69,8 +69,20 @@ function AppContent() {
     // OAuth callback (Google/Supabase) - detecta pelo hash #access_token
     if (hash.includes('access_token') || hash.includes('type=recovery')) {
       console.log('🔵 OAuth callback detectado - aguardando processamento do Supabase...');
+
+      // TENTATIVA FORÇADA DE RECUPERAR SESSÃO
+      import('./lib/supabase').then(({ supabase }) => {
+        if (supabase) {
+          console.log('🔄 Forçando verificação de sessão...');
+          supabase.auth.getSession().then(({ data, error }) => {
+            if (error) console.error('❌ Erro no getSession forçado:', error);
+            if (data.session) console.log('✅ Sessão recuperada via getSession forçado:', data.session.user.email);
+            else console.log('⚠️ Nenhuma sessão encontrada no getSession forçado.');
+          });
+        }
+      });
+
       // NÃO limpar o hash imediatamente. O AuthContext/Supabase precisa dele.
-      // A limpeza será feita quando o usuário for detectado (no useEffect abaixo)
       return;
     }
 
@@ -139,11 +151,26 @@ function AppContent() {
     }
   };
 
+  // Check for configuration error
+  const [sysError, setSysError] = useState(false);
+  React.useEffect(() => {
+    import('./lib/supabase').then(({ supabase }) => {
+      if (!supabase) setSysError(true);
+    });
+  }, []);
+
   return (
     <AudioPlayerProvider>
       <GoogleAnalytics />
       <div className="aurora-overlay"></div>
       <GlobalPlayer />
+
+      {/* SYSTEM ERROR BANNER */}
+      {sysError && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 10000, background: 'red', color: 'white', padding: '20px', textAlign: 'center', fontWeight: 'bold' }}>
+          🛑 ERRO CRÍTICO: CONEXÃO COM BANCO DE DADOS (SUPABASE) NÃO CONFIGURADA. VERIFIQUE AS VARIÁVEIS DE AMBIENTE.
+        </div>
+      )}
 
       {/* Google Translate Widget */}
       <div style={{

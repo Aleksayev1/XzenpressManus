@@ -60,6 +60,11 @@ function AppContent() {
     // ✅ Verificar se é callback do Spotify (tem 'token_type=Bearer' no hash)
     const isSpotifyCallback = hash.includes('access_token') && hash.includes('token_type=Bearer');
 
+    // Rota de Debug
+    if (hash === '#debug-auth') {
+      setCurrentPage('debug-auth');
+    }
+
     // Callback do Spotify tem prioridade
     if (isSpotifyCallback) {
       console.log('🟢 Spotify callback detectado - redirecionando para spotify-callback');

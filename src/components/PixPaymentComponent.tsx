@@ -48,6 +48,33 @@ export const PixPaymentComponent: React.FC<PixPaymentComponentProps> = ({
 
   useEffect(() => {
     if (pixData?.status === 'paid') {
+      // Enviar email de confirmação
+      if (customerEmail && customerName) {
+        import('../services/emailService').then(({ EmailService }) => {
+          EmailService.sendPixPaymentConfirmation(
+            customerEmail,
+            customerName,
+            amount,
+            orderId,
+            new Date().toLocaleString('pt-BR')
+          ).then(success => {
+            if (success) {
+              console.log('✅ Email de confirmação PIX enviado!');
+            }
+          });
+
+          // Enviar email de boas-vindas
+          EmailService.sendWelcomePremiumEmail(
+            customerEmail,
+            customerName
+          ).then(success => {
+            if (success) {
+              console.log('✅ Email de boas-vindas enviado!');
+            }
+          });
+        });
+      }
+
       onPaymentSuccess?.(pixData);
     } else if (error) {
       onPaymentError?.(error);
@@ -93,9 +120,30 @@ export const PixPaymentComponent: React.FC<PixPaymentComponentProps> = ({
             <p className="text-green-700">PIX recebido com sucesso</p>
           </div>
         </div>
+
+        {/* Email Confirmation Notice */}
+        {customerEmail && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <div className="flex items-start space-x-2">
+              <span className="text-2xl">📧</span>
+              <div>
+                <p className="text-sm font-semibold text-blue-900 mb-1">
+                  Email de Confirmação Enviado
+                </p>
+                <p className="text-xs text-blue-700">
+                  Enviamos um comprovante detalhado para <strong>{customerEmail}</strong>
+                </p>
+                <p className="text-xs text-blue-600 mt-1">
+                  ✅ Verifique sua caixa de entrada e spam
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-lg p-4">
           <div className="text-sm text-gray-600">
-            <div>Valor: <span className="font-semibold">${amount.toFixed(2)}</span></div>
+            <div>Valor: <span className="font-semibold">R${amount.toFixed(2)}</span></div>
             <div>Pedido: <span className="font-semibold">{orderId}</span></div>
             <div>Status: <span className="font-semibold text-green-600">Pago</span></div>
           </div>

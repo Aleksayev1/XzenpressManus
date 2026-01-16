@@ -16,7 +16,7 @@ import { BlogPage } from './components/BlogPage';
 import { BlogAdminPage } from './components/BlogAdminPage';
 import { FirstTimeBanner } from './components/FirstTimeBanner';
 import { TutorialModal } from './components/TutorialModal';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { GoogleAnalytics } from './components/GoogleAnalytics';
 import { GoogleTranslateWidget } from './components/GoogleTranslateWidget';
@@ -28,16 +28,48 @@ import SoundFusion from './components/SoundFusion';
 import { ProtocolPage } from './components/ProtocolPage';
 import { ImpactPage } from './components/ImpactPage';
 
-function App() {
+function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
   const [showTutorial, setShowTutorial] = useState(false);
-
+  const { user } = useAuth();
 
   const [isImpactMode, setIsImpactMode] = useState(false);
 
+  // Monitorar login do usuário e redirecionar
   React.useEffect(() => {
-    if (window.location.hash.includes('access_token')) {
+    // Se usuário acabou de fazer login e está na página de login, redirecionar para home
+    if (user && currentPage === 'login') {
+      setCurrentPage('home');
+    }
+  }, [user, currentPage]);
+
+  // Detectar login do Google e redirecionar
+  React.useEffect(() => {
+    const hash = window.location.hash;
+    const search = window.location.search;
+
+    // ✅ CORREÇÃO: Verificar se é callback do Google (tem parâmetro ?auth=google)
+    const isGoogleCallback = search.includes('auth=google');
+
+    // ✅ CORREÇÃO: Verificar se é callback do Spotify (tem 'token_type=Bearer' no hash)
+    const isSpotifyCallback = hash.includes('access_token') && hash.includes('token_type=Bearer');
+
+    // Login do Google/Supabase - PRIORIDADE MÁXIMA
+    if (isGoogleCallback || hash.includes('type=recovery')) {
+      console.log('🔵 Google OAuth detectado - redirecionando para home');
+      // Limpar o hash e query params após processar
+      setTimeout(() => {
+        window.history.replaceState(null, '', window.location.pathname);
+        setCurrentPage('home');
+      }, 100);
+      return;
+    }
+
+    // Callback do Spotify
+    if (isSpotifyCallback) {
+      console.log('🟢 Spotify callback detectado - redirecionando para spotify-callback');
       setCurrentPage('spotify-callback');
+      return;
     }
 
     const handleHashChange = () => {
@@ -106,56 +138,62 @@ function App() {
   };
 
   return (
+    <AudioPlayerProvider>
+      <GoogleAnalytics />
+      <div className="aurora-overlay"></div>
+      <GlobalPlayer />
+
+      {/* Google Translate Widget */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#3b82f6',
+        padding: '10px',
+        textAlign: 'center',
+        zIndex: 9999,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+        minHeight: '45px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ color: 'white', fontSize: '13px', fontWeight: '600', marginRight: '12px' }}>
+          🌐 Tradutor:
+        </div>
+        <div style={{ backgroundColor: 'white', padding: '4px 12px', borderRadius: '6px', minWidth: '150px' }}>
+          <GoogleTranslateWidget />
+        </div>
+      </div>
+
+      {/* Add top margin to account for fixed translate bar */}
+      <div style={{ marginTop: '55px' }}>
+        <Header currentPage={currentPage} onPageChange={setCurrentPage} />
+
+        {renderPage()}
+
+        {/* First Time Banner */}
+        <FirstTimeBanner onStartTutorial={() => setShowTutorial(true)} />
+
+        {/* Tutorial Modal */}
+        <TutorialModal
+          isVisible={showTutorial}
+          onClose={() => setShowTutorial(false)}
+          onPageChange={setCurrentPage}
+        />
+      </div>
+    </AudioPlayerProvider>
+  );
+}
+
+function App() {
+  return (
     <LanguageProvider>
       <AuthProvider>
-        <AudioPlayerProvider>
-          <GoogleAnalytics />
-          <div className="aurora-overlay"></div>
-          <GlobalPlayer />
-
-          {/* Google Translate Widget */}
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: '#3b82f6',
-            padding: '10px',
-            textAlign: 'center',
-            zIndex: 9999,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-            minHeight: '45px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <div style={{ color: 'white', fontSize: '13px', fontWeight: '600', marginRight: '12px' }}>
-              🌐 Tradutor:
-            </div>
-            <div style={{ backgroundColor: 'white', padding: '4px 12px', borderRadius: '6px', minWidth: '150px' }}>
-              <GoogleTranslateWidget />
-            </div>
-          </div>
-
-          {/* Add top margin to account for fixed translate bar */}
-          <div style={{ marginTop: '55px' }}>
-            <Header currentPage={currentPage} onPageChange={setCurrentPage} />
-
-            {renderPage()}
-
-            {/* First Time Banner */}
-            <FirstTimeBanner onStartTutorial={() => setShowTutorial(true)} />
-
-            {/* Tutorial Modal */}
-            <TutorialModal
-              isVisible={showTutorial}
-              onClose={() => setShowTutorial(false)}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-        </AudioPlayerProvider>
+        <AppContent />
       </AuthProvider>
-    </LanguageProvider >
+    </LanguageProvider>
   );
 }
 

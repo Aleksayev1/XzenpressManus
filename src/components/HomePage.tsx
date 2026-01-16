@@ -5,6 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { PartnershipModal } from './PartnershipModal';
 
 import { HappyNewYear2026 } from './HappyNewYear2026';
+import { HeroHybrid } from './HeroHybrid';
 
 
 interface HomePageProps {
@@ -260,6 +261,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </div>
       </div>
+
+      {/* Nova Hero Section Híbrida B2B+B2C */}
+      <HeroHybrid
+        onShowTherapySelection={() => setShowTherapySelection(true)}
+        onPageChange={onPageChange}
+      />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">

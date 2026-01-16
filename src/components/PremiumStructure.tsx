@@ -85,20 +85,25 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
               onClick={() => setShowAIPanel(true)}
               className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-purple-200 hover:border-purple-300"
             >
-              <div className="flex items-center mb-6">
-                {/* AI Avatar */}
-                <div className="flex-shrink-0">
-                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-green-500 shadow-lg">
-                    <img
-                      src="/buddhist-robot.png"
-                      alt="Robo Zen - Assistente IA"
-                      className="w-full h-full object-cover"
-                    />
+              <div className="flex flex-col items-center mb-6">
+                {/* AI Avatar - ROBÔ ZEN MEDITANDO - DESTAQUE */}
+                <div className="flex-shrink-0 mb-6">
+                  <div className="relative">
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-3xl blur-xl opacity-30 animate-pulse"></div>
+                    {/* Imagem do robô */}
+                    <div className="relative w-48 h-48 rounded-3xl overflow-hidden border-4 border-purple-400 shadow-2xl bg-gradient-to-br from-purple-50 to-pink-50">
+                      <img
+                        src="/robo-zen-meditando.png"
+                        alt="Robo Zen - Assistente IA Meditando"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="ml-4">
-                  <h3 className="text-xl font-bold text-gray-900">🤖 Assistente IA Especializado</h3>
-                  <p className="font-medium text-green-600">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">🤖 Assistente IA Especializado</h3>
+                  <p className="font-semibold text-green-600 text-lg">
                     DISPONÍVEL - 24/7
                   </p>
                 </div>
@@ -305,10 +310,10 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
     {
       id: 'ai-assistant',
       icon: (
-        <div className="w-8 h-8 rounded-full overflow-hidden border border-purple-200">
+        <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-purple-300 shadow-lg">
           <img
-            src="/buddhist-robot.png"
-            alt="Robo Zen"
+            src="/robo-zen-meditando.png"
+            alt="Robo Zen Meditando"
             className="w-full h-full object-cover"
           />
         </div>

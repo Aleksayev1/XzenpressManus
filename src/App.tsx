@@ -27,6 +27,7 @@ import { GlobalPlayer } from './components/GlobalPlayer';
 import SoundFusion from './components/SoundFusion';
 import { ProtocolPage } from './components/ProtocolPage';
 import { ImpactPage } from './components/ImpactPage';
+import { DebugAuth } from './components/DebugAuth';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -170,6 +171,8 @@ function AppContent() {
         return <SoundFusion />;
       case 'protocols':
         return <ProtocolPage onPageChange={setCurrentPage} />;
+      case 'debug-auth':
+        return <DebugAuth />;
       default:
         return <HomePage onPageChange={setCurrentPage} />;
     }

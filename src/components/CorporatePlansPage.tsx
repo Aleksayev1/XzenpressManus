@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building2, Users, BarChart3, Shield, CheckCircle, Star, Crown, TrendingUp, FileText, Phone, Mail, ArrowRight, Target, Zap, Award, Globe } from 'lucide-react';
+import { Building2, Users, BarChart3, Shield, CheckCircle, Star, Crown, TrendingUp, FileText, Phone, Mail, ArrowRight, Target, Zap, Award, Globe, ArrowLeft, Home } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { submitCorporateLead, CorporateLeadData } from '../lib/supabase';
 import { trackCorporateLead } from './GoogleAnalytics';
@@ -502,6 +502,19 @@ export const CorporatePlansPage: React.FC<CorporatePlansPageProps> = ({ onPageCh
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
+      {/* Back Button */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <button
+          onClick={() => onPageChange('home')}
+          className="mb-4 flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors group"
+        >
+          <div className="p-2 bg-white rounded-full shadow-md group-hover:shadow-lg transition-all">
+            <ArrowLeft className="w-5 h-5" />
+          </div>
+          <span className="font-medium">Voltar ao Início</span>
+        </button>
+      </div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white">
         <div className="absolute inset-0 bg-black/10"></div>

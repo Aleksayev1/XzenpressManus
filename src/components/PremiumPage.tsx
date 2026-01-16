@@ -1,5 +1,5 @@
 import React from 'react';
-import { Crown, MessageCircle, FileText, Zap, Star, CheckCircle } from 'lucide-react';
+import { Crown, MessageCircle, FileText, Zap, Star, CheckCircle, ArrowLeft, Home } from 'lucide-react';
 
 interface PremiumPageProps {
   onPageChange: (page: string) => void;
@@ -8,6 +8,19 @@ interface PremiumPageProps {
 export const PremiumPage: React.FC<PremiumPageProps> = ({ onPageChange }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 pt-16">
+      {/* Back Button */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <button
+          onClick={() => onPageChange('home')}
+          className="mb-4 flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors group"
+        >
+          <div className="p-2 bg-white rounded-full shadow-md group-hover:shadow-lg transition-all">
+            <ArrowLeft className="w-5 h-5" />
+          </div>
+          <span className="font-medium">Voltar ao Início</span>
+        </button>
+      </div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-r from-amber-600 via-orange-500 to-yellow-500 text-white">
         <div className="absolute inset-0 bg-black/10"></div>
@@ -36,7 +49,7 @@ export const PremiumPage: React.FC<PremiumPageProps> = ({ onPageChange }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* WhatsApp Consultation */}
-          <div 
+          <div
             onClick={() => onPageChange('whatsapp-consultation')}
             className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-green-200"
           >

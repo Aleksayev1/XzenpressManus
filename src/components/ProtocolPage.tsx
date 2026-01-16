@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Clock, ChevronRight, ArrowLeft, CheckCircle, Info, Brain, Moon, Zap, Move, Smile, UserCheck, Hand, Shield, Coffee, Sparkles, RotateCcw, Utensils, XCircle } from 'lucide-react';
+import { Play, Clock, ChevronRight, ArrowLeft, CheckCircle, Info, Brain, Moon, Zap, Move, Smile, UserCheck, Hand, Shield, Coffee, Sparkles, RotateCcw, Utensils, XCircle, Home } from 'lucide-react';
 import { protocols } from '../data/protocols';
 import { acupressurePoints } from '../data/acupressurePoints';
 import { Protocol, ProtocolStep } from '../types';
@@ -101,14 +101,20 @@ export const ProtocolPage: React.FC<ProtocolPageProps> = ({ onPageChange }) => {
         return (
             <div className="min-h-screen bg-gray-50 pt-20 pb-20 px-4">
                 <div className="max-w-4xl mx-auto">
-                    <div className="flex items-center mb-8">
-                        <button onClick={() => onPageChange('home')} className="mr-4 p-2 rounded-full hover:bg-gray-200">
-                            <ArrowLeft className="w-6 h-6 text-gray-700" />
-                        </button>
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900">Sessões Otimizadas</h1>
-                            <p className="text-gray-600">Protocolos guiados para suas principais necessidades.</p>
+                    {/* Back to Home Button */}
+                    <button
+                        onClick={() => onPageChange('home')}
+                        className="mb-8 flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors group"
+                    >
+                        <div className="p-2 bg-white rounded-full shadow-md group-hover:shadow-lg transition-all">
+                            <ArrowLeft className="w-5 h-5" />
                         </div>
+                        <span className="font-medium">Voltar ao Início</span>
+                    </button>
+
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-900">Sessões Otimizadas</h1>
+                        <p className="text-gray-600">Protocolos guiados para suas principais necessidades.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

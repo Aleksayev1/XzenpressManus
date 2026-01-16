@@ -217,15 +217,15 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
               <div className={`rounded-2xl overflow-hidden shadow-xl mb-8${selectedPost.isPremium ? '' : ' cursor-pointer'
                 }`}>
                 <div className={`${selectedPost.isPremium
-                    ? 'h-32 md:h-40'
-                    : 'h-64 md:h-80'
+                  ? 'h-32 md:h-40'
+                  : 'h-64 md:h-80'
                   } overflow-hidden`}>
                   <img
                     src={selectedPost.imageUrl}
                     alt={getTranslatedField(selectedPost, 'title')}
                     className={`w-full h-full object-cover${selectedPost.isPremium
-                        ? ''
-                        : ' hover:scale-105 transition-transform duration-300'
+                      ? ''
+                      : ' hover:scale-105 transition-transform duration-300'
                       }`}
                   />
                 </div>
@@ -369,6 +369,17 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Back Button */}
+        <button
+          onClick={() => onPageChange('home')}
+          className="mb-8 flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors group"
+        >
+          <div className="p-2 bg-white rounded-full shadow-md group-hover:shadow-lg transition-all">
+            <ArrowLeft className="w-5 h-5" />
+          </div>
+          <span className="font-medium">Voltar ao Início</span>
+        </button>
+
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
@@ -452,8 +463,8 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onPageChange }) => {
                           src={post.imageUrl}
                           alt={getTranslatedField(post, 'title')}
                           className={`w-full h-full object-cover${post.isPremium
-                              ? ''
-                              : ' group-hover:scale-110 transition-transform duration-500'
+                            ? ''
+                            : ' group-hover:scale-110 transition-transform duration-500'
                             }`}
                         />
                         <div className="absolute top-4 left-4 z-20">

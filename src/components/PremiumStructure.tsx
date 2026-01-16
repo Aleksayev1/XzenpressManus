@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Crown, Star, Lock, Zap, MessageCircle, Target, Brain, Shield, CheckCircle, Clock, ArrowRight, CreditCard, Smartphone, Bitcoin, Copy } from 'lucide-react';
+import { Crown, Star, Lock, Zap, MessageCircle, Target, Brain, Shield, CheckCircle, Clock, ArrowRight, CreditCard, Smartphone, Bitcoin, Copy, ArrowLeft, Home } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { AIRecommendationsPanel } from './AIRecommendationsPanel';
@@ -719,6 +719,19 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 pt-16">
+      {/* Back to Home Button */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <button
+          onClick={() => onPageChange('home')}
+          className="mb-4 flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors group"
+        >
+          <div className="p-2 bg-white rounded-full shadow-md group-hover:shadow-lg transition-all">
+            <ArrowLeft className="w-5 h-5" />
+          </div>
+          <span className="font-medium">Voltar ao Início</span>
+        </button>
+      </div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-r from-amber-600 via-orange-500 to-yellow-500 text-white">
         <div className="absolute inset-0 bg-black/10"></div>

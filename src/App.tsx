@@ -43,32 +43,27 @@ function AppContent() {
     }
   }, [user, currentPage]);
 
-  // Detectar login do Google e redirecionar
+  // Detectar callbacks OAuth e Spotify
   React.useEffect(() => {
     const hash = window.location.hash;
-    const search = window.location.search;
 
-    // ✅ CORREÇÃO: Verificar se é callback do Google (tem parâmetro ?auth=google)
-    const isGoogleCallback = search.includes('auth=google');
-
-    // ✅ CORREÇÃO: Verificar se é callback do Spotify (tem 'token_type=Bearer' no hash)
+    // ✅ Verificar se é callback do Spotify (tem 'token_type=Bearer' no hash)
     const isSpotifyCallback = hash.includes('access_token') && hash.includes('token_type=Bearer');
 
-    // Login do Google/Supabase - PRIORIDADE MÁXIMA
-    if (isGoogleCallback || hash.includes('type=recovery')) {
-      console.log('🔵 Google OAuth detectado - redirecionando para home');
-      // Limpar o hash e query params após processar
-      setTimeout(() => {
-        window.history.replaceState(null, '', window.location.pathname);
-        setCurrentPage('home');
-      }, 100);
-      return;
-    }
-
-    // Callback do Spotify
+    // Callback do Spotify tem prioridade
     if (isSpotifyCallback) {
       console.log('🟢 Spotify callback detectado - redirecionando para spotify-callback');
       setCurrentPage('spotify-callback');
+      return;
+    }
+
+    // OAuth callback (Google/Supabase) - detecta pelo hash #access_token
+    if (hash.includes('access_token') || hash.includes('type=recovery')) {
+      console.log('🔵 OAuth callback detectado - limpando URL');
+      // Limpar o hash após processar (Supabase já processou automaticamente)
+      setTimeout(() => {
+        window.history.replaceState(null, '', window.location.pathname);
+      }, 100);
       return;
     }
 

@@ -36,7 +36,7 @@ const AppleIcon = () => (
 );
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
-  const { login, signInWithGoogle, signInWithApple, signInWithMagicLink, signInWithOTP, verifyOTP, isLoading } = useAuth();
+  const { login, signUp, signInWithGoogle, signInWithApple, signInWithMagicLink, isLoading } = useAuth();
   const { t } = useLanguage();
 
   type LoginMethod = 'password' | 'magic';
@@ -64,16 +64,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
       // 1. Password Flow
       if (loginMethod === 'password') {
         if (isLogin) {
+          // LOGIN
           await login(formData.email, formData.password);
           onPageChange('home');
         } else {
-          // Sign Up logic - for now using standard login flow or user might need specific Sign Up method in AuthContext
-          // Supabase handles signup via same method or specific signUp. For simplicity, we use password signin but note it might fail if user doesn't exist
-          // For a better UX, usually signInWithPassword throws "Invalid login credentials". 
-          // We can instruct user to use "Magic Link" for first time or add signUp method. 
-          // Assuming existing 'login' method handles or we guide them.
-          await login(formData.email, formData.password);
-          onPageChange('home');
+          // CADASTRO
+          if (formData.password !== formData.confirmPassword) {
+            setError('As senhas não coincidem!');
+            return;
+          }
+          if (formData.password.length < 6) {
+            setError('A senha deve ter pelo menos 6 caracteres!');
+            return;
+          }
+          await signUp(formData.email, formData.password, formData.name);
+          setSuccess('✅ Cadastro realizado! Verifique seu email para confirmar.');
         }
       }
       // 2. Magic Link Flow
@@ -81,7 +86,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
         await signInWithMagicLink(formData.email);
         setSuccess('✨ Link mágico enviado! Verifique seu email para entrar.');
       }
-
 
     } catch (err: any) {
       console.error(err);
@@ -167,6 +171,27 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
           {/* PASSWORD METHOD */}
           {loginMethod === 'password' && (
             <>
+              {/* Nome (apenas no cadastro) */}
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nome completo
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Seu nome"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {t('login.email')}
@@ -209,6 +234,27 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
                   </button>
                 </div>
               </div>
+
+              {/* Confirmar Senha (apenas no cadastro) */}
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Confirmar senha
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="••••••••"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
             </>
           )}
 
@@ -269,7 +315,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
 
           <button
             type="submit"
-            disabled={isLoading || (success.length > 0 && loginMethod === 'magic')}
+            disabled={isLoading || (success.length > 0 && (loginMethod === 'magic' || !isLogin))}
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
             <span>
@@ -277,7 +323,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
                 ? 'Processando...'
                 : loginMethod === 'magic'
                   ? 'Enviar Link Mágico'
-                  : 'Entrar'
+                  : isLogin
+                    ? 'Entrar'
+                    : 'Cadastrar'
               }
             </span>
             {!isLoading && <ArrowRight className="w-5 h-5" />}

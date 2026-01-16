@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, name?: string) => Promise<void>;
   logout: () => void;
   resetPassword: (email: string) => Promise<void>;
   upgradeToPremium: () => void;
@@ -124,6 +125,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signUp = async (email: string, password: string, name?: string) => {
+    setIsLoading(true);
+    try {
+      if (!supabase) throw new Error("Supabase não configurado");
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name || email.split('@')[0],
+          },
+          emailRedirectTo: window.location.origin,
+        }
+      });
+
+      if (error) throw error;
+
+      // Supabase pode exigir confirmação de email
+      if (data.user && !data.session) {
+        throw new Error("✉️ Verifique seu email para confirmar o cadastro!");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -270,6 +298,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider value={{
       user,
       login,
+      signUp,
       logout,
       resetPassword,
       upgradeToPremium,

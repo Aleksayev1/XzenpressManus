@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Target, Crown, Lock, Clock, Play, Pause, RotateCcw, Volume2, X, ZoomIn, ArrowLeft, Loader2 } from 'lucide-react';
+import { Target, Crown, Lock, Clock, Play, Pause, RotateCcw, Volume2, X, ZoomIn, ArrowLeft, Loader2, Home } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSessionHistory } from '../hooks/useSessionHistory';
@@ -1041,13 +1041,22 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                 <div className="bg-white rounded-2xl shadow-2xl p-6 sticky top-24">
                   {/* Botão Voltar - Topo do painel */}
                   <div className="flex items-center justify-between mb-4">
-                    <button
-                      onClick={() => setViewingPoint(null)}
-                      className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors text-sm"
-                    >
-                      <Target className="w-4 h-4" />
-                      <span>← Voltar aos pontos</span>
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setViewingPoint(null)}
+                        className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors text-sm"
+                      >
+                        <Target className="w-4 h-4" />
+                        <span>← Voltar aos pontos</span>
+                      </button>
+                      <button
+                        onClick={() => onPageChange('home')}
+                        className="flex items-center space-x-2 text-green-600 hover:text-green-700 transition-colors text-sm font-medium"
+                      >
+                        <Home className="w-4 h-4" />
+                        <span>Início</span>
+                      </button>
+                    </div>
                     {viewingPointData.isPremium && (
                       <div className="flex items-center space-x-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
                         <Crown className="w-3 h-3" />

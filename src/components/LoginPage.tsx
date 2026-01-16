@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, User, Smartphone, Sparkles, Send } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, User, Sparkles, Send } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -39,7 +39,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
   const { login, signInWithGoogle, signInWithApple, signInWithMagicLink, signInWithOTP, verifyOTP, isLoading } = useAuth();
   const { t } = useLanguage();
 
-  type LoginMethod = 'password' | 'magic' | 'phone';
+  type LoginMethod = 'password' | 'magic';
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('password');
 
   // isLogin affects visuals ("Criar conta" vs "Login") mostly for Password flow
@@ -50,12 +50,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
     email: '',
     password: '',
     confirmPassword: '',
-    name: '',
-    phone: '',
-    otp: ''
+    name: ''
   });
-
-  const [showOTPInput, setShowOTPInput] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -85,17 +81,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
         await signInWithMagicLink(formData.email);
         setSuccess('✨ Link mágico enviado! Verifique seu email para entrar.');
       }
-      // 3. Phone Flow
-      else if (loginMethod === 'phone') {
-        if (showOTPInput) {
-          await verifyOTP(formData.phone, formData.otp);
-          onPageChange('home');
-        } else {
-          await signInWithOTP(formData.phone);
-          setShowOTPInput(true);
-          setSuccess('📱 Código enviado por SMS! Digite abaixo.');
-        }
-      }
+
 
     } catch (err: any) {
       console.error(err);
@@ -173,12 +159,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
           >
             Magic Link
           </button>
-          <button
-            onClick={() => setLoginMethod('phone')}
-            className={`pb-2 text-sm font-medium transition-colors ${loginMethod === 'phone' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-          >
-            Celular
-          </button>
+
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -258,52 +239,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
             </div>
           )}
 
-          {/* PHONE METHOD */}
-          {loginMethod === 'phone' && (
-            <div className="space-y-4">
-              {!showOTPInput ? (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Celular (com DDD)
-                  </label>
-                  <div className="relative">
-                    <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="+55 11 99999-9999"
-                      required
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Pode haver custos de SMS dependendo da sua operadora.
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Código SMS
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="text"
-                      name="otp"
-                      value={formData.otp}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all tracking-widest text-center font-bold text-lg"
-                      placeholder="000000"
-                      maxLength={6}
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+
 
 
           {error && (
@@ -341,11 +277,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
                 ? 'Processando...'
                 : loginMethod === 'magic'
                   ? 'Enviar Link Mágico'
-                  : loginMethod === 'phone' && !showOTPInput
-                    ? 'Enviar Código SMS'
-                    : loginMethod === 'phone' && showOTPInput
-                      ? 'Confirmar Código'
-                      : 'Entrar'
+                  : 'Entrar'
               }
             </span>
             {!isLoading && <ArrowRight className="w-5 h-5" />}

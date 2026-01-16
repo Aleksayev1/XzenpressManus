@@ -1,0 +1,248 @@
+// 🎨 RASCUNHO V2: Nova Hero Section Híbrida B2B + B2C
+// COM ROBÔ ZEN NO TOPO + LOGO NO CENTRO
+// Para ser inserida no HomePage.tsx ANTES do banner atual
+
+{/* ========================================
+    NOVA HERO SECTION V2 - DUAL MESSAGE B2B+B2C
+    COM ROBÔ ZEN + LOGO XZENPRESS
+    ======================================== */}
+
+<section className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-white to-cyan-50 py-16">
+    {/* Decorative Elements */}
+    <div className="absolute top-10 left-10 w-20 h-20 opacity-10">
+        <svg viewBox="0 0 100 100" className="text-purple-400">
+            <circle cx="50" cy="50" r="40" fill="currentColor" />
+        </svg>
+    </div>
+    <div className="absolute bottom-10 right-10 w-24 h-24 opacity-10">
+        <svg viewBox="0 0 100 100" className="text-cyan-400">
+            <path d="M50 10 L90 90 L10 90 Z" fill="currentColor" />
+        </svg>
+    </div>
+
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* ========== ROBÔ ZEN NO TOPO ========== */}
+        <div className="flex justify-center mb-8">
+            <div className="relative">
+                {/* Glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-2xl opacity-30 animate-pulse"></div>
+
+                {/* Robô Zen Meditando */}
+                <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-purple-300 shadow-2xl bg-gradient-to-br from-purple-50 to-pink-50">
+                    <img
+                        src="/robo-zen-meditando.png"
+                        alt="Robo Zen - Guia de Bem-estar"
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+            </div>
+        </div>
+
+        {/* Main Headline - Emotional Hook */}
+        <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-600 bg-clip-text text-transparent">
+                    Sua Biologia é um Milagre
+                </span>
+            </h1>
+
+            <p className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
+                Na XZenPress, unimos a <strong>sabedoria milenar da Medicina Tradicional Chinesa</strong>
+                com a <strong>ciência moderna da neurociência</strong> para um bem-estar integral.
+            </p>
+        </div>
+
+        {/* Dual Message Cards - B2C | LOGO | B2B */}
+        <div className="relative">
+
+            {/* Grid com espaço no centro para o logo */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-32 mb-12">
+
+                {/* ========== B2C CARD (ESQUERDA) ========== */}
+                <div className="group bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-purple-200 hover:border-purple-300">
+                    <div className="text-center">
+                        {/* Icon */}
+                        <div className="flex justify-center mb-6">
+                            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                                <Heart className="w-8 h-8 text-white" />
+                            </div>
+                        </div>
+
+                        {/* Title */}
+                        <h2 className="text-3xl font-bold text-gray-800 mb-6">
+                            Para Você
+                        </h2>
+
+                        {/* Benefits */}
+                        <div className="space-y-4 mb-8">
+                            <div className="flex items-center space-x-3 text-left">
+                                <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow">
+                                    <span className="text-2xl">🌿</span>
+                                </div>
+                                <div>
+                                    <p className="text-gray-700 font-medium">Alívio do estresse</p>
+                                    <p className="text-gray-500 text-sm">Técnicas validadas</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center space-x-3 text-left">
+                                <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow">
+                                    <span className="text-2xl">☯️</span>
+                                </div>
+                                <div>
+                                    <p className="text-gray-700 font-medium">Paz interior</p>
+                                    <p className="text-gray-500 text-sm">Equilíbrio mente-corpo</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center space-x-3 text-left">
+                                <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow">
+                                    <span className="text-2xl">🧘</span>
+                                </div>
+                                <div>
+                                    <p className="text-gray-700 font-medium">Equilíbrio total</p>
+                                    <p className="text-gray-500 text-sm">Transformação duradoura</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* CTA */}
+                        <button
+                            onClick={() => setShowTherapySelection(true)}
+                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center justify-center space-x-2"
+                        >
+                            <span>✨</span>
+                            <span>Começar Gratuitamente</span>
+                            <ArrowRight className="w-5 h-5" />
+                        </button>
+
+                        <p className="text-gray-500 text-sm mt-3">
+                            Sem cadastro • 4 pontos gratuitos
+                        </p>
+                    </div>
+                </div>
+
+                {/* ========== B2B CARD (DIREITA) ========== */}
+                <div className="group bg-gradient-to-br from-cyan-100 to-blue-100 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-cyan-200 hover:border-cyan-300">
+                    <div className="text-center">
+                        {/* Icon */}
+                        <div className="flex justify-center mb-6">
+                            <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                                <BarChart3 className="w-8 h-8 text-white" />
+                            </div>
+                        </div>
+
+                        {/* Title */}
+                        <h2 className="text-3xl font-bold text-gray-800 mb-6">
+                            Para Sua Empresa
+                        </h2>
+
+                        {/* Benefits */}
+                        <div className="space-y-4 mb-8">
+                            <div className="flex items-center space-x-3 text-left">
+                                <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow">
+                                    <span className="text-2xl">🛡️</span>
+                                </div>
+                                <div>
+                                    <p className="text-gray-700 font-medium">Conformidade</p>
+                                    <p className="text-gray-500 text-sm">NR-1 + Lei 14.831/2024</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center space-x-3 text-left">
+                                <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow">
+                                    <span className="text-2xl">💰</span>
+                                </div>
+                                <div>
+                                    <p className="text-gray-700 font-medium">ROI Comprovado</p>
+                                    <p className="text-gray-500 text-sm">Retorno em 6 meses</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center space-x-3 text-left">
+                                <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow">
+                                    <span className="text-2xl">⚡</span>
+                                </div>
+                                <div>
+                                    <p className="text-gray-700 font-medium">Produtividade</p>
+                                    <p className="text-gray-500 text-sm">Redução de absenteísmo</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* CTA */}
+                        <button
+                            onClick={() => onPageChange('corporate')}
+                            className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-cyan-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center justify-center space-x-2"
+                        >
+                            <span>📊</span>
+                            <span>Soluções Corporativas</span>
+                            <ArrowRight className="w-5 h-5" />
+                        </button>
+
+                        <p className="text-gray-500 text-sm mt-3">
+                            Demo gratuita • Análise de ROI
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            {/* ========== LOGO XZENPRESS NO CENTRO (ABSOLUTO) ========== */}
+            <div className="hidden md:block absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                <div className="relative">
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 rounded-full blur-xl opacity-40 animate-pulse"></div>
+
+                    {/* Logo Container */}
+                    <div className="relative w-24 h-24 bg-white rounded-full shadow-2xl border-4 border-white flex items-center justify-center">
+                        <img
+                            src="/Logo Xzenpress oficial.png"
+                            alt="XZenPress Logo"
+                            className="w-20 h-20 object-contain"
+                        />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        {/* Trust Badges - Minimal */}
+        <div className="flex flex-wrap justify-center items-center gap-6 opacity-60">
+            <div className="flex items-center space-x-2">
+                <span className="text-2xl">🏛️</span>
+                <span className="text-sm font-semibold text-gray-600">MTC Tradicional</span>
+            </div>
+            <div className="flex items-center space-x-2">
+                <span className="text-2xl">🧠</span>
+                <span className="text-sm font-semibold text-gray-600">Neurociência</span>
+            </div>
+            <div className="flex items-center space-x-2">
+                <span className="text-2xl">⚖️</span>
+                <span className="text-sm font-semibold text-gray-600">Lei 14.831/2024</span>
+            </div>
+            <div className="flex items-center space-x-2">
+                <span className="text-2xl">🌍</span>
+                <span className="text-sm font-semibold text-gray-600">ISO 45003</span>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{/* ========================================
+    FIM DA NOVA HERO SECTION V2
+    
+    ESTRUTURA:
+    1. Robô Zen meditando (topo, centralizado)
+    2. Headline "Sua Biologia é um Milagre"
+    3. Cards lado a lado (B2C | B2B)
+    4. Logo XZenPress no centro (entre os cards)
+    5. Trust badges (rodapé)
+    
+    DEPOIS DISSO, MANTER:
+    - Banner Hero V6 atual (pode ser secundário ou removido)
+    - Science Banner
+    - Resto da página
+    ======================================== */}

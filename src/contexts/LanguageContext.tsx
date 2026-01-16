@@ -189,7 +189,7 @@ const translations = {
     'premium.plans.monthly.name': 'Premium Mensal',
     'premium.plans.monthly.period': '/mês',
     'premium.plans.monthly.feature1': 'Todos os pontos premium',
-    'premium.plans.monthly.feature2': 'Consulta WhatsApp',
+    'premium.plans.monthly.feature2': 'Assistente IA',
     'premium.plans.monthly.feature3': 'Sons exclusivos',
     'premium.plans.monthly.feature4': 'Cromoterapia avançada',
     'premium.plans.monthly.feature5': 'Suporte prioritário',

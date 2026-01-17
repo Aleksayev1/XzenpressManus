@@ -83,6 +83,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
           setSuccess('✅ Cadastro realizado! Verifique seu email para confirmar.');
         }
       }
+      // 2. Magic Link Flow
+      else if (loginMethod === 'magic') {
+        await signInWithMagicLink(formData.email);
+        setSuccess('✨ Link mágico enviado! Verifique seu email para entrar.');
+      }
 
     } catch (err: any) {
       console.error(err);

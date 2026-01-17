@@ -36,7 +36,7 @@ const AppleIcon = () => (
 );
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
-  const { login, signUp, isLoading, resetPassword } = useAuth();
+  const { login, signUp, isLoading, resetPassword, signInWithGoogle } = useAuth();
   const { t } = useLanguage();
 
   type LoginMethod = 'password' | 'magic';
@@ -117,6 +117,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
             {t('login.subtitle.login')}
           </p>
         </div>
+
+        {/* Google Login Button */}
+        <button
+          onClick={async () => {
+            try {
+              setError('');
+              await signInWithGoogle();
+            } catch (err: any) {
+              setError(err.message || 'Erro ao fazer login com Google');
+            }
+          }}
+          disabled={isLoading}
+          className="w-full mb-6 flex items-center justify-center space-x-3 bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-xl transition-all hover:shadow-md disabled:opacity-50"
+        >
+          <GoogleIcon />
+          <span>Continuar com Google</span>
+        </button>
 
         <div className="relative mb-8">
           <div className="absolute inset-0 flex items-center">

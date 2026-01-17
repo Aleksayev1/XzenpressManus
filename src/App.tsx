@@ -39,17 +39,8 @@ function AppContent() {
   // Monitorar login do usuário e redirecionar
   React.useEffect(() => {
     // Se usuário acabou de fazer login e está na página de login, redirecionar para home
-    if (user) {
-      if (currentPage === 'login') {
-        setCurrentPage('home');
-      }
-
-      // Se tiver hash de access_token na URL e o usuário já estiver logado, limpar a URL
-      // Isso evita o problema de "loop" onde o hash era limpo antes do login completar
-      if (window.location.hash.includes('access_token')) {
-        console.log('✅ Usuário autenticado - limpando hash da URL de forma segura');
-        window.history.replaceState(null, '', window.location.pathname);
-      }
+    if (user && currentPage === 'login') {
+      setCurrentPage('home');
     }
   }, [user, currentPage]);
 
@@ -100,7 +91,9 @@ function AppContent() {
               alert('Erro de Autenticação: ' + error.message);
             } else if (data.session) {
               console.log('✅ Sessão definida com sucesso!', data.user);
-              // Sucesso! O listener do AuthContext vai pegar isso e atualizar o user
+              // AGORA SIM limpa o hash, pois sessão está estabelecida
+              window.history.replaceState(null, '', window.location.pathname);
+              setCurrentPage('home');
               return;
             }
           }

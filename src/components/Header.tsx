@@ -145,15 +145,17 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                     <span>Tutorial</span>
                   </button>
 
-                  {/* Blog Admin Link - For authenticated users */}
-                  <button
-                    onClick={() => onPageChange('blog-admin')}
-                    className="flex items-center space-x-1 px-3 py-2 text-sm text-green-600 hover:bg-green-50 rounded-md transition-colors"
-                    title="Administrar Blog"
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    <span>Admin Blog</span>
-                  </button>
+                  {/* Blog Admin Link - Only for admin users */}
+                  {user.isAdmin && (
+                    <button
+                      onClick={() => onPageChange('blog-admin')}
+                      className="flex items-center space-x-1 px-3 py-2 text-sm text-green-600 hover:bg-green-50 rounded-md transition-colors"
+                      title="Administrar Blog"
+                    >
+                      <BookOpen className="w-4 h-4" />
+                      <span>Admin Blog</span>
+                    </button>
+                  )}
 
                   <div className="flex items-center space-x-2">
                     <User className="w-4 h-4 text-gray-600" />

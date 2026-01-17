@@ -83,11 +83,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
           setSuccess('✅ Cadastro realizado! Verifique seu email para confirmar.');
         }
       }
-      // 2. Magic Link Flow
-      else if (loginMethod === 'magic') {
-        await signInWithMagicLink(formData.email);
-        setSuccess('✨ Link mágico enviado! Verifique seu email para entrar.');
-      }
 
     } catch (err: any) {
       console.error(err);
@@ -95,15 +90,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
     }
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'apple') => {
-    try {
-      setError('');
-      if (provider === 'google') await signInWithGoogle();
-      if (provider === 'apple') await signInWithApple();
-    } catch (err: any) {
-      setError(`Erro ao conectar com ${provider}. Tente novamente.`);
-    }
-  }
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -129,17 +116,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
           <p className="text-gray-600">
             {t('login.subtitle.login')}
           </p>
-        </div>
-
-        {/* Social Login Buttons */}
-        <div className="space-y-3 mb-8">
-          <button
-            onClick={() => handleSocialLogin('google')}
-            className="w-full flex items-center justify-center space-x-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-xl transition-all hover:shadow-md"
-          >
-            <GoogleIcon />
-            <span>Continuar com Google</span>
-          </button>
         </div>
 
         <div className="relative mb-8">

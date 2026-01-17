@@ -133,12 +133,15 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
                 </div>
                 <div className="ml-4">
                   <h3 className="text-xl font-bold text-gray-900">Pontos Exclusivos</h3>
-                  <p className="text-purple-600 font-medium">66 Pontos Premium</p>
+                  <p className="text-purple-600 font-medium">Biblioteca Completa</p>
                 </div>
               </div>
-              <p className="text-gray-600 mb-4 leading-relaxed">
-                <strong>66 pontos especializados</strong> para casos específicos:
-              </p>
+              <div className="flex items-start space-x-2">
+                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span className="text-gray-600 text-sm">
+                  <strong>Coleção exclusiva de pontos</strong> para casos específicos:
+                </span>
+              </div>
               <ul className="space-y-2 text-sm text-gray-700 mb-4">
                 <li className="flex items-start">
                   <span className="text-red-500 mr-2">🔬</span>

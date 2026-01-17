@@ -6,17 +6,12 @@ interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name?: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   logout: () => void;
   resetPassword: (email: string) => Promise<void>;
   upgradeToPremium: () => void;
   confirmPremiumPayment: () => void;
   isLoading: boolean;
-  // New Auth Methods
-  signInWithGoogle: () => Promise<void>;
-  signInWithApple: () => Promise<void>;
-  signInWithMagicLink: (email: string) => Promise<void>;
-  signInWithOTP: (phone: string) => Promise<void>;
-  verifyOTP: (phone: string, token: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -157,119 +152,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // --- New Methods ---
-
   const signInWithGoogle = async () => {
     setIsLoading(true);
     try {
       if (!supabase) throw new Error("Supabase não configurado");
 
-      // Usar URL de produção ou fallback para origin atual
-      const redirectUrl = import.meta.env.PROD
-        ? 'https://xzenpress.com'
-        : window.location.origin;
-
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectUrl,
-          // Forçar popup em mobile (melhor UX)
-          skipBrowserRedirect: false
+          redirectTo: window.location.origin,
         }
       });
 
       if (error) throw error;
     } catch (err) {
-      console.error("Google Auth Error:", err);
+      setIsLoading(false);
       throw err;
-    } finally {
-      setIsLoading(false);
     }
+    // Não faça setIsLoading(false) aqui, pois a página vai redirecionar
   };
-
-  const signInWithApple = async () => {
-    setIsLoading(true);
-    try {
-      if (!supabase) throw new Error("Supabase não configurado");
-
-      // Usar URL de produção ou fallback para origin atual
-      const redirectUrl = import.meta.env.PROD
-        ? 'https://xzenpress.com'
-        : window.location.origin;
-
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: {
-          redirectTo: redirectUrl
-        }
-      });
-      if (error) throw error;
-    } catch (err) {
-      console.error("Apple Auth Error:", err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signInWithMagicLink = async (email: string) => {
-    setIsLoading(true);
-    try {
-      if (!supabase) throw new Error("Supabase não configurado");
-
-      const redirectUrl = import.meta.env.PROD
-        ? 'https://xzenpress.com'
-        : window.location.origin;
-
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: redirectUrl,
-          // Opções adicionais
-          shouldCreateUser: true, // Criar usuário automaticamente se não existir
-          data: {
-            // Metadata adicional
-            source: 'magic_link',
-            timestamp: new Date().toISOString()
-          }
-        }
-      });
-
-      if (error) throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signInWithOTP = async (phone: string) => {
-    setIsLoading(true);
-    try {
-      if (!supabase) throw new Error("Supabase não configurado");
-
-      const { error } = await supabase.auth.signInWithOtp({
-        phone
-      });
-      if (error) throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const verifyOTP = async (phone: string, token: string) => {
-    setIsLoading(true);
-    try {
-      if (!supabase) throw new Error("Supabase não configurado");
-
-      const { error } = await supabase.auth.verifyOtp({
-        phone,
-        token,
-        type: 'sms'
-      });
-      if (error) throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }
 
   // --- Premium Simulation (Keep for now, moves to Backend later) ---
 
@@ -299,16 +200,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       user,
       login,
       signUp,
+      signInWithGoogle,
       logout,
       resetPassword,
       upgradeToPremium,
       confirmPremiumPayment,
-      isLoading,
-      signInWithGoogle,
-      signInWithApple,
-      signInWithMagicLink,
-      signInWithOTP,
-      verifyOTP
+      isLoading
     }}>
       {children}
     </AuthContext.Provider>

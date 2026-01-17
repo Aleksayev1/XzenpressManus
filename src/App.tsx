@@ -12,6 +12,7 @@ import { SoundsLibraryPage } from './components/SoundsLibraryPage';
 import { ProgressTrackingPage } from './components/ProgressTrackingPage';
 import { PersonalizationPage } from './components/PersonalizationPage';
 import { DataDeletionPage } from './components/DataDeletionPage';
+import { NutrimingPage } from './components/NutrimingPage';
 import { BlogPage } from './components/BlogPage';
 import { BlogAdminPage } from './components/BlogAdminPage';
 import { FirstTimeBanner } from './components/FirstTimeBanner';
@@ -171,6 +172,8 @@ function AppContent() {
         return <ProtocolPage onPageChange={setCurrentPage} />;
       case 'debug-auth':
         return <DebugAuth />;
+      case 'nutriming-ai':
+        return <NutrimingPage onPageChange={setCurrentPage} />;
       default:
         return <HomePage onPageChange={setCurrentPage} />;
     }
@@ -223,7 +226,11 @@ function AppContent() {
 
       {/* Add top margin to account for fixed translate bar */}
       <div style={{ marginTop: '55px' }}>
-        <Header currentPage={currentPage} onPageChange={setCurrentPage} />
+        <Header
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          onShowTutorial={() => setShowTutorial(true)}
+        />
 
         {renderPage()}
 

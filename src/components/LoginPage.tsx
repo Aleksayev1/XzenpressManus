@@ -36,7 +36,7 @@ const AppleIcon = () => (
 );
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
-  const { login, signUp, isLoading, resetPassword, signInWithGoogle } = useAuth();
+  const { login, signUp, isLoading, resetPassword, signInWithGoogle, signInWithMagicLink } = useAuth();
   const { t } = useLanguage();
 
   type LoginMethod = 'password' | 'magic';

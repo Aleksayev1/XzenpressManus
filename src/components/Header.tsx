@@ -26,6 +26,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
     { id: 'acupressure' },
     { id: 'protocols' },
     { id: 'breathing' },
+    { id: 'nutriming-ai' }, // ⚠️ TEMPORÁRIO: Liberado para testes (sem Premium)
     { id: 'premium' },
     { id: 'corporate' },
     { id: 'blog' },
@@ -34,14 +35,13 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
   // Adicionar itens premium apenas para usuários premium
   const premiumNavItems = [
     { id: 'dashboard' },
-    { id: 'nutriming-ai' }, // NEW FEATURE
     { id: 'sounds' },
     { id: 'progress' },
     { id: 'personalization' },
   ];
 
   const allNavItems = user?.isPremium
-    ? [...navItems.slice(0, 3), ...premiumNavItems, ...navItems.slice(3)]
+    ? [...navItems.slice(0, 5), ...premiumNavItems, ...navItems.slice(5)]
     : navItems;
 
   const handleLogout = () => {
@@ -328,24 +328,25 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
                         <LogOut className="w-4 h-4" />
                         <span>{t('nav.logout')}</span>
                       </button>
-                    </div>
+                    </>
                   ) : (
-                  <div className="px-3 py-2 border-t border-gray-200">
-                    <button
-                      onClick={() => {
-                        handlePageChange('login');
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium"
-                    >
-                      {t('nav.login')}
-                    </button>
-                  </div>
-                )}
+                    <div className="px-3 py-2 border-t border-gray-200">
+                      <button
+                        onClick={() => {
+                          handlePageChange('login');
+                          setIsMenuOpen(false);
+                        }}
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium"
+                      >
+                        {t('nav.login')}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
-          )}
             </div>
+          )}
+        </div>
       </header>
     </>
   );

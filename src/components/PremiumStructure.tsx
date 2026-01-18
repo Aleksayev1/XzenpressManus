@@ -333,6 +333,20 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
       action: () => setShowAIPanel(true)
     },
     {
+      id: 'nutriming-ai',
+      icon: <Clock className="w-8 h-8 text-green-600" />,
+      title: '💊 Nutriming AI',
+      description: 'Sistema inteligente de timing de suplementação baseado em cronobiologia',
+      benefits: [
+        'Timing otimizado para máxima absorção',
+        'Detecção automatica de conflitos entre suplementos',
+        'Recomendações personalizadas por idade',
+        'Sugestões baseadas em sintomas e objetivos'
+      ],
+      status: 'active',
+      action: () => onPageChange('nutriming-ai')
+    },
+    {
       id: 'premium-points',
       icon: <Target className="w-8 h-8 text-purple-600" />,
       title: t('premium.features.points.title'),

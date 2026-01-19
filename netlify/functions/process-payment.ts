@@ -2,6 +2,9 @@ import { Handler } from '@netlify/functions';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
+// 🔍 VERSION MARKER - Para debug
+const DEPLOY_VERSION = '2026-01-19-11:42-DB-FIX';
+
 // Inicializar Stripe com a SECRET KEY (não a publishable!)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
     apiVersion: '2024-12-18.acacia',
@@ -12,6 +15,11 @@ const supabase = createClient(
     process.env.VITE_SUPABASE_URL || '',
     process.env.SUPABASE_SERVICE_ROLE_KEY || '' // ⚠️ Adicionar no Netlify!
 );
+
+// 🔍 Debug: Verificar se variáveis estão carregadas
+console.log('🔍 DEPLOY VERSION:', DEPLOY_VERSION);
+console.log('🔍 SUPABASE_URL:', process.env.VITE_SUPABASE_URL ? 'SET' : 'MISSING');
+console.log('🔍 SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SET (length: ' + process.env.SUPABASE_SERVICE_ROLE_KEY.length + ')' : 'MISSING');
 
 // Função para calcular data de expiração baseada no plano
 function calculateExpirationDate(planId: string): Date | null {

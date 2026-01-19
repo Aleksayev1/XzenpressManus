@@ -25,7 +25,7 @@ export const handler: Handler = async (event) => {
     try {
         const testData = {
             user_id: '688916bb-c6e3-4be3-83cd-6d4b776c122b', // Seu user_id
-            plan_id: 'TEST-PLAN',
+            plan_id: 'monthly', // ✅ Usando valor válido
             amount: 0.01,
             currency: 'BRL',
             status: 'active',

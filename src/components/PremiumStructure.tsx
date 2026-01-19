@@ -521,7 +521,7 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
       setPixPaymentData({
         amount,
         description: `XZenPress Premium - ${plan.name}`,
-        orderId: `XZP-${Date.now()}-${planId.toUpperCase()}`
+        orderId: `XZP-${Date.now()}-${planId}` // ✅ Mantendo minúsculo para compatibilidade com DB
       });
     }
 

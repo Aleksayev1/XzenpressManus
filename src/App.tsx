@@ -29,6 +29,9 @@ import SoundFusion from './components/SoundFusion';
 import { ProtocolPage } from './components/ProtocolPage';
 import { ImpactPage } from './components/ImpactPage';
 import { DebugAuth } from './components/DebugAuth';
+import { TermsOfServicePage } from './components/TermsOfServicePage';
+import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
+import { RefundPolicyPage } from './components/RefundPolicyPage';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -174,6 +177,12 @@ function AppContent() {
         return <DebugAuth />;
       case 'nutriming-ai':
         return <NutrimingPage onPageChange={setCurrentPage} />;
+      case 'terms-of-service':
+        return <TermsOfServicePage onPageChange={setCurrentPage} />;
+      case 'privacy-policy':
+        return <PrivacyPolicyPage onPageChange={setCurrentPage} />;
+      case 'refund-policy':
+        return <RefundPolicyPage onPageChange={setCurrentPage} />;
       default:
         return <HomePage onPageChange={setCurrentPage} />;
     }

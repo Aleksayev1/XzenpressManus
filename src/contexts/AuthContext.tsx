@@ -59,30 +59,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const mapSupabaseUserToLocalUser = (supabaseUser: any) => {
-    // Check if we have local overrides (like premium status saved locally for dev)
-    const localData = localStorage.getItem('user');
+  const mapSupabaseUserToLocalUser = async (supabaseUser: any) => {
+    // ✅ SEGURO: Verificar status Premium no banco de dados
     let isPremium = false;
+    let hasPaidPremium = false;
+    let premiumActivatedAt: string | undefined;
+    let premiumExpiresAt: string | undefined;
+    let subscriptionId: string | undefined;
 
-    if (localData) {
-      const parsed = JSON.parse(localData);
-      // Only keep premium status if emails match
-      if (parsed.email === supabaseUser.email) {
-        isPremium = parsed.isPremium;
+    try {
+      // Buscar assinatura ativa do usuário
+      const { data: subscription, error } = await supabase
+        .from('premium_subscriptions')
+        .select('*')
+        .eq('user_id', supabaseUser.id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (!error && subscription) {
+        // Verificar se não expirou
+        const now = new Date();
+        const expiresAt = subscription.expires_at ? new Date(subscription.expires_at) : null;
+
+        isPremium = !expiresAt || expiresAt > now;
+        hasPaidPremium = isPremium;
+        premiumActivatedAt = subscription.activated_at;
+        premiumExpiresAt = subscription.expires_at || undefined;
+        subscriptionId = subscription.id;
+
+        console.log('✅ Status Premium verificado:', {
+          isPremium,
+          expiresAt: expiresAt?.toISOString() || 'lifetime',
+          subscriptionId
+        });
+      } else {
+        console.log('ℹ️ Nenhuma assinatura Premium ativa encontrada');
       }
+    } catch (err) {
+      console.error('❌ Erro ao verificar Premium:', err);
+      // Em caso de erro, assume que não é Premium (fail-safe)
     }
 
     const newUser: User = {
       id: supabaseUser.id,
       email: supabaseUser.email || '',
       name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'Usuário',
-      isPremium: isPremium, // In real app, this should come from DB/Supabase claims
+      isPremium: isPremium, // ✅ Agora vem do banco de dados!
+      hasPaidPremium,
+      premiumActivatedAt,
+      premiumExpiresAt,
+      subscriptionId,
       isAdmin: false,
       createdAt: supabaseUser.created_at,
     };
 
     setUser(newUser);
-    // Optimization: Don't constantly overwrite if not changed, but for now it's safe
+    // Salvar no localStorage para cache (mas não confiar nele para validação)
     localStorage.setItem('user', JSON.stringify(newUser));
   };
 
@@ -281,16 +315,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const confirmPremiumPayment = () => {
-    if (user) {
-      const updatedUser = {
-        ...user,
-        isPremium: true,
-        hasPaidPremium: true,
-        premiumActivatedAt: new Date().toISOString()
-      };
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+  const confirmPremiumPayment = async () => {
+    // ✅ SEGURO: Re-verificar autenticação para puxar novo status do banco
+    if (!supabase) return;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      await mapSupabaseUserToLocalUser(session.user);
+      console.log('✅ Status Premium atualizado após pagamento');
     }
   };
 

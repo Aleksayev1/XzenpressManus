@@ -74,8 +74,17 @@ export const StripeCardForm: React.FC<StripeCardFormProps> = ({
 
             console.log('✅ PaymentMethod criado:', paymentMethod?.id);
 
-            // 2. Enviar para backend processar
-            console.log('📡 Enviando para backend...', { amount, currency });
+            // 2. Obter userId do contexto de autenticação
+            // ⚠️ IMPORTANTE: Precisamos adicionar prop userId ao componente
+            const authUser = JSON.parse(localStorage.getItem('user') || '{}');
+            const userId = authUser.id;
+
+            if (!userId) {
+                throw new Error('Erro: Usuário não autenticado. Faça login antes de pagar.');
+            }
+
+            // 3. Enviar para backend processar
+            console.log('📡 Enviando para backend...', { amount, currency, userId });
             const response = await fetch('/.netlify/functions/process-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -86,7 +95,8 @@ export const StripeCardForm: React.FC<StripeCardFormProps> = ({
                     description,
                     orderId,
                     customerEmail,
-                    customerName
+                    customerName,
+                    userId // ✅ NOVO: Enviando userId
                 })
             });
 

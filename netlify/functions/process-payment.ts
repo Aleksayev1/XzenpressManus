@@ -1,10 +1,48 @@
 import { Handler } from '@netlify/functions';
 import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
 
 // Inicializar Stripe com a SECRET KEY (não a publishable!)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
     apiVersion: '2024-12-18.acacia',
 });
+
+// ✅ Inicializar Supabase com SERVICE ROLE KEY (acesso total ao banco)
+const supabase = createClient(
+    process.env.VITE_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || '' // ⚠️ Adicionar no Netlify!
+);
+
+// Função para calcular data de expiração baseada no plano
+function calculateExpirationDate(planId: string): Date | null {
+    const now = new Date();
+
+    switch (planId) {
+        case 'monthly':
+            now.setMonth(now.getMonth() + 1);
+            return now;
+        case 'annual':
+            now.setFullYear(now.getFullYear() + 1);
+            return now;
+        case 'lifetime':
+            return null; // Sem expiração
+        default:
+            return null;
+    }
+}
+
+// Extrair plan_id do orderId (formato: XZP-timestamp-PLANID)
+function extractPlanId(orderId: string): string {
+    const parts = orderId.split('-');
+    const planPart = parts[parts.length - 1]?.toLowerCase();
+
+    if (planPart === 'monthly' || planPart === 'annual' || planPart === 'lifetime') {
+        return planPart;
+    }
+
+    // Fallback: tentar inferir pelo valor
+    return 'monthly'; // Default seguro
+}
 
 export const handler: Handler = async (event) => {
     // CORS headers
@@ -28,14 +66,24 @@ export const handler: Handler = async (event) => {
     }
 
     try {
-        const { paymentMethodId, amount, currency, description, orderId, customerEmail } = JSON.parse(event.body || '{}');
+        const {
+            paymentMethodId,
+            amount,
+            currency,
+            description,
+            orderId,
+            customerEmail,
+            customerName,
+            userId // ✅ NOVO: Receber userId do frontend
+        } = JSON.parse(event.body || '{}');
 
         console.log('🔍 Dados recebidos:', {
             paymentMethodId: paymentMethodId?.substring(0, 10) + '...',
             amount,
             currency,
             orderId,
-            customerEmail
+            customerEmail,
+            userId
         });
 
         if (!paymentMethodId || !amount) {
@@ -47,6 +95,19 @@ export const handler: Handler = async (event) => {
                     success: false,
                     error: 'invalid_request',
                     message: 'PaymentMethod e amount são obrigatórios'
+                }),
+            };
+        }
+
+        if (!userId) {
+            console.error('❌ userId não fornecido');
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({
+                    success: false,
+                    error: 'invalid_request',
+                    message: 'userId é obrigatório para processar pagamento'
                 }),
             };
         }
@@ -64,15 +125,60 @@ export const handler: Handler = async (event) => {
             metadata: {
                 orderId: orderId || `order_${Date.now()}`,
                 customerEmail: customerEmail || 'N/A',
+                userId: userId
             },
-            return_url: 'https://xzenpress.com/payment-success', // Necessário para alguns métodos
+            return_url: 'https://xzenpress.com/payment-success',
         });
 
-        console.log('✅ Pagamento processado:', {
+        console.log('✅ Pagamento Stripe processado:', {
             paymentIntentId: paymentIntent.id,
             status: paymentIntent.status,
             amount: paymentIntent.amount / 100
         });
+
+        // ✅ SALVAR NO SUPABASE (se pagamento foi aprovado)
+        if (paymentIntent.status === 'succeeded') {
+            const planId = extractPlanId(orderId);
+            const expiresAt = calculateExpirationDate(planId);
+
+            console.log('💾 Salvando assinatura no Supabase:', {
+                userId,
+                planId,
+                expiresAt: expiresAt?.toISOString() || 'lifetime'
+            });
+
+            const { data: subscription, error: dbError } = await supabase
+                .from('premium_subscriptions')
+                .insert({
+                    user_id: userId,
+                    stripe_payment_intent_id: paymentIntent.id,
+                    plan_id: planId,
+                    amount: paymentIntent.amount / 100,
+                    currency: paymentIntent.currency.toUpperCase(),
+                    status: 'active',
+                    activated_at: new Date().toISOString(),
+                    expires_at: expiresAt?.toISOString() || null,
+                    metadata: {
+                        customerEmail,
+                        customerName,
+                        orderId
+                    }
+                })
+                .select()
+                .single();
+
+            if (dbError) {
+                console.error('❌ Erro ao salvar no Supabase:', dbError);
+                // ⚠️ Pagamento foi aprovado, mas não salvou no DB
+                // Decisão: retornar sucesso mas logar erro para investigação manual
+                console.error('🚨 CRÍTICO: Pagamento aprovado mas não registrado no DB!', {
+                    paymentIntentId: paymentIntent.id,
+                    error: dbError
+                });
+            } else {
+                console.log('✅ Assinatura salva com sucesso:', subscription?.id);
+            }
+        }
 
         // Retornar resultado
         return {

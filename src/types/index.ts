@@ -5,8 +5,25 @@ export interface User {
   isPremium: boolean;
   hasPaidPremium?: boolean;
   premiumActivatedAt?: string;
+  premiumExpiresAt?: string;
+  subscriptionId?: string;
   isAdmin?: boolean;
   createdAt: string;
+}
+
+export interface PremiumSubscription {
+  id: string;
+  user_id: string;
+  stripe_payment_intent_id: string;
+  plan_id: 'monthly' | 'annual' | 'lifetime';
+  amount: number;
+  currency: string;
+  status: 'active' | 'expired' | 'cancelled' | 'refunded';
+  activated_at: string;
+  expires_at: string | null;
+  metadata?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AcupressurePoint {

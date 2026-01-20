@@ -192,6 +192,14 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         return Math.round((baseWater + supplementBonus) * 10) / 10; // Arredondar para 1 casa decimal
     };
 
+    // Verificar autenticação - redirecionar para login se não estiver logado
+    useEffect(() => {
+        if (!user) {
+            alert('⚠️ Acesso Restrito\n\nFaça login para acessar o Nutriming AI.');
+            onPageChange('login');
+        }
+    }, [user, onPageChange]);
+
     // Verificar trial status e incrementar contador
     useEffect(() => {
         if (!user) return;

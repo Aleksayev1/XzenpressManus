@@ -680,17 +680,6 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                   <RotateCcw className="w-5 h-5" />
                   <span>Reiniciar</span>
                 </button>
-                <button
-                  onClick={() => onPageChange('sounds')}
-                  className="flex items-center justify-center space-x-2 px-6 py-3 rounded-full font-semibold transition-all shadow-lg"
-                  style={{
-                    backgroundColor: currentColor,
-                    color: 'white'
-                  }}
-                >
-                  <Volume2 className="w-5 h-5" />
-                  <span>Biblioteca</span>
-                </button>
               </div>
             </div>
 

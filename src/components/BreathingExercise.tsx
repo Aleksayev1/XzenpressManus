@@ -31,9 +31,6 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({ onPageChan
     exhale: { duration: 8, next: 'inhale' as const, color: '#581C87', label: t('breathing.exhale') },
   };
 
-  const colors = ['#1E3A8A', '#065F46', '#581C87']; // Blue, Green, Magenta - CORES ULTRA INTENSAS
-  const colorNames = ['Azul Ultra Intenso', 'Verde Ultra Intenso', 'Roxo Ultra Intenso'];
-
   useEffect(() => {
     if (isActive) {
       const startTime = Date.now();
@@ -193,12 +190,6 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({ onPageChan
         onNavigateToLibrary={() => onPageChange?.('sounds')}
       />
 
-      {/* Compact Sound Player - Fixed Position */}
-      <CompactSoundPlayer
-        currentColor={currentColor}
-        onNavigateToLibrary={() => onPageChange?.('sounds')}
-      />
-
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Back Button */}
         <button
@@ -279,8 +270,8 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({ onPageChan
           <div className="mb-8">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className={`p-4 rounded-xl transition-all duration-500 border-2 ${phase === 'inhale'
-                  ? 'bg-blue-900 text-white border-blue-500 shadow-2xl transform scale-110'
-                  : 'text-white border-blue-600'
+                ? 'bg-blue-900 text-white border-blue-500 shadow-2xl transform scale-110'
+                : 'text-white border-blue-600'
                 }`}
                 style={phase !== 'inhale' ? {
                   backgroundColor: '#1E3A8A',
@@ -291,8 +282,8 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({ onPageChan
                 <div className="text-xs mt-1 font-bold">AZUL ULTRA</div>
               </div>
               <div className={`p-4 rounded-xl transition-all duration-500 border-2 ${phase === 'hold'
-                  ? 'bg-green-900 text-white border-green-500 shadow-2xl transform scale-110'
-                  : 'text-white border-green-600'
+                ? 'bg-green-900 text-white border-green-500 shadow-2xl transform scale-110'
+                : 'text-white border-green-600'
                 }`}
                 style={phase !== 'hold' ? {
                   backgroundColor: '#065F46',
@@ -303,8 +294,8 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({ onPageChan
                 <div className="text-xs mt-1 font-bold">VERDE ULTRA</div>
               </div>
               <div className={`p-4 rounded-xl transition-all duration-500 border-2 ${phase === 'exhale'
-                  ? 'bg-purple-900 text-white border-purple-500 shadow-2xl transform scale-110'
-                  : 'text-white border-purple-600'
+                ? 'bg-purple-900 text-white border-purple-500 shadow-2xl transform scale-110'
+                : 'text-white border-purple-600'
                 }`}
                 style={phase !== 'exhale' ? {
                   backgroundColor: '#581C87',

@@ -51,7 +51,7 @@ export const CompactSoundPlayer: React.FC<CompactSoundPlayerProps> = ({
     <>
       {/* Compact Player - Fixed Position */}
       <div
-        className="fixed top-20 left-4 z-40 transition-all duration-500"
+        className="fixed top-32 left-4 z-40 transition-all duration-500"
         style={{
           background: `linear-gradient(135deg, ${currentColor}20, ${currentColor}10, white)`,
           borderColor: currentColor + '40'

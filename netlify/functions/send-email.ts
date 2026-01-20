@@ -2,8 +2,8 @@ import { Handler, HandlerEvent } from '@netlify/functions';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-    process.env.VITE_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.VITE_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 /**
@@ -11,84 +11,82 @@ const supabase = createClient(
  * For now, generates HTML that can be sent via email service
  */
 export const handler: Handler = async (event: HandlerEvent) => {
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': '
-
-POST, OPTIONS',
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
   };
 
-    if (event.httpMethod === 'OPTIONS') {
-        return { statusCode: 204, headers, body: '' };
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers, body: '' };
+  }
+
+  try {
+    const { type, userId, data } = JSON.parse(event.body || '{}');
+
+    // Get user email
+    const { data: userData } = await supabase.auth.admin.getUserById(userId);
+    const userEmail = userData?.user?.email;
+
+    if (!userEmail) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'User email not found' }),
+      };
     }
 
-    try {
-        const { type, userId, data } = JSON.parse(event.body || '{}');
+    let emailHTML = '';
+    let subject = '';
 
-        // Get user email
-        const { data: userData } = await supabase.auth.admin.getUserById(userId);
-        const userEmail = userData?.user?.email;
+    switch (type) {
+      case 'welcome':
+        subject = '🎉 Bem-vindo ao XZenPress!';
+        emailHTML = generateWelcomeEmail(userEmail);
+        break;
 
-        if (!userEmail) {
-            return {
-                statusCode: 400,
-                headers,
-                body: JSON.stringify({ error: 'User email not found' }),
-            };
-        }
+      case 'payment_confirmation':
+        subject = '✅ Pagamento Confirmado - XZenPress Premium';
+        emailHTML = generatePaymentConfirmationEmail(data);
+        break;
 
-        let emailHTML = '';
-        let subject = '';
+      case 'refund_confirmation':
+        subject = '💰 Reembolso Processado - XZenPress';
+        emailHTML = generateRefundConfirmationEmail(data);
+        break;
 
-        switch (type) {
-            case 'welcome':
-                subject = '🎉 Bem-vindo ao XZenPress!';
-                emailHTML = generateWelcomeEmail(userEmail);
-                break;
-
-            case 'payment_confirmation':
-                subject = '✅ Pagamento Confirmado - XZenPress Premium';
-                emailHTML = generatePaymentConfirmationEmail(data);
-                break;
-
-            case 'refund_confirmation':
-                subject = '💰 Reembolso Processado - XZenPress';
-                emailHTML = generateRefundConfirmationEmail(data);
-                break;
-
-            default:
-                return {
-                    statusCode: 400,
-                    headers,
-                    body: JSON.stringify({ error: 'Invalid email type' }),
-                };
-        }
-
-        // TODO: Integrate with email service (SendGrid, AWS SES, etc.)
-        // For now, just log and return HTML
-        console.log(`📧 Email ${type} for ${userEmail}`);
-
+      default:
         return {
-            statusCode: 200,
-            headers: {
-                ...headers,
-                'Content-Type': 'text/html',
-            },
-            body: emailHTML,
-        };
-    } catch (error: any) {
-        console.error('Email generation error:', error);
-        return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({ error: 'Failed to generate email' }),
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Invalid email type' }),
         };
     }
+
+    // TODO: Integrate with email service (SendGrid, AWS SES, etc.)
+    // For now, just log and return HTML
+    console.log(`📧 Email ${type} for ${userEmail}`);
+
+    return {
+      statusCode: 200,
+      headers: {
+        ...headers,
+        'Content-Type': 'text/html',
+      },
+      body: emailHTML,
+    };
+  } catch (error: any) {
+    console.error('Email generation error:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Failed to generate email' }),
+    };
+  }
 };
 
 function generateWelcomeEmail(email: string): string {
-    return `
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -137,12 +135,12 @@ function generateWelcomeEmail(email: string): string {
 }
 
 function generatePaymentConfirmationEmail(data: any): string {
-    const amount = new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: data.currency?.toUpperCase() || 'BRL',
-    }).format(data.amount);
+  const amount = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: data.currency?.toUpperCase() || 'BRL',
+  }).format(data.amount);
 
-    return `
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -196,12 +194,12 @@ function generatePaymentConfirmationEmail(data: any): string {
 }
 
 function generateRefundConfirmationEmail(data: any): string {
-    const amount = new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: data.currency?.toUpperCase() || 'BRL',
-    }).format(data.amount);
+  const amount = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: data.currency?.toUpperCase() || 'BRL',
+  }).format(data.amount);
 
-    return `
+  return `
 <!DOCTYPE html>
 <html>
 <head>

@@ -234,7 +234,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     if (!point) return;
 
     if (point.isPremium && !user?.isPremium) {
-      alert('Este ponto é exclusivo para usuários Premium. Faça upgrade para acessar!');
+      onPageChange('premium');
       return;
     }
 

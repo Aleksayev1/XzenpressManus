@@ -148,14 +148,20 @@ export const CompactSoundPlayer: React.FC<CompactSoundPlayerProps> = ({
                 onClick={onNavigateToLibrary}
                 className="w-full flex items-center justify-center space-x-2 p-2 rounded-lg text-xs font-medium transition-all hover:shadow-md"
                 style={{
-                  color: currentColor,
+                  color: 'white',
                   backgroundColor: currentColor,
                   boxShadow: `0 4px 12px ${currentColor}40`
                 }}
+                title="Ir para Vibração Sonora - Sons Terapêuticos no Spotify"
               >
                 <Music className="w-3 h-3" />
-                <span>Biblioteca Completa</span>
+                <span>Mais Sons →</span>
               </button>
+
+              {/* Helper text */}
+              <div className="text-xs text-gray-500 text-center mt-2">
+                💡 Clique para acessar biblioteca completa
+              </div>
             </div>
           )}
         </div>

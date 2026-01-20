@@ -604,7 +604,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 © 2026 XZenPress Wellness. Todos os direitos reservados.
               </p>
             </div>
-            <div className="flex items-center space-x-6">
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-4">
               <button
                 onClick={() => setShowPartnershipModal(true)}
                 className="flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors group"
@@ -612,9 +612,27 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 <Share2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 <span className="font-medium">{t('partnership.title')}</span>
               </button>
+              <button
+                onClick={() => onPageChange('terms-of-service')}
+                className="text-gray-400 hover:text-white transition-colors text-sm"
+              >
+                Termos de Serviço
+              </button>
+              <button
+                onClick={() => onPageChange('privacy-policy')}
+                className="text-gray-400 hover:text-white transition-colors text-sm"
+              >
+                Privacidade
+              </button>
+              <button
+                onClick={() => onPageChange('refund-policy')}
+                className="text-gray-400 hover:text-white transition-colors text-sm"
+              >
+                Reembolso
+              </button>
               <a
                 href="mailto:aleksayevacupress@gmail.com"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 hover:text-white transition-colors text-sm"
               >
                 Contato
               </a>

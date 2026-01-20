@@ -200,6 +200,11 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         }
     }, [user, onPageChange]);
 
+    // ⚠️ TRIAL DESABILITADO TEMPORARIAMENTE - SOFT LAUNCH
+    // TODO: Reativar após implementar Stripe Webhook + Renovação Automática
+
+    /* CÓDIGO DE TRIAL COMENTADO - Será reativado após finalizar sistema de pagamentos
+    
     // Verificar trial status e incrementar contador
     useEffect(() => {
         if (!user) return;
@@ -227,6 +232,8 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
 
         checkTrialStatus();
     }, [user]);
+    
+    */
 
     // Verificar permissão ao carregar (Service Worker)
     useEffect(() => {
@@ -406,25 +413,43 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                         <h1 className="text-4xl font-bold mb-2">Nutriming AI</h1>
                         <p className="text-xl text-green-100">Timing perfeito para sua suplementação</p>
 
-                        {/* Trial Banner */}
-                        {!user?.isPremium && trialStatus.usesLeft < 3 && (
-                            <div className="mt-4 bg-yellow-400 text-yellow-900 px-6 py-3 rounded-xl font-semibold text-sm flex items-center justify-center space-x-2">
-                                <span>🎁</span>
-                                <span>
-                                    {trialStatus.usesLeft > 0
-                                        ? `Teste Grátis: ${trialStatus.usesLeft} ${trialStatus.usesLeft === 1 ? 'uso restante' : 'usos restantes'}`
-                                        : 'Teste Grátis Esgotado'}
-                                </span>
-                                {trialStatus.usesLeft === 0 && (
-                                    <button
-                                        onClick={() => onPageChange('premium')}
-                                        className="ml-3 bg-yellow-900 text-yellow-100 px-4 py-1 rounded-lg hover:bg-yellow-800 transition-colors"
-                                    >
-                                        Assinar Premium
-                                    </button>
-                                )}
+                        {/* BANNER DE TRIAL DESABILITADO temporariamente */}
+                        {/* 
+            {trialStatus && !user?.isPremium && (
+                <div className={`p-4 rounded-xl mb-6 ${trialStatus.usesLeft === 0
+                    ? 'bg-red-100 border-2 border-red-400'
+                    : 'bg-yellow-100 border-2 border-yellow-400'
+                    }`}>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                            <span className="text-2xl">🎁</span>
+                            <div>
+                                <div className="font-bold text-gray-800">
+                                    {trialStatus.usesLeft === 0
+                                        ? 'Teste Grátis Esgotado'
+                                        : `Teste Grátis: ${trialStatus.usesLeft} ${trialStatus.usesLeft === 1 ? 'uso restante' : 'usos restantes'}`
+                                    }
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    {trialStatus.usesLeft === 0
+                                        ? 'Assine Premium para acesso ilimitado'
+                                        : 'Aproveite enquanto você testa o Nutriming AI'
+                                    }
+                                </div>
                             </div>
+                        </div>
+                        {trialStatus.usesLeft === 0 && (
+                            <button
+                                onClick={() => onPageChange('premium')}
+                                className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                            >
+                                Assinar Premium
+                            </button>
                         )}
+                    </div>
+                </div>
+            )}
+            */}
                     </div>
 
                     {/* DISCLAIMER LEGAL E FONTES */}

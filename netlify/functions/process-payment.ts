@@ -6,9 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 const DEPLOY_VERSION = '2026-01-19-11:42-DB-FIX';
 
 // Inicializar Stripe com a SECRET KEY (não a publishable!)
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-    apiVersion: '2024-12-18.acacia',
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
 // ✅ Inicializar Supabase com SERVICE ROLE KEY (acesso total ao banco)
 const supabase = createClient(
@@ -160,12 +158,15 @@ export const handler: Handler = async (event) => {
                 .insert({
                     user_id: userId,
                     stripe_payment_intent_id: paymentIntent.id,
+                    stripe_customer_id: paymentIntent.customer as string || null,
+                    payment_method: 'stripe',
                     plan_id: planId,
                     amount: paymentIntent.amount / 100,
                     currency: paymentIntent.currency.toUpperCase(),
                     status: 'active',
                     activated_at: new Date().toISOString(),
                     expires_at: expiresAt?.toISOString() || null,
+                    webhook_processed: false, // Will be set to true by webhook
                     metadata: {
                         customerEmail,
                         customerName,

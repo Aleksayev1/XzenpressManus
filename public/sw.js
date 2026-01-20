@@ -283,7 +283,78 @@ self.addEventListener('message', event => {
 
     event.ports[0]?.postMessage({ success: true });
   }
+
+  // NOVO: Agendar notificações do Nutriming AI
+  if (event.data && event.data.type === 'SCHEDULE_NOTIFICATIONS') {
+    const { notifications } = event.data;
+
+    const dbRequest = indexedDB.open('nutrimingDB', 1);
+    dbRequest.onsuccess = () => {
+      const db = dbRequest.result;
+      const transaction = db.transaction(['schedules'], 'readwrite');
+      const store = transaction.objectStore('schedules');
+
+      // Salvar todas as notificações agendadas
+      store.put({ id: 'nutriming_notifications', notifications, lastUpdate: Date.now() });
+    };
+
+    console.log('✅ Notificações agendadas no SW:', notifications.length);
+  }
+
+  // NOVO: Cancelar notificações
+  if (event.data && event.data.type === 'CANCEL_NOTIFICATIONS') {
+    const dbRequest = indexedDB.open('nutrimingDB', 1);
+    dbRequest.onsuccess = () => {
+      const db = dbRequest.result;
+      const transaction = db.transaction(['schedules'], 'readwrite');
+      const store = transaction.objectStore('schedules');
+      store.delete('nutriming_notifications');
+    };
+
+    console.log('✅ Notificações canceladas no SW');
+  }
 });
+
+// NOVO: Verificar e disparar notificações nos horários agendados
+setInterval(() => {
+  const dbRequest = indexedDB.open('nutrimingDB', 1);
+
+  dbRequest.onsuccess = () => {
+    const db = dbRequest.result;
+    const transaction = db.transaction(['schedules'], 'readonly');
+    const store = transaction.objectStore('schedules');
+    const request = store.get('nutriming_notifications');
+
+    request.onsuccess = () => {
+      const data = request.result;
+      if (!data || !data.notifications) return;
+
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      // Verificar cada notificação agendada
+      data.notifications.forEach(notification => {
+        if (notification.time === currentTime) {
+          // Disparar notificação
+          self.registration.showNotification(notification.title, {
+            body: notification.body,
+            icon: '/logo192.png',
+            badge: '/logo192.png',
+            vibrate: [200, 100, 200],
+            tag: `nutriming-${notification.id}`,
+            requireInteraction: false,
+            data: {
+              type: 'nutriming-reminder',
+              timing: notification.timing
+            }
+          });
+
+          console.log(`🔔 Notificação disparada: ${notification.title} (${currentTime})`);
+        }
+      });
+    };
+  };
+}, 60000); // Verificar a cada 1 minuto
 
 // IndexedDB setup para persistência de agendamentos
 self.addEventListener('install', event => {

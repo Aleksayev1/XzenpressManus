@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Brain, Sparkles, ArrowLeft, Plus, Trash2, Info, AlertCircle, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { NutrimingTrialService, TrialStatus } from '../services/nutrimingTrialService';
 
 interface NutrimingPageProps {
     onPageChange: (page: string) => void;
 }
 
 interface Supplement {
-    id: string;
+    id?: string;
     name: string;
     dosage: string;
-    timing: 'morning' | 'afternoon' | 'evening' | 'with-meal' | 'empty-stomach';
-    category: 'vitamin' | 'mineral' | 'herb' | 'amino' | 'probiotic' | 'other';
+    timing: 'morning' | 'with-meal' | 'night' | 'anytime';
+    notes?: string;
 }
 
 interface UserProfile {
@@ -123,9 +122,8 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
     const [supplements, setSupplements] = useState<Supplement[]>([]);
     const [userProfile, setUserProfile] = useState<UserProfile>({ age: 35, gender: 'other', symptoms: [] });
     const [showAddForm, setShowAddForm] = useState(false);
-    const [newSupplement, setNewSupplement] = useState({ name: '', dosage: '', category: 'other' as Supplement['category'] });
+    const [newSupplement, setNewSupplement] = useState({ name: '', dosage: '', notes: '' });
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-    const [trialStatus, setTrialStatus] = useState<TrialStatus>({ allowed: true, usesLeft: 3, isPremium: false });
 
     // Função para solicitar permissão de notificações
     const requestNotificationPermission = async () => {
@@ -142,22 +140,12 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         }
     };
 
-    // Agendar notificações consolidadas
-    const scheduleNotifications = () => {
-        const grouped = groupByTiming();
-        const timings = [
-            { time: '08:00', period: 'morning', label: 'Matinais', icon: '🌅' },
-            { time: '13:00', period: 'with-meal', label: 'com Refeição', icon: '🍽️' },
-            { time: '19:00', period: 'evening', label: 'Noturnos', icon: '🌙' }
-        ];
+    // Agendar notificações usando o serviço
+    const scheduleNotifications = async () => {
+        if (!notificationsEnabled) return;
 
-        timings.forEach(({ time, period, label, icon }) => {
-            const supplements = grouped[period as keyof typeof grouped];
-            if (supplements.length > 0) {
-                scheduleNotification(time, `${icon} Suplementos ${label} (${supplements.length})`,
-                    supplements.map(s => s.name).join(', '));
-            }
-        });
+        const { NutrimingNotificationService } = await import('../services/nutrimingNotificationService');
+        await NutrimingNotificationService.scheduleNotifications(supplements);
     };
 
     // Agendar notificação específica
@@ -251,21 +239,39 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         }
     }, [supplements, notificationsEnabled]);
 
+    // Carregar dados do Supabase ao montar componente
     useEffect(() => {
-        // Load from localStorage
-        const stored = localStorage.getItem(`nutriming_${user?.id || 'guest'}`);
-        if (stored) {
-            const data = JSON.parse(stored);
-            setSupplements(data.supplements || []);
-            setUserProfile(data.profile || { age: 35, symptoms: [] });
-        }
-    }, [user]);
+        if (!user?.id) return;
 
-    const saveData = (sups: Supplement[], profile: UserProfile) => {
-        localStorage.setItem(`nutriming_${user?.id || 'guest'}`, JSON.stringify({
-            supplements: sups,
-            profile
-        }));
+        const loadUserData = async () => {
+            // Carregar suplementos do Supabase
+            const { NutrimingStorageService } = await import('../services/nutrimingStorageService');
+            const savedSupplements = await NutrimingStorageService.loadSupplements(user.id);
+            const savedProfile = NutrimingStorageService.loadProfile(user.id);
+
+            setSupplements(savedSupplements);
+            // Garantir que profile tenha todos os campos
+            setUserProfile({
+                age: savedProfile.age || 35,
+                gender: savedProfile.gender || 'other',
+                symptoms: savedProfile.symptoms || []
+            });
+        };
+
+        loadUserData();
+    }, [user?.id]);
+
+    // Salvar dados no Supabase sempre que mudarem
+    const saveData = async (sups: Supplement[], profile: UserProfile) => {
+        if (!user?.id) return;
+
+        const { NutrimingStorageService } = await import('../services/nutrimingStorageService');
+
+        // Salvar no Supabase (permanente)
+        await NutrimingStorageService.saveSupplements(user.id, sups);
+
+        // Salvar perfil no localStorage (não crítico)
+        NutrimingStorageService.saveProfile(user.id, profile);
     };
 
     // Função auxiliar para matching inteligente
@@ -305,23 +311,25 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
             name: newSupplement.name,
             dosage: newSupplement.dosage || '1x ao dia',
             timing,
-            category: newSupplement.category
+            notes: newSupplement.notes || ''
         };
 
         const updated = [...supplements, supplement];
         setSupplements(updated);
         saveData(updated, userProfile);
-        setNewSupplement({ name: '', dosage: '', category: 'other' });
+        setNewSupplement({ name: '', dosage: '', notes: '' });
         setShowAddForm(false);
     };
 
-    const removeSupplement = (id: string) => {
+    const removeSupplement = (id?: string) => {
+        if (!id) return;
         const updated = supplements.filter(s => s.id !== id);
         setSupplements(updated);
         saveData(updated, userProfile);
     };
 
-    const updateTiming = (id: string, timing: Supplement['timing']) => {
+    const updateTiming = (id: string | undefined, timing: Supplement['timing']) => {
+        if (!id) return;
         const updated = supplements.map(s => s.id === id ? { ...s, timing } : s);
         setSupplements(updated);
         saveData(updated, userProfile);
@@ -371,10 +379,9 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
     const groupByTiming = () => {
         const groups = {
             morning: supplements.filter(s => s.timing === 'morning'),
-            afternoon: supplements.filter(s => s.timing === 'afternoon'),
-            evening: supplements.filter(s => s.timing === 'evening'),
             'with-meal': supplements.filter(s => s.timing === 'with-meal'),
-            'empty-stomach': supplements.filter(s => s.timing === 'empty-stomach'),
+            night: supplements.filter(s => s.timing === 'night'),
+            anytime: supplements.filter(s => s.timing === 'anytime'),
         };
         return groups;
     };
@@ -619,18 +626,13 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                                         onChange={(e) => setNewSupplement({ ...newSupplement, dosage: e.target.value })}
                                         className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-gray-900 bg-white placeholder-gray-500"
                                     />
-                                    <select
-                                        value={newSupplement.category}
-                                        onChange={(e) => setNewSupplement({ ...newSupplement, category: e.target.value as Supplement['category'] })}
-                                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-gray-900 bg-white"
-                                    >
-                                        <option value="vitamin">Vitamina</option>
-                                        <option value="mineral">Mineral</option>
-                                        <option value="herb">Fitoterápico</option>
-                                        <option value="amino">Aminoácido</option>
-                                        <option value="probiotic">Probiótico</option>
-                                        <option value="other">Outro</option>
-                                    </select>
+                                    <input
+                                        type="text"
+                                        placeholder="Notas (opcional)"
+                                        value={newSupplement.notes}
+                                        onChange={(e) => setNewSupplement({ ...newSupplement, notes: e.target.value })}
+                                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-gray-900 bg-white placeholder-gray-500"
+                                    />
                                 </div>
                                 <div className="flex space-x-3">
                                     <button

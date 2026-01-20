@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Brain, Sparkles, ArrowLeft, Plus, Trash2, Info, AlertCircle, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { NutrimingTrialService, TrialStatus } from '../services/nutrimingTrialService';
 
 interface NutrimingPageProps {
     onPageChange: (page: string) => void;
@@ -124,6 +125,7 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
     const [showAddForm, setShowAddForm] = useState(false);
     const [newSupplement, setNewSupplement] = useState({ name: '', dosage: '', category: 'other' as Supplement['category'] });
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [trialStatus, setTrialStatus] = useState<TrialStatus>({ allowed: true, usesLeft: 3, isPremium: false });
 
     // Função para solicitar permissão de notificações
     const requestNotificationPermission = async () => {
@@ -190,7 +192,35 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         return Math.round((baseWater + supplementBonus) * 10) / 10; // Arredondar para 1 casa decimal
     };
 
-    // Verificar permissão ao carregar
+    // Verificar trial status e incrementar contador
+    useEffect(() => {
+        if (!user) return;
+
+        const checkTrialStatus = async () => {
+            const status = await NutrimingTrialService.canAccessNutriming(user.id, user.isPremium);
+
+            if (!status.allowed) {
+                // Redirecionar para Premium se esgotou usos
+                alert('🎁 Teste Grátis Esgotado!\n\nVocê usou seus 3 testes gratuitos do Nutriming AI.\n\nAssine Premium para acesso ilimitado!');
+                onPageChange('premium');
+                return;
+            }
+
+            setTrialStatus(status);
+
+            // Incrementar contador apenas se não for Premium
+            if (!user.isPremium) {
+                await NutrimingTrialService.incrementUsage(user.id);
+                // Atualizar status após incremento
+                const updatedStatus = await NutrimingTrialService.canAccessNutriming(user.id, user.isPremium);
+                setTrialStatus(updatedStatus);
+            }
+        };
+
+        checkTrialStatus();
+    }, [user]);
+
+    // Verificar permissão ao carregar (Service Worker)
     useEffect(() => {
         const saved = localStorage.getItem('nutriming_notifications');
         if (saved === 'enabled' && Notification.permission === 'granted') {
@@ -367,6 +397,26 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                         </div>
                         <h1 className="text-4xl font-bold mb-2">Nutriming AI</h1>
                         <p className="text-xl text-green-100">Timing perfeito para sua suplementação</p>
+
+                        {/* Trial Banner */}
+                        {!user?.isPremium && trialStatus.usesLeft < 3 && (
+                            <div className="mt-4 bg-yellow-400 text-yellow-900 px-6 py-3 rounded-xl font-semibold text-sm flex items-center justify-center space-x-2">
+                                <span>🎁</span>
+                                <span>
+                                    {trialStatus.usesLeft > 0
+                                        ? `Teste Grátis: ${trialStatus.usesLeft} ${trialStatus.usesLeft === 1 ? 'uso restante' : 'usos restantes'}`
+                                        : 'Teste Grátis Esgotado'}
+                                </span>
+                                {trialStatus.usesLeft === 0 && (
+                                    <button
+                                        onClick={() => onPageChange('premium')}
+                                        className="ml-3 bg-yellow-900 text-yellow-100 px-4 py-1 rounded-lg hover:bg-yellow-800 transition-colors"
+                                    >
+                                        Assinar Premium
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* DISCLAIMER LEGAL E FONTES */}

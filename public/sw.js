@@ -265,4 +265,41 @@ self.addEventListener('message', event => {
       cache.put('/breathing-session', new Response(JSON.stringify(event.data.session)));
     });
   }
+
+  // ✨ NOVO: Agendar notificações do Nutriming AI
+  if (event.data && event.data.type === 'SCHEDULE_NUTRIMING_NOTIFICATIONS') {
+    const { timings } = event.data;
+    console.log('📅 Agendando notificações do Nutriming AI:', timings);
+
+    // Salvar horários no IndexedDB para persistência
+    const dbRequest = indexedDB.open('nutrimingDB', 1);
+
+    dbRequest.onsuccess = () => {
+      const db = dbRequest.result;
+      const transaction = db.transaction(['schedules'], 'readwrite');
+      const store = transaction.objectStore('schedules');
+      store.put({ id: 'nutriming_schedule', timings, lastUpdate: Date.now() });
+    };
+
+    event.ports[0]?.postMessage({ success: true });
+  }
+});
+
+// IndexedDB setup para persistência de agendamentos
+self.addEventListener('install', event => {
+  event.waitUntil(
+    new Promise((resolve) => {
+      const dbRequest = indexedDB.open('nutrimingDB', 1);
+
+      dbRequest.onupgradeneeded = () => {
+        const db = dbRequest.result;
+        if (!db.objectStoreNames.contains('schedules')) {
+          db.createObjectStore('schedules', { keyPath: 'id' });
+        }
+      };
+
+      dbRequest.onsuccess = () => resolve();
+      dbRequest.onerror = () => resolve(); // Fail gracefully
+    })
+  );
 });

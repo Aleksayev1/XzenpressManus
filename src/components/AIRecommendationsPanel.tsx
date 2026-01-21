@@ -173,8 +173,8 @@ Como posso ajudá-lo hoje?`,
             >
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 ${msg.role === 'user'
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                    : 'bg-white text-gray-800 shadow-sm border border-gray-200'
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                  : 'bg-white text-gray-800 shadow-sm border border-gray-200'
                   }`}
               >
                 <div className="whitespace-pre-wrap text-sm leading-relaxed">
@@ -246,7 +246,7 @@ Como posso ajudá-lo hoje?`,
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Digite sua pergunta sobre YNSA ou MTC..."
-              className="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all max-h-32"
+              className="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all max-h-32 text-gray-800 placeholder-gray-400"
               rows={2}
               disabled={isLoading || remainingQueries === 0}
             />

@@ -1,37 +1,48 @@
-import React, { useState } from 'react';
-import { Play, Pause, Volume2, VolumeX, Music, Sparkles, Waves, CloudRain, Wind, Flame, Leaf, Star, Crown, Zap, Cloud, ArrowLeft } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Play, Pause, Volume2, VolumeX, Music, Heart, Waves, CloudRain, Wind, Flame, Leaf, Star, Lock, Crown, ExternalLink, Zap, Cloud } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { createSpotifyService } from '../services/spotifyService';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useAudioPlayer, Track } from '../contexts/AudioPlayerContext';
 
 interface SoundsLibraryPageProps {
   onPageChange: (page: string) => void;
 }
 
-// Extending local Sound interface to match Track logic
-interface Sound extends Omit<Track, 'name'> {
-  name: string; // Ensuring name is present
+interface Sound {
+  id: string;
+  name: string;
   description: string;
   icon: React.ReactNode;
   category: 'nature' | 'ambient' | 'binaural' | 'mantras';
   duration: string;
   isPremium: boolean;
   src?: string;
-  spotifyEmbedUrl?: string;
+  spotifyUrl?: string;
 }
 
 export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChange }) => {
+  const { user } = useAuth();
   const { t } = useLanguage();
-  const { currentTrack, isPlaying, togglePlay, playTrack, volume, setVolume } = useAudioPlayer();
-
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [currentSound, setCurrentSound] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.3);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Spotify sempre disponível via links diretos
+  useEffect(() => {
+    console.log('🎵 Spotify: Links diretos sempre ativos');
+    console.log('✅ Playlists oficiais do Spotify funcionando');
+  }, []);
 
   const categories = [
     { id: 'all', name: t('sounds.category.all'), icon: <Volume2 className="w-4 h-4" /> },
     { id: 'nature', name: t('sounds.category.nature'), icon: <Cloud className="w-4 h-4" /> },
     { id: 'ambient', name: t('sounds.category.ambient'), icon: <Wind className="w-4 h-4" /> },
-    { id: 'binaural', name: t('sounds.category.binaural'), icon: <Zap className="w-4 h-4" /> },
-    { id: 'mantras', name: t('sounds.category.mantras'), icon: <Music className="w-4 h-4" /> },
+    { id: 'binaural', name: t('sounds.category.binaural'), icon: <Zap className="w-4 h-4" />, premium: true },
+    { id: 'mantras', name: t('sounds.category.mantras'), icon: <Music className="w-4 h-4" />, premium: true },
   ];
 
   const sounds: Sound[] = [
@@ -44,7 +55,8 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
       category: 'nature',
       duration: '30:00',
       isPremium: false,
-      src: '/sounds/ocean.mp3'
+      src: '/sounds/ocean.mp3',
+      spotifyUrl: 'https://open.spotify.com/search/ocean%20waves%20sounds'
     },
     {
       id: 'gentle-rain',
@@ -54,10 +66,11 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
       category: 'nature',
       duration: '45:00',
       isPremium: false,
-      src: '/sounds/rain.mp3'
+      src: '/sounds/rain.mp3',
+      spotifyUrl: 'https://open.spotify.com/search/rain%20sounds%20sleep'
     },
 
-    // Sons Premium - Com Spotify
+    // Sons Premium
     {
       id: 'forest-ambience',
       name: 'Floresta Encantada',
@@ -65,8 +78,8 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
       icon: <Leaf className="w-6 h-6 text-green-500" />,
       category: 'nature',
       duration: '60:00',
-      isPremium: false,
-      spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX8ymr6UES7vc?utm_source=generator' // Nature Sounds (Official)
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/forest%20sounds%20meditation'
     },
     {
       id: 'fireplace-crackle',
@@ -75,8 +88,8 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
       icon: <Flame className="w-6 h-6 text-orange-500" />,
       category: 'ambient',
       duration: '120:00',
-      isPremium: false,
-      spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZmwS63ON8g7?utm_source=generator' // Calm Vibes (Official)
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/fireplace%20sounds'
     },
     {
       id: 'wind-chimes',
@@ -85,8 +98,8 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
       icon: <Wind className="w-6 h-6 text-purple-400" />,
       category: 'ambient',
       duration: '40:00',
-      isPremium: false,
-      spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX1n9whBbBKoL?utm_source=generator' // Peaceful Piano (Official)
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/wind%20chimes%20meditation'
     },
     {
       id: 'binaural-focus',
@@ -95,18 +108,18 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
       icon: <Star className="w-6 h-6 text-yellow-500" />,
       category: 'binaural',
       duration: '30:00',
-      isPremium: false,
-      spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO?utm_source=generator' // Peaceful Piano (Official)
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/binaural%20beats%2040hz%20focus'
     },
     {
-      id: 'guided-meditation',
-      name: 'Meditação Guiada',
-      description: 'Jornada de paz interior para reduzir ansiedade e estresse',
-      icon: <Sparkles className="w-6 h-6 text-pink-500" />,
-      category: 'mantras', // Mudando para mantras/meditação
-      duration: '20:00',
-      isPremium: false,
-      spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWVS1recTqXqO?utm_source=generator' // Guided Meditation (Official)
+      id: 'binaural-sleep',
+      name: 'Sono Profundo 2Hz',
+      description: 'Frequência delta para induzir sono reparador',
+      icon: <Heart className="w-6 h-6 text-indigo-500" />,
+      category: 'binaural',
+      duration: '480:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/delta%20waves%20sleep%20meditation'
     },
     {
       id: 'om-mantra',
@@ -115,8 +128,8 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
       icon: <span className="text-2xl">🕉️</span>,
       category: 'mantras',
       duration: '21:00',
-      isPremium: false,
-      spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX9uKNf5jGX6m?utm_source=generator' // Yoga & Meditation (Official)
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/om%20mantra%20meditation'
     },
     {
       id: 'tibetan-bowls',
@@ -125,47 +138,136 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
       icon: <span className="text-2xl">🎌</span>,
       category: 'mantras',
       duration: '35:00',
-      isPremium: false,
-      spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX9uKNf5jGX6m?utm_source=generator' // Yoga & Meditation (Official)
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/tibetan%20singing%20bowls'
+    },
+    {
+      id: 'reset-nervous-system',
+      name: 'Reset do Sistema Nervoso',
+      description: 'Respiração 4-7-8 guiada para ativação parassimpática e redução do cortisol.',
+      icon: <Zap className="w-6 h-6 text-purple-500" />,
+      category: 'mantras',
+      duration: '12:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/4-7-8%20breathing%20guided%20meditation'
+    },
+    {
+      id: 'cranio-anxiety',
+      name: 'Craniopuntura para Ansiedade',
+      description: 'Prática guiada Yamamoto para redução de ansiedade clínica e tensão muscular.',
+      icon: <Star className="w-6 h-6 text-pink-500" />,
+      category: 'mantras',
+      duration: '15:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/binaural%20beats%2040hz%20focus'
+    },
+    {
+      id: 'corporate-focus',
+      name: 'Foco Corporativo Profundo',
+      description: 'Ambiente sonoro otimizado para trabalho de alta demanda cognitiva e fluxo contínuo.',
+      icon: <Zap className="w-6 h-6 text-blue-600" />,
+      category: 'binaural',
+      duration: '25:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/foco%20corporativo%20profundo'
+    },
+    {
+      id: 'mindfulness-guided',
+      name: 'Meditação Mindfulness Guiada',
+      description: 'Jornada de atenção plena para redução de ansiedade e clareza mental.',
+      icon: <Star className="w-6 h-6 text-purple-400" />,
+      category: 'mantras',
+      duration: '20:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/guided%20mindfulness%20meditation'
     }
   ];
 
   const filteredSounds = sounds.filter(sound => {
     const categoryMatch = selectedCategory === 'all' || sound.category === selectedCategory;
-    return categoryMatch;
+    const accessMatch = !sound.isPremium || (user && user.isPremium);
+    return categoryMatch && accessMatch;
   });
 
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateTime = () => setCurrentTime(audio.currentTime);
+    const updateDuration = () => setDuration(audio.duration);
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    };
+
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('loadedmetadata', updateDuration);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateTime);
+      audio.removeEventListener('loadedmetadata', updateDuration);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [currentSound]);
+
   const handleSoundSelect = (sound: Sound) => {
-    if (currentTrack?.id === sound.id) {
-      togglePlay();
+    if (sound.isPremium && !user?.isPremium) {
+      return;
+    }
+
+    if (currentSound === sound.id) {
+      togglePlayback();
     } else {
-      playTrack({
-        id: sound.id,
-        name: sound.name,
-        src: sound.src,
-        spotifyEmbedUrl: sound.spotifyEmbedUrl
-      });
+      setCurrentSound(sound.id);
+      if (sound.src) {
+        setIsPlaying(true);
+      }
     }
   };
 
-  // Find the full sound data object for the currently playing track
-  const currentSoundData = sounds.find(s => s.id === currentTrack?.id);
+  const togglePlayback = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play().catch(console.error);
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const currentSoundData = sounds.find(s => s.id === currentSound);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 pt-16">
+      {/* Audio Element */}
+      {currentSound && currentSoundData?.src && (
+        <audio
+          ref={audioRef}
+          src={currentSoundData.src}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onError={() => {
+            console.warn('Erro ao carregar áudio');
+            setIsPlaying(false);
+          }}
+        />
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Back Button */}
-        <button
-          onClick={() => onPageChange('home')}
-          className="mb-8 flex items-center space-x-2 text-gray-600 hover:text-purple-600 transition-colors group"
-        >
-          <div className="p-2 bg-white rounded-full shadow-md group-hover:shadow-lg transition-all">
-            <ArrowLeft className="w-5 h-5" />
-          </div>
-          <span className="font-medium">Voltar ao Início</span>
-        </button>
-
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
@@ -190,21 +292,27 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
+                disabled={(category as any).premium && !user?.isPremium}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${selectedCategory === category.id
                   ? 'bg-purple-500 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : (category as any).premium && !user?.isPremium
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
               >
                 <span>{category.icon}</span>
                 <span>{category.name}</span>
+                {(category as any).premium && !user?.isPremium && (
+                  <Lock className="w-4 h-4" />
+                )}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Current Playing (Using Global State) */}
-        {currentTrack && currentSoundData && (
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 max-w-2xl mx-auto border-2 border-purple-100">
+        {/* Current Playing */}
+        {currentSound && currentSoundData && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 max-w-2xl mx-auto">
             <div className="flex items-center space-x-4 mb-4">
               <div className="p-3 bg-purple-100 rounded-xl">
                 {currentSoundData.icon}
@@ -221,51 +329,66 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
               )}
             </div>
 
-            {/* Content: Local Player Controls OR Spotify Embed Placeholder */}
-            {currentSoundData.src ? (
-              // Local Player Controls
-              <div className="space-y-4">
-                <div className="flex items-center justify-center space-x-4">
-                  <button
-                    onClick={togglePlay}
-                    className={`p-3 rounded-full transition-all ${isPlaying
-                      ? 'bg-red-500 hover:bg-red-600 text-white'
-                      : 'bg-purple-500 hover:bg-purple-600 text-white'
-                      }`}
-                  >
-                    {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
-                  </button>
-                </div>
+            {/* Audio Controls */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-center space-x-4">
+                <button
+                  onClick={togglePlayback}
+                  className={`p-3 rounded-full transition-all ${isPlaying
+                    ? 'bg-red-500 hover:bg-red-600 text-white'
+                    : 'bg-purple-500 hover:bg-purple-600 text-white'
+                    }`}
+                >
+                  {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+                </button>
 
-                {/* Volume Control */}
-                <div className="flex items-center space-x-3">
-                  <VolumeX className="w-5 h-5 text-gray-500" />
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.1"
-                    value={volume}
-                    onChange={(e) => setVolume(parseFloat(e.target.value))}
-                    className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                  />
-                  <Volume2 className="w-5 h-5 text-gray-500" />
+                {currentSoundData.spotifyUrl && (
+                  <a
+                    href={currentSoundData.spotifyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Abrir no Spotify</span>
+                  </a>
+                )}
+              </div>
+
+              {/* Progress Bar */}
+              {currentSoundData.src && duration > 0 && (
+                <div className="space-y-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-purple-500 h-2 rounded-full transition-all"
+                      style={{ width: `${(currentTime / duration) * 100}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-600">
+                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(duration)}</span>
+                  </div>
                 </div>
+              )}
+
+              {/* Volume Control */}
+              <div className="flex items-center space-x-3">
+                <VolumeX className="w-5 h-5 text-gray-500" />
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={volume}
+                  onChange={(e) => setVolume(parseFloat(e.target.value))}
+                  className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <Volume2 className="w-5 h-5 text-gray-500" />
+                <span className="text-sm text-gray-600 min-w-[3rem]">
+                  {Math.round(volume * 100)}%
+                </span>
               </div>
-            ) : currentSoundData.spotifyEmbedUrl ? (
-              // Spotify Player Message
-              <div className="w-full text-center p-4 bg-green-50 rounded-xl">
-                <p className="text-green-800 font-medium mb-2">
-                  🎵 Tocando via Spotify
-                </p>
-                <p className="text-sm text-green-700">
-                  O player aparecerá na parte inferior da tela.
-                </p>
-                <p className="text-xs text-green-600 mt-2">
-                  Continue navegando - o som não vai parar!
-                </p>
-              </div>
-            ) : null}
+            </div>
           </div>
         )}
 
@@ -274,10 +397,13 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
           {filteredSounds.map((sound) => (
             <div
               key={sound.id}
-              className={`bg-white rounded-2xl p-6 shadow-lg transition-all duration-300 border-2 ${currentTrack?.id === sound.id
+              className={`bg-white rounded-2xl p-6 shadow-lg transition-all duration-300 border-2 ${currentSound === sound.id
                 ? 'border-purple-500 shadow-xl'
                 : 'border-gray-200 hover:border-gray-300'
-                } hover:shadow-xl cursor-pointer`}
+                } ${sound.isPremium && !user?.isPremium
+                  ? 'opacity-60'
+                  : 'hover:shadow-xl cursor-pointer'
+                }`}
               onClick={() => handleSoundSelect(sound)}
             >
               <div className="flex items-center justify-between mb-4">
@@ -291,8 +417,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
                       <span>Premium</span>
                     </div>
                   )}
-                  {/* Indicator for Active Sound */}
-                  {currentTrack?.id === sound.id && isPlaying && (
+                  {currentSound === sound.id && isPlaying && (
                     <div className="flex space-x-1">
                       <div className="w-1 h-4 bg-purple-500 rounded animate-pulse"></div>
                       <div className="w-1 h-4 bg-purple-500 rounded animate-pulse delay-100"></div>
@@ -309,18 +434,128 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
                 <span className="capitalize">{sound.category}</span>
                 <span>{sound.duration}</span>
               </div>
+
+              {sound.isPremium && !user?.isPremium && (
+                <div className="mt-4 flex items-center justify-center">
+                  <div className="flex items-center space-x-2 text-yellow-600">
+                    <Lock className="w-4 h-4" />
+                    <span className="text-sm font-medium">Premium</span>
+                  </div>
+                </div>
+              )}
+
+              {sound.spotifyUrl && (user?.isPremium || !sound.isPremium) && (
+                <div className="mt-4">
+                  <a
+                    href={sound.spotifyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Spotify</span>
+                  </a>
+                </div>
+              )}
             </div>
           ))}
         </div>
 
-        {/* Global Player Info Footer */}
+        {/* Premium CTA */}
+        {!user?.isPremium && (
+          <div className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-3xl p-8 text-center text-white">
+            <h2 className="text-3xl font-bold mb-4">{t('sounds.premium.title')}</h2>
+            <p className="text-xl mb-6 opacity-90">
+              {t('sounds.premium.subtitle')}
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-white bg-opacity-20 rounded-lg p-4">
+                <div className="text-2xl mb-2">🧠</div>
+                <div className="font-semibold">{t('sounds.category.binaural')}</div>
+                <div className="text-sm opacity-80">Frequências terapêuticas</div>
+              </div>
+              <div className="bg-white bg-opacity-20 rounded-lg p-4">
+                <div className="text-2xl mb-2">🕉️</div>
+                <div className="font-semibold">{t('sounds.category.mantras')}</div>
+                <div className="text-sm opacity-80">Vibrações sagradas</div>
+              </div>
+              <div className="bg-white bg-opacity-20 rounded-lg p-4">
+                <div className="text-2xl mb-2">🌿</div>
+                <div className="font-semibold">{t('sounds.category.nature')}</div>
+                <div className="text-sm opacity-80">Alta qualidade</div>
+              </div>
+              <div className="bg-white bg-opacity-20 rounded-lg p-4">
+                <div className="text-2xl mb-2">🎵</div>
+                <div className="font-semibold">Spotify</div>
+                <div className="text-sm opacity-80">Integração completa</div>
+              </div>
+            </div>
+            <button
+              onClick={() => onPageChange('premium')}
+              className="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transform hover:scale-105 transition-all duration-200 shadow-lg"
+            >
+              {t('sounds.premium.unlock')}
+            </button>
+          </div>
+        )}
+
+        {/* Spotify Integration */}
         <div className="mt-8 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-200">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">🎵 Player Global Ativo</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">🎵 {t('sounds.spotify.title')}</h2>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              Agora você pode navegar para a página de Acupressão ou qualquer outra área do app sem que a música pare!
+              {t('sounds.spotify.subtitle')}
             </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <a
+                href="https://open.spotify.com/search/meditation%20relaxation"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white rounded-lg p-4 hover:shadow-lg transition-all border border-green-200"
+              >
+                <div className="text-2xl mb-2">🧘</div>
+                <div className="font-semibold text-gray-800">Meditação</div>
+                <div className="text-sm text-gray-600">Busca no Spotify</div>
+              </a>
+              <a
+                href="https://open.spotify.com/search/sleep%20sounds%20nature"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white rounded-lg p-4 hover:shadow-lg transition-all border border-green-200"
+              >
+                <div className="text-2xl mb-2">😴</div>
+                <div className="font-semibold text-gray-800">Sono</div>
+                <div className="text-sm text-gray-600">Sons para dormir</div>
+              </a>
+              <a
+                href="https://open.spotify.com/search/focus%20concentration%20music"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white rounded-lg p-4 hover:shadow-lg transition-all border border-green-200"
+              >
+                <div className="text-2xl mb-2">🎯</div>
+                <div className="font-semibold text-gray-800">Foco</div>
+                <div className="text-sm text-gray-600">Concentração</div>
+              </a>
+            </div>
           </div>
+          {createSpotifyService() ? (
+            <button
+              onClick={() => {
+                const service = createSpotifyService();
+                if (service) window.location.href = service.getAuthUrl();
+              }}
+              className="bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition-colors flex items-center justify-center mx-auto space-x-2"
+            >
+              <Music className="w-5 h-5" />
+              <span>{t('sounds.spotify.connect')}</span>
+            </button>
+          ) : (
+            <button className="bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition-colors">
+              ✅ {t('sounds.spotify.active')}
+            </button>
+          )}
         </div>
       </div>
     </div>

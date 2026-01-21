@@ -40,9 +40,9 @@ export const protocols: Protocol[] = [
         breathingOptimization: '💡 Dica: Pratique a Respiração Guiada 4-7-8 (página inicial) 10 minutos antes de dormir. A técnica induz ondas cerebrais lentas (Theta) que, combinadas com a acupressão, potencializam o sono profundo e reparador.',
         benefits: ['Induz sono profundo', 'Desacelera a mente', 'Relaxamento físico'],
         soundtrack: {
-            genre: 'theta-waves',
-            description: 'Ondas Theta (4-7Hz). Induzem o estado hipnagógico (pré-sono).',
-            spotifyUrl: 'https://open.spotify.com/search/theta%20waves%20sleep'
+            genre: 'delta-waves',
+            description: 'Ondas Delta (0.5-4Hz). A frequência do sono profundo regenerativo e cura física.',
+            spotifyUrl: 'https://open.spotify.com/search/delta%20waves%20sleep%20meditation'
         },
         nutrition: {
             avoid: ['Queijos Curados (Tiramina)', 'Pimenta/Condimentos', 'Telas (Luz Azul)'],
@@ -67,9 +67,9 @@ export const protocols: Protocol[] = [
         colorTheme: 'orange',
         benefits: ['Clareza mental', 'Aumenta concentração', 'Energia vital'],
         soundtrack: {
-            genre: 'binaural',
-            description: 'Batidas Binaurais Beta (14Hz+). Sincronizam os hemisférios para foco.',
-            spotifyUrl: 'https://open.spotify.com/search/binaural%20beta%20focus'
+            genre: 'gamma-waves',
+            description: 'Ondas Gamma (40Hz). O "Estado de Fluxo" para alta performance cognitiva e memória.',
+            spotifyUrl: 'https://open.spotify.com/search/gamma%20waves%20focus%2040hz'
         },
         nutrition: {
             avoid: ['Frituras (Gordura Trans)', 'Farinha Branca (Pico Glicêmico)', 'Adoçantes Artificiais'],
@@ -96,8 +96,8 @@ export const protocols: Protocol[] = [
         colorTheme: 'red',
         benefits: ['Alívio dor lombar', 'Descompressão ciática', 'Mobilidade'],
         soundtrack: {
-            genre: 'solfeggio',
-            description: 'Frequência 174Hz. Conhecida como "Anéstésico Natural" (Solfeggio) para alívio da dor e segurança dos órgãos.',
+            genre: 'frequency-174hz',
+            description: 'Frequência 174Hz. Conhecida como "Anéstésico Natural" e "Segurança dos Órgãos".',
             spotifyUrl: 'https://open.spotify.com/search/174hz%20solfeggio%20pain'
         },
         nutrition: {
@@ -123,7 +123,7 @@ export const protocols: Protocol[] = [
         colorTheme: 'teal',
         benefits: ['Alívio da dor de cabeça', 'Relaxamento ocular', 'Reduz tensão nuca'],
         soundtrack: {
-            genre: 'solfeggio',
+            genre: 'frequency-174hz',
             description: 'Frequência 174Hz. Alívio natural para dores de cabeça e cefaleias tensionais.',
             spotifyUrl: 'https://open.spotify.com/search/174hz%20migraine%20relief'
         },
@@ -144,7 +144,7 @@ export const protocols: Protocol[] = [
         colorTheme: 'green',
         benefits: ['Relaxa trapézio', 'Solta o pescoço', 'Postura leve'],
         soundtrack: {
-            genre: 'solfeggio',
+            genre: 'frequency-528hz',
             description: 'Frequência 528Hz. Conhecida como "Frequência Milagrosa" para reparação e relaxamento profundo.',
             spotifyUrl: 'https://open.spotify.com/search/528hz%20muscle%20relaxation'
         },
@@ -166,7 +166,7 @@ export const protocols: Protocol[] = [
         colorTheme: 'blue',
         benefits: ['Alivia LER/DORT', 'Desinflama tendões', 'Fortalece punhos'],
         soundtrack: {
-            genre: 'solfeggio',
+            genre: 'frequency-174hz',
             description: 'Frequência 174Hz. Reduz a dor e inflamação nos membros superiores.',
             spotifyUrl: 'https://open.spotify.com/search/174hz%20inflammation%20relief'
         },
@@ -187,7 +187,7 @@ export const protocols: Protocol[] = [
         colorTheme: 'orange',
         benefits: ['Relaxa mandíbula', 'Alivia dor facial', 'Melhora abertura bucal'],
         soundtrack: {
-            genre: 'solfeggio',
+            genre: 'frequency-174hz',
             description: 'Frequência 174Hz. O anestésico natural para relaxamento dos músculos masseter e temporal.',
             spotifyUrl: 'https://open.spotify.com/search/174hz%20tmj%20relief'
         },
@@ -246,7 +246,7 @@ export const protocols: Protocol[] = [
         colorTheme: 'teal',
         benefits: ['Elimina toxinas', 'Reduz retenção líquido', 'Clareza'],
         soundtrack: {
-            genre: 'solfeggio',
+            genre: 'frequency-741hz',
             description: 'Frequência 741Hz. Ideal para limpeza celular, desintoxicação e remoção de toxinas.',
             spotifyUrl: 'https://open.spotify.com/search/741hz%20detox%20cleansing'
         },
@@ -270,7 +270,7 @@ export const protocols: Protocol[] = [
         colorTheme: 'purple',
         benefits: ['Restaura energia vital', 'Reduz cinismo e irritabilidade', 'Recupera capacidade decisória', 'Clareza mental'],
         soundtrack: {
-            genre: 'solfeggio',
+            genre: 'frequency-528hz',
             description: 'Frequência 528Hz - "Love Frequency". Reduz cortisol, repara DNA celular e promove transformação energética profunda.',
             spotifyUrl: 'https://open.spotify.com/search/528hz%20healing%20frequency'
         },

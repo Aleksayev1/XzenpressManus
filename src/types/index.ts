@@ -206,7 +206,7 @@ export interface Protocol {
   steps: ProtocolStep[];
   benefits: string[];
   soundtrack?: {
-    genre: 'alpha-waves' | 'theta-waves' | 'binaural' | 'nature' | 'lofi' | 'solfeggio';
+    genre: 'alpha-waves' | 'theta-waves' | 'delta-waves' | 'gamma-waves' | 'binaural' | 'nature' | 'lofi' | 'solfeggio' | 'frequency-174hz' | 'frequency-528hz' | 'frequency-741hz';
     description: string;
     spotifyUrl?: string; // Future integration
   };

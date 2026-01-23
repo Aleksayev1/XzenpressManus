@@ -29,10 +29,10 @@ export const NutrimingSafetyModal: React.FC<NutrimingSafetyModalProps> = ({ isOp
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border-2 border-yellow-500">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] border-2 border-yellow-500">
 
                 {/* Header */}
-                <div className="bg-yellow-50 p-6 border-b border-yellow-100 flex items-center space-x-4">
+                <div className="bg-yellow-50 p-6 border-b border-yellow-100 flex items-center space-x-4 flex-shrink-0">
                     <div className="p-3 bg-yellow-100 rounded-full">
                         <AlertTriangle className="w-8 h-8 text-yellow-600" />
                     </div>
@@ -43,7 +43,7 @@ export const NutrimingSafetyModal: React.FC<NutrimingSafetyModalProps> = ({ isOp
                 </div>
 
                 {/* Content */}
-                <div className="p-8 space-y-6">
+                <div className="p-8 space-y-6 overflow-y-auto">
                     <p className="text-gray-700 text-lg leading-relaxed">
                         O Nutriming AI é uma ferramenta de <strong>análise educacional</strong>. Para garantir sua saúde e evitar a "extrapolação" de dosagens (sobredose), você precisa confirmar que entende os limites de uso desta plataforma.
                     </p>
@@ -97,17 +97,17 @@ export const NutrimingSafetyModal: React.FC<NutrimingSafetyModalProps> = ({ isOp
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end">
+                <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end flex-shrink-0">
                     <button
                         onClick={handleAccept}
                         disabled={!canProceed}
                         className={`px-8 py-4 rounded-xl font-bold text-lg flex items-center transition-all ${canProceed
-                                ? 'bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1'
-                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            ? 'bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                             }`}
                     >
                         <ShieldCheck className="w-6 h-6 mr-2" />
-                        {canProceed ? 'Concordo e Quero Acessar' : 'Marque as 3 opções para continuar'}
+                        {canProceed ? 'Concordo' : 'Marque as 3 opções'}
                     </button>
                 </div>
             </div>

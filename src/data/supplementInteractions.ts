@@ -112,14 +112,7 @@ export const analyzeInteractions = (userSupplements: string[]) => {
     SUPPLEMENT_INTERACTIONS.forEach(interaction => {
         // Verifica quantos itens da interação o usuário possui
         const matches = interaction.substances.filter(substance =>
-            normalizedUserList.some(userItem => {
-                // Correspondência exata ou contém a palavra inteira
-                return userItem === substance ||
-                    userItem.includes(` ${substance} `) ||
-                    userItem.startsWith(`${substance} `) ||
-                    userItem.endsWith(` ${substance}`) ||
-                    substance.includes(userItem); // Caso o usuário digite menos que o nome completo
-            })
+            normalizedUserList.some(userItem => userItem.includes(substance) || substance.includes(userItem))
         );
 
         // Se o usuário tem 2 ou mais itens da lista de substâncias, ativa a interação

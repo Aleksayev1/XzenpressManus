@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AlertOctagon, XCircle, AlertTriangle } from 'lucide-react';
 
 interface CriticalSafetyModalProps {
@@ -18,11 +18,43 @@ export const CriticalSafetyModal: React.FC<CriticalSafetyModalProps> = ({
     message,
     details
 }) => {
+    useEffect(() => {
+        if (isOpen) {
+            // Tocar som de alerta
+            const audio = new Audio('/sounds/alert.mp3'); // Fallback se não existir
+            // Usar oscilador se arquivo não existir (mais garantido)
+            try {
+                const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.value = 200;
+                gain.gain.value = 0.1;
+                osc.start();
+
+                // Modulação de sirene
+                const now = ctx.currentTime;
+                osc.frequency.linearRampToValueAtTime(800, now + 0.1);
+                osc.frequency.linearRampToValueAtTime(200, now + 0.2);
+                osc.frequency.linearRampToValueAtTime(800, now + 0.3);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                osc.stop(now + 0.5);
+            } catch (e) {
+                console.error('Audio context error', e);
+            }
+        }
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-red-900/90 backdrop-blur-md animate-in fade-in duration-200">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border-4 border-red-600 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-red-950/95 backdrop-blur-xl animate-in fade-in duration-200">
+            {/* Overlay piscante */}
+            <div className="absolute inset-0 bg-red-500/20 animate-pulse pointer-events-none" />
+
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border-8 border-red-600 animate-in zoom-in-95 duration-200 relative z-10 transform hover:scale-[1.02] transition-transform">
 
                 {/* Header Vermelho */}
                 <div className="bg-red-600 p-6 flex items-center justify-center flex-col text-white">

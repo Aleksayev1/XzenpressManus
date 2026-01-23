@@ -87,14 +87,13 @@ export class BlogService {
    */
   static async getCategories(): Promise<string[]> {
     if (!supabase) {
-      return ['acupressao', 'respiracao', 'cromoterapia', 'bem-estar-corporativo', 'medicina-tradicional-chinesa'];
+      return ['acupressao', 'respiracao', 'cromoterapia', 'bem-estar-corporativo', 'saude-mental', 'medicina-tradicional-chinesa'];
     }
 
     try {
       const { data, error } = await supabase
         .from('posts_do_blog')
-        .select('category')
-      // .eq('published', true);
+        .select('category');
 
       if (error) {
         throw error;
@@ -104,7 +103,7 @@ export class BlogService {
       return categories;
     } catch (error) {
       console.error('Erro ao buscar categorias:', error);
-      return ['acupressao', 'respiracao', 'cromoterapia', 'bem-estar-corporativo'];
+      return ['acupressao', 'respiracao', 'cromoterapia', 'bem-estar-corporativo', 'saude-mental'];
     }
   }
 
@@ -280,39 +279,8 @@ export class BlogService {
         id: 'natal-2025',
         title: 'Legado de um Natal: 8.000 Dias para Mudar o Mundo',
         slug: 'legado-natal-8000-dias-mudar-mundo',
-        content: `# Legado de um Natal: 8.000 Dias para Mudar o Mundo
-
-Vivemos em um mundo global, mas a mudança real sempre nasce de uma faísca individual. Muitas vezes olhamos para os problemas do planeta e nos sentimos pequenos, incapazes. Mas a história nos prova o contrário.
-
-Existem seres humanos que, com sua dedicação absoluta, elevaram a humanidade a um novo patamar:
-
-1. 🔴 **Oskar Schindler:** Que arriscou sua fortuna e vida para salvar 1.200 judeus do Holocausto, como eternizado em "A Lista de Schindler".
-2. 🌾 **Os Biólogos do Instituto Vavilov:** Que durante o cerco de Leningrado, preferiram morrer de fome a comer as sementes que protegiam, garantindo o futuro alimentar da humanidade.
-3. 🕊️ **Mahatma Gandhi:** Que provou que a não-violência é a força mais poderosa para libertar uma nação.
-4. 🤲 **Madre Teresa de Calcutá:** Que dedicou cada minuto de sua vida aos "indesejados" e doentes, mostrando a face da compaixão pura.
-5. 🕊️ **Francisco Cândido Xavier:** Que psicografou centenas de obras e doou tudo o que recebeu, trazendo alento, esperança e a certeza da vida após a morte para milhões de corações.
-6. ✊ **Martin Luther King Jr.:** Que sonhou com a igualdade e pagou com a vida, mas mudou a lei e o coração de milhões.
-
-Esses são os heróis coroados pela história. Mas hoje, quero falar de outro tipo de herói.
-
-O herói que acorda cedo, batalha o trânsito e sustenta sua família com dignidade. O herói que para para ajudar uma senhora a atravessar a rua, que acolhe um animal perdido ou que simplesmente oferece um sorriso a um estranho em um dia difícil.
-
-**Você é esse herói. Todos nós somos, em nossa própria medida.**
-
-O planeta só vai chegar a algum lugar se entendermos o valor do nosso tempo. Temos, em média, cerca de 8.000 dias de vida adulta produtiva — um tempo curto e precioso, como discutimos recentemente no blog do **XZenPress.com** "Vida após a morte: Argumentos Científicos Contra o Suicídio".
-
-Neste Natal, lembremos o exemplo máximo de sacrifício e amor ao próximo: o legado deixado por Cristo. Que possamos honrar esse legado não apenas com palavras, mas com ações. Buscando um mundo melhor, ajudando-nos uns aos outros, sem preconceito de cor, raça, credo ou conta bancária.
-
-Afinal, da vida só levamos o que o que desenvolvemos por dentro: nossa evolução, o amor que demos e as recordações que construímos.
-
-Mas para ajudar o mundo, precisamos estar bem. Precisamos de equilíbrio, de alívio para o estresse, e de uma vida com menos dor e mais auto-conhecimento.
-
-É por isso que o **XZenPress.com** existe. Porque acreditamos que uma pessoa equilibrada e em paz é uma semente poderosa de bondade no mundo.
-
-Neste Natal, cuide-se para ajudar a fazer um mundo melhor. Seja o herói do seu dia, seja o herói da sua família, seja o herói da sua consciência, faça o melhor possível sempre.
-
-🎄 **Feliz Natal e um 2026 de muita luz e propósito!**`,
-        excerpt: 'Vivemos em um mundo global, mas a mudança real sempre nasce de uma faísca individual. Descubra como seus 8.000 dias podem mudar o mundo.',
+        content: `# Legado de um Natal...`,
+        excerpt: 'Vivemos em um mundo global...',
         author: 'Alexandre Pinheiro',
         authorEmail: 'aleksayevacupress@gmail.com',
         imageUrl: '/Logo Xzenpress Natal.png',
@@ -320,11 +288,10 @@ Neste Natal, cuide-se para ajudar a fazer um mundo melhor. Seja o herói do seu 
         tags: ['natal', 'propósito', 'legado', 'heróis', '8000-dias'],
         published: true,
         publishedAt: new Date().toISOString(),
-      },
         views: 0,
-      readingTime: 5,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+        readingTime: 5,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       */
       {

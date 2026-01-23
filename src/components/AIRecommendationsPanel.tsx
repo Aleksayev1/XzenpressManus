@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Brain, Send, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { acupressurePoints } from '../data/acupressurePoints';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -23,7 +24,43 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [remainingQueries, setRemainingQueries] = useState<number | null>(null);
+  const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Função para encontrar imagem do ponto
+  const findPointImage = (pointName: string) => {
+    const normalized = pointName.toLowerCase().replace(/[\s-]/g, '');
+    const point = acupressurePoints.find((p: any) => {
+      const pName = p.name.toLowerCase().replace(/[\s-]/g, '');
+      const pId = p.id.toLowerCase().replace(/[\s-]/g, '');
+      return pName.includes(normalized) || pId.includes(normalized) || (p.nameEn && p.nameEn.toLowerCase().includes(normalized));
+    });
+    return point?.image || null;
+  };
+
+  const renderMessageContent = (content: string) => {
+    const pointRegex = /\b((?:IG|VB|VC|Ren|Du|P|C|TA|CS|F|R|BP|E|ID|B|YNSA)\s?-?\s?\d{1,2}[a-zA-Z]?|YNSA\s+[a-zA-Z]+)\b/gi;
+    const parts = content.split(pointRegex);
+    return parts.map((part, i) => {
+      if (part.match(pointRegex)) {
+        const imageUrl = findPointImage(part);
+        if (imageUrl) {
+          return (
+            <button
+              key={i}
+              onClick={() => setPreviewImage({ url: imageUrl, title: part })}
+              className="inline-flex items-center space-x-1 mx-1 px-1.5 py-0.5 bg-blue-100/50 hover:bg-blue-200 text-blue-700 rounded text-xs font-semibold transition-colors align-middle border border-blue-200/50"
+              title="Ver imagem do ponto"
+            >
+              <span>{part}</span>
+              <span className="text-[10px]">📸</span>
+            </button>
+          );
+        }
+      }
+      return part;
+    });
+  };
 
   // Auto-scroll para última mensagem
   const scrollToBottom = () => {
@@ -156,7 +193,24 @@ Como posso ajudá-lo hoje?`,
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-3xl w-full h-[85vh] flex flex-col shadow-2xl">
+      {/* Modal de Preview de Imagem (Smart Link) */}
+      {previewImage && (
+        <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setPreviewImage(null)}>
+          <div className="bg-white rounded-xl overflow-hidden max-w-sm w-full shadow-2xl animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+            <div className="p-3 bg-gray-100 flex justify-between items-center border-b">
+              <h3 className="font-bold text-gray-800">{previewImage.title}</h3>
+              <button onClick={() => setPreviewImage(null)} className="p-1 hover:bg-gray-200 rounded-full">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-1 bg-white">
+              <img src={previewImage.url} alt={previewImage.title} className="w-full h-auto object-contain rounded-lg" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white rounded-2xl max-w-3xl w-full h-[85vh] flex flex-col shadow-2xl relative z-10">
         {/* Header */}
         <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-purple-50 to-blue-50 rounded-t-2xl">
           <div className="flex items-center space-x-3">
@@ -199,7 +253,7 @@ Como posso ajudá-lo hoje?`,
                   }`}
               >
                 <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                  {msg.content}
+                  {msg.role === 'assistant' ? renderMessageContent(msg.content) : msg.content}
                 </div>
                 <div
                   className={`text-xs mt-2 ${msg.role === 'user' ? 'text-blue-100' : 'text-gray-400'

@@ -117,6 +117,11 @@ const SUPPLEMENT_DATABASE = {
     } as Record<string, string[]>
 };
 
+import { getNutrientLimit } from '../data/nutrientLimits';
+import { NutrimingSafetyModal } from './NutrimingSafetyModal';
+import { CriticalSafetyModal } from './CriticalSafetyModal';
+import { analyzeInteractions, Interaction } from '../data/supplementInteractions';
+
 export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) => {
     const { user } = useAuth();
     const [supplements, setSupplements] = useState<Supplement[]>([]);
@@ -125,6 +130,26 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
     const [newSupplement, setNewSupplement] = useState({ name: '', dosage: '', notes: '' });
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
+    // Novo Estado para Segurança
+    const [showSafetyModal, setShowSafetyModal] = useState(false);
+
+    // Estado para Alerta Crítico (Popup)
+    const [criticalAlert, setCriticalAlert] = useState<{
+        isOpen: boolean;
+        type: 'dosage' | 'interaction';
+        title: string;
+        message: string;
+        details?: string;
+    }>({ isOpen: false, type: 'dosage', title: '', message: '' });
+
+    // Verificar consentimento legal ao carregar
+    useEffect(() => {
+        const consent = localStorage.getItem('nutriming_legal_consent');
+        if (consent !== 'accepted_v1') {
+            setShowSafetyModal(true);
+        }
+    }, []);
+
     // Função para solicitar permissão de notificações
     const requestNotificationPermission = async () => {
         if ('Notification' in window) {
@@ -132,7 +157,6 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
             if (permission === 'granted') {
                 setNotificationsEnabled(true);
                 scheduleNotifications();
-                // Salvar preferência
                 localStorage.setItem('nutriming_notifications', 'enabled');
             }
         } else {
@@ -305,6 +329,37 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
     const addSupplement = () => {
         if (!newSupplement.name) return;
 
+        // 1. Verificação de Segurança (Dosagem)
+        const limit = getNutrientLimit(newSupplement.name);
+        const doseValue = parseFloat((newSupplement.dosage || '').replace(/[^0-9.]/g, ''));
+
+        if (limit && doseValue > limit.maxDaily) {
+            setCriticalAlert({
+                isOpen: true,
+                type: 'dosage',
+                title: `Dose Excessiva de ${limit.names[0]}`,
+                message: `A dose de ${newSupplement.dosage} excede o limite seguro de ${limit.maxDaily}${limit.unit}.`,
+                details: limit.warning
+            });
+            return; // Bloqueia adição
+        }
+
+        // 2. Verificação de Interação Crítica
+        const currentNames = supplements.map(s => s.name);
+        const potentialInteractions = analyzeInteractions([...currentNames, newSupplement.name]);
+        const criticalInteraction = potentialInteractions.find(i => i.severity === 'high');
+
+        if (criticalInteraction) {
+            setCriticalAlert({
+                isOpen: true,
+                type: 'interaction',
+                title: criticalInteraction.title,
+                message: criticalInteraction.description,
+                details: criticalInteraction.source
+            });
+            return; // Bloqueia adição
+        }
+
         const timing = findOptimalTiming(newSupplement.name);
         const supplement: Supplement = {
             id: Date.now().toString(),
@@ -344,17 +399,9 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         saveData(supplements, newProfile);
     };
 
-    const getConflicts = () => {
-        const conflicts: string[] = [];
-        supplements.forEach(sup => {
-            const conflictsWith = SUPPLEMENT_DATABASE.conflicts[sup.name as keyof typeof SUPPLEMENT_DATABASE.conflicts] || [];
-            conflictsWith.forEach(conflict => {
-                if (supplements.some(s => s.name === conflict)) {
-                    conflicts.push(`⚠️ ${sup.name} conflita com ${conflict} - evite tomar no mesmo horário`);
-                }
-            });
-        });
-        return [...new Set(conflicts)]; // Remove duplicates
+    const getInteractions = () => {
+        const names = supplements.map(s => s.name);
+        return analyzeInteractions(names);
     };
 
     const getRecommendations = () => {
@@ -387,7 +434,7 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
     };
 
     const groups = groupByTiming();
-    const conflicts = getConflicts();
+    const interactions = getInteractions();
     const recommendations = getRecommendations();
 
     const timingLabels = {
@@ -400,6 +447,17 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+            <NutrimingSafetyModal isOpen={showSafetyModal} onClose={() => setShowSafetyModal(false)} />
+
+            <CriticalSafetyModal
+                isOpen={criticalAlert.isOpen}
+                onClose={() => setCriticalAlert(prev => ({ ...prev, isOpen: false }))}
+                alertType={criticalAlert.type}
+                title={criticalAlert.title}
+                message={criticalAlert.message}
+                details={criticalAlert.details}
+            />
+
             <div className="max-w-6xl mx-auto">
                 <button
                     onClick={() => onPageChange('home')}
@@ -576,18 +634,42 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                             </div>
                         )}
 
-                        {/* Conflicts */}
-                        {conflicts.length > 0 && (
-                            <div className="bg-red-50 rounded-2xl shadow-lg p-6 border border-red-200 mt-6">
-                                <h3 className="text-lg font-bold text-red-900 mb-4 flex items-center">
-                                    <AlertCircle className="w-5 h-5 mr-2" />
-                                    Conflitos Detectados
-                                </h3>
-                                <ul className="space-y-2">
-                                    {conflicts.map((conflict, idx) => (
-                                        <li key={idx} className="text-sm text-red-800">{conflict}</li>
-                                    ))}
-                                </ul>
+                        {/* Interactions Analysis (Synergies & Conflicts) */}
+                        {interactions.length > 0 && (
+                            <div className="space-y-4 mb-6">
+                                {interactions.map((interaction, idx) => (
+                                    <div
+                                        key={interaction.id + idx}
+                                        className={`rounded-2xl shadow-lg p-6 border ${interaction.type === 'synergy'
+                                            ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200'
+                                            : interaction.severity === 'high'
+                                                ? 'bg-red-50 border-red-200'
+                                                : 'bg-orange-50 border-orange-200'
+                                            }`}
+                                    >
+                                        <div className="flex items-start">
+                                            <div className={`p-2 rounded-full mr-4 ${interaction.type === 'synergy' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'
+                                                }`}>
+                                                {interaction.type === 'synergy' ? <Sparkles className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
+                                            </div>
+                                            <div>
+                                                <h3 className={`text-lg font-bold mb-1 ${interaction.type === 'synergy' ? 'text-emerald-900' : 'text-red-900'
+                                                    }`}>
+                                                    {interaction.title}
+                                                </h3>
+                                                <p className={`text-sm mb-2 ${interaction.type === 'synergy' ? 'text-emerald-800' : 'text-red-800'
+                                                    }`}>
+                                                    {interaction.description}
+                                                </p>
+                                                {interaction.source && (
+                                                    <p className="text-xs font-semibold opacity-75">
+                                                        Fonte: {interaction.source}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         )}
 
@@ -673,7 +755,23 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                                                     <div key={sup.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                                                         <div className="flex-1">
                                                             <p className="font-medium text-gray-900">{sup.name}</p>
-                                                            <p className="text-sm text-gray-500">{sup.dosage}</p>
+                                                            <div className="flex flex-col">
+                                                                <p className="text-sm text-gray-500">{sup.dosage}</p>
+                                                                {(() => {
+                                                                    const limit = getNutrientLimit(sup.name);
+                                                                    if (limit) {
+                                                                        return (
+                                                                            <div className="mt-1 flex items-start space-x-1 text-xs bg-yellow-50 p-1.5 rounded border border-yellow-200">
+                                                                                <Info className="w-3 h-3 text-yellow-600 mt-0.5 flex-shrink-0" />
+                                                                                <span className="text-yellow-800">
+                                                                                    <strong>Ref. Segurança:</strong> Max {limit.maxDaily}{limit.unit} ({limit.source}).
+                                                                                </span>
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                    return null;
+                                                                })()}
+                                                            </div>
                                                         </div>
                                                         <div className="flex items-center space-x-2">
                                                             <select

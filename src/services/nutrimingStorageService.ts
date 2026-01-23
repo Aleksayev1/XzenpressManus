@@ -12,6 +12,7 @@ export interface NutrimingData {
     supplements: Supplement[];
     profile: {
         age: number;
+        gender?: 'male' | 'female' | 'other';
         symptoms: string[];
     };
 }
@@ -104,14 +105,14 @@ export const NutrimingStorageService = {
     /**
      * Salvar perfil do usuário no localStorage (não crítico para Supabase por enquanto)
      */
-    saveProfile(userId: string, profile: { age: number; symptoms: string[] }) {
+    saveProfile(userId: string, profile: { age: number; gender?: 'male' | 'female' | 'other'; symptoms: string[] }) {
         localStorage.setItem(`nutriming_profile_${userId}`, JSON.stringify(profile));
     },
 
     /**
      * Carregar perfil do usuário do localStorage
      */
-    loadProfile(userId: string): { age: number; symptoms: string[] } {
+    loadProfile(userId: string): { age: number; gender?: 'male' | 'female' | 'other'; symptoms: string[] } {
         const saved = localStorage.getItem(`nutriming_profile_${userId}`);
         if (saved) {
             return JSON.parse(saved);

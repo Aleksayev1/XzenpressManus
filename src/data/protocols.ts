@@ -194,10 +194,10 @@ export const protocols: Protocol[] = [
         steps: [
             { pointId: 'atm-xiaguan-st7', durationSeconds: 120, customInstructions: 'Abra e feche a boca suavemente enquanto pressiona.' },
             { pointId: 'atm-ermen-sj21', durationSeconds: 90, customInstructions: 'Pressione no portal da orelha.' },
-            { pointId: 'atm-jiache-st6', durationSeconds: 120, customInstructions: 'Foque no relaxamento do músculo masseter.' },
-            { pointId: 'ynsa-cranial-5', durationSeconds: 120, customInstructions: 'YNSA Trigêmeo: Controle neural da face.' },
-            { pointId: 'ynsa-sensorial-boca-a', durationSeconds: 90, customInstructions: 'Relaxamento profundo do assoalho bucal.' },
-            { pointId: 'ynsa-cranial-10', durationSeconds: 120, customInstructions: 'YNSA Vago: Controle de stress e inflamação.' }
+            { pointId: 'ynsa-cranial-5', durationSeconds: 180, customInstructions: 'YNSA Cranial V (Trigêmeo): Ponto Mestre para toda dor e sensibilidade da face e ATM.' },
+            { pointId: 'ynsa-sensorial-boca-a', durationSeconds: 120, customInstructions: 'YNSA Sensorial Boca: Relaxe especificamente a área da boca e mandíbula.' },
+            { pointId: 'ynsa-cranial-10', durationSeconds: 120, customInstructions: 'YNSA Cranial X (Vago): Para acalmar o sistema nervoso e reduzir o componente emocional da dor (bruxismo tensional).' },
+            { pointId: 'ynsa-cranial-1', durationSeconds: 120, customInstructions: 'YNSA Cranial I (Olfatório/Rim): Base de vitalidade para suportar o tratamento.' }
         ]
     },
 
@@ -284,6 +284,30 @@ export const protocols: Protocol[] = [
             { pointId: 'ynsa-zf-baco', durationSeconds: 180, customInstructions: 'YNSA Ponto 8 (Baço-Pâncreas): Elimina "névoa cerebral", melhora concentração e reduz overthinking.' },
             { pointId: 'ynsa-zf-figado', durationSeconds: 180, customInstructions: 'YNSA Ponto 10 (Fígado): Libera irritabilidade, cinismo e raiva acumulada do trabalho.' },
             { pointId: 'ynsa-zf-vesicula', durationSeconds: 180, customInstructions: 'YNSA Ponto 11 (Vesícula Biliar): CRÍTICO para decisão e coragem. Combate indecisão paralisante e procrastinação por medo.' }
+        ]
+    },
+
+    {
+        id: 'saude-cardiaca',
+        title: 'Saúde Cardíaca',
+        subtitle: 'Coração & Circulação',
+        isPremium: true,
+        breathingOptimization: '💡 Dica: A Coerência Cardíaca é atingida respirando 6x por minuto. Use a Respiração 4-7-8 para baixar a frequência cardíaca e induzir relaxamento profundo dos vasos sanguíneos.',
+        description: 'Fortaleça o coração e melhore a circulação. Essencial para palpitações, ansiedade cardíaca e pressão arterial (suporte).',
+        iconName: 'Heart',
+        colorTheme: 'red',
+        benefits: ['Regula ritmo cardíaco', 'Melhora circulação', 'Reduz opressão no peito', 'Acalma Shen (Espírito)'],
+        soundtrack: {
+            genre: 'alpha-waves',
+            description: 'Frequência 432Hz ou 528Hz. Harmoniza o chakra cardíaco e promove reparação celular.',
+            spotifyUrl: 'https://open.spotify.com/search/528hz%20heart%20healing'
+        },
+        steps: [
+            { pointId: 'ren17-danzhong', durationSeconds: 180, customInstructions: 'Centro do Peito: O Mestre do Qi. Abra o coração para a cura.' },
+            { pointId: 'neiguan-pc6', durationSeconds: 120, customInstructions: 'Portão Interno: O melhor ponto para acalmar o coração e a mente.' },
+            { pointId: 'ynsa-cardio-heart', durationSeconds: 120, customInstructions: 'YNSA Coração: Regulação central da função cardíaca.' },
+            { pointId: 'ynsa-cardio-pericardium', durationSeconds: 120, customInstructions: 'YNSA Pericárdio: Proteção emocional e circulação.' },
+            { pointId: 'bp6-sanyinjiao', durationSeconds: 180, customInstructions: 'Reunião dos 3 Yin: Melhora o retorno venoso e acalma a mente.' }
         ]
     }
 ];

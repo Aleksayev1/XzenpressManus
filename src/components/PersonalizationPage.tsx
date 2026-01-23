@@ -408,7 +408,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                 <select
                   value={preferences.preferredTime}
                   onChange={(e) => setPreferences(prev => ({ ...prev, preferredTime: e.target.value as any }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                 >
                   <option value="morning">Manhã (6h-12h)</option>
                   <option value="afternoon">Tarde (12h-18h)</option>
@@ -424,7 +424,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                 <select
                   value={preferences.sessionDuration}
                   onChange={(e) => setPreferences(prev => ({ ...prev, sessionDuration: parseInt(e.target.value) }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                 >
                   <option value={180}>3 minutos (Iniciante)</option>
                   <option value={300}>5 minutos (Padrão)</option>
@@ -441,7 +441,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                 <select
                   value={preferences.experienceLevel}
                   onChange={(e) => setPreferences(prev => ({ ...prev, experienceLevel: e.target.value as any }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                 >
                   <option value="beginner">Iniciante</option>
                   <option value="intermediate">Intermediário</option>
@@ -456,7 +456,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                 <select
                   value={preferences.breathingPace}
                   onChange={(e) => setPreferences(prev => ({ ...prev, breathingPace: e.target.value as any }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                 >
                   <option value="slow">Lento (5-8-10)</option>
                   <option value="normal">Normal (4-7-8)</option>

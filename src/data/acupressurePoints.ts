@@ -51,7 +51,7 @@ export const acupressurePoints: AcupressurePoint[] = [
     descriptionEs: 'Punto para elevar mente, combatir fatiga mental leve y fortalecer energía yang. Ubicado en la parte superior de la cabeza, centro del cráneo. Presiona suavemente con el dedo medio por 2 minutos.',
     descriptionFr: 'Point pour élever esprit, combattre fatigue mentale légère et renforcer énergie yang. Situé au sommet de la tête, centre du crâne. Pressez doucement avec le majeur pendant 2 minutes.',
     position: { x: 50, y: 15 },
-    image: '/GV20 Baihui.jpg',
+    image: '/du20-baihui-avc.jpg',
     imageAlt: 'Localização do ponto Baihui Básico VG20 - Técnica simples',
     benefits: ['Eleva a mente (básico)', 'Combate fadiga leve', 'Melhora clareza básica', 'Fortalece yang suavemente'],
     benefitsEn: ['Elevates mind (basic)', 'Combats mild fatigue', 'Improves basic clarity', 'Gently strengthens yang'],
@@ -61,7 +61,8 @@ export const acupressurePoints: AcupressurePoint[] = [
     category: 'general',
     instructions: 'Técnica básica: Pressione suavemente o topo da cabeça com o dedo médio por 2 minutos.',
     duration: 120,
-    pressure: 'leve'
+    pressure: 'leve',
+    additionalCategories: ['avc']
   },
 
   {
@@ -231,6 +232,29 @@ export const acupressurePoints: AcupressurePoint[] = [
     pressure: 'muito leve'
   },
 
+  {
+    id: 'du26-renzhong',
+    name: 'Renzhong (VG26) - Centro do Homem',
+    nameEn: 'Renzhong (GV26) - Middle of Person',
+    nameEs: 'Renzhong (VG26) - Centro del Hombre',
+    nameFr: 'Renzhong (VG26) - Centre de l\'Homme',
+    description: 'Ponto de EMERGÊNCIA para perda de consciência, desmaios e epilepsia. Essencial na recuperação pós-AVC para restaurar a consciência e clareza mental. Localizado no sulco abaixo do nariz, no terço superior.',
+    descriptionEn: 'EMERGENCY point for loss of consciousness, fainting and epilepsy. Essential in post-stroke recovery to restore consciousness and mental clarity. Located in the philtrum below the nose, in the upper third.',
+    descriptionEs: 'Punto de EMERGENCIA para pérdida de conciencia, desmayos y epilepsia. Esencial en recuperación post-ACV para restaurar conciencia y claridad mental. Ubicado en el surco debajo de la nariz, en el tercio superior.',
+    descriptionFr: 'Point d\'URGENCE pour perte de conscience, évanouissements et épilepsie. Essentiel dans la récupération post-AVC pour restaurer la conscience et la clarté mentale. Situé dans le sillon sous le nez, dans le tiers supérieur.',
+    position: { x: 50, y: 45 },
+    image: '/du26-renzhong.jpg',
+    imageAlt: 'Localização do ponto Renzhong VG26 abaixo do nariz',
+    benefits: ['Restaura consciência (Desmaio/Coma)', 'Trata Epilepsia e Convulsões', 'Foco e Clareza Mental', 'Recuperação aguda Pós-AVC'],
+    benefitsEn: ['Restores consciousness', 'Treats Epilepsy/Seizures', 'Focus and Mental Clarity', 'Acute Post-Stroke Recovery'],
+    isPremium: true,
+    category: 'neuro',
+    additionalCategories: ['avc', 'cranio', 'general'],
+    instructions: 'Pressionar firmemente com a unha ou ponta do dedo no terço superior do sulco entre o nariz e o lábio superior. Estímulo forte.',
+    duration: 120,
+    pressure: 'firme'
+  },
+
   // ===== PONTOS GRATUITOS - TRIÂNGULO DE BUDA (ANSIEDADE) =====
   {
     id: 'neiguan-pc6',
@@ -341,9 +365,9 @@ export const acupressurePoints: AcupressurePoint[] = [
     descriptionJa: '生命エネルギーを強化し、感染への抵抗力を高め、消化を改善し、回復を加速するポイント。膝蓋骨の下4指、脛骨の外側に位置。3〜5分間押す。',
     descriptionDe: 'Punkt zur Stärkung der Lebensenergie, Erhöhung der Infektionsresistenz, Verbesserung der Verdauung und Beschleunigung der Genesung. 4 Finger unterhalb der Kniescheibe an der Außenseite des Schienbeins. 3-5 Minuten drücken.',
     position: { x: 45, y: 80 },
-    image: '/st 36 Estômago imunidade a.jpg',
+    image: '/st36-zusanli-avc.png',
     imageAlt: 'Localização do ponto Zusanli ST36 abaixo do joelho',
-    benefits: ['Fortalece energia vital', 'Aumenta resistência a infecções', 'Melhora digestão e absorção', 'Acelera recuperação'],
+    benefits: ['Fortalece energia vital', 'Reabilitação Motora (AVC)', 'Aumenta resistência', 'Melhora digestão'],
     benefitsEn: ['Strengthens vital energy', 'Increases infection resistance', 'Improves digestion and absorption', 'Accelerates recovery'],
     benefitsEs: ['Fortalece energía vital', 'Aumenta resistencia a infecciones', 'Mejora digestión y absorción', 'Acelera recuperación'],
     benefitsFr: ['Renforce énergie vitale', 'Augmente résistance infections', 'Améliore digestion et absorption', 'Accélère récupération'],
@@ -352,7 +376,7 @@ export const acupressurePoints: AcupressurePoint[] = [
     benefitsDe: ['Stärkt Lebensenergie', 'Erhöht Infektionsresistenz', 'Verbessert Verdauung und Absorption', 'Beschleunigt Genesung'],
     isPremium: true,
     category: 'septicemia',
-    additionalCategories: ['immunity'],
+    additionalCategories: ['immunity', 'avc'],
     instructions: 'Pressionar 4 dedos abaixo da patela, na lateral externa da tíbia, por 3-5 minutos.',
     duration: 300,
     pressure: 'moderada'
@@ -774,6 +798,164 @@ export const acupressurePoints: AcupressurePoint[] = [
     duration: 300,
     pressure: 'moderada'
   },
+
+  // ===== PONTOS CARDIO =====
+
+  {
+    id: 'ren17-danzhong',
+    name: 'Ren 17 (Danzhong) - Centro do Peito',
+    nameEn: 'Ren 17 (CV17) - Chest Center',
+    nameEs: 'Ren 17 (VC17) - Centro del Pecho',
+    description: 'Ponto Mestre do Qi (Energia) e do Pericárdio. Essencial para abrir o peito, aliviar falta de ar, angústia, ansiedade e palpitações. Localizado no centro do esterno, na linha dos mamilos.',
+    descriptionEn: 'Master Point of Qi (Energy) and Pericardium. Essential to open the chest, relieve shortness of breath, anguish, anxiety and palpitations. Located in the center of the sternum, at the nipple line.',
+    position: { x: 50, y: 55 },
+    image: '/ren17-cardio.png',
+    imageAlt: 'Localização do ponto Ren 17 no centro do peito',
+    benefits: ['Abre o tórax (respiração)', 'Alivia angústia e ansiedade', 'Trata palpitações', 'Regula o Qi do coração'],
+    benefitsEn: ['Opens chest (breathing)', 'Relieves anguish/anxiety', 'Treats palpitations', 'Regulates Heart Qi'],
+    isPremium: true,
+    category: 'cardio',
+    additionalCategories: ['general'],
+    instructions: 'Pressionar suavemente no centro do peito, na linha dos mamilos. Respire profundamente focando no coração.',
+    duration: 180,
+    pressure: 'leve'
+  },
+
+  {
+    id: 'bp6-sanyinjiao',
+    name: 'Sanyinjiao (BP6) - Reunião dos 3 Yin',
+    nameEn: 'Sanyinjiao (SP6) - Three Yin Intersection',
+    nameEs: 'Sanyinjiao (BP6) - Reunión de 3 Yin',
+    description: 'Ponto de cruzamento dos meridianos do Baço, Fígado e Rim. Melhora a circulação sanguínea, reduz a pressão arterial e acalma a mente. Localizado 4 dedos acima do maléolo interno (ossinho do tornozelo).',
+    descriptionEn: 'Crossing point of Spleen, Liver and Kidney meridians. Improves blood circulation, reduces blood pressure and calms the mind. Located 4 fingers above inner malleolus (ankle bone).',
+    position: { x: 45, y: 90 },
+    image: '/bp6-cardio.jpg',
+    imageAlt: 'Localização do ponto BP6 na perna',
+    benefits: ['Melhora circulação sanguínea', 'Regula pressão arterial', 'Acalma a mente', 'Saúde ginecológica/urológica'],
+    benefitsEn: ['Improves blood circulation', 'Regulates blood pressure', 'Calms the mind', 'Gyn/Urological health'],
+    isPremium: false,
+    category: 'cardio',
+    additionalCategories: ['general'],
+    instructions: 'Medir 4 dedos acima do maléolo interno, na borda posterior da tíbia. Pressionar moderadamente.',
+    duration: 180,
+    pressure: 'moderada'
+  },
+
+  {
+    id: 'ynsa-cardio-heart',
+    name: 'YNSA Ypslon - Coração (4)',
+    nameEn: 'YNSA Ypsilon - Heart (4)',
+    description: 'Ponto YNSA representativo do órgão Coração. Trata distúrbios circulatórios, mentais (Shen) e emocionais.',
+    descriptionEn: 'YNSA point representing the Heart organ. Treats circulatory, mental (Shen) and emotional disorders.',
+    position: { x: 52, y: 25 },
+    image: '/ynsa-cardio-map.jpg',
+    imageAlt: 'Localização YNSA Ponto Y - Coração',
+    benefits: ['Circulação Sanguínea', 'Ansiedade e Shen', 'Palpitações', 'Equilíbrio Emocional'],
+    benefitsEn: ['Blood Circulation', 'Anxiety and Shen', 'Palpitations', 'Emotional Balance'],
+    isPremium: true,
+    category: 'cardio',
+    additionalCategories: ['neuro'],
+    instructions: 'Localizar na têmpora ou linha frontal conforme mapa YNSA (Ponto 4).',
+    duration: 180,
+    pressure: 'moderada'
+  },
+
+  {
+    id: 'ynsa-cardio-pericardium',
+    name: 'YNSA Ypslon - Pericárdio (3)',
+    nameEn: 'YNSA Ypsilon - Pericardium (3)',
+    description: 'Ponto YNSA do Pericárdio (Protetor do Coração). Excelente para proteção emocional, circulação e redução de estresse agudo.',
+    descriptionEn: 'YNSA Pericardium point (Heart Protector). Excellent for emotional protection, circulation and acute stress reduction.',
+    position: { x: 51, y: 25 },
+    image: '/ynsa-cardio-map.jpg',
+    imageAlt: 'Localização YNSA Ponto Y - Pericárdio',
+    benefits: ['Proteção Emocional', 'Circulação Periférica', 'Estresse Agudo', 'Opressão Torácica'],
+    benefitsEn: ['Emotional Protection', 'Peripheral Circulation', 'Acute Stress', 'Chest Oppression'],
+    isPremium: true,
+    category: 'cardio',
+    additionalCategories: ['neuro'],
+    instructions: 'Localizar na têmpora ou linha frontal conforme mapa YNSA (Ponto 3).',
+    duration: 180,
+    pressure: 'moderada'
+  },
+
+  // ===== PONTOS ATM ESPECIAIS =====
+
+  {
+    id: 'ynsa-cranial-1',
+    name: 'YNSA Cranial I (Olfatório/Rim)',
+    nameEn: 'YNSA Cranial I (Olfactory/Kidney)',
+    description: 'Ponto cranial 1. Relacionado à vitalidade, medos e sensibilidade. Base do tratamento máster.',
+    descriptionEn: 'Cranial Point 1. Related to vitality, fears and sensitivity. Base of master treatment.',
+    position: { x: 50, y: 19 },
+    image: '/ynsa-atm-points-1-5-10.png',
+    imageAlt: 'YNSA Ponto 1 Craniano',
+    benefits: ['Vitalidade', 'Base do Tratamento', 'Sensibilidade'],
+    benefitsEn: ['Vitality', 'Treatment Base', 'Sensitivity'],
+    isPremium: true,
+    category: 'atm',
+    additionalCategories: ['neuro'],
+    instructions: 'Pressionar no ponto mais superior da linha de nervos cranianos.',
+    duration: 120,
+    pressure: 'moderada'
+  },
+
+  {
+    id: 'ynsa-cranial-5',
+    name: 'YNSA Cranial V (Trigêmeo)',
+    nameEn: 'YNSA Cranial V (Trigeminal)',
+    description: 'Ponto Mestre do Nervo Trigêmeo. Essencial para tratar qualquer dor na face, ATM, dentes e mandíbula.',
+    descriptionEn: 'Master Point of Trigeminal Nerve. Essential for facial pain, TMJ, teeth and jaw.',
+    position: { x: 50, y: 20 },
+    image: '/ynsa-atm-points-1-5-10.png',
+    imageAlt: 'YNSA Ponto 5 Trigêmeo',
+    benefits: ['Dor na ATM', 'Neuralgia do Trigêmeo', 'Dor Facial', 'Bruxismo'],
+    benefitsEn: ['TMJ Pain', 'Trigeminal Neuralgia', 'Facial Pain', 'Bruxism'],
+    isPremium: true,
+    category: 'atm',
+    additionalCategories: ['neuro'],
+    instructions: 'Localizar na linha vertical atrás da linha do cabelo. Ponto crítico para ATM.',
+    duration: 180,
+    pressure: 'moderada'
+  },
+
+  {
+    id: 'ynsa-cranial-10',
+    name: 'YNSA Cranial X (Vago)',
+    nameEn: 'YNSA Cranial X (Vagus)',
+    description: 'Ponto do Nervo Vago. Controla o sistema parassimpático, reduz o estresse da dor crônica e relaxa a musculatura facial.',
+    descriptionEn: 'Vagus Nerve Point. Controls parasympathetic system, reduces chronic pain stress and relaxes facial muscles.',
+    position: { x: 50, y: 22 },
+    image: '/ynsa-atm-points-1-5-10.png',
+    imageAlt: 'YNSA Ponto 10 Vago',
+    benefits: ['Reduz Estresse da Dor', 'Relaxamento Muscular', 'Combate inflamação', 'Equilíbrio Autonômico'],
+    benefitsEn: ['Reduces Pain Stress', 'Muscle Relaxation', 'Fights Inflammation', 'Autonomic Balance'],
+    isPremium: true,
+    category: 'atm',
+    additionalCategories: ['neuro'],
+    instructions: 'Localizado inferiormente na linha de nervos cranianos. Pressão suave e contínua.',
+    duration: 180,
+    pressure: 'leve'
+  },
+
+  {
+    id: 'ynsa-sensorial-boca-a',
+    name: 'YNSA Sensorial - Boca (A)',
+    nameEn: 'YNSA Sensory - Mouth (A)',
+    description: 'Ponto A Sensorial da Boca. Específico para relaxar a zona oral, língua e mandíbula. Atua diretamente na representação cortical da boca.',
+    descriptionEn: 'Sensory Mouth Point A. Specific for relaxing oral zone, tongue and jaw. Acts directly on cortical representation of the mouth.',
+    position: { x: 55, y: 15 },
+    image: '/ynsa-atm-boca.jpg',
+    imageAlt: 'YNSA Ponto A Sensorial Boca',
+    benefits: ['Relaxamento da Mandíbula', 'Bruxismo', 'Tensão Oral', 'Abertura Bucal'],
+    benefitsEn: ['Jaw Relaxation', 'Bruxism', 'Oral Tension', 'Mouth Opening'],
+    isPremium: true,
+    category: 'atm',
+    additionalCategories: ['neuro'],
+    instructions: 'Localizar na região frontal, área da Boca (ver imagem). Massagem circular.',
+    duration: 180,
+    pressure: 'moderada'
+  },
   {
     id: 'ynsa-ponto-g',
     name: 'YNSA Ponto G (Joelho)',
@@ -944,74 +1126,10 @@ export const acupressurePoints: AcupressurePoint[] = [
     duration: 180,
     pressure: 'moderada'
   },
-  {
-    id: 'ynsa-cranial-1',
-    name: 'YNSA Nervo 1 (Olfatório/Rim)',
-    nameEn: 'YNSA Nerve 1 (Olfactory/Kidney)',
-    description: 'Ponto inicial da linha cranial. Relacionado ao Olfato (Sensorial) e ao Rim (Zang-Fu). Fundamental para a base energética e equilíbrio.',
-    descriptionEn: 'Starting point of the cranial line. Related to Olfactory (Sensory) and Kidney (Zang-Fu). Fundamental for energy base and balance.',
-    position: { x: 50, y: 18.5 },
-    image: '/YNSA/ynsa-cranial-organs-map.jpg',
-    imageAlt: 'Localização YNSA Nervo 1 (Rim/Olfatório)',
-    benefits: ['Equilíbrio Energético', 'Melhora Olfato', 'Vitalidade Renal', 'Conexão Base'],
-    benefitsEn: ['Energy Balance', 'Smell Improvement', 'Renal Vitality', 'Base Connection'],
-    isPremium: true,
-    category: 'neuro',
-    instructions: 'Localizar no topo da linha vertical (atrás do Ponto A).',
-    duration: 180,
-    pressure: 'moderada'
-  },
-  {
-    id: 'ynsa-cranial-5',
-    name: 'YNSA Nervo 5 (Trigêmeo/Estômago)',
-    nameEn: 'YNSA Nerve 5 (Trigeminal/Stomach)',
-    description: 'Ponto crucial para ATM e Nevralgia do Trigêmeo. Relacionado ao Nervo V e ao Estômago.',
-    descriptionEn: 'Crucial point for TMJ and Trigeminal Neuralgia. Related to Nerve V and Stomach.',
-    position: { x: 50, y: 20 },
-    image: '/YNSA/ynsa-cranial-organs-map.jpg',
-    imageAlt: 'Localização YNSA Nervo 5 (Trigêmeo/Estômago)',
-    benefits: ['Nevralgia do Trigêmeo', 'Dor na ATM', 'Harmoniza Estômago', 'Relaxamento Facial'],
-    benefitsEn: ['Trigeminal Neuralgia', 'TMJ Pain', 'Stomach Harmonization', 'Facial Relaxation'],
-    isPremium: true,
-    category: 'neuro',
-    instructions: 'Localizar no centro da linha vertical cranial.',
-    duration: 300,
-    pressure: 'moderada'
-  },
-  {
-    id: 'ynsa-cranial-10',
-    name: 'YNSA Nervo 10 (Vago/Fígado)',
-    nameEn: 'YNSA Nerve 10 (Vagus/Liver)',
-    description: 'Ponto mestre do Sistema Nervoso Parassimpático. Relacionado ao Nervo Vago e ao Fígado. Desinflama e acalma.',
-    descriptionEn: 'Master point of Parasympathetic Nervous System. Related to Vagus Nerve and Liver. Reduces inflammation and calms.',
-    position: { x: 50, y: 22 },
-    image: '/YNSA/ynsa-cranial-organs-map.jpg',
-    imageAlt: 'Localização YNSA Nervo 10 (Vago/Fígado)',
-    benefits: ['Regula Sistema Parassimpático', 'Ansiedade e Stress', 'Desinflamação', 'Saúde Hepática'],
-    benefitsEn: ['Regulates Parasympathetic', 'Anxiety and Stress', 'Anti-inflammatory', 'Liver Health'],
-    isPremium: true,
-    category: 'neuro',
-    instructions: 'Localizar na parte inferior da linha vertical cranial.',
-    duration: 300,
-    pressure: 'moderada'
-  },
-  {
-    id: 'ynsa-sensorial-boca-a',
-    name: 'YNSA Boca A (Relaxamento Mandibular)',
-    nameEn: 'YNSA Mouth A (Jaw Relaxation)',
-    description: 'Ponto específico para relaxamento da mandíbula e assoalho bucal. Diferente do ponto sensorial clássico, foca na estrutura motora.',
-    descriptionEn: 'Specific point for jaw and mouth floor relaxation. Focuses on motor structure.',
-    position: { x: 50, y: 27 },
-    image: '/YNSA/ynsa-frontal-sensory.png',
-    imageAlt: 'Localização YNSA Ponto Boca A',
-    benefits: ['Relaxa Mandíbula', 'Trata Bruxismo', 'Solta Musculatura Facial', 'Abertura Bucal'],
-    benefitsEn: ['Relaxes Jaw', 'Treats Bruxism', 'Releases Facial Muscles', 'Mouth Opening'],
-    isPremium: true,
-    category: 'cranio',
-    instructions: 'Localizar na linha média, abaixo da linha sensorial principal.',
-    duration: 180,
-    pressure: 'moderada'
-  },
+
+
+
+
 
   // ===== PONTOS YNSA ZANG FU (ÓRGÃOS) - ESPECIAL PARA SEPTICEMIA =====
   {

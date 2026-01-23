@@ -70,6 +70,27 @@ Como posso ajudá-lo hoje?`,
     setError(null);
 
     try {
+      // Simulação para Localhost (Evita erro 404 da Netlify Function)
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        await new Promise(resolve => setTimeout(resolve, 1500)); // Delay artificial
+
+        const mockResponses = [
+          "No contexto da Medicina Tradicional Chinesa, esse ponto ajuda a equilibrar o Qi.",
+          "Para essa condição, o ponto Yintang é frequentemente recomendado para acalmar a mente.",
+          "A respiração 4-7-8 pode ser uma excelente prática complementar.",
+          "Lembre-se que na MTC, observamos o corpo como um todo integrado."
+        ];
+        const randomResponse = mockResponses[Math.floor(Math.random() * mockResponses.length)];
+
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `[MODO SIMULAÇÃO LOCAL]\n\n${randomResponse}\n\n(A IA real funcionará após o deploy)`,
+          timestamp: new Date()
+        }]);
+        setIsLoading(false);
+        return;
+      }
+
       // Preparar histórico de conversa para a API (formato OpenAI)
       const conversationHistory = messages.map(msg => ({
         role: msg.role,

@@ -432,6 +432,71 @@ A acupressão é uma ferramenta poderosa e acessível para o gerenciamento do es
         contentZh: '# 缓解日常压力的5个指压点\n\n压力是现代生活中不变的现实。幸运的是，中医提供了简单有效的指压技术来对抗它。\n\n## 1. 印堂 (Yintang)\n位于眉间，被称为"第三只眼"。对减轻焦虑非常有效。'
       },
       {
+        id: 'memoria-da-agua-consciencia',
+        title: 'A Memória da Água e o Poder da Intenção',
+        slug: 'memoria-da-agua-consciencia',
+        content: `# A Memória da Água e o Poder da Intenção: Uma Jornada de Evolução
+
+Você sabia que somos compostos por aproximadamente **75% de água**?
+
+Essa substância fundamental não é apenas um veículo para hidratação física, mas um condutor de energia, vibração e, possivelmente, consciência.
+
+## A Ciência por trás do Sal Integral
+
+Muitos bebem "água morta" sem saber. A água filtrada comum, muitas vezes, perde seus minerais essenciais. É aqui que entra a importância do **Sal Integral (ou Sal Rosa do Himalaia)**.
+
+Diferente do sal refinado (que é apenas cloreto de sódio isolado e inflamatório), o sal integral contém mais de **80 minerais** necessários para a condução elétrica no nosso corpo. Uma pitada na água devolve a ela a capacidade de nutrir nossas células eletricamente.
+
+## Dr. Masaru Emoto e os Cristais de Água
+
+O cientista japonês **Dr. Masaru Emoto** revolucionou nossa compreensão sobre a água. Em seus experimentos, ele expôs a água a diferentes palavras, músicas e intenções antes de congelá-la.
+
+O resultado foi chocante:
+- **Água exposta a "Amor e Gratidão":** Formou cristais geométricos perfeitos e belíssimos.
+- **Água exposta a "Ódio e Você me enoja":** Formou estruturas caóticas e desarmônicas.
+
+Se a água reage assim às palavras, imagine o que seus pensamentos fazem com a água dentro do **seu** corpo?
+
+## O Experimento do Arroz
+
+Qualquer um pode fazer este teste em casa. Coloque arroz cozido em dois potes limpos:
+1. No Pote A, diga "Eu te amo, obrigado" todos os dias.
+2. No Pote B, diga "Você é inútil, idiota" todos os dias.
+
+Em poucas semanas, o arroz do Pote A geralmente fermenta com um cheiro agradável, enquanto o do Pote B apodrece e fica preto. É a prova física do poder da nossa energia.
+
+## Bioeletrografia: A Prova dos Fótons
+
+Nós somos seres de luz. Literalmente.
+
+![Bioeletrografia GDV mostrando emissão de energia](/bioelectrografia-gdv.png)
+
+A imagem acima, capturada através de **Bioeletrografia GDV (Gas Discharge Visualization)** de última geração, mostra a emissão de fótons (luz/energia) da ponta de um dedo humano enquanto a pessoa emana boas energias.
+
+Não é misticismo, é física. Nós emitimos um campo bioelétrico que afeta tudo ao nosso redor.
+
+## Evolução: O Nosso Propósito
+
+Estamos aqui na Terra com um "timer". Nossa passagem é temporária. O objetivo de tudo isso? **Evoluir.**
+
+Fazer da nossa relação conosco mesmos e com as pessoas do planeta a melhor possível. Energizar nossa água interna com bons pensamentos, nutrir nosso corpo com água de qualidade e emanar luz para o mundo não é apenas "saudável", é nossa responsabilidade espiritual e biofísica.
+
+Beba água. Emane amor. Evolua.`,
+        excerpt: 'Descubra como a ciência do Dr. Emoto, a bioeletrografia e a hidratação correta provam que somos condutores de energia e que nossa missão é evoluir.',
+        author: 'Alexandre Pinheiro',
+        authorEmail: 'aleksayevacupress@gmail.com',
+        imageUrl: '/bioelectrografia-gdv.png',
+        category: 'saude-mental',
+        tags: ['agua', 'dr-emoto', 'espiritualidade', 'bioeletrografia', 'consciencia'],
+        published: true,
+        publishedAt: new Date().toISOString(),
+        isPremium: false,
+        views: 0,
+        readingTime: 6,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
         id: '2',
         title: 'Respiração 4-7-8: A Técnica Científica para Ansiedade',
         slug: 'respiracao-4-7-8-tecnica-cientifica-ansiedade',

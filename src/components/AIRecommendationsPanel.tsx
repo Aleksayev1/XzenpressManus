@@ -39,7 +39,7 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
   };
 
   const renderMessageContent = (content: string) => {
-    const pointRegex = /\b((?:IG|VB|VC|Ren|Du|P|C|TA|CS|F|R|BP|E|ID|B|YNSA)\s?-?\s?\d{1,2}[a-zA-Z]?|YNSA\s+[a-zA-Z]+)\b/gi;
+    const pointRegex = /\b((?:IG|LI|VB|GB|VC|Ren|CV|Du|GV|P|LU|C|HT|HE|TA|SJ|TB|CS|PC|F|LR|LV|R|KI|BP|SP|E|ST|ID|SI|B|BL|YNSA)\s?-?\s?\d{1,2}[a-zA-Z]?|YNSA\s+[a-zA-Z]+)\b/gi;
     const parts = content.split(pointRegex);
     return parts.map((part, i) => {
       if (part.match(pointRegex)) {

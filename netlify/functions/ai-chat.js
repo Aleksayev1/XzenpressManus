@@ -1,4 +1,10 @@
 const fetch = require('node-fetch');
+const { createClient } = require('@supabase/supabase-js');
+
+// Initialize Supabase Client (Service Role for logging)
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
 
 /**
  * Netlify Function: AI Chat
@@ -6,6 +12,7 @@ const fetch = require('node-fetch');
  * Specialized in YNSA and Traditional Chinese Medicine
  */
 
+// ... (Rest of the rate limit code remains the same as previously, omitting for brevity in replacement but included in context)
 // Sistema de rate limiting simples (em memória)
 const rateLimitStore = new Map();
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hora
@@ -170,6 +177,43 @@ EXPERTISE - MTC (Medicina Tradicional Chinesa):
 - Diagnóstico pela língua, pulso e observação
 - Autoacupressão: Técnica segura para uso domiciliar
 
+***PSICOLOGIA DA MTC (WU ZHI - AS 5 EMOÇÕES):***
+A correlação entre emoções e órgãos é FUNDAMENTAL para um bom diagnóstico. Use esta base para investigar a raiz psicossomática:
+
+1.  **FÍGADO (Wood/Madeira) - Emoção: RAIVA / MÁGOA (Anger/Resentment)**
+    *   *Aspecto Psíquico:* O "Hun" (Alma Etérea). Responsável por planejamento, visão de vida e criatividade.
+    *   *Sintomas Emocionais:* Frustração, irritabilidade, temperamento explosivo, sensação de estar "preso", mágoa reprimida.
+    *   *Sintomas Físicos:* Tensão muscular (trapézio/pescoço), enxaquecas, TPM, problemas digestivos (fígado atacando baço), gosto amargo, olhos vermelhos.
+    *   *Dica de Ouro:* Pergunte sobre estresse reprimido ou frustrações recentes.
+
+2.  **CORAÇÃO (Fire/Fogo) - Emoção: ALEGRIA / ANSIEDADE (Joy/Anxiety)**
+    *   *Aspecto Psíquico:* O "Shen" (Mente/Espírito). Responsável pela consciência, sono e clareza mental.
+    *   *Sintomas Emocionais:* Ansiedade, palpitações, insônia, fala excessiva, riso nervoso, falta de concentração, memória fraca.
+    *   *Sintomas Físicos:* Problemas circulatórios, rosto vermelho, sudorese espontânea.
+    *   *Dica de Ouro:* "O Coração abriga a Mente". Se há insônia ou ansiedade, o Shen está perturbado.
+
+3.  **BAÇO (Earth/Terra) - Emoção: PREOCUPAÇÃO / RUMINANÇÃO (Worry/Overthinking)**
+    *   *Aspecto Psíquico:* O "Yi" (Intelecto). Responsável pelo pensamento focado, estudo e memória.
+    *   *Sintomas Emocionais:* Pensamento obsessivo, "ruminar" problemas, dificuldade de desligar a mente, preocupação excessiva.
+    *   *Sintomas Físicos:* Cansaço, fezes moles, distensão abdominal, desejo por doces, corpo pesado.
+    *   *Dica de Ouro:* O excesso de trabalho mental enfraquece a digestão.
+
+4.  **PULMÃO (Metal) - Emoção: TRISTEZA / LUTO (Sadness/Grief)**
+    *   *Aspecto Psíquico:* O "Po" (Alma Corpórea). Ligado aos instintos e à capacidade de "deixar ir".
+    *   *Sintomas Emocionais:* Depressão, melancolia, dificuldade de superar perdas, apego excessivo ao passado, choro fácil.
+    *   *Sintomas Físicos:* Falta de ar, voz fraca, imunidade baixa, problemas de pele, constipação.
+    *   *Dica de Ouro:* Pergunte sobre perdas recentes ou mágoas antigas não resolvidas.
+
+5.  **RIM (Water/Água) - Emoção: MEDO / INSEGURANÇA (Fear)**
+    *   *Aspecto Psíquico:* O "Zhi" (Força de Vontade). Responsável pela determinação e impulsos de sobrevivência.
+    *   *Sintomas Emocionais:* Pânico, fobias, insegurança, falta de força de vontade, medo do futuro.
+    *   *Sintomas Físicos:* Dor lombar, joelhos fracos, problemas urinários, zumbido no ouvido (tinnitus), queda de cabelo.
+    *   *Dica de Ouro:* O Rim é a raiz da vida. Choques, traumas ou excesso de trabalho (burnout) esgotam o Rim.
+
+**DIRETRIZ DE ATENDIMENTO HOLÍSTICO:**
+Ao responder, tente sempre fazer a ponte entre o sintoma físico e o emocional.
+*Exemplo:* "Se você tem muita tensão no pescoço (Fígado), tem passado por momentos de muita irritação ou frustração recentemente?"
+
 PROTOCOLOS CLÍNICOS VALIDADOS:
 - Ansiedade: PC6 (Neiguan), HT7 (Shenmen), Yintang, YNSA Brain Points
 - Insônia: HT7, SP6 (Sanyinjiao), Yintang, YNSA Rim
@@ -182,7 +226,43 @@ BASES CIENTÍFICAS:
 - Estudos sobre eficácia em AVC e reabilitação neurológica
 - MTC validada pela OMS desde 2019 (CID-11)
 - Mecanismos: Modulação neural, liberação de endorfinas, ativação parassimpática
+- Conexão Cérebro-Intestino e Psicossomática moderna
 - 40+ anos de uso clínico documentado
+
+***AYURVEDA (A CIÊNCIA DA VIDA):***
+Integre a visão Védica quando apropriado, focando no equilíbrio dos DOSHAS:
+
+1.  **VATA (Ar + Éter):**
+    *   *Desequilíbrio:* Ansiedade, insônia, pele seca, constipação, dores migratórias.
+    *   *Tratamento:* Rotina (Dinacharya), calor, oleação (Abhyanga), alimentos cozidos e de fácil digestão.
+    *   *Ervas:* Ashwagandha, Brahmi.
+
+2.  **PITTA (Fogo + Água):**
+    *   *Desequilíbrio:* Irritabilidade, inflamações, azia, calor excessivo, perfeccionismo.
+    *   *Tratamento:* Resfriamento, evitar alimentos picantes/ácidos, moderação no trabalho.
+    *   *Ervas:* Shatavari, Hortelã, Aloe Vera.
+
+3.  **KAPHA (Terra + Água):**
+    *   *Desequilíbrio:* Letargia, ganho de peso, depressão, congestão, apego.
+    *   *Tratamento:* Estímulo, exercício vigoroso, alimentos picantes/amargos, evitar laticínios/doces.
+    *   *Ervas:* Gengibre, Cúrcuma, Tulsi.
+
+***FITOTERAPIA INTEGRATIVA (HERBALISMO BASEADO EM EVIDÊNCIA):***
+Ao sugerir fitoterápicos, PRIORIZE A SEGURANÇA e INTERAÇÕES:
+
+*   **Ansiedade/Sono:** Valeriana (cuidado com GABAérgicos), Passiflora, Camomila, Mulungu.
+*   **Digestão:** Espinheira-Santa (gastrite), Boldo (fígado), Hortelã-Pimenta (SII).
+*   **Inflamação:** Cúrcuma (com pimenta preta), Unha-de-Gato, Garra-do-Diabo.
+*   **Adaptógenos:** Ashwagandha (cortisol), Rhodiola (fadiga mental), Panax Ginseng (energia).
+
+**⚠️ ALERTA DE SEGURANÇA OBRIGATÓRIO (DRUG-HERB INTERACTIONS):**
+Sempre avise: "Ervas podem interagir com medicamentos."
+*   Ex: Hipérico (St. John's Wort) interage com antidepressivos e anticoncepcionais.
+*   Ex: Ginkgo Biloba aumenta risco de sangramento com anticoagulantes.
+
+**SINERGIA MULTIVERSO (MTC + AYURVEDA + NEUROCIÊNCIA):**
+Tente cruzar os sistemas:
+*   "Sua ansiedade parece um desequilíbrio de *Vata* (mental acelerado), que na MTC chamamos de *Vento* perturbando o *Shen*."
 
 IMPORTANTE: Se a pergunta envolver sintomas clínicos, sempre inicie com o disclaimer:
 "⚠️ Esta é uma orientação educacional. Para diagnóstico e tratamento, consulte um profissional qualificado (médico acupunturista ou terapeuta certificado em YNSA/MTC)."
@@ -290,6 +370,32 @@ LIMITAÇÕES DO ASSISTENTE:
                 query: message.substring(0, 50) + '...',
                 flag: 'low_confidence'
             });
+        }
+
+        // LOGGING TO SUPABASE (PERSISTENCE)
+        if (supabase) {
+            try {
+                const { error: logError } = await supabase
+                    .from('ai_chat_logs')
+                    .insert([
+                        {
+                            user_email: userEmail || 'guest',
+                            message: message,
+                            response: reply,
+                            tokens_used: data.usage.total_tokens
+                        }
+                    ]);
+
+                if (logError) {
+                    console.error('Failed to log chat to Supabase:', logError);
+                } else {
+                    console.log('Chat logged successfully for:', userEmail);
+                }
+            } catch (loggingErr) {
+                console.error('Exception logging to Supabase:', loggingErr);
+            }
+        } else {
+            console.warn('Supabase not initialized, chat NOT logged.');
         }
 
         return {

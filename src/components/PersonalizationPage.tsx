@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Target, Clock, Brain, Heart, Zap, Save, RefreshCw, Palette, Volume2, Bell } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { PreferencesService } from '../services/preferencesService';
 
 interface PersonalizationPageProps {
   onPageChange: (page: string) => void;
@@ -220,20 +221,28 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
     }));
   };
 
+
+
+  // ... (inside component)
+
   const savePreferences = async () => {
+    if (!user) return;
+
     setIsSaving(true);
     setSaveStatus('idle');
 
     try {
-      // Simular salvamento
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const success = await PreferencesService.saveUserPreferences(user.id, preferences);
 
-      // Salvar no localStorage para demonstração
-      localStorage.setItem('userPreferences', JSON.stringify(preferences));
+      if (success) {
+        setSaveStatus('success');
+      } else {
+        throw new Error('Failed to save to Supabase');
+      }
 
-      setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
+      console.error('Save error:', error);
       setSaveStatus('error');
     } finally {
       setIsSaving(false);
@@ -257,16 +266,15 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
   };
 
   useEffect(() => {
-    // Carregar preferências salvas
-    const saved = localStorage.getItem('userPreferences');
-    if (saved) {
-      try {
-        setPreferences(JSON.parse(saved));
-      } catch (error) {
-        console.error('Erro ao carregar preferências:', error);
+    const loadPreferences = async () => {
+      if (!user) return;
+      const saved = await PreferencesService.getUserPreferences(user.id);
+      if (saved) {
+        setPreferences(saved);
       }
-    }
-  }, []);
+    };
+    loadPreferences();
+  }, [user]);
 
   if (!user) {
     return (

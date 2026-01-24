@@ -10,7 +10,7 @@ interface Supplement {
     id?: string;
     name: string;
     dosage: string;
-    timing: 'morning' | 'with-meal' | 'night' | 'anytime';
+    timing: 'morning' | 'afternoon' | 'evening' | 'night' | 'with-meal' | 'empty-stomach' | 'anytime';
     notes?: string;
 }
 
@@ -132,6 +132,8 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
 
     // Novo Estado para Segurança
     const [showSafetyModal, setShowSafetyModal] = useState(false);
+    // Pending supplement for override scenario
+    const [pendingSupplement, setPendingSupplement] = useState<{ name: string, dosage: string, notes: string } | null>(null);
 
     // Estado para Alerta Crítico (Popup)
     const [criticalAlert, setCriticalAlert] = useState<{
@@ -162,6 +164,25 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         } else {
             alert('Seu navegador não suporta notificações.');
         }
+    };
+
+    // Função de Teste de Notificação
+    const testNotification = async () => {
+        if (!notificationsEnabled) {
+            const granted = await Notification.requestPermission();
+            if (granted !== 'granted') {
+                alert('⚠️ Permissão de notificação negada. Verifique as configurações do seu navegador.');
+                return;
+            }
+        }
+
+        const { NutrimingNotificationService } = await import('../services/nutrimingNotificationService');
+        await NutrimingNotificationService.showNotification(
+            '🔔 Teste do Nutriming',
+            'Se você está vendo isso, as notificações estão funcionando perfeitamente!',
+            '/robo-zen-meditando.png'
+        );
+        alert('Notificação de teste enviada! Verifique sua área de notificações (ou Central de Ações no Windows).');
     };
 
     // Agendar notificações usando o serviço
@@ -271,7 +292,7 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
             // Carregar suplementos do Supabase
             const { NutrimingStorageService } = await import('../services/nutrimingStorageService');
             const savedSupplements = await NutrimingStorageService.loadSupplements(user.id);
-            const savedProfile = NutrimingStorageService.loadProfile(user.id);
+            const savedProfile = await NutrimingStorageService.loadProfile(user.id); // Agora é async
 
             setSupplements(savedSupplements);
             // Garantir que profile tenha todos os campos
@@ -294,8 +315,8 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         // Salvar no Supabase (permanente)
         await NutrimingStorageService.saveSupplements(user.id, sups);
 
-        // Salvar perfil no localStorage (não crítico)
-        NutrimingStorageService.saveProfile(user.id, profile);
+        // Salvar perfil no Supabase (Agora com tabela dedicada)
+        await NutrimingStorageService.saveProfile(user.id, profile);
     };
 
     // Função auxiliar para matching inteligente
@@ -326,6 +347,30 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         return 'morning';
     };
 
+    const finalizeAddSupplement = (supData: { name: string, dosage: string, notes: string }) => {
+        const timing = findOptimalTiming(supData.name);
+        const supplement: Supplement = {
+            id: Date.now().toString(),
+            name: supData.name,
+            dosage: supData.dosage || '1x ao dia',
+            timing,
+            notes: supData.notes || ''
+        };
+
+        const updated = [...supplements, supplement];
+        setSupplements(updated);
+        saveData(updated, userProfile);
+        setNewSupplement({ name: '', dosage: '', notes: '' });
+        setShowAddForm(false);
+        setPendingSupplement(null);
+    };
+
+    const handleForceAdd = () => {
+        if (pendingSupplement) {
+            finalizeAddSupplement(pendingSupplement);
+        }
+    };
+
     const addSupplement = () => {
         if (!newSupplement.name) return;
 
@@ -334,6 +379,7 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         const doseValue = parseFloat((newSupplement.dosage || '').replace(/[^0-9.]/g, ''));
 
         if (limit && doseValue > limit.maxDaily) {
+            setPendingSupplement(newSupplement); // Store for potential override
             setCriticalAlert({
                 isOpen: true,
                 type: 'dosage',
@@ -341,7 +387,7 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                 message: `A dose de ${newSupplement.dosage} excede o limite seguro de ${limit.maxDaily}${limit.unit}.`,
                 details: limit.warning
             });
-            return; // Bloqueia adição
+            return; // Bloqueia adição direta, mas permite override via modal
         }
 
         // 2. Verificação de Interação Crítica
@@ -350,6 +396,7 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         const criticalInteraction = potentialInteractions.find(i => i.severity === 'high');
 
         if (criticalInteraction) {
+            setPendingSupplement(newSupplement); // Store for potential override
             setCriticalAlert({
                 isOpen: true,
                 type: 'interaction',
@@ -357,23 +404,11 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                 message: criticalInteraction.description,
                 details: criticalInteraction.source
             });
-            return; // Bloqueia adição
+            return; // Bloqueia adição direta, mas permite override
         }
 
-        const timing = findOptimalTiming(newSupplement.name);
-        const supplement: Supplement = {
-            id: Date.now().toString(),
-            name: newSupplement.name,
-            dosage: newSupplement.dosage || '1x ao dia',
-            timing,
-            notes: newSupplement.notes || ''
-        };
-
-        const updated = [...supplements, supplement];
-        setSupplements(updated);
-        saveData(updated, userProfile);
-        setNewSupplement({ name: '', dosage: '', notes: '' });
-        setShowAddForm(false);
+        // Se passar nas verificações, adiciona direto
+        finalizeAddSupplement(newSupplement);
     };
 
     const removeSupplement = (id?: string) => {
@@ -426,9 +461,12 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
     const groupByTiming = () => {
         const groups = {
             morning: supplements.filter(s => s.timing === 'morning'),
+            afternoon: supplements.filter(s => s.timing === 'afternoon'), // Added
+            evening: supplements.filter(s => s.timing === 'evening' || s.timing === 'night'), // Handle legacy 'night'
             'with-meal': supplements.filter(s => s.timing === 'with-meal'),
-            night: supplements.filter(s => s.timing === 'night'),
-            anytime: supplements.filter(s => s.timing === 'anytime'),
+            'empty-stomach': supplements.filter(s => s.timing === 'empty-stomach'), // Added
+            // Catch-all for any legacy/undefined timings to avoid hidden items
+            others: supplements.filter(s => !['morning', 'afternoon', 'evening', 'night', 'with-meal', 'empty-stomach'].includes(s.timing))
         };
         return groups;
     };
@@ -443,6 +481,7 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         evening: { icon: Moon, label: 'Noite (18h-22h)', color: 'text-indigo-600' },
         'with-meal': { icon: Clock, label: 'Com refeição', color: 'text-green-600' },
         'empty-stomach': { icon: Clock, label: 'Estômago vazio', color: 'text-purple-600' },
+        others: { icon: Info, label: 'Outros Horários', color: 'text-gray-600' },
     };
 
     return (
@@ -451,7 +490,11 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
 
             <CriticalSafetyModal
                 isOpen={criticalAlert.isOpen}
-                onClose={() => setCriticalAlert(prev => ({ ...prev, isOpen: false }))}
+                onClose={() => {
+                    setCriticalAlert(prev => ({ ...prev, isOpen: false }));
+                    setPendingSupplement(null);
+                }}
+                onConfirm={handleForceAdd}
                 alertType={criticalAlert.type}
                 title={criticalAlert.title}
                 message={criticalAlert.message}
@@ -595,6 +638,8 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                                         </div>
                                     </div>
                                 </div>
+
+
                             )}
 
                             <div>
@@ -612,6 +657,20 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                                         </label>
                                     ))}
                                 </div>
+                            </div>
+
+                            {/* Botão de Teste de Notificação (Posicionamento Correto) */}
+                            <div className="mt-6 border-t pt-4">
+                                <button
+                                    onClick={testNotification}
+                                    className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl text-sm transition-colors border border-gray-200"
+                                >
+                                    <span className="text-xl">🔔</span>
+                                    <span className="font-medium">Testar Notificação</span>
+                                </button>
+                                <p className="text-xs text-gray-500 mt-2 text-center">
+                                    Receber um aviso de teste agora
+                                </p>
                             </div>
                         </div>
 
@@ -963,6 +1022,6 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };

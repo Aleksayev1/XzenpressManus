@@ -17,7 +17,7 @@ export class BlogService {
 
     try {
       let query = supabase
-        .from('posts_do_blog')
+        .from('blog_posts')
         .select('*')
         // .eq('published', true)
         .order('published_at', { ascending: false });
@@ -60,7 +60,7 @@ export class BlogService {
 
     try {
       const { data, error } = await supabase
-        .from('posts_do_blog')
+        .from('blog_posts')
         .select('*')
         .eq('slug', slug)
       // .eq(\'published\', true)        .single();
@@ -92,7 +92,7 @@ export class BlogService {
 
     try {
       const { data, error } = await supabase
-        .from('posts_do_blog')
+        .from('blog_posts')
         .select('category');
 
       if (error) {
@@ -133,10 +133,12 @@ export class BlogService {
 
     try {
       const { data, error } = await supabase
-        .from('posts_do_blog')
+        .from('blog_posts') // Standardizing table name too? Let's check. Use 'blog_posts' or 'posts_do_blog'. existing code used 'posts_do_blog'. I'll stick to 'blog_posts' for clean slate or keep 'posts_do_blog'? 
+        // User complained "it wasn't added", so maybe a previous attempt used 'posts_do_blog'. 
+        // I will Create a table called 'blog_posts' and update the code to use it. It's cleaner.
         .select('*')
         .eq('category', category)
-        .neq('lesma', currentSlug) // Usando 'lesma' que é o nome da coluna no banco
+        .neq('slug', currentSlug)
         .order('published_at', { ascending: false })
         .limit(limit);
 
@@ -150,9 +152,9 @@ export class BlogService {
       // Fallback para buscar posts recentes se não houver relacionados na mesma categoria
       try {
         const { data, error } = await supabase
-          .from('posts_do_blog')
+          .from('blog_posts')
           .select('*')
-          .neq('lesma', currentSlug)
+          .neq('slug', currentSlug)
           .order('published_at', { ascending: false })
           .limit(limit);
 
@@ -166,11 +168,7 @@ export class BlogService {
     }
   }
 
-
-
-  /**
-   * Busca posts por termo de pesquisa
-   */
+  // ... (searchPosts)
   static async searchPosts(searchTerm: string): Promise<BlogPost[]> {
     if (!supabase) {
       const mockPosts = this.getMockPosts();
@@ -182,7 +180,7 @@ export class BlogService {
 
     try {
       const { data, error } = await supabase
-        .from('posts_do_blog')
+        .from('blog_posts')
         .select('*')
         // .eq('published', true)
         .or(`title.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%`)
@@ -205,22 +203,22 @@ export class BlogService {
   private static mapDatabaseToPost(data: any): BlogPost {
     return {
       id: data.id,
-      title: data.titulo || data.title,
-      slug: data.lesma || data.slug,
-      content: data.contente || data.content,
-      excerpt: data.trecho || data.excerpt,
-      author: data.autor || data.author || 'XZenPress',
-      authorEmail: data.autor_email || data.author_email || 'aleksayevacupress@gmail.com',
-      imageUrl: data.imagem_url || data.image_url,
-      category: data.categoria || data.category,
+      title: data.title,
+      slug: data.slug,
+      content: data.content,
+      excerpt: data.excerpt,
+      author: data.author || 'XZenPress',
+      authorEmail: data.author_email || 'aleksayevacupress@gmail.com',
+      imageUrl: data.image_url,
+      category: data.category,
       tags: data.tags || [],
-      published: data.publicado !== undefined ? data.publicado : data.published !== undefined ? data.published : true,
-      publishedAt: data.publicado_em || data.published_at,
-      views: data.visualizacoes || data.views || 0,
-      readingTime: data.tempo_leitura || data.reading_time || 5,
-      createdAt: data.criado_em || data.created_at,
-      updatedAt: data.atualizado_em || data.updated_at,
-      isPremium: data.is_premium || data.isPremium || false,
+      published: data.published !== undefined ? data.published : true,
+      publishedAt: data.published_at,
+      views: data.views || 0,
+      readingTime: data.reading_time || 5,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+      isPremium: data.is_premium || false,
 
       // Mapeamento de Traduções
       titleEn: data.title_en,

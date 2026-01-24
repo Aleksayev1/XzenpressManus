@@ -124,30 +124,35 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
         </div>
 
         {/* Google Login Button */}
-        <button
-          onClick={async () => {
-            try {
-              setError('');
-              await signInWithGoogle();
-            } catch (err: any) {
-              setError(err.message || 'Erro ao fazer login com Google');
-            }
-          }}
-          disabled={isLoading}
-          className="w-full mb-6 flex items-center justify-center space-x-3 bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-xl transition-all hover:shadow-md disabled:opacity-50"
-        >
-          <GoogleIcon />
-          <span>Continuar com Google</span>
-        </button>
+        {/* Google Login Button - Hidden on Amazon builds */}
+        {!import.meta.env.VITE_HIDE_GOOGLE_LOGIN && (
+          <button
+            onClick={async () => {
+              try {
+                setError('');
+                await signInWithGoogle();
+              } catch (err: any) {
+                setError(err.message || 'Erro ao fazer login com Google');
+              }
+            }}
+            disabled={isLoading}
+            className="w-full mb-6 flex items-center justify-center space-x-3 bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-xl transition-all hover:shadow-md disabled:opacity-50"
+          >
+            <GoogleIcon />
+            <span>Continuar com Google</span>
+          </button>
+        )}
 
-        <div className="relative mb-8">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200"></div>
+        {!import.meta.env.VITE_HIDE_GOOGLE_LOGIN && (
+          <div className="relative mb-8">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Ou entre com</span>
+            </div>
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Ou entre com</span>
-          </div>
-        </div>
+        )}
 
         {/* Tabs for Login Methods */}
         <div className="flex justify-center space-x-4 mb-6">

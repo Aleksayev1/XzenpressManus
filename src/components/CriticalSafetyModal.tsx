@@ -4,6 +4,7 @@ import { AlertOctagon, XCircle, AlertTriangle } from 'lucide-react';
 interface CriticalSafetyModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onConfirm?: () => void; // New prop for override
     alertType: 'dosage' | 'interaction';
     title: string;
     message: string;
@@ -13,6 +14,7 @@ interface CriticalSafetyModalProps {
 export const CriticalSafetyModal: React.FC<CriticalSafetyModalProps> = ({
     isOpen,
     onClose,
+    onConfirm,
     alertType,
     title,
     message,
@@ -87,7 +89,7 @@ export const CriticalSafetyModal: React.FC<CriticalSafetyModalProps> = ({
                     </div>
 
                     <p className="text-sm text-gray-500">
-                        O Nutriming bloqueou esta ação para sua segurança baseada nas diretrizes da ANVISA/FDA.
+                        O Nutriming detectou um risco potencial. Prossiga apenas com orientação médica.
                     </p>
                 </div>
 
@@ -95,16 +97,29 @@ export const CriticalSafetyModal: React.FC<CriticalSafetyModalProps> = ({
                 <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-center space-x-4">
                     <button
                         onClick={onClose}
-                        className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-bold transition-colors"
+                        className="flex-1 px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-bold transition-colors"
                     >
                         Cancelar
                     </button>
-                    <button
-                        onClick={onClose}
-                        className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-200 transition-all transform hover:scale-105"
-                    >
-                        Entendi o Risco
-                    </button>
+
+                    {onConfirm ? (
+                        <button
+                            onClick={() => {
+                                onConfirm();
+                                onClose();
+                            }}
+                            className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-200 transition-all transform hover:scale-105"
+                        >
+                            Adicionar Mesmo Assim
+                        </button>
+                    ) : (
+                        <button
+                            onClick={onClose}
+                            className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-200 transition-all transform hover:scale-105"
+                        >
+                            Entendi o Risco
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

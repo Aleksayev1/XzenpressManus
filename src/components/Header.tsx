@@ -38,6 +38,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
     { id: 'sounds' },
     { id: 'progress' },
     { id: 'personalization' },
+    { id: 'premium' },
   ];
 
   const allNavItems = user?.isPremium
@@ -159,10 +160,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
                     <User className="w-4 h-4 text-gray-600" />
                     <span className="text-sm text-gray-700">{user.name}</span>
                     {user.isPremium && (
-                      <div className="flex items-center">
+                      <button
+                        onClick={() => onPageChange('premium')}
+                        className="flex items-center hover:opacity-80 transition-opacity cursor-pointer"
+                        title="Acessar Menu Premium"
+                      >
                         <Crown className="w-4 h-4 text-yellow-500" />
                         <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full ml-1">PREMIUM</span>
-                      </div>
+                      </button>
                     )}
                   </div>
 

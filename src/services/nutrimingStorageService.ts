@@ -26,6 +26,9 @@ export const NutrimingStorageService = {
      */
     async saveSupplements(userId: string, supplements: Supplement[]): Promise<boolean> {
         try {
+            // Backup local sempre (redundância)
+            localStorage.setItem(`nutriming_supplements_${userId}`, JSON.stringify(supplements));
+
             // 1. Deletar suplementos antigos do usuário
             const { error: deleteError } = await supabase
                 .from('nutriming_supplements')
@@ -33,7 +36,7 @@ export const NutrimingStorageService = {
                 .eq('user_id', userId);
 
             if (deleteError) {
-                console.error('Erro ao deletar suplementos antigos:', deleteError);
+                console.error('Erro ao deletar suplementos antigos (DB), salvo localmente:', deleteError);
                 return false;
             }
 
@@ -52,7 +55,7 @@ export const NutrimingStorageService = {
                     .insert(supplementsToInsert);
 
                 if (insertError) {
-                    console.error('Erro ao inserir suplementos:', insertError);
+                    console.error('Erro ao inserir suplementos (DB), salvo localmente:', insertError);
                     return false;
                 }
             }
@@ -61,6 +64,7 @@ export const NutrimingStorageService = {
             return true;
         } catch (error) {
             console.error('❌ Erro ao salvar suplementos:', error);
+            // Backup já foi feito no início do try
             return false;
         }
     },
@@ -76,29 +80,33 @@ export const NutrimingStorageService = {
                 .eq('user_id', userId)
                 .order('created_at', { ascending: true });
 
-            if (error) {
-                console.error('Erro ao carregar suplementos:', error);
-                return [];
+            if (data && !error && data.length > 0) {
+                const supplements: Supplement[] = data.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    dosage: item.dosage,
+                    timing: item.timing as Supplement['timing'],
+                    notes: item.notes || undefined
+                }));
+
+                // Atualizar cache local
+                localStorage.setItem(`nutriming_supplements_${userId}`, JSON.stringify(supplements));
+                console.log('✅ Suplementos carregados do Supabase:', supplements.length);
+                return supplements;
             }
 
-            if (!data || data.length === 0) {
-                console.log('ℹ️ Nenhum suplemento encontrado para este usuário');
-                return [];
+            // Fallback: Se der erro ou vazio, tenta local
+            console.log('ℹ️ Buscando suplementos no cache local...');
+            const localData = localStorage.getItem(`nutriming_supplements_${userId}`);
+            if (localData) {
+                return JSON.parse(localData);
             }
 
-            const supplements: Supplement[] = data.map(item => ({
-                id: item.id,
-                name: item.name,
-                dosage: item.dosage,
-                timing: item.timing as Supplement['timing'],
-                notes: item.notes || undefined
-            }));
-
-            console.log('✅ Suplementos carregados do Supabase:', supplements.length);
-            return supplements;
-        } catch (error) {
-            console.error('❌ Erro ao carregar suplementos:', error);
             return [];
+        } catch (error) {
+            console.error('❌ Erro ao carregar suplementos, tentando local:', error);
+            const localData = localStorage.getItem(`nutriming_supplements_${userId}`);
+            return localData ? JSON.parse(localData) : [];
         }
     },
 

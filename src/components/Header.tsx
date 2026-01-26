@@ -38,7 +38,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
     { id: 'sounds' },
     { id: 'progress' },
     { id: 'personalization' },
-    { id: 'premium' },
   ];
 
   const allNavItems = user?.isPremium
@@ -78,8 +77,8 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
       {/* Main Header */}
       <header className="bg-white shadow-lg sticky top-[55px] z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
+          <div className="flex justify-between items-center h-16 gap-4">
+            <div className="flex items-center flex-shrink-0">
               <button
                 onClick={() => handlePageChange('home')}
                 className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
@@ -99,19 +98,19 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
                 <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full items-center justify-center hidden">
                   <span className="text-white font-bold text-lg">X</span>
                 </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hidden xl:block">
                   XZenPress
                 </h1>
               </button>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
+            {/* Desktop Navigation - Condensed */}
+            <nav className="hidden md:flex space-x-1 items-center overflow-x-auto no-scrollbar">
               {displayNavItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handlePageChange(item.id)}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${currentPage === item.id
+                  className={`px-2 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 whitespace-nowrap ${currentPage === item.id
                     ? 'text-blue-600 bg-blue-50'
                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                     }`}

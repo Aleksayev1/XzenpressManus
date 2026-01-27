@@ -240,6 +240,12 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
                       <div className="flex items-center px-3 mb-4">
                         <User className="w-5 h-5 text-gray-600 mr-2" />
                         <span className="text-gray-700 font-medium">{user.name}</span>
+                        {user.isPremium && (
+                          <Crown className="w-4 h-4 text-yellow-500 ml-2" />
+                        )}
+                        {user.isAdmin && (
+                          <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full ml-2">ADMIN</span>
+                        )}
                       </div>
 
                       <button
@@ -270,19 +276,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
                           </div>
                         </button>
                       )}
-
-                      {/* WhatsApp Button removed */}
-
-                      <div className="flex items-center space-x-2 mb-2">
-                        <User className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm text-gray-700">{user.name}</span>
-                        {user.isPremium && (
-                          <Crown className="w-4 h-4 text-yellow-500" />
-                        )}
-                        {user.isAdmin && (
-                          <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full ml-2">ADMIN</span>
-                        )}
-                      </div>
 
                       {/* Data Deletion Link - Mobile */}
                       <button

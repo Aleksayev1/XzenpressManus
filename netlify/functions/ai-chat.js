@@ -16,7 +16,7 @@ const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supaba
 // Sistema de rate limiting simples (em memória)
 const rateLimitStore = new Map();
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hora
-const MAX_REQUESTS_PER_HOUR = 20;
+const MAX_REQUESTS_PER_HOUR = 100; // Aumentado de 20 para 100 para permitir melhor uso em produção e testes
 
 function checkRateLimit(userEmail) {
     const now = Date.now();
@@ -226,27 +226,37 @@ Traga a dimensão espiritual estruturada e o sentido do esforço.
             const errorData = await response.json();
             console.error('OpenAI API Error:', errorData);
 
-            // Tratamento de erros específicos
+            // Tratamento de erros específicos da OpenAI
             if (response.status === 401) {
                 return {
                     statusCode: 500,
                     headers,
-                    body: JSON.stringify({ error: 'Erro de autenticação com serviço de IA' })
+                    body: JSON.stringify({ error: 'Erro de autenticação com a OpenAI. Verifique sua API Key.' })
                 };
             }
 
             if (response.status === 429) {
+                // Verificar se é cota insuficiente
+                const isQuotaError = errorData.error && errorData.error.code === 'insufficient_quota';
+
                 return {
                     statusCode: 429,
                     headers,
-                    body: JSON.stringify({ error: 'Serviço temporariamente sobrecarregado. Tente novamente em alguns segundos.' })
+                    body: JSON.stringify({
+                        error: isQuotaError
+                            ? 'Créditos da OpenAI esgotados ou em processo de sincronização. Se você acabou de pagar, aguarde alguns minutos.'
+                            : 'OpenAI temporariamente sobrecarregada. Tente novamente em instantes.'
+                    })
                 };
             }
 
             return {
                 statusCode: 500,
                 headers,
-                body: JSON.stringify({ error: 'Erro ao processar sua solicitação' })
+                body: JSON.stringify({
+                    error: 'Erro ao processar sua solicitação pela IA',
+                    details: errorData.error ? errorData.error.message : 'Erro desconhecido'
+                })
             };
         }
 

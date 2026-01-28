@@ -81,9 +81,9 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
 Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-Dimensional**:
 • **Científica:** Psiconeuroimunologia e biologia do estresse.
 • **Metafísica:** Causalidade e padrões de consciência.
-• **Integrativa:** Sinergia MTC e Valcapelli & Gasparetto.
+• **Integrativa:** Sinergia entre Medicina Chinesa e Saúde Integral.
 • **Filosófica:** Maêutica evolutiva.
-• **Espiritual:** Reforma Íntima (inspirado em Mauro Kwitiko).
+• **Espiritual:** Reforma Íntima e Ética Universal.
 
 ⚠️ **Importante:** Sou uma ferramenta de autoconhecimento. Para diagnósticos médicos, consulte um profissional.`,
         timestamp: new Date()

@@ -37,6 +37,10 @@ const translations = {
     'nav.personalization': 'Personalização',
     'nav.login': 'Entrar',
     'nav.logout': 'Sair',
+    'nav.ai-assistant': 'Self Oracle (IA)',
+    'home.feature.ai-assistant.title': 'Self Oracle',
+    'home.feature.ai-assistant.desc': 'Assistente de Evolução Humana que integra Acupressão, Ayurveda, Neurociência, Epigenética e Metafísica da Saúde.',
+    'home.feature.ai-assistant.tagline': 'Decifre a linguagem do seu corpo e evolua.',
 
     // Home Page
     'home.hero.title': 'XZenPress Wellness',
@@ -517,6 +521,10 @@ const translations = {
     'nav.personalization': 'Personalization',
     'nav.login': 'Login',
     'nav.logout': 'Logout',
+    'nav.ai-assistant': 'Self Oracle (AI)',
+    'home.feature.ai-assistant.title': 'Self Oracle',
+    'home.feature.ai-assistant.desc': 'Human Evolution Assistant integrating Acupressure, Ayurveda, Neuroscience, Epigenetics, and Metaphysics of Health.',
+    'home.feature.ai-assistant.tagline': 'Decode your body\'s language and evolve.',
 
     // Home Page
     'home.hero.title': 'XZenPress Wellness',

@@ -101,6 +101,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
       pageId: 'whatsapp-consultation'
     },
     {
+      icon: <Brain className="w-8 h-8 text-purple-600" />,
+      title: t('home.feature.ai-assistant.title'),
+      description: t('home.feature.ai-assistant.desc'),
+      pageId: 'ai-assistant'
+    },
+    {
       icon: <BarChart3 className="w-8 h-8 text-indigo-500" />,
       title: 'Dashboard Inteligente',
       description: 'Analytics avançados e acompanhamento de progresso personalizado',

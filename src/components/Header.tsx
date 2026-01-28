@@ -3,6 +3,7 @@ import { Menu, X, User, LogOut, Crown, Trash2, BookOpen, Play, Globe } from 'luc
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage, languages } from '../contexts/LanguageContext';
 import { trackPageView } from './GoogleAnalytics';
+import { AIRecommendationsPanel } from './AIRecommendationsPanel';
 
 interface HeaderProps {
   currentPage: string;
@@ -13,16 +14,23 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onShowTutorial }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [showAIPanel, setShowAIPanel] = useState(false);
   const { user, logout } = useAuth();
   const { t, currentLanguage, setLanguage } = useLanguage();
 
   const handlePageChange = (page: string) => {
+    if (page === 'ai-assistant') {
+      setShowAIPanel(true);
+      trackPageView('ai-assistant', t('nav.ai-assistant'));
+      return;
+    }
     onPageChange(page);
     trackPageView(page, t(`nav.${page}`));
   };
 
   const navItems = [
     { id: 'home' },
+    { id: 'ai-assistant' }, // 🚀 NOVO: Acesso direto ao Self-Oráculo
     { id: 'acupressure' },
     { id: 'protocols' },
     { id: 'breathing' },
@@ -320,6 +328,12 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
           )}
         </div>
       </header>
+
+      {/* 🤖 Assistente IA (Self-Oráculo) */}
+      <AIRecommendationsPanel
+        isVisible={showAIPanel}
+        onClose={() => setShowAIPanel(false)}
+      />
     </>
   );
 };

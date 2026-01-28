@@ -13,7 +13,7 @@ export const FirstTimeBanner: React.FC<FirstTimeBannerProps> = ({ onStartTutoria
     // Verificar se é primeira vez do usuário
     const hasSeenTutorial = localStorage.getItem('xzenpress_tutorial_seen');
     const hasSeenBanner = localStorage.getItem('xzenpress_banner_dismissed');
-    
+
     if (!hasSeenTutorial && !hasSeenBanner) {
       // Mostrar banner após 2 segundos para não ser intrusivo
       setTimeout(() => {
@@ -38,12 +38,11 @@ export const FirstTimeBanner: React.FC<FirstTimeBannerProps> = ({ onStartTutoria
   if (!isVisible) return null;
 
   return (
-    <div 
-      className={`fixed top-20 right-4 z-50 transition-all duration-500 ${
-        isAnimating ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
-      }`}
+    <div
+      className={`fixed top-20 right-4 z-50 transition-all duration-500 ${isAnimating ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+        }`}
     >
-      <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 rounded-2xl shadow-2xl p-1 max-w-sm">
+      <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-2xl p-1 max-w-sm">
         <div className="bg-white rounded-xl p-6 relative">
           {/* Close Button */}
           <button
@@ -56,8 +55,8 @@ export const FirstTimeBanner: React.FC<FirstTimeBannerProps> = ({ onStartTutoria
           {/* Header */}
           <div className="text-center mb-4">
             <div className="flex justify-center mb-3">
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full">
-                <Play className="w-6 h-6 text-white" />
+              <div className="p-2 bg-slate-100 rounded-full">
+                <Play className="w-6 h-6 text-slate-600" />
               </div>
             </div>
             <h3 className="text-lg font-bold text-gray-800 mb-1">
@@ -99,7 +98,7 @@ export const FirstTimeBanner: React.FC<FirstTimeBannerProps> = ({ onStartTutoria
           {/* CTA Button */}
           <button
             onClick={handleStartTutorial}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-600 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+            className="w-full bg-slate-800 text-white py-3 rounded-lg font-semibold hover:bg-slate-900 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
           >
             <Play className="w-4 h-4" />
             <span>Começar Tutorial</span>

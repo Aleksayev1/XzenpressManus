@@ -98,7 +98,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
                 <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full items-center justify-center hidden">
                   <span className="text-white font-bold text-lg">X</span>
                 </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hidden xl:block">
+                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 hidden xl:block">
                   XZenPress
                 </h1>
               </button>

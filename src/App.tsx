@@ -199,7 +199,7 @@ function AppContent() {
   return (
     <AudioPlayerProvider>
       <GoogleAnalytics />
-      <div className="aurora-overlay"></div>
+      <div className="aurora-overlay fixed inset-0 z-0 pointer-events-none opacity-40"></div>
       <GlobalPlayer />
 
       {/* SYSTEM ERROR BANNER */}

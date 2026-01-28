@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Play, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2 } from 'lucide-react';
+import { Play, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2, Sparkles } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { PartnershipModal } from './PartnershipModal';
 
@@ -14,25 +14,18 @@ interface HomePageProps {
 
 // Defines ScienceBanner component outside to keep HomePage clean
 const ScienceBanner = () => (
-  <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white py-3 overflow-hidden relative">
+  <div className="bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 text-white py-3 overflow-hidden relative shadow-lg">
     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       <div className="flex flex-col md:flex-row items-center justify-center text-center space-y-2 md:space-y-0 md:space-x-8 text-sm md:text-base font-medium tracking-wide">
         <div className="flex items-center">
-          <span className="text-cyan-400 mr-2">🔬</span>
-          <span>Tecnologia e Ciência</span>
+          <Sparkles className="w-4 h-4 mr-2 text-yellow-300" />
+          <span className="uppercase tracking-wider text-xs font-bold text-blue-100">Neurociência Aplicada</span>
         </div>
-        <div className="hidden md:block w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-        <div className="text-gray-200">
-          Baseado em <span className="text-white font-bold">Regulação Autonômica</span>
-        </div>
-        <div className="hidden md:block w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-        <div className="text-gray-200">
-          <span className="text-white font-bold">Eixo HPA</span>
-        </div>
-        <div className="hidden md:block w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-        <div className="text-gray-200">
-          <span className="text-white font-bold">Teoria Polivagal</span>
+        <div className="flex items-center gap-4 text-xs text-blue-200">
+          <span>• Regulação Autonômica</span>
+          <span>• Eixo HPA</span>
+          <span>• Teoria Polivagal</span>
         </div>
       </div>
     </div>
@@ -126,7 +119,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
   // Se mostrar seleção de terapia, renderizar interface de escolha
   if (showTherapySelection) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
+      <div className="min-h-screen bg-slate-50 pt-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -245,7 +238,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-24">
+    <div className="min-h-screen bg-transparent pt-24 text-white">
 
 
       {/* Daily Practice Notice */}

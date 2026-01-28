@@ -76,17 +76,16 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
     if (isVisible && messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: `Olá! Sou seu assistente especializado em YNSA e Medicina Tradicional Chinesa. 
+        content: `Olá! Sou o **Self Oracle**, seu Assistente de Evolução Humana.
+        
+Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-Dimensional**:
+• **Científica:** Psiconeuroimunologia e biologia do estresse.
+• **Metafísica:** Causalidade e padrões de consciência.
+• **Integrativa:** Sinergia MTC e Valcapelli & Gasparetto.
+• **Filosófica:** Maêutica evolutiva.
+• **Espiritual:** Reforma Íntima (inspirado em Mauro Kwitiko).
 
-Posso ajudá-lo com:
-• Explicações sobre pontos YNSA e seus usos
-• Conceitos de MTC (Qi, Meridianos, 5 Elementos)
-• Técnicas de autoacupressão
-• Protocolos de bem-estar
-
-⚠️ **Importante:** Sou uma ferramenta educacional. Para diagnósticos e tratamentos, sempre consulte um profissional qualificado.
-
-Como posso ajudá-lo hoje?`,
+⚠️ **Importante:** Sou uma ferramenta de autoconhecimento. Para diagnósticos médicos, consulte um profissional.`,
         timestamp: new Date()
       }]);
     }

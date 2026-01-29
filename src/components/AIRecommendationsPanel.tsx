@@ -3,6 +3,7 @@ import { X, Send, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
 import { useAuth } from '../contexts/AuthContext';
 import { acupressurePoints } from '../data/acupressurePoints';
+import { useSessionHistory } from '../hooks/useSessionHistory';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -26,6 +27,8 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [remainingQueries, setRemainingQueries] = useState<number | null>(null);
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const { recordSession } = useSessionHistory();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Função para encontrar imagem do ponto
@@ -74,10 +77,12 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
 
   // Mensagem inicial de boas-vindas
   useEffect(() => {
-    if (isVisible && messages.length === 0) {
-      setMessages([{
-        role: 'assistant',
-        content: `Olá! Sou o **Self Oracle**, seu Assistente de Evolução Humana.
+    if (isVisible) {
+      // Registrar tempo de início se for a primeira vez
+      if (messages.length === 0) {
+        setMessages([{
+          role: 'assistant',
+          content: `Olá! Sou o **Self Oracle**, seu Assistente de Evolução Humana.
         
 Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-Dimensional**:
 • **Científica:** Psiconeuroimunologia e biologia do estresse.
@@ -87,8 +92,29 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
 • **Espiritual:** Reforma Íntima e Ética Universal.
 
 ⚠️ **Importante:** Sou uma ferramenta de autoconhecimento. Para diagnósticos médicos, consulte um profissional.`,
-        timestamp: new Date()
-      }]);
+          timestamp: new Date()
+        }]);
+      }
+      setStartTime(Date.now());
+    } else {
+      // Quando fechar (isVisible = false) e tiver um startTime
+      if (startTime) {
+        const durationSeconds = Math.floor((Date.now() - startTime) / 1000);
+
+        // Só registra se a sessão durou mais de 30 segundos
+        if (durationSeconds > 30) {
+          recordSession({
+            sessionType: 'ai-mentorship',
+            durationSeconds,
+            effectivenessRating: 5, // Default rating for AI interactions
+            sessionData: {
+              messageCount: messages.length
+            }
+          }).catch(err => console.error('Failed to record AI session:', err));
+        }
+
+        setStartTime(null);
+      }
     }
   }, [isVisible]);
 

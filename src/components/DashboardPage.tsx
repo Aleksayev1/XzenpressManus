@@ -130,6 +130,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onPageChange }) =>
       case 'acupressure': return <Target className="w-4 h-4 text-green-500" />;
       case 'integrated': return <Zap className="w-4 h-4 text-purple-500" />;
       case 'chromotherapy': return <Zap className="w-4 h-4 text-purple-500" />;
+      case 'ai-mentorship': return <Brain className="w-4 h-4 text-indigo-500" />;
       default: return <Heart className="w-4 h-4 text-gray-500" />;
     }
   };
@@ -141,6 +142,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onPageChange }) =>
       case 'acupressure': return 'Acupressão';
       case 'integrated': return 'Terapia Integrada';
       case 'chromotherapy': return 'Cromoterapia';
+      case 'ai-mentorship': return 'Mentoria IA';
       default: return type;
     }
   };
@@ -304,7 +306,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onPageChange }) =>
                             {[...Array(5)].map((_, i) => (
                               <div
                                 key={i}
-                                className={`w-2 h-2 rounded-full ${i < Math.floor(session.effectivenessRating) ? 'bg-yellow-400' : 'bg-gray-200'
+                                className={`w-2 h-2 rounded-full ${i < Math.floor(session.effectivenessRating || 0) ? 'bg-yellow-400' : 'bg-gray-200'
                                   }`}
                               />
                             ))}

@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 export interface SessionData {
   id?: string;
   userId: string;
-  sessionType: 'breathing' | 'acupressure' | 'chromotherapy' | 'integrated';
+  sessionType: 'breathing' | 'acupressure' | 'chromotherapy' | 'integrated' | 'ai-mentorship';
   durationSeconds: number;
   effectivenessRating?: number;
   pointsUsed?: string[];
@@ -30,7 +30,7 @@ export class SessionHistoryService {
   static async recordSession(sessionData: Omit<SessionData, 'id' | 'createdAt'>): Promise<SessionData | null> {
     if (!supabase) {
       console.warn('Supabase não configurado. Salvando sessão localmente para demonstração.');
-      
+
       // Salvar localmente para demonstração
       const localSessions = this.getLocalSessions();
       const newSession: SessionData = {
@@ -40,7 +40,7 @@ export class SessionHistoryService {
       };
       localSessions.push(newSession);
       localStorage.setItem('xzenpress_sessions', JSON.stringify(localSessions));
-      
+
       return newSession;
     }
 
@@ -85,7 +85,7 @@ export class SessionHistoryService {
    * Busca o histórico de sessões do usuário
    */
   static async fetchUserSessions(
-    userId: string, 
+    userId: string,
     options?: {
       startDate?: string;
       endDate?: string;
@@ -165,7 +165,7 @@ export class SessionHistoryService {
     // Filtrar sessões por período
     const now = new Date();
     const periodStart = new Date();
-    
+
     switch (period) {
       case 'week':
         periodStart.setDate(now.getDate() - 7);
@@ -178,14 +178,14 @@ export class SessionHistoryService {
         break;
     }
 
-    const periodSessions = sessions.filter(session => 
+    const periodSessions = sessions.filter(session =>
       new Date(session.completedAt || session.createdAt || '') >= periodStart
     );
 
     // Calcular estatísticas básicas
     const totalSessions = periodSessions.length;
     const totalTime = periodSessions.reduce((acc, session) => acc + session.durationSeconds, 0);
-    const averageEffectiveness = periodSessions.length > 0 
+    const averageEffectiveness = periodSessions.length > 0
       ? periodSessions.reduce((acc, session) => acc + (session.effectivenessRating || 0), 0) / periodSessions.length
       : 0;
 
@@ -201,9 +201,9 @@ export class SessionHistoryService {
         });
       }
     });
-    
+
     const favoritePoint = Object.keys(pointUsage).length > 0
-      ? Object.entries(pointUsage).sort(([,a], [,b]) => b - a)[0][0]
+      ? Object.entries(pointUsage).sort(([, a], [, b]) => b - a)[0][0]
       : 'Nenhum';
 
     // Calcular tendência de melhoria
@@ -237,7 +237,7 @@ export class SessionHistoryService {
     if (sessions.length === 0) return 0;
 
     const sessionDates = [...new Set(
-      sessions.map(session => 
+      sessions.map(session =>
         new Date(session.completedAt || session.createdAt || '').toDateString()
       )
     )].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
@@ -248,7 +248,7 @@ export class SessionHistoryService {
 
     for (let i = 0; i < sessionDates.length; i++) {
       const sessionDate = currentDate.toDateString();
-      
+
       if (sessionDates.includes(sessionDate)) {
         streak++;
         currentDate.setDate(currentDate.getDate() - 1);
@@ -269,7 +269,7 @@ export class SessionHistoryService {
     const now = new Date();
     const periodStart = new Date();
     const previousPeriodStart = new Date();
-    
+
     switch (period) {
       case 'week':
         periodStart.setDate(now.getDate() - 7);
@@ -310,7 +310,7 @@ export class SessionHistoryService {
    */
   private static calculateDailyActivity(sessions: SessionData[], period: 'week' | 'month' | 'year'): Array<{ date: string; sessions: number }> {
     const dailyCount: Record<string, number> = {};
-    
+
     sessions.forEach(session => {
       const date = new Date(session.completedAt || session.createdAt || '').toDateString();
       dailyCount[date] = (dailyCount[date] || 0) + 1;

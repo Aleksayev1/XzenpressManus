@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Brain, Send, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { X, Send, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { MatrixRain } from './MatrixRain';
 import { useAuth } from '../contexts/AuthContext';
 import { acupressurePoints } from '../data/acupressurePoints';
 
@@ -141,7 +142,8 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
         body: JSON.stringify({
           message: input.trim(),
           conversationHistory,
-          userEmail: user?.email || null
+          userEmail: user?.email || null,
+          isPremium: user?.isPremium || false
         })
       });
 
@@ -213,8 +215,8 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
         {/* Header */}
         <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-purple-50 to-blue-50 rounded-t-2xl">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-purple-600 rounded-lg">
-              <Brain className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-lg overflow-hidden border border-green-500/30 shadow-lg relative bg-black">
+              <MatrixRain className="opacity-90" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Assistente IA YNSA/MTC</h2>

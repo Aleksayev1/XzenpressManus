@@ -34,6 +34,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
     { id: 'acupressure' },
     { id: 'protocols' },
     { id: 'breathing' },
+    { id: 'sounds' }, // 🎵 Restored
     { id: 'nutriming-ai' }, // ⚠️ TEMPORÁRIO: Liberado para testes (sem Premium)
     { id: 'premium' },
     { id: 'corporate' },
@@ -141,15 +142,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
               {/* User Actions */}
               {user ? (
                 <div className="flex items-center space-x-3">
-                  {/* Tutorial Button for logged users */}
-                  <button
-                    onClick={handleTutorialClick}
-                    className="flex items-center space-x-1 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                    title="Rever tutorial"
-                  >
-                    <Play className="w-4 h-4" />
-                    <span>Tutorial</span>
-                  </button>
+
 
                   {/* Blog Admin Link - Only for admin users */}
                   {user.isAdmin && (
@@ -164,16 +157,19 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
                   )}
 
                   <div className="flex items-center space-x-2">
-                    <User className="w-4 h-4 text-gray-600" />
-                    <span className="text-sm text-gray-700">{user.name}</span>
+                    <div className="flex flex-col items-end">
+                      <span className="text-sm font-bold text-gray-700" title={user.name}>
+                        {user.name.split(' ').map((n: string) => n[0]).join('').substring(0, 3).toUpperCase()}
+                      </span>
+                    </div>
                     {user.isPremium && (
                       <button
                         onClick={() => onPageChange('premium')}
                         className="flex items-center hover:opacity-80 transition-opacity cursor-pointer"
                         title="Acessar Menu Premium"
                       >
-                        <Crown className="w-4 h-4 text-yellow-500" />
-                        <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full ml-1">PREMIUM</span>
+                        <Crown className="w-5 h-5 text-yellow-500" />
+                        {/* <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full ml-1 hidden lg:inline">PREMIUM</span> */}
                       </button>
                     )}
                   </div>

@@ -350,7 +350,6 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
         onClose={() => setShowAIPanel(false)}
       />
     </div >
-    </div >
   );
   }
 const premiumFeatures = [

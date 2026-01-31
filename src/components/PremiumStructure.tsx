@@ -160,10 +160,10 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
                   <span><strong>MTC Geral:</strong> 34+ pontos avançados</span>
                 </li>
               </ul>
-              <p className="text-gray-600 mb-4">
+              {/*               <p className="text-gray-600 mb-4">
                 <strong className="text-purple-700">+ 12 Jornadas Clínicas Completas</strong><br />
                 <span className="text-sm">Protocolos guiados para Ansiedade, Dor, Sono e mais</span>
-              </p>
+              </p> */}
               <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
                 <span>Explorar pontos</span>
                 <Zap className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -349,7 +349,6 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
           />
         </div>
       </div>
-    </div >
   );
   }
 const premiumFeatures = [

@@ -36,6 +36,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
     { id: 'breathing' },
     { id: 'sounds' }, // 🎵 Restored
     { id: 'nutriming-ai' }, // ⚠️ TEMPORÁRIO: Liberado para testes (sem Premium)
+    { id: 'pricing' }, // 💰 NOVO: Página de preços
     { id: 'premium' },
     { id: 'corporate' },
     { id: 'blog' },

@@ -4,6 +4,7 @@ import { HomePage } from './components/HomePage';
 import { LoginPage } from './components/LoginPage';
 import { BreathingExercise } from './components/BreathingExercise';
 import { AcupressurePage } from './components/AcupressurePage';
+import { PricingPage } from './components/PricingPage';
 
 import { PremiumStructure } from './components/PremiumStructure';
 import { CorporatePlansPage } from './components/CorporatePlansPage';
@@ -164,6 +165,8 @@ function AppContent() {
         return <BreathingExercise onPageChange={setCurrentPage} />;
       case 'acupressure':
         return <AcupressurePage onPageChange={setCurrentPage} />;
+      case 'pricing':
+        return <PricingPage onPageChange={setCurrentPage} />;
       case 'premium':
         return <PremiumStructure onPageChange={setCurrentPage} />;
       case 'whatsapp-consultation':

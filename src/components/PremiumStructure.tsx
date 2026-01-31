@@ -343,13 +343,13 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
               </div>
             </div>
           </div>
+          <AIRecommendationsPanel
+            isVisible={showAIPanel}
+            onClose={() => setShowAIPanel(false)}
+          />
         </div>
       </div>
-      <AIRecommendationsPanel
-        isVisible={showAIPanel}
-        onClose={() => setShowAIPanel(false)}
-      />
-    </div >
+      </div >
   );
   }
 const premiumFeatures = [

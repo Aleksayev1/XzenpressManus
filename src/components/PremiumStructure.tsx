@@ -349,7 +349,7 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
           />
         </div>
       </div>
-      </div >
+    </div >
   );
   }
 const premiumFeatures = [

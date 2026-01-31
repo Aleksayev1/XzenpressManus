@@ -345,14 +345,13 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
           </div>
         </div>
       </div>
-
-        {/* AI Recommendations Panel */ }
-    <AIRecommendationsPanel
-      isVisible={showAIPanel}
-      onClose={() => setShowAIPanel(false)}
-    />
-      </div >
-    );
+      <AIRecommendationsPanel
+        isVisible={showAIPanel}
+        onClose={() => setShowAIPanel(false)}
+      />
+    </div >
+    </div >
+  );
   }
 const premiumFeatures = [
   // ✅ SUBSTITUÍDO: WhatsApp → Assistente IA (Segurança)

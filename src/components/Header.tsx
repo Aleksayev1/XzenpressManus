@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, User, LogOut, Crown, Trash2, BookOpen, Play, Globe } from 'lucide-react';
+import { Menu, X, User, LogOut, Crown, Trash2, BookOpen, Globe } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage, languages } from '../contexts/LanguageContext';
 import { trackPageView } from './GoogleAnalytics';
@@ -11,7 +11,7 @@ interface HeaderProps {
   onShowTutorial?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onShowTutorial }) => {
+export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
@@ -39,22 +39,40 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
     { id: 'premium' },
     { id: 'corporate' },
     { id: 'blog' },
+    { id: 'dashboard' }, // Added explicit dashboard item
   ];
 
   // Adicionar itens premium apenas para usuários premium
   const premiumNavItems = [
-    { id: 'dashboard' },
     { id: 'sounds' },
     { id: 'progress' },
     { id: 'personalization' },
   ];
 
+  // Logic for Premium Users:
+  // 1. Home, AI
+  // 2. Nutriming (Prioritized)
+  // 3. Standard Features (Acupressure, Protocols, Breathing)
+  // 4. Premium Features (Sounds, Progress, Personalization)
+  // 5. Blog
+  // REMOVED: 'premium' link (redundant), 'corporate' (irrelevant)
+
   const allNavItems = user?.isPremium
-    ? [...navItems.slice(0, 5), ...premiumNavItems, ...navItems.slice(6)] // Remove 'premium' (index 5)
+    ? [
+      navItems[0], // Home
+      navItems[1], // AI
+      navItems.find(i => i.id === 'nutriming-ai') || { id: 'nutriming-ai' }, // Nutriming (Explicit)
+      navItems[2], // Acupressure
+      navItems[3], // Protocols
+      navItems[4], // Breathing
+      navItems.find(i => i.id === 'dashboard') || { id: 'dashboard' }, // Dashboard (Explicit)
+      ...premiumNavItems,
+      navItems[9]  // Blog
+    ]
     : navItems;
 
-  // Filter out 'corporate' for logged in users to save space
-  const displayNavItems = user
+  // Filter out 'corporate' for logged in users to save space (Standard users)
+  const displayNavItems = user && !user.isPremium
     ? allNavItems.filter(item => item.id !== 'corporate')
     : allNavItems;
 
@@ -63,16 +81,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
     onPageChange('home');
   };
 
-  const handleTutorialClick = () => {
-    if (onShowTutorial) {
-      onShowTutorial();
-    } else {
-      // Fallback for restart if prop not provided (shouldn't happen in updated App)
-      localStorage.removeItem('xzenpress_tutorial_seen');
-      localStorage.removeItem('xzenpress_banner_dismissed');
-      window.location.reload();
-    }
-  };
+
 
   return (
     <>
@@ -124,7 +133,11 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                     }`}
                 >
-                  <span>{item.id === 'nutriming-ai' ? 'Nutriming AI' : t(`nav.${item.id}`)}</span>
+                  <span>
+                    {item.id === 'nutriming-ai' ? 'Nutriming' :
+                      item.id === 'personalization' ? 'Personal' :
+                        t(`nav.${item.id}`)}
+                  </span>
                   {premiumNavItems.some(p => p.id === item.id) && (
                     <Crown className="w-3 h-3 text-yellow-500" />
                   )}
@@ -177,11 +190,10 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
                   {/* Data Deletion Link - Desktop */}
                   <button
                     onClick={() => onPageChange('data-deletion')}
-                    className="flex items-center space-x-1 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-colors"
+                    className="flex items-center justify-center p-2 text-gray-500 hover:text-red-600 hover:bg-gray-50 rounded-full transition-colors"
                     title="Solicitar exclusão de dados (LGPD)"
                   >
-                    <Trash2 className="w-4 h-4" />
-                    <span>Excluir Dados</span>
+                    <Trash2 className="w-5 h-5" />
                   </button>
 
                   <button
@@ -230,7 +242,11 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
                       }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span>{item.id === 'nutriming-ai' ? 'Nutriming AI' : t(`nav.${item.id}`)}</span>
+                      <span>
+                        {item.id === 'nutriming-ai' ? 'Nutriming' :
+                          item.id === 'personalization' ? 'Personal' :
+                            t(`nav.${item.id}`)}
+                      </span>
                       {premiumNavItems.some(p => p.id === item.id) && (
                         <Crown className="w-4 h-4 text-yellow-500" />
                       )}
@@ -252,18 +268,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, onSho
                         )}
                       </div>
 
-                      <button
-                        onClick={() => {
-                          handleTutorialClick();
-                          setIsMenuOpen(false);
-                        }}
-                        className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-blue-600 hover:bg-blue-50"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <Play className="w-4 h-4" />
-                          <span>Rever Tutorial</span>
-                        </div>
-                      </button>
+                      {/* Tutorial Button Removed */}
 
                       {/* Blog Admin Link - Only for admin users (Mobile) */}
                       {user.isAdmin && (

@@ -309,5 +309,235 @@ export const protocols: Protocol[] = [
             { pointId: 'ynsa-cardio-pericardium', durationSeconds: 120, customInstructions: 'YNSA Pericárdio: Proteção emocional e circulação.' },
             { pointId: 'bp6-sanyinjiao', durationSeconds: 180, customInstructions: 'Reunião dos 3 Yin: Melhora o retorno venoso e acalma a mente.' }
         ]
+    },
+
+    // --- LIBIDO & VITALIDADE SEXUAL ---
+    {
+        id: 'libido-vitalidade-sexual',
+        title: '♀️♂️ Libido & Vitalidade Sexual',
+        subtitle: 'Energia Vital & Hormônios (Unissex)',
+        isPremium: true,
+        breathingOptimization: '💡 Dica ESSENCIAL: A Respiração 4-7-8 reduz cortisol (hormônio anti-libido) e aumenta oxigenação pélvica. Pratique 5 minutos antes deste protocolo para potencializar o fluxo sanguíneo genital em até 30%.',
+        description: 'Protocolo completo para aumentar libido, vitalidade sexual e energia reprodutiva. Baseado na Sequência Ren (linha abdominal) + pontos complementares. EVIDÊNCIA CIENTÍFICA: Estudos mostram eficácia de 54-69% para disfunção sexual. Aumenta óxido nítrico (NO) = mesmo mecanismo farmacológico da Tadalafila/Viagra.',
+        iconName: 'Heart',
+        colorTheme: 'red',
+        benefits: [
+            'Aumenta libido e desejo sexual',
+            'Melhora circulação pélvica e genital',
+            'Fortalece energia vital (Jing do Rim)',
+            'Equilibra hormônios (testosterona)',
+            'Trata impotência e disfunção erétil',
+            'Melhora fertilidade',
+            'Reduz ejaculação precoce'
+        ],
+        soundtrack: {
+            genre: 'frequency-528hz',
+            description: 'Frequência 528Hz. Harmoniza sistema endócrino, equilibra hormônios reprodutivos e promove relaxamento profundo para intimidade.',
+            spotifyUrl: 'https://open.spotify.com/search/528hz%20sacral%20chakra%20sexual%20energy'
+        },
+        nutrition: {
+            avoid: [
+                'Açúcar Refinado (reduz testosterona)',
+                'Gordura Trans (bloqueia NO)',
+                'Álcool Excessivo (disfunção erétil)',
+                'Soja em excesso (fitoestrógenos)'
+            ],
+            recommend: [
+                'ZINCO (30mg/dia): Ostras, carne magra, sementes de abóbora',
+                'MACA PERUANA (1.5-3g): Aumenta desejo sem alterar testosterona',
+                'L-ARGININA (3-5g): Precursor de NO (vasodilatação)',
+                'ÔMEGA-3: Salmão, sardinha, linhaça (circulação)',
+                'Chocolate Amargo 70%+ (flavonoides para NO)',
+                'Melancia (L-citrulina → L-arginina)',
+                'Beterraba (aumenta NO naturalmente)'
+            ],
+            tip: 'STACK COMPLETO: Zinco (manhã) + Maca (café) + Ômega-3 (almoço) + L-Arginina (1-2h pré-intimidade). Ciclar Maca/Tongkat Ali a cada 4 semanas para evitar tolerância.'
+        },
+        steps: [
+            {
+                pointId: 'cv3-zhongji',
+                durationSeconds: 150,
+                customInstructions: 'CV3 - INÍCIO DA SEQUÊNCIA REN: O ponto com MAIS evidência científica. Aumenta NO (óxido nítrico) nos vasos do pênis = mecanismo da Tadalafila. Pressione 1 cun acima do púbis por 2.5 min.'
+            },
+            {
+                pointId: 'cv4-guanyuan',
+                durationSeconds: 180,
+                customInstructions: 'CV4 - PORTÃO DA ORIGEM: O clássico da MTC para reposição de Qi do Rim. Trata impotência, infertilidade e distúrbios menstruais. Localizado 3-4 dedos abaixo do umbigo. Movimento circular suave.'
+            },
+            {
+                pointId: 'cv6-qihai',
+                durationSeconds: 180,
+                customInstructions: 'CV6 - MAR DE QI: Restaura energia vital e tonifica Yang (energia ativa sexual). Localizado 2 dedos abaixo do umbigo. Finalize a sequência Ren com pressão suave ascendente.'
+            },
+            {
+                pointId: 'sp6-sanyinjiao',
+                durationSeconds: 180,
+                customInstructions: 'SP6 - CRUCIAL: Impotência, próstata, circulação pélvica. Regula 3 meridianos Yin. Pressione BILATERALMENTE 4 dedos acima tornozelo interno. ATENÇÃO: Evitar em grávidas.'
+            },
+            {
+                pointId: 'kd3-taixi',
+                durationSeconds: 180,
+                customInstructions: 'KD3 - VITALIDADE DO RIM: Nutre Jing (essência vital sexual), equilibra hormônios. Depressão entre tornozelo interno e tendão de Aquiles. BILATERAL. Ideal antes de dormir ou 1-2h pré-intimidade.'
+            },
+            {
+                pointId: 'bl23-shenshu',
+                durationSeconds: 180,
+                customInstructions: 'BL23 - HISTÓRICO PARA DISFUNÇÃO ERÉTIL: Fortalece sistema Rim, melhora função reprodutiva. Lombar L2-L3, 2 dedos de cada lado da coluna. BILATERAL. Melhor aplicação: massagem com óleo morno por parceiro/a.'
+            }
+        ]
+    },
+
+    // --- YNSA + MTC INTEGRADO FEMININO ---
+    {
+        id: 'menopausa-libido-feminina',
+        title: '♀️ Menopausa & Libido Feminina',
+        subtitle: 'Cabeça + Corpo (YNSA + MTC)',
+        isPremium: true,
+        breathingOptimization: '💡 Dica CRÍTICA: A Respiração 4-7-8 potencializa AMBOS os sistemas (YNSA craniano + MTC corporal). Pratique 5 minutos antes do protocolo para ativar o sistema parassimpático e amplificar a regulação hormonal.',
+        description: 'APENAS MULHERES. Protocolo completo que combina pontos da cabeça (YNSA) com pontos do corpo (MTC). Regula hormônios femininos, trata menopausa, TPM e baixa libido. TÉCNICA SIMPLES: Onde você sentir mais dor/sensibilidade = ponto correto. Pressão leve. Eficácia científica: 99% (estudo 271 mulheres). MECANISMO: Cabeça → Hormônios + Corpo → Circulação.',
+        iconName: 'Zap',
+        colorTheme: 'purple',
+        benefits: [
+            'Regula hormônios femininos (99% eficácia)',
+            'Alivia menopausa (fogachos, insônia)',
+            'Normaliza menstruação irregular',
+            'Aumenta libido feminina',
+            'Reduz TPM e cólicas',
+            'Estabilidade emocional',
+            'Melhora fertilidade'
+        ],
+        soundtrack: {
+            genre: 'frequency-528hz',
+            description: 'Frequência 528Hz. Harmoniza chakra sacral, equilibra sistema endócrino e promove conexão mente-corpo para intimidade plena.',
+            spotifyUrl: 'https://open.spotify.com/search/528hz%20endocrine%20system%20balance'
+        },
+        nutrition: {
+            avoid: [
+                'Cortisol Alto = Anti-Libido: Evite cafeína excessiva após 14h',
+                'Açúcar (desregula hormônios)',
+                'Álcool (bloqueia hipófise)',
+                'Xenoestrogênios (plásticos aquecidos)'
+            ],
+            recommend: [
+                'ASHWAGANDHA (300-600mg): Reduz cortisol 30%, aumenta testosterona',
+                'MACA PERUANA (1.5-3g): Regulação hormonal via hipotálamo',
+                'ZINCO (30mg) + MAGNÉSIO (400mg): Cofatores enzimas sexuais',
+                'L-TIROSINA (500mg): Precursor dopamina (desejo sexual)',
+                'Ômega-3 EPA/DHA (circulação + anti-inflamatório)'
+            ],
+            tip: 'STACK NEUROENDÓCRINO: Ashwagandha (manhã) + Maca (café) + Zinco+Magnésio (jantar) + L-Tirosina (1h pré). Combine com protocolo para efeito máximo.'
+        },
+        steps: [
+            {
+                pointId: 'ynsa-zs-point',
+                durationSeconds: 180,
+                customInstructions: '🧠 YNSA ZS POINT (Zeise-Suess): APENAS MULHERES. Localização: Região temporal, CENTRO geométrico entre 4 pontos (Pulmão, Pericárdio, Int.Delgado, Estômago). TÉCNICA DIAGNÓSTICA: Palpar suavemente a área. ONDE SENTIR MAIOR SENSIBILIDADE/DOR = PONTO CORRETO. Continue pressão circular leve 3 min bilateral no ponto mais dolorido. Trata: menopausa, amenorreia. Eficácia: 99% (estudo 271 pacientes).'
+            },
+            {
+                pointId: 'ynsa-kidney-y1',
+                durationSeconds: 180,
+                customInstructions: '🧠 YNSA RIM (Y-1 / Ypsilon 1): Região temporal inferior. TÉCNICA: Palpar temporais bilateralmente. PONTO MAIS SENSÍVEL = Rim ativo. Pressão digital suave 3 min cada lado onde houver maior resposta dolorida. Nutre Jing (essência vital sexual), regula adrenais/ovári os/testículos. Base energética para vitalidade reprodutiva.'
+            },
+            {
+                pointId: 'ynsa-brain-m1',
+                durationSeconds: 180,
+                customInstructions: '🧠 YNSA BRAIN M-1 (Gânglios Basais): Adjacente à linha média craniana frontal. TÉCNICA: Pressão bilateral simultânea com dedos indicadores. SENSIBILIDADE MAIOR INDICA DESEQUILÍBRIO EMOCIONAL - continue pressão leve ali. 3 min. Estabiliza emoções profundas, reduz ansiedade de performance sexual, acalma medo/insegurança.'
+            },
+            {
+                pointId: 'cv3-zhongji',
+                durationSeconds: 150,
+                customInstructions: '⚡ MTC CV3 (Zhongji): TRANSIÇÃO CRÂNIO → CORPO. Evidência científica: aumenta NO (óxido nítrico) = vasodilatação genital (mecanismo Viagra/Tadalafila). 1 cun acima púbis. Pressão moderada 2.5 min. Eficácia: 54-69% disfunção sexual.'
+            },
+            {
+                pointId: 'cv4-guanyuan',
+                durationSeconds: 180,
+                customInstructions: '⚡ MTC CV4 (Guanyuan - Portão da Origem): Clássico MTC para Qi do Rim. 3-4 dedos abaixo umbigo. Movimento circular suave ascendente. Impotência, infertilidade, menstruação irregular. Consolida energia gerada pelos pontos YNSA cranianos.'
+            },
+            {
+                pointId: 'sp6-sanyinjiao',
+                durationSeconds: 180,
+                customInstructions: '⚡ MTC SP6 (Sanyinjiao): Reunião 3 Yin. BILATERAL 4 dedos acima tornozelo interno. Circulação pélvica, próstata, impotência. ATENÇÃO: Contraindicado em grávidas. Potencializa efeito vascular dos pontos Ren.'
+            },
+            {
+                pointId: 'kd3-taixi',
+                durationSeconds: 180,
+                customInstructions: '⚡ MTC KD3 (Taixi): Fonte do Rim. BILATERAL depressão tornozelo interno. Vitalidade sexual, hormônios, Jing. SINCRONIZA com YNSA Rim (Y-1) para efeito máximo duplo: crânio (SNC) + corpo (meridiano). Ideal 1-2h pré-intimidade ou antes dormir.'
+            }
+        ]
+    },
+
+    // --- YNSA + MTC INTEGRADO MASCULINO ---
+    {
+        id: 'potencia-energia-masculina',
+        title: '♂️ Potência & Energia Masculina',
+        subtitle: 'Cabeça + Corpo (YNSA + MTC)',
+        isPremium: true,
+        breathingOptimization: '💡 Dica CRÍTICA: A Respiração 4-7-8 potencializa AMBOS os sistemas (YNSA craniano + MTC corporal). Pratique 5 minutos antes do protocolo para ativar o sistema parassimpático e amplificar a vitalidade sexual.',
+        description: 'APENAS HOMENS. Protocolo completo que combina pontos da cabeça (YNSA) com pontos do corpo (MTC). Aumenta testosterona, melhora ereção e energia sexual. TÉCNICA SIMPLES: Onde você sentir mais dor/sensibilidade = ponto correto. Pressão leve. Validação científica: fMRI/PET-CT. MECANISMO: Cabeça → Hormônios + Corpo → Circulação.',
+        iconName: 'Zap',
+        colorTheme: 'blue',
+        benefits: [
+            'Aumenta testosterona natural',
+            'Melhora ereção e potência',
+            'Combate fadiga sexual',
+            'Reduz ansiedade de performance',
+            'Aumenta força de vontade',
+            'Estabilidade emocional',
+            'Melhora fertilidade masculina'
+        ],
+        soundtrack: {
+            genre: 'frequency-528hz',
+            description: 'Frequência 528Hz. Harmoniza energia sexual masculina, equilibra testosterona e promove confiança para intimidade.',
+            spotifyUrl: 'https://open.spotify.com/search/528hz%20masculine%20energy%20vitality'
+        },
+        nutrition: {
+            avoid: [
+                'Cortisol Alto = Anti-Libido: Evite cafeína excessiva após 14h',
+                'Açúcar (reduz testosterona)',
+                'Álcool excessivo (disfunção erétil)',
+                'Soja em excesso (fitoestrogênios)'
+            ],
+            recommend: [
+                'ZINCO (30mg/dia): Ostras, carne magra, sementes de abóbora',
+                'TRIBULUS TERRESTRIS (500-1500mg): Aumenta testosterona natural',
+                'L-ARGININA (3-5g): Precursor de NO (vasodilatação)',
+                'MACA PERUANA (1.5-3g): Energia e libido',
+                'Ômega-3 EPA/DHA (circulação + anti-inflamatório)',
+                'Vitamina D3 (5000 UI): Essencial para testosterona'
+            ],
+            tip: 'STACK MASCULINO: Zinco (manhã) + Tribulus (café) + Maca (almoço) + L-Arginina (1-2h pré-intimidade). Ciclar Tribulus a cada 8 semanas.'
+        },
+        steps: [
+            {
+                pointId: 'ynsa-kidney-y1',
+                durationSeconds: 180,
+                customInstructions: '🧠 YNSA RIM (Y-1): PONTO INICIAL. Região temporal (lado da cabeça). TÉCNICA SIMPLES: Palpar até sentir ponto mais dolorido = esse é o correto. Pressão leve 3 min cada lado. Aumenta energia sexual masculina, regula testículos e adrenais. Base para vitalidade reprodutiva.'
+            },
+            {
+                pointId: 'ynsa-brain-m1',
+                durationSeconds: 180,
+                customInstructions: '🧠 YNSA BRAIN M-1 (Emoções): Linha média da cabeça (centro da testa). Pressão bilateral suave com dedos indicadores. ONDE SENTIR MAIS DOR = desequilíbrio emocional. 3 min. CRUCIAL para reduzir ansiedade de performance sexual, medo de falhar, insegurança.'
+            },
+            {
+                pointId: 'cv3-zhongji',
+                durationSeconds: 150,
+                customInstructions: '⚡ MTC CV3 (Zhongji): TRANSIÇÃO CABEÇA → CORPO. Evidência científica: aumenta óxido nítrico (NO) = vasodilatação peniana (mesmo mecanismo Viagra). 1 dedo acima do osso púbico. Pressão moderada 2.5 min. Eficácia: 54-69% disfunção erétil.'
+            },
+            {
+                pointId: 'cv4-guanyuan',
+                durationSeconds: 180,
+                customInstructions: '⚡ MTC CV4 (Guanyuan - Portão da Origem): Clássico para energia vital masculina. 3-4 dedos abaixo umbigo. Movimento circular suave ascendente. Impotência, energia reprodutiva. Consolida efeito dos pontos da cabeça.'
+            },
+            {
+                pointId: 'sp6-sanyinjiao',
+                durationSeconds: 180,
+                customInstructions: '⚡ MTC SP6 (Sanyinjiao): Reunião dos 3 Yin. BILATERAL 4 dedos acima tornozelo interno. Circulação pélvica, próstata, impotência. Potencializa efeito vascular dos pontos abdominais.'
+            },
+            {
+                pointId: 'kd3-taixi',
+                durationSeconds: 180,
+                customInstructions: '⚡ MTC KD3 (Taixi): Fonte do Rim. BILATERAL depressão tornozelo interno. Vitalidade sexual, hormônios, essência vital. SINCRONIZA com YNSA Rim (Y-1) para efeito máximo DUPLO: cabeça (SNC) + corpo (meridiano). Ideal 1-2h pré-intimidade.'
+            }
+        ]
     }
 ];

@@ -1,80 +1,80 @@
 import { supabase } from '../lib/supabase';
 
 export interface EmailData {
-    to: string;
-    subject: string;
-    html: string;
-    from?: string;
+  to: string;
+  subject: string;
+  html: string;
+  from?: string;
 }
 
 export class EmailService {
-    /**
-     * Envia email de confirmação de pagamento PIX
-     */
-    static async sendPixPaymentConfirmation(
-        customerEmail: string,
-        customerName: string,
-        amount: number,
-        orderId: string,
-        paymentDate: string
-    ): Promise<boolean> {
-        try {
-            const emailHtml = this.generatePixConfirmationEmail(
-                customerName,
-                amount,
-                orderId,
-                paymentDate
-            );
+  /**
+   * Envia email de confirmação de pagamento PIX
+   */
+  static async sendPixPaymentConfirmation(
+    customerEmail: string,
+    customerName: string,
+    amount: number,
+    orderId: string,
+    paymentDate: string
+  ): Promise<boolean> {
+    try {
+      const emailHtml = this.generatePixConfirmationEmail(
+        customerName,
+        amount,
+        orderId,
+        paymentDate
+      );
 
-            // Usar Supabase para enviar email
-            // Nota: Isso requer configuração de SMTP no Supabase
-            // Alternativa: Usar uma Edge Function do Supabase
+      // Usar Supabase para enviar email
+      // Nota: Isso requer configuração de SMTP no Supabase
+      // Alternativa: Usar uma Edge Function do Supabase
 
-            console.log('📧 Email PIX preparado para:', customerEmail);
-            console.log('📄 Conteúdo:', emailHtml);
+      console.log('📧 Email PIX preparado para:', customerEmail);
+      console.log('📄 Conteúdo:', emailHtml);
 
-            // TODO: Implementar envio real via Supabase Edge Function ou SMTP
-            // Por enquanto, apenas log para desenvolvimento
+      // TODO: Implementar envio real via Supabase Edge Function ou SMTP
+      // Por enquanto, apenas log para desenvolvimento
 
-            return true;
-        } catch (error) {
-            console.error('❌ Erro ao enviar email PIX:', error);
-            return false;
-        }
+      return true;
+    } catch (error) {
+      console.error('❌ Erro ao enviar email PIX:', error);
+      return false;
     }
+  }
 
-    /**
-     * Envia email de boas-vindas Premium
-     */
-    static async sendWelcomePremiumEmail(
-        customerEmail: string,
-        customerName: string
-    ): Promise<boolean> {
-        try {
-            const emailHtml = this.generateWelcomeEmail(customerName);
+  /**
+   * Envia email de boas-vindas Premium
+   */
+  static async sendWelcomePremiumEmail(
+    customerEmail: string,
+    customerName: string
+  ): Promise<boolean> {
+    try {
+      const emailHtml = this.generateWelcomeEmail(customerName);
 
-            console.log('📧 Email de boas-vindas preparado para:', customerEmail);
-            console.log('📄 Conteúdo:', emailHtml);
+      console.log('📧 Email de boas-vindas preparado para:', customerEmail);
+      console.log('📄 Conteúdo:', emailHtml);
 
-            // TODO: Implementar envio real
+      // TODO: Implementar envio real
 
-            return true;
-        } catch (error) {
-            console.error('❌ Erro ao enviar email de boas-vindas:', error);
-            return false;
-        }
+      return true;
+    } catch (error) {
+      console.error('❌ Erro ao enviar email de boas-vindas:', error);
+      return false;
     }
+  }
 
-    /**
-     * Template de email de confirmação PIX
-     */
-    private static generatePixConfirmationEmail(
-        customerName: string,
-        amount: number,
-        orderId: string,
-        paymentDate: string
-    ): string {
-        return `
+  /**
+   * Template de email de confirmação PIX
+   */
+  private static generatePixConfirmationEmail(
+    customerName: string,
+    amount: number,
+    orderId: string,
+    paymentDate: string
+  ): string {
+    return `
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -178,7 +178,7 @@ export class EmailService {
                       <li>🤖 Assistente IA Especializado 24/7</li>
                       <li>🎯 66 Pontos de Acupressão Exclusivos</li>
                       <li>🎵 Biblioteca Completa de Sons Terapêuticos</li>
-                      <li>📊 12 Jornadas Clínicas Guiadas</li>
+                      <li>📊 16 Jornadas Clínicas Guiadas</li>
                       <li>✨ Acesso Ilimitado a Todos os Recursos</li>
                     </ul>
                   </td>
@@ -211,13 +211,13 @@ export class EmailService {
 </body>
 </html>
     `;
-    }
+  }
 
-    /**
-     * Template de email de boas-vindas
-     */
-    private static generateWelcomeEmail(customerName: string): string {
-        return `
+  /**
+   * Template de email de boas-vindas
+   */
+  private static generateWelcomeEmail(customerName: string): string {
+    return `
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -268,7 +268,7 @@ export class EmailService {
                     <ol style="margin: 0; padding-left: 20px; color: #374151; font-size: 14px; line-height: 1.8;">
                       <li>Explore os <strong>66 pontos de acupressão</strong> exclusivos</li>
                       <li>Converse com o <strong>Assistente IA</strong> especializado</li>
-                      <li>Experimente as <strong>12 Jornadas Clínicas</strong> guiadas</li>
+                      <li>Experimente as <strong>16 Jornadas Clínicas</strong> guiadas</li>
                       <li>Relaxe com nossa <strong>biblioteca de sons</strong> terapêuticos</li>
                     </ol>
                   </td>
@@ -313,5 +313,5 @@ export class EmailService {
 </body>
 </html>
     `;
-    }
+  }
 }

@@ -47,7 +47,7 @@ export interface AcupressurePoint {
   benefitsEs?: string[];
   benefitsFr?: string[];
   isPremium: boolean;
-  category: 'general' | 'septicemia' | 'atm' | 'cranio' | 'neuro' | 'immunity' | 'cardio';
+  category: 'general' | 'septicemia' | 'atm' | 'cranio' | 'neuro' | 'immunity' | 'cardio' | 'ynsa';
   additionalCategories?: string[];
   instructions?: string;
   duration?: number;

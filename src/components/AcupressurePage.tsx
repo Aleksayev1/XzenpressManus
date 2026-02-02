@@ -1239,7 +1239,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
               Desbloqueie 61 pontos especializados com terapia integrada avançada
             </p>
             <p className="text-lg mb-6 opacity-80 font-semibold">
-              + 12 Jornadas Clínicas Completas (Protocolos Guiados)
+              + 16 Jornadas Clínicas Completas (Protocolos Guiados)
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-white bg-opacity-20 rounded-lg p-4">

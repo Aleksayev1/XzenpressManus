@@ -470,7 +470,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
             </div>
 
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-              12 Jornadas Clínicas Completas
+              16 Jornadas Clínicas Completas
             </h2>
 
             <p className="text-xl text-cyan-100 max-w-3xl mx-auto mb-4">

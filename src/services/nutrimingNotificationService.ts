@@ -19,9 +19,12 @@ export const NutrimingNotificationService = {
      * Horários padrão para notificações
      */
     SCHEDULES: {
-        morning: '08:00',
+        'empty-stomach': '07:30',
+        morning: '08:30',
         'with-meal': '13:00',
-        night: '19:00'
+        afternoon: '16:00',
+        evening: '19:00',
+        night: '22:00'
     },
 
     /**
@@ -58,7 +61,6 @@ export const NutrimingNotificationService = {
                 body,
                 icon: icon || '/logo192.png',
                 badge: '/logo192.png',
-                vibrate: [200, 100, 200],
                 tag: 'nutriming-reminder',
                 requireInteraction: false
             });
@@ -81,27 +83,42 @@ export const NutrimingNotificationService = {
 
         // Agrupar suplementos por horário
         const supplementsByTiming: Record<string, string[]> = {
+            'empty-stomach': [],
             morning: [],
             'with-meal': [],
+            afternoon: [],
+            evening: [],
             night: [],
             anytime: []
         };
 
         supplements.forEach(sup => {
-            const timing = sup.timing as keyof typeof supplementsByTiming;
-            if (supplementsByTiming[timing]) {
-                supplementsByTiming[timing].push(sup.name);
+            let timing = sup.timing as keyof typeof supplementsByTiming;
+            // Fallback for legacy keys or safe defaults
+            if (!supplementsByTiming[timing]) {
+                timing = 'morning';
             }
+            supplementsByTiming[timing].push(sup.name);
         });
 
         // Preparar notificações
         const notifications: ScheduledNotification[] = [];
 
+        if (supplementsByTiming['empty-stomach'].length > 0) {
+            notifications.push({
+                id: 'empty-stomach',
+                time: this.SCHEDULES['empty-stomach'],
+                title: '⚡ Em Jejum: Hora de absorção máxima!',
+                body: `${supplementsByTiming['empty-stomach'].join(', ')}`,
+                timing: 'morning' // Using morning icon context
+            });
+        }
+
         if (supplementsByTiming.morning.length > 0) {
             notifications.push({
                 id: 'morning',
                 time: this.SCHEDULES.morning,
-                title: '☀️ Bom dia! Hora dos suplementos da manhã',
+                title: '☀️ Bom dia! Suplementos da manhã',
                 body: `${supplementsByTiming.morning.join(', ')}`,
                 timing: 'morning'
             });
@@ -111,9 +128,29 @@ export const NutrimingNotificationService = {
             notifications.push({
                 id: 'meal',
                 time: this.SCHEDULES['with-meal'],
-                title: '🍽️ Hora do almoço! Lembre-se dos suplementos',
+                title: '🍽️ Almoço/Refeição: Potencialize a absorção',
                 body: `${supplementsByTiming['with-meal'].join(', ')}`,
                 timing: 'with-meal'
+            });
+        }
+
+        if (supplementsByTiming.afternoon.length > 0) {
+            notifications.push({
+                id: 'afternoon',
+                time: this.SCHEDULES.afternoon,
+                title: '🌅 Tarde: Hora do reforço',
+                body: `${supplementsByTiming.afternoon.join(', ')}`,
+                timing: 'with-meal'
+            });
+        }
+
+        if (supplementsByTiming.evening.length > 0) {
+            notifications.push({
+                id: 'evening',
+                time: this.SCHEDULES.evening,
+                title: '🌙 Noite: Preparando para descansar',
+                body: `${supplementsByTiming.evening.join(', ')}`,
+                timing: 'night'
             });
         }
 
@@ -121,8 +158,8 @@ export const NutrimingNotificationService = {
             notifications.push({
                 id: 'night',
                 time: this.SCHEDULES.night,
-                title: '🌙 Boa noite! Hora dos suplementos noturnos',
-                body: `${supplementsByTiming.night.length} (${supplementsByTiming.night.join(', ')})`,
+                title: '🛌 Hora de dormir: Recuperação noturna',
+                body: `${supplementsByTiming.night.join(', ')}`,
                 timing: 'night'
             });
         }
@@ -163,7 +200,7 @@ export const NutrimingNotificationService = {
     /**
      * Calcular próximos horários de notificação
      */
-    getNextNotificationTimes(): { morning: Date, meal: Date, night: Date } {
+    getNextNotificationTimes(): Record<string, Date> {
         const now = new Date();
         const today = new Date(now);
 
@@ -180,10 +217,11 @@ export const NutrimingNotificationService = {
             return time;
         };
 
-        return {
-            morning: createTimeToday(this.SCHEDULES.morning),
-            meal: createTimeToday(this.SCHEDULES['with-meal']),
-            night: createTimeToday(this.SCHEDULES.night)
-        };
+        const times: Record<string, Date> = {};
+        for (const [key, value] of Object.entries(this.SCHEDULES)) {
+            times[key] = createTimeToday(value);
+        }
+
+        return times;
     }
 };

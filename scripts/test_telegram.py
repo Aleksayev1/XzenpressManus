@@ -1,8 +1,22 @@
 import requests
 import sys
 
-# Token fornecido pelo usuário (extraído da imagem)
-BOT_TOKEN = "8429414341:AAG3rqCYJuEGMcsN7S38fr524LxNvn5t-_g"
+import os
+
+# Função simples para carregar .env sem precisar instalar bibliotecas extras
+def load_env():
+    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    if os.path.exists(env_path):
+        with open(env_path, 'r') as f:
+            for line in f:
+                if line.strip() and not line.startswith('#') and '=' in line:
+                    key, value = line.strip().split('=', 1)
+                    os.environ[key] = value
+
+load_env()
+
+# Token deve ser configurado via variável de ambiente ou .env
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 
 def test_bot():
     print("🤖 Testando conexão com o XZenRadar Bot...")

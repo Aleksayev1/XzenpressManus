@@ -49,6 +49,17 @@ function AppContent() {
     }
   }, [user, currentPage]);
 
+  // Deep Linking Support (e.g. ?page=pricing)
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pageParam = params.get('page');
+    if (pageParam) {
+      setCurrentPage(pageParam);
+      // Optional: Clean URL after navigation
+      // window.history.replaceState({}, '', window.location.pathname); 
+    }
+  }, []);
+
   // Detectar callbacks OAuth e Spotify
   React.useEffect(() => {
     const hash = window.location.hash;

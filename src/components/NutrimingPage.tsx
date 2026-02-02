@@ -120,7 +120,7 @@ const SUPPLEMENT_DATABASE = {
 import { getNutrientLimit } from '../data/nutrientLimits';
 import { NutrimingSafetyModal } from './NutrimingSafetyModal';
 import { CriticalSafetyModal } from './CriticalSafetyModal';
-import { analyzeInteractions, Interaction } from '../data/supplementInteractions';
+import { analyzeInteractions } from '../data/supplementInteractions';
 
 export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) => {
     const { user } = useAuth();
@@ -374,6 +374,12 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
     const addSupplement = () => {
         if (!newSupplement.name) return;
 
+        // 0. Verificação de Limite Gratuito (Regra de 3)
+        if (!user?.isPremium && supplements.length >= 3) {
+            alert('🔒 Limite Gratuito Atingido\n\nVocê já adicionou seus 3 suplementos gratuitos do Nutriming. Para otimizar toda sua rotina, torne-se Premium.');
+            return;
+        }
+
         // 1. Verificação de Segurança (Dosagem)
         const limit = getNutrientLimit(newSupplement.name);
         const doseValue = parseFloat((newSupplement.dosage || '').replace(/[^0-9.]/g, ''));
@@ -519,7 +525,27 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                             </div>
                         </div>
                         <h1 className="text-4xl font-bold mb-2">Nutriming AI</h1>
-                        <p className="text-xl text-green-100">Timing perfeito para sua suplementação</p>
+                        <p className="text-xl text-green-100 mb-4">Timing perfeito para sua suplementação</p>
+
+                        {!user?.isPremium && (
+                            <div className="max-w-md mx-auto bg-white/20 backdrop-blur-sm rounded-lg p-2 border border-white/30">
+                                <div className="flex justify-between text-xs font-bold text-white mb-1 px-1">
+                                    <span>Plano Gratuito</span>
+                                    <span>{supplements.length} / 3 Suplementos</span>
+                                </div>
+                                <div className="h-2 w-full bg-black/20 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full ${supplements.length >= 3 ? 'bg-red-400' : 'bg-yellow-400'} transition-all duration-500`}
+                                        style={{ width: `${Math.min((supplements.length / 3) * 100, 100)}%` }}
+                                    />
+                                </div>
+                                {supplements.length >= 3 && (
+                                    <p className="text-xs text-red-100 mt-1 font-semibold">
+                                        Limite atingido. Assine Premium para ilimitado.
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                         {/* BANNER DE TRIAL DESABILITADO temporariamente */}
                         {/* 

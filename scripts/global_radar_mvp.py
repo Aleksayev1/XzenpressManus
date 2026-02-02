@@ -1,15 +1,29 @@
 import datetime
 import time
 import requests
+import os
 
 # INSTRUÇÕES DE USO:
 # 1. Envie uma mensagem "/start" para o bot @XZenRadar_Bot no Telegram do seu celular.
 # 2. Rode este script. Ele vai encontrar o seu "Chat ID" automaticamente e mandar o alerta.
 
+# Função simples para carregar .env
+def load_env():
+    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    if os.path.exists(env_path):
+        with open(env_path, 'r') as f:
+            for line in f:
+                if line.strip() and not line.startswith('#') and '=' in line:
+                    key, value = line.strip().split('=', 1)
+                    os.environ[key] = value
+
+load_env()
+
 class GlobalRadar:
     def __init__(self):
         # Configuração do Telegram (Bot Privado do Cliente)
-        self.telegram_token = "8429414341:AAG3rqCYJuEGMcsN7S38fr524LxNvn5t-_g"
+        # Token deve estar nas variáveis de ambiente
+        self.telegram_token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
         self.chat_id = None  # Será descoberto automaticamente
 
         # 1. O Dicionário Global (Clusters de Idiomas) - Atualizado para MATINAL

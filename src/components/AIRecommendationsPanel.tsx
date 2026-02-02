@@ -118,8 +118,26 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
     }
   }, [isVisible]);
 
+  const [freeUsageCount, setFreeUsageCount] = useState(0);
+  const FREE_LIMIT = 3;
+
+  useEffect(() => {
+    const savedCount = localStorage.getItem('self_oracle_free_usage');
+    if (savedCount) setFreeUsageCount(parseInt(savedCount));
+  }, []);
+
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
+
+    // Check Free Tier Limit
+    if (!user?.isPremium && freeUsageCount >= FREE_LIMIT) {
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `🔒 **Limite Gratuito Atingido**\n\nVocê utilizou seus ${FREE_LIMIT} insights gratuitos do Self Oracle. Para continuar descobrindo seus padrões e desbloquear análises ilimitadas, torne-se Premium.`,
+        timestamp: new Date()
+      }]);
+      return;
+    }
 
     const userMessage: Message = {
       role: 'user',
@@ -131,6 +149,13 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
     setInput('');
     setIsLoading(true);
     setError(null);
+
+    // Increment usage for free users immediately to prevent bypass
+    if (!user?.isPremium) {
+      const newCount = freeUsageCount + 1;
+      setFreeUsageCount(newCount);
+      localStorage.setItem('self_oracle_free_usage', newCount.toString());
+    }
 
     try {
       // Simulação para Localhost (Evita erro 404 da Netlify Function)
@@ -332,12 +357,32 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
             </p>
           </div>
 
-          {/* Rate Limit Info */}
+          {/* Rate Limit Info & Free Tier Counter */}
           {remainingQueries !== null && remainingQueries < 10 && (
             <div className="mb-2 text-xs text-gray-500 text-center">
               {remainingQueries > 0
                 ? `${remainingQueries} perguntas restantes nesta hora`
                 : 'Limite de perguntas atingido. Aguarde 1 hora.'}
+            </div>
+          )}
+
+          {!user?.isPremium && (
+            <div className="mb-3 flex flex-col space-y-1">
+              <div className="flex justify-between text-xs text-purple-700 font-medium px-1">
+                <span>Insights Gratuitos</span>
+                <span>{Math.min(freeUsageCount, FREE_LIMIT)} / {FREE_LIMIT}</span>
+              </div>
+              <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className={`h-full ${freeUsageCount >= FREE_LIMIT ? 'bg-red-500' : 'bg-gradient-to-r from-blue-500 to-purple-500'} transition-all duration-500`}
+                  style={{ width: `${Math.min((freeUsageCount / FREE_LIMIT) * 100, 100)}%` }}
+                />
+              </div>
+              {freeUsageCount >= FREE_LIMIT && (
+                <p className="text-xs text-red-500 text-center mt-1 font-semibold">
+                  Limite atingido. <button className="underline hover:text-red-700">Torne-se Premium</button>
+                </p>
+              )}
             </div>
           )}
 

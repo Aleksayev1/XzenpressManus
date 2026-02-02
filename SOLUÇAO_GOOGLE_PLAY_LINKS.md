@@ -19,7 +19,6 @@ O Google Play Console está reportando:
 - ✅ `netlify.toml` - Redirects configurados
 
 ### **3. Configuração Correta:**
-```xml
 <intent-filter android:autoVerify="true">
     <action android:name="android.intent.action.VIEW" />
     <category android:name="android.intent.category.DEFAULT" />
@@ -28,6 +27,13 @@ O Google Play Console está reportando:
           android:host="xzenpressbolt.netlify.app" />
 </intent-filter>
 ```
+
+### **4. (NOVO) Arquivo Digital Asset Links:**
+Criado o arquivo obrigatório para validação do domínio:
+- 📂 `public/.well-known/assetlinks.json`
+- 🔑 Inclui o fingerprint SHA-256 da sua chave de upload.
+
+> **IMPORTANTE:** Se você usa o **Google Play App Signing**, pode ser necessário adicionar também o fingerprint da chave do Google. Verifique no Console em "Integridade do App" > "Assinatura de apps".
 
 ## 🚀 **Próximos Passos:**
 

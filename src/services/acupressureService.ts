@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { AcupressurePoint } from '../types';
 import { acupressurePoints as staticPoints } from '../data/acupressurePoints';
+import { sensoryPoints } from '../data/acupressurePoints_sensory';
 
 export const acupressureService = {
     /**
@@ -9,8 +10,8 @@ export const acupressureService = {
      * This prevents the app from breaking during the migration phase.
      */
     async getAllPoints(): Promise<AcupressurePoint[]> {
-        // Usar apenas dados estáticos do TypeScript (65 pontos completos)
-        return staticPoints;
+        // Usar dados estáticos + pontos sensoriais YNSA
+        return [...staticPoints, ...sensoryPoints];
     },
 
     async getPointsByCategory(category: string): Promise<AcupressurePoint[]> {

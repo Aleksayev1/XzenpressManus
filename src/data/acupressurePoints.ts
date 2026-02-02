@@ -1828,6 +1828,185 @@ export const acupressurePoints: AcupressurePoint[] = [
     instructions: 'Localizar linha média craniana frontal (centro da testa até topo da cabeça). Palpar nos pontos adjacentes. SENSIBILIDADE MAIOR INDICA DESEQUILÍBRIO EMOCIONAL - continue pressão leve ali. Pressão bilateral simultânea com dedos indicadores 3 minutos. Ideal antes de situações de intimidade para reduzir ansiedade de performance.',
     duration: 180,
     pressure: 'leve'
+  },
+
+  // ===== PONTOS PARA RAIVA (ANGER MANAGEMENT) =====
+  {
+    id: 'ren14-juque',
+    name: 'Ren 14 (CV14) - Juque - Grande Palácio',
+    nameEn: 'Ren 14 (CV14) - Juque - Great Palace',
+    nameEs: 'Ren 14 (CV14) - Juque - Gran Palacio',
+    nameFr: 'Ren 14 (CV14) - Juque - Grand Palais',
+    nameZh: '巨阙穴',
+    description: 'Ponto mestre para raiva, agitação e comportamento maníaco-depressivo. Localizado 4 cun (largura de 4 dedos) acima do umbigo, na linha média do abdômen. Trata raiva explosiva, vontade de gritar, dor no coração emocional e acidez estomacal relacionada ao estresse emocional. Pressão moderada por 2-3 minutos.',
+    descriptionEn: 'Master point for anger, agitation and manic-depressive behavior. Located 4 cun above navel, midline of abdomen. Treats explosive anger, urge to scream, emotional heart pain and stomach acidity related to emotional stress. Moderate pressure for 2-3 minutes.',
+    descriptionEs: 'Punto maestro para ira, agitación y comportamiento maníaco-depresivo. Ubicado 4 cun arriba del ombligo, línea media del abdomen. Trata ira explosiva, ganas de gritar, dolor de corazón emocional y acidez estomacal relacionada con estrés emocional. Presión moderada por 2-3 minutos.',
+    descriptionFr: 'Point maître pour colère, agitation et comportement maniaco-dépressif. Situé 4 cun au-dessus du nombril, ligne médiane de l\'abdomen. Traite colère explosive, envie de crier, douleur cardiaque émotionnelle et acidité gastrique liée au stress émotionnel. Pression modérée pendant 2-3 minutes.',
+    position: { x: 50, y: 45 },
+    image: '/uploaded_media_1770056882040.png',
+    imageAlt: 'Localização do ponto Ren 14 (CV14) na linha média abdominal',
+    benefits: [
+      'Trata raiva explosiva e irritabilidade',
+      'Reduz vontade de gritar e agitação',
+      'Regula comportamento maníaco-depressivo',
+      'Alivia dor no coração (emocional)',
+      'Reduz ansiedade relacionada à raiva reprimida',
+      'Trata acidez estomacal por estresse',
+      'Acalma mente agitada'
+    ],
+    benefitsEn: [
+      'Treats explosive anger and irritability',
+      'Reduces urge to scream and agitation',
+      'Regulates manic-depressive behavior',
+      'Relieves heart pain (emotional)',
+      'Reduces anxiety related to repressed anger',
+      'Treats stomach acidity from stress',
+      'Calms agitated mind'
+    ],
+    benefitsEs: [
+      'Trata ira explosiva e irritabilidad',
+      'Reduce ganas de gritar y agitación',
+      'Regula comportamiento maníaco-depresivo',
+      'Alivia dolor de corazón (emocional)',
+      'Reduce ansiedad relacionada con ira reprimida',
+      'Trata acidez estomacal por estrés',
+      'Calma mente agitada'
+    ],
+    benefitsFr: [
+      'Traite colère explosive et irritabilité',
+      'Réduit envie de crier et agitation',
+      'Régule comportement maniaco-dépressif',
+      'Soulage douleur cardiaque (émotionnelle)',
+      'Réduit anxiété liée à colère refoulée',
+      'Traite acidité gastrique par stress',
+      'Calme esprit agité'
+    ],
+    isPremium: true,
+    category: 'general',
+    additionalCategories: ['anger', 'emotional'],
+    instructions: 'Localizar 4 cun (4 dedos de largura) acima do umbigo, na linha média do abdômen (entre Ren 13 e Ren 15). Aplicar pressão moderada com 2-3 dedos por 2-3 minutos. Respirar profundamente durante aplicação. Ponto crucial para liberar raiva reprimida e acalmar agitação emocional.',
+    duration: 180,
+    pressure: 'moderada'
+  },
+
+  {
+    id: 'lu10-yuji',
+    name: 'P10 (LU10) - Yuji - Margem do Peixe',
+    nameEn: 'P10 (LU10) - Yuji - Fish Border',
+    nameEs: 'P10 (LU10) - Yuji - Borde del Pez',
+    nameFr: 'P10 (LU10) - Yuji - Bord du Poisson',
+    nameZh: '鱼际穴',
+    description: 'Ponto do meridiano do Pulmão para raiva, medo, pavor e inquietude mental. Localizado na eminência tenar da palma da mão (base do polegar), onde a pele muda de cor. Trata calor no Pulmão, garganta seca/dolorida, inquietude mental, raiva e comportamento maníaco. Pressão moderada por 2-3 minutos bilateral.',
+    descriptionEn: 'Lung meridian point for anger, fear, panic and mental restlessness. Located on thenar eminence of palm (thumb base), where skin changes color. Treats Lung heat, dry/sore throat, mental restlessness, anger and manic behavior. Moderate pressure for 2-3 minutes bilateral.',
+    descriptionEs: 'Punto de meridiano Pulmón para ira, miedo, pavor e inquietud mental. Ubicado en eminencia tenar de palma (base pulgar), donde piel cambia color. Trata calor en Pulmón, garganta seca/dolorida, inquietud mental, ira y comportamiento maníaco. Presión moderada 2-3 minutos bilateral.',
+    descriptionFr: 'Point méridien Poumon pour colère, peur, terreur et agitation mentale. Situé sur éminence thénar de paume (base pouce), où peau change couleur. Traite chaleur Poumon, gorge sèche/douloureuse, agitation mentale, colère et comportement maniaque. Pression modérée 2-3 min bilatéral.',
+    position: { x: 25, y: 60 },
+    image: '/uploaded_media_1770057087514.png',
+    imageAlt: 'Localização do ponto P10 (LU10) Yuji na base do polegar',
+    benefits: [
+      'Trata raiva e irrit abilidade',
+      'Reduz medo e pavor',
+      'Acalma inquietude mental',
+      'Regula comportamento maníaco',
+      'Alivia garganta seca e dor de garganta',
+      'Trata calor no Pulmão (MTC)',
+      'Reduz agitação emocional'
+    ],
+    benefitsEn: [
+      'Treats anger and irritability',
+      'Reduces fear and panic',
+      'Calms mental restlessness',
+      'Regulates manic behavior',
+      'Relieves dry/sore throat',
+      'Treats Lung heat (TCM)',
+      'Reduces emotional agitation'
+    ],
+    benefitsEs: [
+      'Trata ira e irritabilidad',
+      'Reduce miedo y pavor',
+      'Calma inquietud mental',
+      'Regula comportamiento maníaco',
+      'Alivia garganta seca/dolorida',
+      'Trata calor Pulmón (MTC)',
+      'Reduce agitación emocional'
+    ],
+    benefitsFr: [
+      'Traite colère et irritabilité',
+      'Réduit peur et terreur',
+      'Calme agitation mentale',
+      'Régule comportement maniaque',
+      'Soulage gorge sèche/douloureuse',
+      'Traite chaleur Poumon (MTC)',
+      'Réduit agitation émotionnelle'
+    ],
+    isPremium: true,
+    category: 'general',
+    additionalCategories: ['anger', 'fear', 'emotional'],
+    instructions: 'Localizar na eminência tenar (base do polegar), onde a pele muda de cor. Pressionar com polegar da outra mão por 2-3 minutos em cada lado. Ponto crucial do Pulmão (METAL) para liberar raiva, medo e inquietude segundo MTC 5 Elementos.',
+    duration: 180,
+    pressure: 'moderada'
+  },
+
+  {
+    id: 'ht5-tongli',
+    name: 'C5 (HT5) - Tongli - Comunicação Interior',
+    nameEn: 'C5 (HT5) - Tongli - Inner Communication',
+    nameEs: 'C5 (HT5) - Tongli - Comunicación Interior',
+    nameFr: 'C5 (HT5) - Tongli - Communication Intérieure',
+    nameZh: '通里穴',
+    description: 'Ponto do meridiano do Coração para tristeza, raiva, medo e depressão. Localizado 0.5 cun (meio dedo) acima da prega do punho, lado do dedo mínimo (entre C4 e C6). Trata inquietude mental, raiva, medo, depressão, agitação, afasia, gagueira, dor nos olhos/face, aftas, dor de cabeça e queimação ao urinar. Pressão leve por 2-3 minutos bilateral.',
+    descriptionEn: 'Heart meridian point for sadness, anger, fear and depression. Located 0.5 cun above wrist crease, pinky side (between C4-C6). Treats mental restlessness, anger, fear, depression, agitation, aphasia, stuttering, eye/face pain, canker sores, headache and burning urination. Light pressure 2-3 min bilateral.',
+    descriptionEs: 'Punto meridiano Corazón para tristeza, ira, miedo y depresión. Ubicado 0.5 cun arriba pliegue muñeca, lado meñique (entre C4-C6). Trata inquietud mental, ira, miedo, depresión, agitación, afasia, tartamudeo, dolor ojos/cara, aftas, dolor cabeza y ardor al orinar. Presión leve 2-3 min bilateral.',
+    descriptionFr: 'Point méridien Cœur pour tristesse, colère, peur et dépression. Situé 0.5 cun au-dessus pli poignet, côté auriculaire (entre C4-C6). Traite agitation mentale, colère, peur, dépression, agitation, aphasie, bégaiement, douleur yeux/visage, aphtes, céphalée et brûlure miction. Pression légère 2-3 min bilatéral.',
+    position: { x: 30, y: 58 },
+    image: '/uploaded_media_1770057308756.png',
+    imageAlt: 'Localização do ponto C5 (HT5) Tongli no punho',
+    benefits: [
+      'Trata tristeza e depressão',
+      'Reduz raiva e irrita bilidade',
+      'Acalma medo e ansiedade',
+      'Regula inquietude mental',
+      'Alivia agitação emocional',
+      'Trata afasia e gagueira',
+      'Reduz dor nos olhos e face',
+      'Alivia aftas e dor de cabeça'
+    ],
+    benefitsEn: [
+      'Treats sadness and depression',
+      'Reduces anger and irritability',
+      'Calms fear and anxiety',
+      'Regulates mental restlessness',
+      'Relieves emotional agitation',
+      'Treats aphasia and stuttering',
+      'Reduces eye and face pain',
+      'Relieves canker sores and headache'
+    ],
+    benefitsEs: [
+      'Trata tristeza y depresión',
+      'Reduce ira e irritabilidad',
+      'Calma miedo y ansiedad',
+      'Regula inquietud mental',
+      'Alivia agitación emocional',
+      'Trata afasia y tartamudeo',
+      'Reduce dolor ojos y cara',
+      'Alivia aftas y dolor cabeza'
+    ],
+    benefitsFr: [
+      'Traite tristesse et dépression',
+      'Réduit colère et irritabilité',
+      'Calme peur et anxiété',
+      'Régule agitation mentale',
+      'Soul age agitation émotionnelle',
+      'Traite aphasie et bégaiement',
+      'Réduit douleur yeux et visage',
+      'Soulage aphtes et céphalée'
+    ],
+    isPremium: true,
+    category: 'general',
+    additionalCategories: ['sadness', 'anger', 'fear', 'depression', 'emotional'],
+    instructions: 'Localizar 0.5 cun (meio dedo) acima da prega do punho, lado do dedo mínimo, entre C4 e C6. Pressionar suavemente com polegar por 2-3 minutos em cada punho. Ponto do Coração (FOGO) que regula múltiplas emoções segundo MTC: tristeza, raiva, medo e depressão.',
+    duration: 180,
+    pressure: 'leve'
   }
 ];
 

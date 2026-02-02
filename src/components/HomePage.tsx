@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Play, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2, Sparkles } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { PartnershipModal } from './PartnershipModal';
+import { EmotionalCheckIn } from './EmotionalCheckIn';
 
 import { HappyNewYear2026 } from './HappyNewYear2026';
 import { HeroHybrid } from './HeroHybrid';
@@ -37,6 +38,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
   const [showTherapySelection, setShowTherapySelection] = useState(false);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
   const [showPartnershipModal, setShowPartnershipModal] = useState(false);
+  const [showEmotionalCheckIn, setShowEmotionalCheckIn] = useState(false);
 
   useEffect(() => {
     // Mostrar mensagem de boas-vindas se for primeira visita
@@ -46,6 +48,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
       localStorage.setItem('xzenpress_has_visited', 'true');
     }
   }, []);
+
+  const handleEmotionalSelection = (emotionId: string, intensity: number) => {
+    // Salvar seleção emocional
+    localStorage.setItem('last_emotional_checkin', JSON.stringify({
+      emotionId,
+      intensity,
+      timestamp: new Date().toISOString()
+    }));
+  };
+
 
   const features = [
     {
@@ -258,6 +270,37 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
             Lembrete Diário: Pratique os pontos e a respiração para manter seu equilíbrio.
           </p>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </div>
+      </div>
+
+      {/* Emotional Check-in Banner - NEW! */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div
+          className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white p-5 rounded-2xl shadow-2xl cursor-pointer transform hover:scale-[1.02] transition-all relative overflow-hidden group"
+          onClick={() => setShowEmotionalCheckIn(true)}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-blue-400/20 animate-pulse"></div>
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex space-x-2 text-3xl">
+                <span>😊</span>
+                <span>😢</span>
+                <span>😠</span>
+              </div>
+              <div className="text-left">
+                <h3 className="text-xl md:text-2xl font-bold mb-1">
+                  Como você está se sentindo hoje?
+                </h3>
+                <p className="text-purple-100 text-sm md:text-base">
+                  Check-in emocional • Protocolo personalizado baseado em OMS 2024 + MTC
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-xl group-hover:bg-white/30 transition-colors">
+              <span className="font-bold text-lg">Fazer Check-in</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -757,6 +800,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
         isOpen={showPartnershipModal}
         onClose={() => setShowPartnershipModal(false)}
       />
+
+      {/* Emotional Check-in Modal */}
+      {showEmotionalCheckIn && (
+        <EmotionalCheckIn
+          onClose={() => setShowEmotionalCheckIn(false)}
+          onSelect={handleEmotionalSelection}
+        />
+      )}
     </div>
   );
 };

@@ -806,6 +806,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
         <EmotionalCheckIn
           onClose={() => setShowEmotionalCheckIn(false)}
           onSelect={handleEmotionalSelection}
+          onNavigate={onPageChange}
         />
       )}
     </div>

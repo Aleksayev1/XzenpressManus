@@ -8,9 +8,10 @@ import { emotionalStates, type EmotionalState } from '../data/emotionalMapping';
 interface EmotionalCheckInProps {
     onClose: () => void;
     onSelect: (emotionId: string, intensity: number) => void;
+    onNavigate: (page: string) => void;
 }
 
-export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onSelect }) => {
+export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onSelect, onNavigate }) => {
     const [selectedEmotion, setSelectedEmotion] = useState<EmotionalState | null>(null);
     const [intensity, setIntensity] = useState<number>(3);
 
@@ -37,10 +38,9 @@ export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onS
         if (selectedEmotion) {
             onSelect(selectedEmotion.id, intensity);
 
-            // REMOVIDO navigate() que causava crash
-            // A recomendação fica salva no localStorage
-            // User pode clicar em "Jornadas" manualmente
+            // Navegar para protocolos após seleção
             onClose();
+            onNavigate('protocols');
         }
     };
 

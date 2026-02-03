@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { X, ArrowRight } from 'lucide-react';
 import { emotionalStates, type EmotionalState } from '../data/emotionalMapping';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { X, ArrowRight } from 'lucide-react';
+import { emotionalStates, type EmotionalState } from '../data/emotionalMapping';
 
 interface EmotionalCheckInProps {
     onClose: () => void;
@@ -11,7 +13,6 @@ interface EmotionalCheckInProps {
 export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onSelect }) => {
     const [selectedEmotion, setSelectedEmotion] = useState<EmotionalState | null>(null);
     const [intensity, setIntensity] = useState<number>(3);
-    const navigate = useNavigate();
 
     // Safety check: ensure emotional States is loaded
     if (!emotionalStates || emotionalStates.length === 0) {

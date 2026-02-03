@@ -36,10 +36,9 @@ export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onS
         if (selectedEmotion) {
             onSelect(selectedEmotion.id, intensity);
 
-            // Redireciona para protocolo recomendado
-            if (selectedEmotion.recommendedProtocol) {
-                navigate(`/jornadas`);
-            }
+            // REMOVIDO navigate() que causava crash
+            // A recomendação fica salva no localStorage
+            // User pode clicar em "Jornadas" manualmente
             onClose();
         }
     };

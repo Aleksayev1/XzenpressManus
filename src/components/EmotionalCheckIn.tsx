@@ -13,6 +13,25 @@ export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onS
     const [intensity, setIntensity] = useState<number>(3);
     const navigate = useNavigate();
 
+    // Safety check: ensure emotional States is loaded
+    if (!emotionalStates || emotionalStates.length === 0) {
+        console.error('EmotionalCheckIn: emotionalStates not loaded');
+        return (
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div className="bg-gradient-to-br from-gray-900 to-black border border-red-500/30 rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
+                    <h2 className="text-2xl font-bold text-white mb-4">⚠️ Erro ao carregar</h2>
+                    <p className="text-gray-300 mb-6">Não foi possível carregar as opções emocionais. Por favor, recarregue a página.</p>
+                    <button
+                        onClick={onClose}
+                        className="bg-red-600 hover:bg-red-500 text-white font-semibold py-3 px-6 rounded-xl transition-all"
+                    >
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     const handleContinue = () => {
         if (selectedEmotion) {
             onSelect(selectedEmotion.id, intensity);
@@ -51,8 +70,8 @@ export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onS
                             key={emotion.id}
                             onClick={() => setSelectedEmotion(emotion)}
                             className={`w-full p-4 rounded-xl border-2 transition-all text-left ${selectedEmotion?.id === emotion.id
-                                    ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
-                                    : 'border-gray-700 bg-gray-800/50 hover:border-purple-400 hover:bg-purple-500/10'
+                                ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                                : 'border-gray-700 bg-gray-800/50 hover:border-purple-400 hover:bg-purple-500/10'
                                 }`}
                         >
                             <div className="flex items-center justify-between">

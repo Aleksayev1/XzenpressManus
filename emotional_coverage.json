@@ -1,0 +1,107 @@
+{
+  "total_points": 66,
+  "emotions": {
+    "ansiedade": {
+      "count": 14,
+      "points": [
+        "yintang-ex-hn3",
+        "yongquan-r1-kd1",
+        "cranio-frontal",
+        "laogong-pc8",
+        "du26-renzhong",
+        "neuro-insonia-anmian",
+        "ynsa-ponto-f",
+        "ynsa-cardio-heart",
+        "ynsa-zf-estomago",
+        "ynsa-zf-intestino-grosso",
+        "anmian-extra",
+        "lv3-taichong",
+        "cv4-guanyuan",
+        "ynsa-brain-m1"
+      ]
+    },
+    "estresse": {
+      "count": 17,
+      "points": [
+        "yintang-ex-hn3",
+        "cranio-frontal",
+        "shenmen-c7-he7",
+        "tiantu-ren22",
+        "atm-yifeng-sj17",
+        "atm-jiache-st6",
+        "ynsa-cranial-nerves-master",
+        "ynsa-ponto-b",
+        "ynsa-cardio-pericardium",
+        "ynsa-cranial-10",
+        "ynsa-sensorial-boca-a",
+        "ynsa-ponto-j",
+        "ynsa-zf-figado",
+        "ynsa-zf-intestino-grosso",
+        "jianjing-gb21",
+        "huantiao-vb30",
+        "lv3-taichong"
+      ]
+    },
+    "tristeza": {
+      "count": 16,
+      "points": [
+        "yongquan-r1-kd1",
+        "tiantu-ren22",
+        "cerebro-cerebelo",
+        "du26-renzhong",
+        "taiyuan-lu9",
+        "septicemia-zusanli-st36",
+        "atm-xiaguan-st7",
+        "atm-yifeng-sj17",
+        "atm-tinggong-si19",
+        "ynsa-cerebrum",
+        "ynsa-cerebellum",
+        "neuro-insonia-anmian",
+        "anmian-extra",
+        "huantiao-vb30",
+        "sp4-gongsun",
+        "bl23-shenshu"
+      ]
+    },
+    "raiva": {
+      "count": 2,
+      "points": [
+        "ynsa-zf-figado",
+        "lv3-taichong"
+      ]
+    },
+    "medo": {
+      "count": 6,
+      "points": [
+        "laogong-pc8",
+        "du26-renzhong",
+        "ynsa-cardio-pericardium",
+        "ynsa-zf-bexiga",
+        "cv4-guanyuan",
+        "ynsa-brain-m1"
+      ]
+    },
+    "solidao": {
+      "count": 0,
+      "points": []
+    },
+    "insonia": {
+      "count": 13,
+      "points": [
+        "shenmen-c7-he7",
+        "laogong-pc8",
+        "cerebro-cerebelo",
+        "atm-tinggong-si19",
+        "ynsa-cerebrum",
+        "ynsa-cerebellum",
+        "neuro-insonia-anmian",
+        "ynsa-zf-coracao",
+        "ynsa-zf-intestino-grosso",
+        "anmian-extra",
+        "huantiao-vb30",
+        "lv3-taichong",
+        "bl23-shenshu"
+      ]
+    }
+  }
+}

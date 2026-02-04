@@ -2,6 +2,100 @@ import { Protocol } from '../types';
 
 export const protocols: Protocol[] = [
     // --- MENTE & EMOÇÃO ---
+    // --- PROTOCOLOS EMOCIONAIS ESPECÍFICOS ---
+    {
+        id: 'equilibrio-raiva',
+        title: 'Gerenciamento da Raiva',
+        subtitle: 'Irritabilidade & Frustração',
+        description: 'Dissolva a raiva antes que ela exploda. Protocolo focado em circular a energia estagnada do Fígado e acalmar o "Fogo" emocional.',
+        iconName: 'Shield',
+        colorTheme: 'red',
+        isPremium: true,
+        breathingOptimization: '💡 Dica: A raiva gera calor e tensão. Use a Respiração 4-7-8 para "resfriar" o sistema e soltar a mandíbula antes de iniciar os pontos.',
+        benefits: ['Reduz irritabilidade', 'Acalma explosões emocionais', 'Alivia tensão muscular'],
+        soundtrack: {
+            genre: 'frequency-396hz',
+            description: 'Frequência 396Hz. Libera culpa e medo, bases profundas da raiva defensiva.',
+            spotifyUrl: 'https://open.spotify.com/search/396hz%20liberation%20frequency'
+        },
+        nutrition: {
+            avoid: ['Álcool (estressa o Fígado)', 'Pimentas fortes', 'Cafeína em excesso'],
+            recommend: ['Chá de Hortelã (move o Qi do Fígado)', 'Vegetais verdes escuros', 'Limão/Água com limão'],
+            tip: 'O Fígado odeia estagnação. Movimente-se ou grite em uma almofada para liberar a energia travada.'
+        },
+        steps: [
+            { pointId: 'xingjian-lv2', durationSeconds: 120, customInstructions: 'Ponto DE FOGO (Filho). Dispersa o calor da raiva explosiva. "Apague o incêndio" pressionando firmemente.' },
+            { pointId: 'lv3-taichong', durationSeconds: 120, customInstructions: 'Ponto FONTE (Terra). Harmoniza o fluxo do Qi após apagar o fogo. Transforme a tensão em planejamento.' },
+            { pointId: 'ren14-juque', durationSeconds: 120, customInstructions: 'Ponto de Alarme do Coração. Acalma a agitação e a ansiedade gerada pela raiva.' },
+            { pointId: 'lu10-yuji', durationSeconds: 90, customInstructions: 'Dissipa o calor (raiva) que sobe para o peito e garganta.' }
+        ]
+    },
+    {
+        id: 'acolhimento-tristeza',
+        title: 'Acolhimento da Tristeza',
+        subtitle: 'Luto & Desânimo',
+        description: 'Para momentos de "coração apertado" e falta de ar. Fortaleça a energia do Pulmão (sede da tristeza na MTC) e permita que a emoção flua.',
+        iconName: 'CloudRain',
+        colorTheme: 'teal',
+        isPremium: true,
+        breathingOptimization: '💡 Dica: A tristeza ataca os pulmões. Respire fundo e visualize uma luz branca preenchendo o peito a cada inspiração.',
+        benefits: ['Alivia aperto no peito', 'Processamento do luto', 'Restaura a esperança'],
+        soundtrack: {
+            genre: 'frequency-417hz',
+            description: 'Frequência 417Hz. Facilita a mudança e desfaz situações traumáticas/emocionais.',
+            spotifyUrl: 'https://open.spotify.com/search/417hz%20healing%20trauma'
+        },
+        steps: [
+            { pointId: 'ren17-danzhong', durationSeconds: 180, customInstructions: 'Centro do peito. Massagem suave para soltar a angústia acumulada.' },
+            { pointId: 'taiyuan-lu9', durationSeconds: 120, customInstructions: 'Ponto MÃE (Terra). Terra gera Metal. Tonifique para preencher o vazio da perda e fortalecer o Pulmão.' },
+            { pointId: 'ht5-tongli', durationSeconds: 120, customInstructions: 'Conecta Coração e Fala. Ajuda a verbalizar ou expressar o que está preso.' },
+            { pointId: 'zusanli-st36', durationSeconds: 120, customInstructions: 'Terra (Estômago) nutre Metal (Pulmão). Dá base física para suportar a emoção.' }
+        ]
+    },
+    {
+        id: 'superando-medo',
+        title: 'Coragem & Segurança',
+        subtitle: 'Medo & Insegurança',
+        description: 'Quando o medo paralisa. Tonifique a energia dos Rins (sede da vontade/Zhi) para transformar medo em prudência e coragem.',
+        iconName: 'Shield',
+        colorTheme: 'blue',
+        isPremium: true,
+        breathingOptimization: '💡 Dica: O medo congela. A respiração rítmica (4-7-8) avisa ao cérebro reptiliano que você está seguro agora.',
+        benefits: ['Reduz insegurança', 'Aterramento (Grounding)', 'Fortalece a vontade'],
+        soundtrack: {
+            genre: 'frequency-396hz',
+            description: 'Frequência 396Hz. A frequência raiz para liberar o medo fundamental e a culpa.',
+            spotifyUrl: 'https://open.spotify.com/search/396hz%20remove%20fear'
+        },
+        steps: [
+            { pointId: 'kd3-taixi', durationSeconds: 180, customInstructions: 'Ponto FONTE (Terra). A base da bateria. Harmoniza a energia vital.' },
+            { pointId: 'fuliu-kd7', durationSeconds: 180, customInstructions: 'Ponto MÃE (Metal). Metal gera Água. Tonifique este ponto para "encher o tanque" de coragem e força de vontade.' },
+            { pointId: 'kd1-yongquan', durationSeconds: 120, customInstructions: 'Ponto FILHO (Madeira). Aterre o excesso de ansiedade e puxe a energia para o chão.' },
+            { pointId: 'baihui-vg20', durationSeconds: 90, customInstructions: 'Topo da cabeça. Eleva o espírito para ver além do medo.' }
+        ]
+    },
+    {
+        id: 'decisao-coragem',
+        title: 'Decisão & Ação',
+        subtitle: 'Indecisão & Procrastinação',
+        description: 'Para quando você sabe o que fazer, mas não consegue começar. Fortaleça a Vesícula Biliar (o "General da Decisão") para transformar planos em ação.',
+        iconName: 'Zap',
+        colorTheme: 'orange',
+        isPremium: true,
+        breathingOptimization: '💡 Dica: A indecisão trava a respiração. Inspire profundamente imaginando a cor verde (madeira) expandindo suas opções e expire a dúvida.',
+        benefits: ['Clareza para decidir', 'Coragem para agir', 'Reduz procrastinação'],
+        soundtrack: {
+            genre: 'frequency-528hz',
+            description: 'Frequência 528Hz. Transformação e milagres (reparo de DNA), ideal para desbloquear potencial de ação.',
+            spotifyUrl: 'https://open.spotify.com/search/528hz%20action%20motivation'
+        },
+        steps: [
+            { pointId: 'gb40-qiuxu', durationSeconds: 120, customInstructions: 'Ponto Fonte da Vesícula Biliar. Clareia a mente para tomadas de decisão difíceis.' },
+            { pointId: 'gb34-yanglingquan', durationSeconds: 180, customInstructions: 'Ponto Mestre dos Tendões e da Ação. Flexibilidade para escolher e se mover.' },
+            { pointId: 'ynsa-zf-vesicula', durationSeconds: 120, customInstructions: 'YNSA Z. Frontal (Vesícula). O "Botão da Decisão" no crânio. Pressione onde for mais sensível na testa lateral.' },
+            { pointId: 'lv3-taichong', durationSeconds: 120, customInstructions: 'Parceiro do Fígado. Garante que o fluxo de energia para a decisão seja suave.' }
+        ]
+    },
     {
         id: 'harmonia-mental',
         title: 'Harmonia Mental',
@@ -52,7 +146,7 @@ export const protocols: Protocol[] = [
         steps: [
             { pointId: 'anmian-extra', durationSeconds: 180, customInstructions: 'Massageie atrás da orelha circularmente.' },
             { pointId: 'yintang-ex-hn3', durationSeconds: 60, customInstructions: 'Suavemente, como um carinho.' },
-            { pointId: 'shenmen-c7', durationSeconds: 60, customInstructions: 'Acalme o espírito.' },
+            { pointId: 'shenmen-c7', durationSeconds: 120, customInstructions: 'Ponto FILHO (Terra). Fogo gera Terra. Drena o excesso de agitação mental e ancora o espírito.' },
             { pointId: 'ynsa-zf-rim', durationSeconds: 120, customInstructions: 'Regula adrenalina e medo (causa da insônia).' }
         ]
     },

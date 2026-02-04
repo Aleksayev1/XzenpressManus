@@ -47,7 +47,7 @@ export interface AcupressurePoint {
   benefitsEs?: string[];
   benefitsFr?: string[];
   isPremium: boolean;
-  category: 'general' | 'septicemia' | 'atm' | 'cranio' | 'neuro' | 'immunity' | 'cardio' | 'ynsa';
+  category: 'general' | 'septicemia' | 'atm' | 'cranio' | 'neuro' | 'immunity' | 'cardio' | 'ynsa' | 'sexual' | 'kidney' | 'menstrual' | 'back_pain' | 'digestive' | 'headache' | 'neck' | 'lung';
   additionalCategories?: string[];
   instructions?: string;
   duration?: number;
@@ -206,7 +206,7 @@ export interface Protocol {
   steps: ProtocolStep[];
   benefits: string[];
   soundtrack?: {
-    genre: 'alpha-waves' | 'theta-waves' | 'delta-waves' | 'gamma-waves' | 'binaural' | 'nature' | 'lofi' | 'solfeggio' | 'frequency-174hz' | 'frequency-528hz' | 'frequency-741hz';
+    genre: 'alpha-waves' | 'theta-waves' | 'delta-waves' | 'gamma-waves' | 'binaural' | 'nature' | 'lofi' | 'solfeggio' | 'frequency-174hz' | 'frequency-396hz' | 'frequency-417hz' | 'frequency-528hz' | 'frequency-741hz';
     description: string;
     spotifyUrl?: string; // Future integration
   };

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Clock, ChevronRight, ArrowLeft, CheckCircle, Info, Brain, Moon, Zap, Move, Smile, UserCheck, Hand, Shield, Coffee, Sparkles, RotateCcw, Utensils, XCircle, Home } from 'lucide-react';
-import { protocols } from '../data/protocols';
-import { acupressurePoints } from '../data/acupressurePoints';
-import { Protocol, ProtocolStep } from '../types';
-
+import { ArrowLeft, Play, Lock, Brain, Moon, Zap, Move, Smile, UserCheck, Hand, Shield, Coffee, Sparkles, Clock, CheckCircle, RotateCcw, ChevronRight, XCircle, Utensils } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { acupressurePoints } from '../data/acupressurePoints';
+import { protocols } from '../data/protocols';
+import { Protocol } from '../types';
+import { getRecommendedProtocol, getEmotionalStateById } from '../data/emotionalMapping';
 
 interface ProtocolPageProps {
     onPageChange: (page: string) => void;
@@ -13,10 +13,48 @@ interface ProtocolPageProps {
 export const ProtocolPage: React.FC<ProtocolPageProps> = ({ onPageChange }) => {
     const { user } = useAuth();
     const [selectedProtocol, setSelectedProtocol] = useState<Protocol | null>(null);
-    const [activeStepIndex, setActiveStepIndex] = useState<number>(-1); // -1 means overview, 0+ means active step
+    const [activeStepIndex, setActiveStepIndex] = useState<number>(-1);
     const [timer, setTimer] = useState<number>(0);
     const [isTimerRunning, setIsTimerRunning] = useState(false);
     const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+
+    // Estado para recomendação
+    const [recommendedId, setRecommendedId] = useState<string | null>(null);
+    const [emotionName, setEmotionName] = useState<string | null>(null);
+
+    // Carregar emoção do localStorage ao iniciar
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem('last_emotional_checkin');
+            if (saved) {
+                const data = JSON.parse(saved);
+                // Validar se é recente (menos de 24h)
+                const checkinTime = new Date(data.timestamp).getTime();
+                const now = new Date().getTime();
+                const isRecent = (now - checkinTime) < 24 * 60 * 60 * 1000;
+
+                if (isRecent && data.emotionId) {
+                    const rec = getRecommendedProtocol(data.emotionId);
+                    const state = getEmotionalStateById(data.emotionId);
+
+                    if (rec) setRecommendedId(rec);
+                    if (state) setEmotionName(state.namePortuguese);
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao ler recomendação emocional:', error);
+        }
+    }, []);
+
+    // Ordenar protocolos: Recomendado primeiro
+    const sortedProtocols = React.useMemo(() => {
+        if (!recommendedId) return protocols;
+        return [...protocols].sort((a, b) => {
+            if (a.id === recommendedId) return -1;
+            if (b.id === recommendedId) return 1;
+            return 0;
+        });
+    }, [recommendedId]);
 
     // Icon mapping
     const getIcon = (name: string) => {
@@ -31,6 +69,9 @@ export const ProtocolPage: React.FC<ProtocolPageProps> = ({ onPageChange }) => {
             case 'Shield': return <Shield className="w-12 h-12" />;
             case 'Coffee': return <Coffee className="w-12 h-12" />;
             case 'Sparkles': return <Sparkles className="w-12 h-12" />;
+            case 'Battery': return <div className="text-3xl font-bold">🔋</div>;
+            case 'Heart': return <div className="text-3xl font-bold">❤</div>;
+            case 'Activity': return <div className="text-3xl font-bold">⚕️</div>;
             default: return <Brain className="w-12 h-12" />;
         }
     };
@@ -101,6 +142,8 @@ export const ProtocolPage: React.FC<ProtocolPageProps> = ({ onPageChange }) => {
         return (
             <div className="min-h-screen bg-gray-50 pt-20 pb-20 px-4">
                 <div className="max-w-4xl mx-auto">
+
+
                     {/* Back to Home Button */}
                     <button
                         onClick={() => onPageChange('home')}
@@ -115,52 +158,140 @@ export const ProtocolPage: React.FC<ProtocolPageProps> = ({ onPageChange }) => {
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-gray-900">Sessões Otimizadas</h1>
                         <p className="text-gray-600">Protocolos guiados para suas principais necessidades.</p>
+
+                        {recommendedId && emotionName && (
+                            <div className="mt-4 bg-purple-100 border border-purple-200 rounded-xl p-4 animate-fade-in shadow-sm">
+                                <div className="flex items-center mb-4">
+                                    <span className="text-2xl mr-3">💡</span>
+                                    <div>
+                                        <p className="text-sm text-purple-600 font-semibold uppercase tracking-wide">Analise Emocional XZen (BETA):</p>
+                                        <p className="text-purple-900">
+                                            Identificamos <strong>{emotionName}</strong>. Estes são os pontos principais desta emoção:
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Galeria de Pontos da Emoção */}
+                                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
+                                    {(() => {
+                                        try {
+                                            const saved = localStorage.getItem('last_emotional_checkin');
+                                            const emoId = saved ? JSON.parse(saved).emotionId : null;
+                                            const emoState = emoId ? getEmotionalStateById(emoId) : null;
+
+                                            if (!emoState || !emoState.primaryPoints) return null;
+
+                                            return emoState.primaryPoints.map(pointId => {
+                                                const point = acupressurePoints.find(p => p.id === pointId);
+                                                if (!point) return null;
+
+                                                return (
+                                                    <div key={pointId} className="flex-shrink-0 w-24 bg-white/80 backdrop-blur-sm rounded-lg p-2 shadow-sm border border-purple-100 flex flex-col items-center">
+                                                        <div
+                                                            className="w-20 h-20 bg-gray-100 rounded-md mb-2 overflow-hidden flex-shrink-0 cursor-zoom-in active:scale-95 transition-transform"
+                                                            onClick={() => point.image && setZoomedImage(point.image)}
+                                                        >
+                                                            {point.image ? (
+                                                                <img src={point.image} alt={point.name} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">Sem Foto</div>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-[10px] font-bold text-gray-800 text-center leading-tight line-clamp-2 h-6 flex items-center justify-center">
+                                                            {point.name.split('(')[0] || point.name}
+                                                        </p>
+                                                    </div>
+                                                );
+                                            });
+                                        } catch (e) {
+                                            return null;
+                                        }
+                                    })()}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {protocols.map((protocol) => (
-                            <div
-                                key={protocol.id}
-                                onClick={() => {
-                                    if (protocol.isPremium && !user?.isPremium) {
-                                        alert('Este protocolo é exclusivo para assinantes Premium.');
-                                        return;
-                                    }
-                                    startProtocol(protocol);
-                                }}
-                                className={`bg-white rounded-2xl shadow-lg overflow-hidden transform transition hover:scale-[1.02] hover:shadow-xl relative ${protocol.isPremium ? 'border-2 border-yellow-400' : ''}`}
-                            >
-                                {protocol.isPremium && (
-                                    <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center shadow-sm z-10">
-                                        <span className="mr-1">🔒</span> PREMIUM
-                                    </div>
-                                )}
-                                <div className={`h-2 bg-gradient-to-r ${getThemeColor(protocol.colorTheme)}`} />
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className={`p-3 rounded-xl bg-gray-50 text-${protocol.colorTheme}-600`}>
-                                            {getIcon(protocol.iconName)}
-                                        </div>
-                                        <div className="flex items-center text-gray-400 text-sm">
-                                            <Clock className="w-4 h-4 mr-1" />
-                                            {Math.ceil(protocol.steps.reduce((acc, step) => acc + step.durationSeconds, 0) / 60)} min
-                                        </div>
-                                    </div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-1">{protocol.title}</h3>
-                                    <p className="text-sm text-indigo-600 font-medium mb-3 uppercase tracking-wider">{protocol.subtitle}</p>
-                                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{protocol.description}</p>
+                        {sortedProtocols.map((protocol) => {
+                            const isRecommended = protocol.id === recommendedId;
 
-                                    <div className="flex flex-wrap gap-2">
-                                        {protocol.benefits.slice(0, 2).map((benefit, i) => (
-                                            <span key={i} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
-                                                {benefit}
-                                            </span>
-                                        ))}
+                            return (
+                                <div
+                                    key={protocol.id}
+                                    onClick={() => {
+                                        if (protocol.isPremium && !user?.isPremium) {
+                                            alert('Este protocolo é exclusivo para assinantes Premium.');
+                                            return;
+                                        }
+                                        startProtocol(protocol);
+                                    }}
+                                    className={`bg-white rounded-2xl shadow-lg overflow-hidden transform transition hover:scale-[1.02] hover:shadow-xl relative ${isRecommended
+                                        ? 'border-4 border-purple-400 ring-4 ring-purple-100'
+                                        : protocol.isPremium ? 'border-2 border-yellow-400' : ''
+                                        }`}
+                                >
+                                    {isRecommended && (
+                                        <div className="absolute top-0 right-0 left-0 bg-purple-500 text-white text-xs font-bold px-3 py-1.5 text-center z-20 shadow-sm uppercase tracking-wider">
+                                            ✨ Recomendado para {emotionName}
+                                        </div>
+                                    )}
+
+                                    {protocol.isPremium && !isRecommended && (
+                                        <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center shadow-sm z-10">
+                                            <span className="mr-1">🔒</span> PREMIUM
+                                        </div>
+                                    )}
+                                    <div className={`h-2 bg-gradient-to-r ${getThemeColor(protocol.colorTheme)}`} />
+                                    <div className={`p-6 ${isRecommended ? 'pt-8' : ''}`}>
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className={`p-3 rounded-xl bg-gray-50 text-${protocol.colorTheme}-600`}>
+                                                {getIcon(protocol.iconName)}
+                                            </div>
+                                            <div className="flex items-center text-gray-400 text-sm">
+                                                <Clock className="w-4 h-4 mr-1" />
+                                                {Math.ceil(protocol.steps.reduce((acc, step) => acc + step.durationSeconds, 0) / 60)} min
+                                            </div>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-900 mb-1">{protocol.title}</h3>
+                                        <p className="text-sm text-indigo-600 font-medium mb-3 uppercase tracking-wider">{protocol.subtitle}</p>
+                                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{protocol.description}</p>
+
+                                        <div className="flex flex-wrap gap-2">
+                                            {protocol.benefits.slice(0, 2).map((benefit, i) => (
+                                                <span key={i} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
+                                                    {benefit}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
+
+                    {/* Image Zoom Modal (List Mode) */}
+                    {zoomedImage && (
+                        <div
+                            className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-200"
+                            onClick={() => setZoomedImage(null)}
+                        >
+                            <button
+                                className="absolute top-6 right-6 p-3 bg-white/10 rounded-full hover:bg-white/20 text-white transition-colors z-[101]"
+                                onClick={() => setZoomedImage(null)}
+                            >
+                                <XCircle className="w-8 h-8" />
+                            </button>
+                            <img
+                                src={zoomedImage}
+                                alt="Zoomed Point"
+                                className="max-w-full max-h-[85vh] rounded-lg shadow-2xl object-contain cursor-zoom-out"
+                            />
+                            <p className="absolute bottom-10 left-0 right-0 text-center text-white/70 text-sm pointer-events-none">
+                                Toque na tela para fechar
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
         );
@@ -330,9 +461,28 @@ export const ProtocolPage: React.FC<ProtocolPageProps> = ({ onPageChange }) => {
 
                 {/* Instructions */}
                 <h2 className="text-2xl font-bold mb-4 text-gray-900">{pointData?.name.split('(')[0]}</h2>
-                <p className="text-gray-600 text-lg mb-8 max-w-md">
+                <p className="text-gray-600 text-lg mb-6 max-w-md">
                     {currentStep.customInstructions || pointData?.instructions || "Pressione firmemente."}
                 </p>
+
+                {/* Card de Ciência / Análise Biológica */}
+                {pointData?.description && (
+                    <div className={`max-w-md w-full mb-8 p-4 rounded-xl text-left text-sm ${pointData.description.includes('ANÁLISE BIOLÓGICA') || pointData.description.includes('BIO-ANALYSIS')
+                        ? 'bg-blue-50 border border-blue-200 text-blue-900'
+                        : 'bg-gray-50 border border-gray-100 text-gray-600'
+                        }`}>
+                        <div className="flex items-center mb-2 font-bold uppercase tracking-wide text-xs opacity-70">
+                            {pointData.description.includes('ANÁLISE BIOLÓGICA') ? (
+                                <><span className="text-lg mr-2">🧬</span> Neurociência / Análise Biológica</>
+                            ) : (
+                                <><span className="text-lg mr-2">ℹ️</span> Saiba Mais</>
+                            )}
+                        </div>
+                        <p className="leading-relaxed">
+                            {pointData.description}
+                        </p>
+                    </div>
+                )}
 
                 {/* Timer */}
                 <div className="flex flex-col items-center mb-8">

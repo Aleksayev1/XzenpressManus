@@ -4,6 +4,7 @@ import { MatrixRain } from './MatrixRain';
 import { useAuth } from '../contexts/AuthContext';
 import { acupressurePoints } from '../data/acupressurePoints';
 import { useSessionHistory } from '../hooks/useSessionHistory';
+import { getEmotionalStateById, getOrganByTime } from '../data/emotionalMapping';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -78,22 +79,61 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
   // Mensagem inicial de boas-vindas
   useEffect(() => {
     if (isVisible) {
+      // Check for emotional state
+      const checkInData = localStorage.getItem('last_emotional_checkin');
+      let diagnosisMessage = null;
+
+      if (checkInData) {
+        try {
+          const { emotionId } = JSON.parse(checkInData);
+          const emotion = getEmotionalStateById(emotionId);
+
+          if (emotion && emotion.cycle) {
+            diagnosisMessage = {
+              role: 'assistant',
+              content: `🔮 **Diagnóstico do Oráculo (Ciclo dos 5 Elementos)**
+              
+Detectei: **${emotion.namePortuguese}** (Elemento ${emotion.mtcElement.toUpperCase()})
+
+Para restaurar seu equilíbrio, não tratamos apenas o sintoma, mas o Ciclo Energético:
+• **Nutrir a Mãe (${emotion.cycle.mother.toUpperCase()}):** Para dar força e suporte.
+• **Controlar o Avô (${emotion.cycle.controller.toUpperCase()}):** Para evitar excessos.
+
+Este protocolo foi ajustado para equilibrar essas energias.`,
+              timestamp: new Date()
+            };
+          }
+        } catch (e) {
+          console.error('Error parsing checkin for Oracle', e);
+        }
+      }
+
       // Registrar tempo de início se for a primeira vez
       if (messages.length === 0) {
-        setMessages([{
+        const currentClock = getOrganByTime();
+
+        const initialMessages: Message[] = [{
           role: 'assistant',
           content: `Olá! Sou o **Self Oracle**, seu Assistente de Evolução Humana.
+
+🕒 **Relógio Biológico (${new Date().getHours()}h):** Estamos no horário do(a) **${currentClock.organ.toUpperCase()}**.
+• **Emoção:** ${currentClock.emotion}
+• **Foco:** ${currentClock.function}
         
 Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-Dimensional**:
 • **Científica:** Psiconeuroimunologia e biologia do estresse.
 • **Metafísica:** Causalidade e padrões de consciência.
 • **Integrativa:** Sinergia entre Medicina Chinesa e Saúde Integral.
-• **Filosófica:** Maêutica evolutiva.
-• **Espiritual:** Reforma Íntima e Ética Universal.
 
 ⚠️ **Importante:** Sou uma ferramenta de autoconhecimento. Para diagnósticos médicos, consulte um profissional.`,
           timestamp: new Date()
-        }]);
+        }];
+
+        if (diagnosisMessage) {
+          initialMessages.push(diagnosisMessage as Message);
+        }
+
+        setMessages(initialMessages);
       }
       setStartTime(Date.now());
     } else {

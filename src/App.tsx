@@ -33,6 +33,7 @@ import { DebugAuth } from './components/DebugAuth';
 import { TermsOfServicePage } from './components/TermsOfServicePage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { RefundPolicyPage } from './components/RefundPolicyPage';
+import { YNSAStudyPage } from './pages/YNSAStudyPage';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -217,6 +218,8 @@ function AppContent() {
         return <PrivacyPolicyPage onPageChange={setCurrentPage} />;
       case 'refund-policy':
         return <RefundPolicyPage onPageChange={setCurrentPage} />;
+      case 'ynsa-study':
+        return <YNSAStudyPage />;
       default:
         return <HomePage onPageChange={setCurrentPage} />;
     }

@@ -14,6 +14,11 @@ export interface EmotionalState {
     description: string;
     primaryPoints: string[]; // IDs dos pontos principais
     recommendedProtocol?: string; // ID do protocolo recomendado
+    cycle?: {
+        mother: string;
+        son: string;
+        controller: string;
+    };
 }
 
 export const emotionalStates: EmotionalState[] = [
@@ -32,7 +37,12 @@ export const emotionalStates: EmotionalState[] = [
             'neiguan-pc6',
             'yongquan-r1-kd1'
         ],
-        recommendedProtocol: 'harmonia-mental'
+        recommendedProtocol: 'harmonia-mental',
+        cycle: {
+            mother: 'fire',
+            son: 'metal',
+            controller: 'wood'
+        }
     },
     {
         id: 'stress',
@@ -49,7 +59,12 @@ export const emotionalStates: EmotionalState[] = [
             'ynsa-ponto-d',
             'anmian-extra'
         ],
-        recommendedProtocol: 'harmonia-mental'
+        recommendedProtocol: 'harmonia-mental',
+        cycle: {
+            mother: 'wood',
+            son: 'earth',
+            controller: 'water'
+        }
     },
     {
         id: 'sadness',
@@ -63,28 +78,49 @@ export const emotionalStates: EmotionalState[] = [
         primaryPoints: [
             'ht5-tongli',
             'yongquan-r1-kd1',
-            'ynsa-ganglios-base',
+            'ynsa-basal-ganglia',
             'neiguan-pc6'
         ],
-        recommendedProtocol: 'harmonia-mental'
+        recommendedProtocol: 'harmonia-mental',
+        cycle: {
+            mother: 'earth',
+            son: 'water',
+            controller: 'fire'
+        }
     },
     {
         id: 'anger',
-        namePortuguese: 'Com Raiva/Irritado',
-        nameEnglish: 'Angry/Irritated',
-        emoji: '😠',
-        globalPrevalence: 22,
+        namePortuguese: 'Raiva / Irritação',
+        nameEnglish: 'Anger / Irritation',
+        emoji: '😡',
+        globalPrevalence: 15,
         mtcElement: 'wood',
-        mtcOrgan: 'Fígado (Liver)',
-        description: 'Raiva explosiva, irritabilidade, vontade de gritar, frustração',
-        primaryPoints: [
-            'ren14-juque',
-            'lu10-yuji',
-            'ht5-tongli',
-            'taichong-lv3',
-            'ynsa-zf-figado'
-        ],
-        recommendedProtocol: 'harmonia-mental'
+        mtcOrgan: 'Fígado',
+        description: 'Frustração, pavio curto, sensação de injustiça ou explosão iminente.',
+        primaryPoints: ['xingjian-lv2', 'lv3-taichong', 'ren14-juque', 'ynsa-zf-figado'],
+        recommendedProtocol: 'equilibrio-raiva',
+        cycle: {
+            mother: 'water', // Rim nutre Fígado
+            son: 'fire',   // Fígado alimenta Coração (F2 Drena)
+            controller: 'metal' // Pulmão controla Fígado
+        }
+    },
+    {
+        id: 'indecision',
+        namePortuguese: 'Indecisão / Insegurança',
+        nameEnglish: 'Indecision / Insecurity',
+        emoji: '😕',
+        globalPrevalence: 10,
+        mtcElement: 'wood',
+        mtcOrgan: 'Vesícula Biliar',
+        description: 'Dificuldade em escolher, falta de coragem, sentir-se travado ou tímido.',
+        primaryPoints: ['gb40-qiuxu', 'gb34-yanglingquan', 'ynsa-zf-vesicula'],
+        recommendedProtocol: 'decisao-coragem',
+        cycle: {
+            mother: 'water', // Água dá coragem à Madeira
+            son: 'fire',
+            controller: 'metal'
+        }
     },
     {
         id: 'fear',
@@ -96,13 +132,17 @@ export const emotionalStates: EmotionalState[] = [
         mtcOrgan: 'Rim (Kidney)',
         description: 'Medo paralisante, insegurança, pânico, pavor',
         primaryPoints: [
-            'yongquan-r1-kd1',
-            'lu10-yuji',
-            'ht5-tongli',
-            'laogong-pc8',
-            'ynsa-zf-rim'
+            'kd3-taixi', // Fonte (Terra) harmoniza
+            'yongquan-r1-kd1', // Filho (Madeira) aterra
+            'ynsa-zf-rim',
+            'ynsa-brain-m1'
         ],
-        recommendedProtocol: 'harmonia-mental'
+        recommendedProtocol: 'superando-medo', // ID correto do protocolo
+        cycle: {
+            mother: 'metal', // Metal (Pulmão) gera Água -> R7
+            son: 'wood',     // Água gera Madeira -> R1
+            controller: 'earth' // Terra controla Água -> R3
+        }
     },
     {
         id: 'loneliness',
@@ -110,17 +150,22 @@ export const emotionalStates: EmotionalState[] = [
         nameEnglish: 'Lonely/Isolated',
         emoji: '😶',
         globalPrevalence: 10,
-        mtcElement: 'multi',
+        mtcElement: 'fire', // Coração sofre na solidão
         mtcOrgan: 'Coração/Baço',
         description: 'Solidão profunda, sensação de desconexão, isolamento emocional',
         primaryPoints: [
             'shenmen-c7',
             'neiguan-pc6',
-            'sanyinjiao-sp6',
+            'sp6-sanyinjiao',
             'yintang-ex-hn3',
             'ynsa-ponto-d'
         ],
-        recommendedProtocol: 'harmonia-mental'
+        recommendedProtocol: 'harmonia-mental',
+        cycle: {
+            mother: 'wood',
+            son: 'earth',
+            controller: 'water'
+        }
     },
     {
         id: 'insomnia',
@@ -128,7 +173,7 @@ export const emotionalStates: EmotionalState[] = [
         nameEnglish: 'Insomniac/Tired',
         emoji: '😴',
         globalPrevalence: 30,
-        mtcElement: 'multi',
+        mtcElement: 'water', // Desarmonia Rim/Coração
         mtcOrgan: 'Coração/Rim',
         description: 'Dificuldade para dormir, pensamentos noturnos, fadiga constante',
         primaryPoints: [
@@ -136,9 +181,14 @@ export const emotionalStates: EmotionalState[] = [
             'shenmen-c7',
             'yintang-ex-hn3',
             'ynsa-ponto-d',
-            'ynsa-cerebro-cerebelo'
+            'cerebro-cerebelo'
         ],
-        recommendedProtocol: 'sono-reparador'
+        recommendedProtocol: 'sono-reparador',
+        cycle: {
+            mother: 'metal',
+            son: 'wood',
+            controller: 'earth'
+        }
     }
 ];
 
@@ -162,4 +212,26 @@ export const getEmotionalStatesByPrevalence = (): EmotionalState[] => {
 export const getRecommendedProtocol = (emotionId: string): string | undefined => {
     const state = getEmotionalStateById(emotionId);
     return state?.recommendedProtocol;
+};
+
+/**
+ * Retorna o órgão ativo no Relógio Biológico MTC atual
+ */
+export const getOrganByTime = (date: Date = new Date()) => {
+    const hour = date.getHours();
+
+    if (hour >= 23 || hour < 1) return { organ: 'Vesícula Biliar', element: 'Madeira', emotion: 'Indecisão/Coragem', function: 'Hora de dormir para regenerar a energia de decisão.' };
+    if (hour >= 1 && hour < 3) return { organ: 'Fígado', element: 'Madeira', emotion: 'Raiva/Planejamento', function: 'Detox profundo do sangue e emoções.' };
+    if (hour >= 3 && hour < 5) return { organ: 'Pulmão', element: 'Metal', emotion: 'Tristeza/Inspiração', function: 'Distribuição do Qi e oxigenação.' };
+    if (hour >= 5 && hour < 7) return { organ: 'Intestino Grosso', element: 'Metal', emotion: 'Apego/Soltar', function: 'Eliminação e "deixar ir".' };
+    if (hour >= 7 && hour < 9) return { organ: 'Estômago', element: 'Terra', emotion: 'Preocupação/Nutrição', function: 'Digestão física e mental.' };
+    if (hour >= 9 && hour < 11) return { organ: 'Baço-Pâncreas', element: 'Terra', emotion: 'Excesso de Pensamento', function: 'Transformação de nutrientes em energia.' };
+    if (hour >= 11 && hour < 13) return { organ: 'Coração', element: 'Fogo', emotion: 'Ansiedade/Alegria', function: 'Circulação sanguínea e paz mental (Shen).' };
+    if (hour >= 13 && hour < 15) return { organ: 'Intestino Delgado', element: 'Fogo', emotion: 'Clareza/Discernimento', function: 'Separação do puro do impuro.' };
+    if (hour >= 15 && hour < 17) return { organ: 'Bexiga', element: 'Água', emotion: 'Medo/Zona de Conforto', function: 'Reserva de energia e eliminação líquida.' };
+    if (hour >= 17 && hour < 19) return { organ: 'Rim', element: 'Água', emotion: 'Medo/Força de Vontade', function: 'Filtro essencial e vitalidade sexual.' };
+    if (hour >= 19 && hour < 21) return { organ: 'Pericárdio', element: 'Fogo', emotion: 'Proteção Emocional', function: 'Proteção do coração e circulação.' };
+    if (hour >= 21 && hour < 23) return { organ: 'Triplo Aquecedor', element: 'Fogo', emotion: 'Equilíbrio Geral', function: 'Regulação térmica e metabólica.' };
+
+    return { organ: 'Desconhecido', element: 'N/A', emotion: 'Neutro', function: 'Equilíbrio' };
 };

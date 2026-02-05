@@ -45,7 +45,7 @@ export const HeroHybrid: React.FC<HeroHybridProps> = ({ onShowTherapySelection, 
                     </h2>
 
                     <p className="text-xl md:text-2xl text-gray-800 max-w-4xl mx-auto leading-relaxed drop-shadow-md bg-white/60 backdrop-blur-sm rounded-2xl p-4">
-                        Na XZenPress, unimos a <strong>sabedoria milenar da Medicina Tradicional Chinesa</strong>
+                        Na XZenPress, unimos a <strong>sabedoria milenar da Medicina Tradicional Chinesa</strong>{' '}
                         com a <strong>ciência moderna da neurociência</strong> para um bem-estar integral.
                     </p>
                 </div>
@@ -84,12 +84,15 @@ export const HeroHybrid: React.FC<HeroHybridProps> = ({ onShowTherapySelection, 
                                         </div>
                                     </div>
                                     <div className="flex items-center space-x-3 text-left">
-                                        <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow">
-                                            <span className="text-2xl">🧘</span>
+                                        <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center shadow border border-purple-200">
+                                            <span className="text-xl animate-pulse">🌬️</span>
                                         </div>
                                         <div>
-                                            <p className="text-gray-700 font-medium">Equilíbrio total</p>
-                                            <p className="text-gray-500 text-sm">Transformação duradoura</p>
+                                            <p className="text-purple-900 font-bold flex items-center gap-2">
+                                                ZenFlow (Movimento)
+                                                <span className="text-[10px] bg-purple-600 text-white px-1.5 py-0.5 rounded-md uppercase tracking-wide">Novo</span>
+                                            </p>
+                                            <p className="text-purple-700 text-sm">Liberação de Trauma</p>
                                         </div>
                                     </div>
                                 </div>

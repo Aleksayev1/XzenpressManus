@@ -805,6 +805,26 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                     </div>
                   </div>
                 </div>
+
+                {/* Potencialização Neuroacústica (NOVO CARD) */}
+                <div className="mt-4 p-4 bg-purple-50 rounded-xl border border-purple-100 relative overflow-hidden group hover:shadow-md transition-all cursor-pointer" onClick={() => onPageChange('sounds')}>
+                  <div className="flex items-start gap-3 relative z-10">
+                    <div className="p-2 bg-purple-100 rounded-lg text-purple-600 group-hover:bg-purple-200 transition-colors">
+                      <Volume2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-purple-900 text-sm uppercase tracking-wide mb-1 flex items-center">
+                        Potencialize em 3x <span className="ml-2 text-[10px] bg-purple-200 text-purple-800 px-2 rounded-full">Ciência</span>
+                      </h4>
+                      <p className="text-xs text-purple-800 leading-relaxed mb-2">
+                        <strong>Ressonância Piezoelétrica:</strong> Ouvir frequências binaurais por 2 min <em>antes</em> de tocar o ponto coloca seu cérebro em estado Alpha e reduz a resistência elétrica da pele.
+                      </p>
+                      <span className="text-xs font-bold text-purple-700 group-hover:underline flex items-center">
+                        Escolher Frequência Sonora <ArrowLeft className="w-3 h-3 ml-1 rotate-180" />
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Active Session Status - CORES HARMONIOSAS */}

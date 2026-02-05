@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Play, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2, Sparkles } from 'lucide-react';
+import { Play, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2, Sparkles, Wind } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { PartnershipModal } from './PartnershipModal';
 import { EmotionalCheckIn } from './EmotionalCheckIn';
@@ -151,47 +151,65 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
           </div>
 
           {/* Therapy Selection Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
             {/* Respiração 4-7-8 */}
             <div
               onClick={() => onPageChange('breathing')}
-              className="group bg-white rounded-3xl shadow-2xl p-8 cursor-pointer transform hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-blue-300"
+              className="group bg-white rounded-3xl shadow-xl p-6 cursor-pointer transform hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-blue-300 flex flex-col"
             >
-              <div className="text-center">
+              <div className="text-center flex-1">
                 <div className="flex justify-center mb-6">
-                  <div className="p-6 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full group-hover:from-blue-600 group-hover:to-cyan-600 transition-all">
-                    <Brain className="w-16 h-16 text-white" />
+                  <div className="p-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full group-hover:from-blue-600 group-hover:to-cyan-600 transition-all">
+                    <Brain className="w-12 h-12 text-white" />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold text-gray-900 mb-3">
                   Respiração 4-7-8
                 </h2>
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  Técnica científica de respiração com cromoterapia integrada.
-                  Reduz ansiedade, melhora o sono e ativa o sistema parassimpático.
+                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                  Técnica científica para ativar o sistema parassimpático e reduzir ansiedade instantaneamente.
                 </p>
-                <div className="space-y-2 text-sm text-gray-500 mb-6">
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span>4 segundos: Inspiração (Azul Calmante)</span>
-                  </div>
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span>7 segundos: Retenção (Verde Equilibrante)</span>
-                  </div>
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <span>8 segundos: Expiração (Roxo Energizante)</span>
+
+                <div className="text-xs text-blue-600 font-semibold mt-auto pt-4 border-t border-gray-100 flex items-center justify-center gap-1 group-hover:gap-2 transition-all">
+                  <span>REGULAR SISTEMA</span> <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+
+            {/* ZenFlow (NOVO!) */}
+            <div
+              onClick={() => onPageChange('zenflow')} /* Placeholder: Redireciona para ZenFlow */
+              className="group bg-gradient-to-br from-purple-50 to-indigo-50 rounded-3xl shadow-xl p-6 cursor-pointer transform hover:scale-110 transition-all duration-300 border-2 border-purple-200 hover:border-purple-400 relative overflow-hidden flex flex-col z-10"
+            >
+              <div className="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl">
+                NOVO
+              </div>
+              <div className="text-center flex-1">
+                <div className="flex justify-center mb-6">
+                  <div className="p-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full group-hover:from-purple-700 group-hover:to-indigo-700 transition-all shadow-lg shadow-purple-200">
+                    <Wind className="w-12 h-12 text-white animate-pulse-slow" />
                   </div>
                 </div>
-                <div className="bg-blue-50 rounded-xl p-4 mb-6">
-                  <div className="text-sm text-blue-800">
-                    <strong>Ideal para:</strong> Estresse, ansiedade, insônia, pressão alta
+                <h2 className="text-2xl font-bold text-purple-900 mb-3">
+                  ZenFlow™
+                </h2>
+                <p className="text-purple-800 mb-4 text-sm leading-relaxed font-medium">
+                  Movimento Intencional para reprogramar traumas e liberar o que o toque não alcança.
+                </p>
+                <div className="space-y-2 text-xs text-purple-700 mb-4 text-left bg-white/50 p-3 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-purple-500">✔</span> Qi Gong Medicinal
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-purple-500">✔</span> Yoga Facial (Nervos Cranianos)
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-purple-500">✔</span> Reprogramação Somática
                   </div>
                 </div>
-                <div className="flex items-center justify-center space-x-2 text-blue-600 font-semibold group-hover:text-blue-700">
-                  <span>Começar Respiração</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+
+                <div className="text-xs text-purple-700 font-bold mt-auto pt-4 border-t border-purple-200 flex items-center justify-center gap-1 group-hover:gap-2 transition-all">
+                  <span>INTEGRAR TRAUMA</span> <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
             </div>
@@ -199,43 +217,23 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
             {/* Terapia Integrada (Acupressão) */}
             <div
               onClick={() => onPageChange('acupressure')}
-              className="group bg-white rounded-3xl shadow-2xl p-8 cursor-pointer transform hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-green-300"
+              className="group bg-white rounded-3xl shadow-xl p-6 cursor-pointer transform hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-green-300 flex flex-col"
             >
-              <div className="text-center">
+              <div className="text-center flex-1">
                 <div className="flex justify-center mb-6">
-                  <div className="p-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full group-hover:from-green-600 group-hover:to-emerald-600 transition-all">
-                    <Heart className="w-16 h-16 text-white" />
+                  <div className="p-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full group-hover:from-green-600 group-hover:to-emerald-600 transition-all">
+                    <Heart className="w-12 h-12 text-white" />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  Terapia Integrada
+                <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                  Acupressão Digital
                 </h2>
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  Acupressão + Respiração + Cromoterapia + Sons harmonizantes.
-                  Experiência completa de bem-estar integrativo.
+                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                  Protocolos completos com MTC, Sons Binaurais e Cronologia Inteligente.
                 </p>
-                <div className="space-y-2 text-sm text-gray-500 mb-6">
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span>33 pontos terapêuticos (4 gratuitos + 29 premium)</span>
-                  </div>
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span>Respiração 4-7-8 sincronizada</span>
-                  </div>
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <span>Cromoterapia + Sons harmonizantes</span>
-                  </div>
-                </div>
-                <div className="bg-green-50 rounded-xl p-4 mb-6">
-                  <div className="text-sm text-green-800">
-                    <strong>Ideal para:</strong> Dores específicas, problemas crônicos, bem-estar completo
-                  </div>
-                </div>
-                <div className="flex items-center justify-center space-x-2 text-green-600 font-semibold group-hover:text-green-700">
-                  <span>Explorar Pontos</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+
+                <div className="text-xs text-green-600 font-semibold mt-auto pt-4 border-t border-gray-100 flex items-center justify-center gap-1 group-hover:gap-2 transition-all">
+                  <span>DESBLOQUEAR CORPO</span> <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
             </div>

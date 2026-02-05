@@ -36,11 +36,13 @@ import { RefundPolicyPage } from './components/RefundPolicyPage';
 import { YNSAStudyPage } from './pages/YNSAStudyPage';
 import HormonalResearchPage from './components/HormonalResearchPage';
 import { ZSResearchFloating } from './components/ZSResearchFloating';
+import { ZenFlowPage } from './components/ZenFlowPage';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
   const [showTutorial, setShowTutorial] = useState(false);
   const { user } = useAuth();
+  console.log('App Loaded vZenFlow'); // Debug loading
 
   const [isImpactMode, setIsImpactMode] = useState(false);
 
@@ -224,6 +226,8 @@ function AppContent() {
         return <HormonalResearchPage />;
       case 'ynsa-study':
         return <YNSAStudyPage />;
+      case 'zenflow':
+        return <ZenFlowPage onBack={() => setCurrentPage('home')} />;
       default:
         return <HomePage onPageChange={setCurrentPage} />;
     }

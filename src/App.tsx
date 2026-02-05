@@ -34,6 +34,8 @@ import { TermsOfServicePage } from './components/TermsOfServicePage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { RefundPolicyPage } from './components/RefundPolicyPage';
 import { YNSAStudyPage } from './pages/YNSAStudyPage';
+import HormonalResearchPage from './components/HormonalResearchPage';
+import { ZSResearchFloating } from './components/ZSResearchFloating';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -218,6 +220,8 @@ function AppContent() {
         return <PrivacyPolicyPage onPageChange={setCurrentPage} />;
       case 'refund-policy':
         return <RefundPolicyPage onPageChange={setCurrentPage} />;
+      case 'hormonal-research':
+        return <HormonalResearchPage />;
       case 'ynsa-study':
         return <YNSAStudyPage />;
       default:
@@ -288,6 +292,11 @@ function AppContent() {
           isVisible={showTutorial}
           onClose={() => setShowTutorial(false)}
           onPageChange={setCurrentPage}
+        />
+
+        {/* ZS Research Floating Button */}
+        <ZSResearchFloating
+          onEnroll={() => setCurrentPage('hormonal-research')}
         />
       </div>
     </AudioPlayerProvider>

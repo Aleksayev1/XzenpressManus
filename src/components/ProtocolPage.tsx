@@ -358,6 +358,34 @@ export const ProtocolPage: React.FC<ProtocolPageProps> = ({ onPageChange }) => {
                                 )}
                             </div>
                         )}
+
+                        {/* Neuro-Acoustic Science Explanation */}
+                        <div className="mt-4 p-4 bg-purple-50 rounded-xl border border-purple-100 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-2 opacity-10">
+                                <Brain className="w-24 h-24 text-purple-600" />
+                            </div>
+                            <h4 className="font-semibold text-purple-900 text-sm uppercase tracking-wide mb-2 flex items-center">
+                                <span className="text-xl mr-2">🧬</span> Por que usar fones?
+                            </h4>
+                            <p className="text-sm text-purple-800 font-medium mb-2">
+                                Potencialização Neuroacústica (3x + Eficiência)
+                            </p>
+                            <ul className="text-xs text-purple-700 space-y-1.5 leading-relaxed relative z-10">
+                                <li className="flex items-start">
+                                    <span className="mr-1.5 mt-0.5">•</span>
+                                    <span><strong>Acesso Límbico:</strong> O som acessa diretamente o centro emocional do cérebro, "destrancando" tensões mentais para que o ponto físico possa agir.</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <span className="mr-1.5 mt-0.5">•</span>
+                                    <span><strong>Ressonância Piezoelétrica:</strong> A vibração sonora cria uma bio-ressonância nos tecidos, facilitando a transmissão do sinal elétrico da acupressão.</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <span className="mr-1.5 mt-0.5">•</span>
+                                    <span><strong>Ondas Cerebrais:</strong> Frequências binaurais induzem relaxamento profundo (Alpha/Theta) rapidamente, preparando o corpo para a cura.</span>
+                                </li>
+                            </ul>
+                        </div>
+
                         {selectedProtocol.nutrition && (
                             <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-100">
                                 <div className="flex items-center mb-3">

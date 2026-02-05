@@ -54,7 +54,7 @@ export const YNSAStudyPage = () => {
                         <div className="flex-1 text-center lg:text-left">
                             <div className="inline-flex items-center space-x-2 bg-purple-500/20 text-purple-200 px-4 py-2 rounded-full mb-6 border border-purple-500/30">
                                 <Sparkles className="w-4 h-4" />
-                                <span className="text-sm font-semibold uppercase tracking-wider">XZenPress Research Study</span>
+                                <span className="text-sm font-semibold uppercase tracking-wider">XZenPress & Neurociência</span>
                             </div>
 
                             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
@@ -63,8 +63,13 @@ export const YNSAStudyPage = () => {
                                 </span>
                             </h1>
 
-                            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                                Em 2008, um estudo alemão reportou <strong>99% de eficácia</strong> em distúrbios hormonais usando um único ponto neuro-sensorial. Nós vamos replicar esse estudo pela primeira vez na história - digitalmente.
+                            <p className="text-xl text-blue-100 mb-6 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                                Há 18 anos, cientistas alemães relataram <strong>99% de eficácia</strong> em distúrbios hormonais com um único ponto (YNSA).<br />
+                                Na ciência, isso é "bom demais para ser verdade".
+                            </p>
+
+                            <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light border-l-4 border-purple-500 pl-4">
+                                Nós não queremos apenas acreditar. Queremos provar. O XZenPress está montando o primeiro grupo digital para validar se o "Ponto ZS" pode realmente reiniciar seu eixo hormonal.
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -72,8 +77,8 @@ export const YNSAStudyPage = () => {
                                     Quero participar da História
                                     <ArrowRight className="w-5 h-5" />
                                 </a>
-                                <a href="https://xzenpress.com" className="border border-white/30 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/10 transition-all">
-                                    Conhecer XZenPress
+                                <a href="/" className="border border-white/30 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/10 transition-all">
+                                    Conhecer Plataforma
                                 </a>
                             </div>
                         </div>
@@ -102,10 +107,13 @@ export const YNSAStudyPage = () => {
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 md:p-12 shadow-2xl border border-purple-500/20">
                         <div className="text-center mb-10">
-                            <h2 className="text-3xl font-bold mb-4">Lista de Espera Oficial</h2>
-                            <p className="text-slate-400">
-                                Estamos selecionando 500 participantes para a Fase 1. Preencha abaixo para garantir sua chance de elegibilidade.
+                            <h2 className="text-3xl font-bold mb-4">Você é elegível?</h2>
+                            <p className="text-slate-400 mb-6">
+                                Procuramos mulheres visionárias que sofram com Fogachos, Libido Baixa, TPM severa ou Amenorreia. Ajudem-nos a testar a neurofisiologia sem remédios.
                             </p>
+                            <div className="inline-block bg-purple-900/30 text-purple-300 px-4 py-1 rounded-lg text-sm font-mono border border-purple-500/30">
+                                VAGAS LIMITADAS: FASE 1 (500 PESSOAS)
+                            </div>
                         </div>
 
                         {status === 'success' ? (
@@ -168,8 +176,8 @@ export const YNSAStudyPage = () => {
                                                 key={option.id}
                                                 onClick={() => setIssue(option.id)}
                                                 className={`cursor-pointer px-4 py-3 rounded-xl border text-sm font-medium transition-all flex items-center justify-between ${issue === option.id
-                                                        ? 'bg-purple-600 border-purple-500 text-white'
-                                                        : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-purple-500/50'
+                                                    ? 'bg-purple-600 border-purple-500 text-white'
+                                                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-purple-500/50'
                                                     }`}
                                             >
                                                 {option.label}
@@ -209,7 +217,10 @@ export const YNSAStudyPage = () => {
 
             {/* Footer Simple */}
             <div className="border-t border-white/5 py-8 text-center text-slate-500 text-sm">
-                <p>© 2026 XZenPress Research Labs. MTC Integrativa e Neurociência.</p>
+                <p>
+                    "Na XZenPress, nós não seguimos tendências. Nós as testamos."<br />
+                    © 2026 XZenPress Research Labs.
+                </p>
             </div>
         </div>
     );

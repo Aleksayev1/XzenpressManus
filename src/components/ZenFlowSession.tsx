@@ -176,13 +176,28 @@ export const ZenFlowSession: React.FC<ZenFlowSessionProps> = ({ sequence, onClos
                 {/* Conteúdo Central */}
                 <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
                     {/* Visual Placeholder / Vídeo */}
-                    <div className="w-full max-w-md aspect-video bg-gray-100 rounded-2xl mb-8 flex items-center justify-center relative overflow-hidden shadow-inner">
-                        {/* Aqui entraria o <video> real. Por enquanto, usamos animação de respiração */}
-                        <div className={`w-32 h-32 bg-purple-500 rounded-full opacity-20 absolute animate-ping ${isPaused ? 'paused' : ''}`} style={{ animationDuration: '3s' }}></div>
-                        <div className={`w-24 h-24 bg-purple-600 rounded-full opacity-30 absolute animate-pulse ${isPaused ? 'paused' : ''}`} style={{ animationDuration: '3s' }}></div>
-                        <Play className="w-12 h-12 text-purple-600 relative z-10 opacity-50" />
-
-                        <p className="absolute bottom-4 text-xs text-gray-400 font-mono">VÍDEO GUIA EM BREVE</p>
+                    {/* Video / Spotify Embed */}
+                    <div className="w-full max-w-md aspect-video bg-gray-100 rounded-2xl mb-8 flex items-center justify-center relative overflow-hidden shadow-inner ring-1 ring-gray-200">
+                        {sequence.spotifyEmbedUrl ? (
+                            <iframe
+                                style={{ borderRadius: '12px' }}
+                                src={sequence.spotifyEmbedUrl}
+                                width="100%"
+                                height="100%"
+                                frameBorder="0"
+                                allowFullScreen
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                loading="lazy"
+                                className="absolute inset-0 w-full h-full"
+                            ></iframe>
+                        ) : (
+                            <>
+                                <div className={`w-32 h-32 bg-purple-500 rounded-full opacity-20 absolute animate-ping ${isPaused ? 'paused' : ''}`} style={{ animationDuration: '3s' }}></div>
+                                <div className={`w-24 h-24 bg-purple-600 rounded-full opacity-30 absolute animate-pulse ${isPaused ? 'paused' : ''}`} style={{ animationDuration: '3s' }}></div>
+                                <Play className="w-12 h-12 text-purple-600 relative z-10 opacity-50" />
+                                <p className="absolute bottom-4 text-xs text-gray-400 font-mono">VÍDEO EM BREVE</p>
+                            </>
+                        )}
                     </div>
 
                     <h2 className="text-3xl font-bold text-gray-900 mb-4">{currentStep.name}</h2>

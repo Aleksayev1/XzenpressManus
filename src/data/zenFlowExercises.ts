@@ -21,6 +21,7 @@ export interface ZenFlowSequence {
     targetEmotion?: string[]; // Tags para IA cruzar (Raiva, Medo, etc)
     steps: ZenFlowStep[];
     intention: string; // A frase-chave da Tela 6
+    spotifyEmbedUrl?: string; // Link embed do Spotify "direcionado"
 }
 
 export const zenFlowExercises: ZenFlowSequence[] = [
@@ -33,6 +34,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '5 min',
         targetEmotion: ['ansiedade', 'stress', 'insônia', 'fogo'],
         intention: 'Eu permito que meu corpo encontre o silêncio.',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u?utm_source=generator', // Peaceful Piano
         steps: [
             {
                 id: 'shake',
@@ -62,6 +64,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '6 min',
         targetEmotion: ['medo', 'insegurança', 'água', 'terra'],
         intention: 'Estou seguro e sustentado pela terra.',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWXLeA8Omikj7?utm_source=generator', // Brain Food (Foco/Grounding)
         steps: [
             {
                 id: 'stomp',
@@ -87,6 +90,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '4 min',
         targetEmotion: ['raiva', 'frustração', 'madeira', 'fígado'],
         intention: 'Eu solto o que não preciso carregar.',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX3YSRoSdA634?utm_source=generator&theme=0', // Rock/Intense ou Shamanic (usando Release Radar genérico por enquanto)
         steps: [
             {
                 id: 'fists',
@@ -116,6 +120,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '5 min',
         targetEmotion: ['tristeza', 'angústia', 'metal', 'pulmão'],
         intention: 'Meu coração tem espaço para respirar.',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZd79rJ6a7lp?utm_source=generator', // Sleep/Calm
         steps: [
             {
                 id: 'open-wings',
@@ -141,6 +146,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '5 min',
         targetEmotion: ['controle', 'rigidez', 'madeira', 'terra'],
         intention: 'Eu fluo com a vida, sem resistir.',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX889U0CL85jj?utm_source=generator', // Focus Flow
         steps: [
             {
                 id: 'water-hands',

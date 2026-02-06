@@ -457,34 +457,37 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header - Only show when not in active therapy */}
         {!isTimerActive && (
-          <>
-            {/* Back Button */}
-            <button
-              onClick={() => onPageChange('home')}
-              className="mb-8 flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors group"
-            >
-              <div className="p-2 bg-white rounded-full shadow-md group-hover:shadow-lg transition-all">
-                <ArrowLeft className="w-5 h-5" />
+          <div className="relative mb-8">
+            <div className="flex items-center absolute left-0 top-1 z-10">
+              <button
+                onClick={() => onPageChange('home')}
+                className="p-2 mr-4 bg-white/80 hover:bg-white rounded-full shadow-sm hover:shadow transition-all group border border-gray-100"
+                title="Voltar ao Início"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-green-600 transition-colors" />
+              </button>
+              {/* Visual Cue - Drawing */}
+              <div className="hidden sm:flex items-center gap-2 text-xs text-gray-400 font-handwriting opacity-80 animate-fade-in select-none">
+                <span>↵ Menu Principal</span>
               </div>
-              <span className="font-medium">Voltar ao Início</span>
-            </button>
+            </div>
 
-            <div className="text-center mb-8">
+            <div className="text-center pt-8 md:pt-2"> {/* Padding adjustment for mobile overlap */}
               <div className="flex justify-center mb-4">
-                <div className="p-4 bg-gradient-to-r from-green-500 to-blue-500 rounded-full">
+                <div className="p-4 bg-gradient-to-r from-green-500 to-blue-500 rounded-full ring-4 ring-blue-50 shadow-xl">
                   <Target className="w-12 h-12 text-white" />
                 </div>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
                 <span className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
                   {t('acupressure.title')}
                 </span>
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 {t('acupressure.subtitle')}
               </p>
             </div>
-          </>
+          </div>
         )}
 
         {/* Category Filter - Only show when not in active therapy */}

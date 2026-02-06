@@ -190,19 +190,23 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({ onPageChan
         onNavigateToLibrary={() => onPageChange?.('sounds')}
       />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Back Button */}
-        <button
-          onClick={() => onPageChange('home')}
-          className="mb-8 flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors group"
-        >
-          <div className="p-2 bg-white rounded-full shadow-md group-hover:shadow-lg transition-all">
-            <ArrowLeft className="w-5 h-5" />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+        {/* Back Button Container */}
+        <div className="flex items-center absolute left-4 top-0 z-10 w-full">
+          <button
+            onClick={() => onPageChange('home')}
+            className="p-2 mr-4 bg-white/80 hover:bg-white rounded-full shadow-sm hover:shadow transition-all group border border-gray-100"
+            title="Voltar ao Início"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors" />
+          </button>
+          {/* Visual Cue - Drawing */}
+          <div className="hidden sm:flex items-center gap-2 text-xs text-gray-400 font-handwriting opacity-80 animate-fade-in select-none">
+            <span>↵ Menu Principal</span>
           </div>
-          <span className="font-medium">Voltar ao Início</span>
-        </button>
+        </div>
 
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">{t('breathing.title')}</h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8 pt-12 md:pt-4">{t('breathing.title')}</h1>
 
         <div
           className="rounded-3xl shadow-2xl p-8 md:p-12 mb-8 border-2 transition-all duration-1000"

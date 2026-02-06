@@ -81,8 +81,8 @@ export const ZenFlowSession: React.FC<ZenFlowSessionProps> = ({ sequence, onClos
     // 1. INTRO (Apresentação)
     if (phase === 'intro') {
         return (
-            <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 text-center animate-fade-in">
-                <button onClick={onClose} className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100">
+            <div className="fixed inset-0 z-[10000] bg-white flex flex-col items-center justify-center p-6 text-center animate-fade-in">
+                <button onClick={onClose} className="absolute top-20 right-6 p-2 rounded-full hover:bg-gray-100 border border-gray-100 shadow-sm">
                     <X className="w-6 h-6 text-gray-500" />
                 </button>
 
@@ -116,7 +116,14 @@ export const ZenFlowSession: React.FC<ZenFlowSessionProps> = ({ sequence, onClos
     // 2. PREPARATION (Preparação)
     if (phase === 'preparation') {
         return (
-            <div className="fixed inset-0 z-50 bg-purple-600 flex flex-col items-center justify-center p-6 text-center text-white animate-fade-in">
+            <div className="fixed inset-0 z-[10000] bg-purple-600 flex flex-col items-center justify-center p-6 text-center text-white animate-fade-in">
+                <button
+                    onClick={onClose}
+                    className="absolute top-20 right-6 p-2 rounded-full hover:bg-white/20 transition-colors"
+                    title="Sair da Sessão"
+                >
+                    <X className="w-6 h-6 text-white" />
+                </button>
                 <h3 className="text-2xl font-bold mb-4">Prepare seu corpo</h3>
                 <p className="text-lg opacity-90 mb-8 max-w-md">
                     Encontre uma postura confortável. <br />
@@ -131,7 +138,7 @@ export const ZenFlowSession: React.FC<ZenFlowSessionProps> = ({ sequence, onClos
     // 3. MOVEMENT (O ZenFlow)
     if (phase === 'movement') {
         return (
-            <div className="fixed inset-0 z-50 bg-white flex flex-col">
+            <div className="fixed inset-0 z-[10000] bg-white flex flex-col pt-12">
                 {/* Header Minimalista */}
                 <div className="p-6 flex justify-between items-center bg-white/80 backdrop-blur-md sticky top-0 z-10">
                     <button
@@ -152,9 +159,18 @@ export const ZenFlowSession: React.FC<ZenFlowSessionProps> = ({ sequence, onClos
                         Passo {currentStepIndex + 1}/{sequence.steps.length}
                     </div>
 
-                    <button onClick={() => setIsPaused(!isPaused)} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                        {isPaused ? <Play className="w-6 h-6 text-gray-600" /> : <Pause className="w-6 h-6 text-gray-600" />}
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button onClick={() => setIsPaused(!isPaused)} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                            {isPaused ? <Play className="w-6 h-6 text-gray-600" /> : <Pause className="w-6 h-6 text-gray-600" />}
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="p-2 rounded-full hover:bg-red-50 transition-colors group"
+                            title="Encerrar Sessão"
+                        >
+                            <X className="w-6 h-6 text-gray-400 group-hover:text-red-500" />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Conteúdo Central */}
@@ -194,7 +210,13 @@ export const ZenFlowSession: React.FC<ZenFlowSessionProps> = ({ sequence, onClos
     // 4. INTENTION (Intenção Ativa)
     if (phase === 'intention') {
         return (
-            <div className="fixed inset-0 z-50 bg-gradient-to-br from-purple-900 to-indigo-900 flex flex-col items-center justify-center p-8 text-center text-white animate-fade-in">
+            <div className="fixed inset-0 z-[10000] bg-gradient-to-br from-purple-900 to-indigo-900 flex flex-col items-center justify-center p-8 text-center text-white animate-fade-in">
+                <button
+                    onClick={onClose}
+                    className="absolute top-20 right-6 p-2 rounded-full hover:bg-white/20 transition-colors"
+                >
+                    <X className="w-6 h-6 text-white" />
+                </button>
                 <Zap className="w-12 h-12 mb-6 text-yellow-400" />
                 <h3 className="text-sm font-bold uppercase tracking-widest opacity-50 mb-4">Intenção Ativa</h3>
 
@@ -217,7 +239,10 @@ export const ZenFlowSession: React.FC<ZenFlowSessionProps> = ({ sequence, onClos
     // 5. INTEGRATION (Selo)
     if (phase === 'integration') {
         return (
-            <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 text-center animate-fade-in">
+            <div className="fixed inset-0 z-[10000] bg-white flex flex-col items-center justify-center p-6 text-center animate-fade-in">
+                <button onClick={onClose} className="absolute top-20 right-6 p-2 rounded-full hover:bg-gray-100">
+                    <X className="w-6 h-6 text-gray-500" />
+                </button>
                 <h2 className="text-2xl font-bold text-gray-900 mb-8">O que mudou no seu corpo?</h2>
 
                 <div className="grid grid-cols-2 gap-4 w-full max-w-md mb-12">
@@ -244,7 +269,8 @@ export const ZenFlowSession: React.FC<ZenFlowSessionProps> = ({ sequence, onClos
     // 6. FINISH (Retorno)
     if (phase === 'finish') {
         return (
-            <div className="fixed inset-0 z-50 bg-green-50 flex flex-col items-center justify-center p-6 text-center animate-fade-in">
+
+            <div className="fixed inset-0 z-[10000] bg-green-50 flex flex-col items-center justify-center p-6 text-center animate-fade-in">
                 <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6">
                     <CheckCircle className="w-12 h-12 text-green-600" />
                 </div>

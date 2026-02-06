@@ -508,13 +508,20 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
             />
 
             <div className="max-w-6xl mx-auto">
-                <button
-                    onClick={() => onPageChange('home')}
-                    className="flex items-center text-gray-600 hover:text-green-600 mb-8 transition-colors"
-                >
-                    <ArrowLeft className="w-5 h-5 mr-2" />
-                    Voltar para Início
-                </button>
+                {/* Back to Home Button */}
+                <div className="flex items-center mb-8 relative">
+                    <button
+                        onClick={() => onPageChange('home')}
+                        className="p-2 mr-4 bg-white/80 hover:bg-white rounded-full shadow-sm hover:shadow transition-all group border border-gray-100"
+                        title="Voltar ao Início"
+                    >
+                        <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-green-600 transition-colors" />
+                    </button>
+                    {/* Visual Cue - Drawing */}
+                    <div className="hidden sm:flex items-center gap-2 text-xs text-gray-400 font-handwriting opacity-80 animate-fade-in select-none">
+                        <span>↵ Menu Principal</span>
+                    </div>
+                </div>
 
                 {/* Header */}
                 <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-8">

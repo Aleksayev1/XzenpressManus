@@ -58,23 +58,30 @@ export const ZenFlowPage: React.FC<ZenFlowPageProps> = ({ onBack }) => {
     return (
         <div className="min-h-screen bg-gray-50 pb-20 pt-20 px-4">
             {/* Header */}
-            <div className="max-w-4xl mx-auto mb-8 relative">
+            <div className="flex items-center absolute left-0 top-1">
                 <button
                     onClick={onBack}
-                    className="absolute left-0 top-1 p-2 hover:bg-gray-200 rounded-full transition-colors"
+                    className="p-2 mr-4 bg-white/80 hover:bg-white rounded-full shadow-sm hover:shadow transition-all group border border-gray-100"
+                    title="Voltar ao Menu Principal"
                 >
-                    <ArrowLeft className="w-6 h-6 text-gray-600" />
+                    <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-purple-600 transition-colors" />
                 </button>
-                <div className="text-center">
-                    <div className="inline-flex items-center justify-center p-3 bg-purple-100 rounded-full mb-4">
-                        <Wind className="w-8 h-8 text-purple-600" />
-                    </div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">ZenFlow™</h1>
-                    <p className="text-lg text-gray-600 max-w-lg mx-auto">
-                        Movimento Intencional para reprogramar o que a mente não alcança.
-                    </p>
+                {/* Visual Cue - Drawing */}
+                <div className="hidden sm:flex items-center gap-2 text-xs text-purple-400 font-handwriting opacity-80 animate-fade-in select-none">
+                    <span>↵ Menu Principal</span>
                 </div>
             </div>
+
+            <div className="text-center pt-2">
+                <div className="inline-flex items-center justify-center p-3 bg-purple-100 rounded-full mb-4 ring-4 ring-purple-50 shadow-inner">
+                    <Wind className="w-8 h-8 text-purple-600" />
+                </div>
+                <h1 className="text-4xl font-bold text-gray-900 mb-2 tracking-tight">ZenFlow™</h1>
+                <p className="text-lg text-gray-600 max-w-lg mx-auto leading-relaxed">
+                    Movimento Intencional para reprogramar o que a mente não alcança.
+                </p>
+            </div>
+
 
             {/* Educational Banner */}
             <div className="max-w-4xl mx-auto mb-12 bg-white rounded-2xl p-6 shadow-sm border border-purple-100 relative overflow-hidden">
@@ -137,6 +144,6 @@ export const ZenFlowPage: React.FC<ZenFlowPageProps> = ({ onBack }) => {
                     </div>
                 ))}
             </div>
-        </div>
+        </div >
     );
 };

@@ -145,15 +145,19 @@ export const ProtocolPage: React.FC<ProtocolPageProps> = ({ onPageChange }) => {
 
 
                     {/* Back to Home Button */}
-                    <button
-                        onClick={() => onPageChange('home')}
-                        className="mb-8 flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors group"
-                    >
-                        <div className="p-2 bg-white rounded-full shadow-md group-hover:shadow-lg transition-all">
-                            <ArrowLeft className="w-5 h-5" />
+                    <div className="flex items-center mb-8 relative">
+                        <button
+                            onClick={() => onPageChange('home')}
+                            className="p-2 mr-4 bg-white/80 hover:bg-white rounded-full shadow-sm hover:shadow transition-all group border border-gray-100"
+                            title="Voltar ao Início"
+                        >
+                            <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-purple-600 transition-colors" />
+                        </button>
+                        {/* Visual Cue - Drawing */}
+                        <div className="hidden sm:flex items-center gap-2 text-xs text-gray-400 font-handwriting opacity-80 animate-fade-in select-none">
+                            <span>↵ Menu Principal</span>
                         </div>
-                        <span className="font-medium">Voltar ao Início</span>
-                    </button>
+                    </div>
 
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-gray-900">Sessões Otimizadas</h1>

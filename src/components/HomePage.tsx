@@ -4,6 +4,7 @@ import { Play, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, 
 import { useLanguage } from '../contexts/LanguageContext';
 import { PartnershipModal } from './PartnershipModal';
 import { EmotionalCheckIn } from './EmotionalCheckIn';
+import { MatrixRain } from './MatrixRain';
 
 import { HappyNewYear2026 } from './HappyNewYear2026';
 import { HeroHybrid } from './HeroHybrid';
@@ -39,6 +40,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
   const [showPartnershipModal, setShowPartnershipModal] = useState(false);
   const [showEmotionalCheckIn, setShowEmotionalCheckIn] = useState(false);
+  // New state for the choice modal
+  const [showTherapyChoice, setShowTherapyChoice] = useState(false);
 
   useEffect(() => {
     // Mostrar mensagem de boas-vindas se for primeira visita
@@ -50,12 +53,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
   }, []);
 
   const handleEmotionalSelection = (emotionId: string, intensity: number) => {
-    // Salvar seleção emocional
+    // 1. Salvar seleção emocional (sempre salva para persistência)
     localStorage.setItem('last_emotional_checkin', JSON.stringify({
       emotionId,
       intensity,
       timestamp: new Date().toISOString()
     }));
+
+    // 2. Fechar o check-in e abrir a escolha
+    setShowEmotionalCheckIn(false);
+    setShowTherapyChoice(true);
   };
 
 
@@ -152,6 +159,53 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
 
           {/* Therapy Selection Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
+            {/* --- SESSÃO MESTRA (Premium/Recommended) --- */}
+            <div
+              onClick={() => onPageChange('triad-session')}
+              className="group col-span-1 md:col-span-3 bg-gradient-to-r from-gray-900 via-purple-900 to-black rounded-3xl shadow-2xl p-8 cursor-pointer transform hover:scale-[1.02] transition-all duration-300 border-2 border-purple-500/30 hover:border-purple-400 relative overflow-hidden flex flex-col md:flex-row items-center gap-8 z-20"
+            >
+              <div className="absolute top-0 right-0 bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-bl-xl z-20">
+                RECOMENDADO
+              </div>
+
+              {/* Animated Background */}
+              <div className="absolute inset-0 opacity-20">
+                <MatrixRain />
+              </div>
+
+              {/* Icon */}
+              <div className="relative z-10 flex-shrink-0">
+                <div className="w-20 h-20 rounded-full bg-black/50 border border-purple-500/50 flex items-center justify-center p-4 shadow-[0_0_30px_rgba(168,85,247,0.4)]">
+                  <Sparkles className="w-10 h-10 text-purple-300 animate-pulse" />
+                </div>
+              </div>
+
+              {/* Text */}
+              <div className="relative z-10 flex-1 text-center md:text-left">
+                <h2 className="text-3xl font-bold text-white mb-2">
+                  Sessão Mestra <span className="text-purple-300 text-lg font-normal mb-1">(Tríade Unificada)</span>
+                </h2>
+                <p className="text-gray-300 mb-4 text-base leading-relaxed">
+                  A experiência completa de consultório. O sistema guia você automaticamente por
+                  <span className="text-white font-bold"> Insight (Mente)</span> ➡
+                  <span className="text-yellow-400 font-bold"> Energia</span> ➡
+                  <span className="text-blue-400 font-bold"> Corpo</span>.
+                </p>
+                <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-purple-200 border border-purple-500/20">Diagnóstico IA</span>
+                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-yellow-200 border border-yellow-500/20">Acupressão</span>
+                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-blue-200 border border-blue-500/20">ZenFlow</span>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="relative z-10">
+                <div className="w-12 h-12 rounded-full bg-white text-purple-900 flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform">
+                  <ArrowRight className="w-6 h-6" />
+                </div>
+              </div>
+            </div>
+
             {/* Respiração 4-7-8 */}
             <div
               onClick={() => onPageChange('breathing')}
@@ -176,14 +230,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
               </div>
             </div>
 
-            {/* ZenFlow (NOVO!) */}
+            {/* ZenFlow */}
             <div
               onClick={() => onPageChange('zenflow')} /* Placeholder: Redireciona para ZenFlow */
-              className="group bg-gradient-to-br from-purple-50 to-indigo-50 rounded-3xl shadow-xl p-6 cursor-pointer transform hover:scale-110 transition-all duration-300 border-2 border-purple-200 hover:border-purple-400 relative overflow-hidden flex flex-col z-10"
+              className="group bg-gradient-to-br from-purple-50 to-indigo-50 rounded-3xl shadow-xl p-6 cursor-pointer transform hover:scale-105 transition-all duration-300 border-2 border-purple-200 hover:border-purple-400 relative overflow-hidden flex flex-col z-10"
             >
-              <div className="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl">
-                NOVO
-              </div>
               <div className="text-center flex-1">
                 <div className="flex justify-center mb-6">
                   <div className="p-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full group-hover:from-purple-700 group-hover:to-indigo-700 transition-all shadow-lg shadow-purple-200">
@@ -196,17 +247,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 <p className="text-purple-800 mb-4 text-sm leading-relaxed font-medium">
                   Movimento Intencional para reprogramar traumas e liberar o que o toque não alcança.
                 </p>
-                <div className="space-y-2 text-xs text-purple-700 mb-4 text-left bg-white/50 p-3 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <span className="text-purple-500">✔</span> Qi Gong Medicinal
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-purple-500">✔</span> Yoga Facial (Nervos Cranianos)
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-purple-500">✔</span> Reprogramação Somática
-                  </div>
-                </div>
 
                 <div className="text-xs text-purple-700 font-bold mt-auto pt-4 border-t border-purple-200 flex items-center justify-center gap-1 group-hover:gap-2 transition-all">
                   <span>INTEGRAR TRAUMA</span> <ArrowRight className="w-4 h-4" />
@@ -804,8 +844,75 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
         <EmotionalCheckIn
           onClose={() => setShowEmotionalCheckIn(false)}
           onSelect={handleEmotionalSelection}
-          onNavigate={onPageChange}
+          onNavigate={() => { }} // Controlled by handleEmotionalSelection locally
         />
+      )}
+
+      {/* Therapy Choice Modal (Protocol vs Sessão Mestra) */}
+      {showTherapyChoice && (
+        <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 relative overflow-hidden">
+            <button
+              onClick={() => setShowTherapyChoice(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">🤔</span>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Como deseja prosseguir?</h2>
+              <p className="text-gray-600">Escolha a profundidade do seu tratamento hoje.</p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {/* Option 1: Quick Relief (Protocols) */}
+              <button
+                onClick={() => {
+                  setShowTherapyChoice(false);
+                  onPageChange('protocols');
+                }}
+                className="group relative p-4 rounded-xl border-2 border-blue-100 hover:border-blue-500 bg-blue-50/50 hover:bg-blue-50 transition-all text-left flex items-start gap-4"
+              >
+                <div className="bg-blue-200 p-3 rounded-lg group-hover:bg-blue-500 transition-colors">
+                  <Heart className="w-6 h-6 text-blue-700 group-hover:text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-lg group-hover:text-blue-700">Alívio Rápido</h3>
+                  <p className="text-sm text-gray-600">Protocolo direto de acupuntura para alívio imediato dos sintomas.</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-gray-300 absolute right-4 top-1/2 -translate-y-1/2 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+              </button>
+
+              {/* Option 2: Complete Session (Sessão Mestra) */}
+              <button
+                onClick={() => {
+                  setShowTherapyChoice(false);
+                  onPageChange('triad-session');
+                }}
+                className="group relative p-4 rounded-xl border-2 border-purple-100 hover:border-purple-500 bg-purple-50/50 hover:bg-purple-50 transition-all text-left flex items-start gap-4"
+              >
+                <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">RECOMENDADO</div>
+                <div className="bg-purple-200 p-3 rounded-lg group-hover:bg-purple-600 transition-colors">
+                  <Sparkles className="w-6 h-6 text-purple-800 group-hover:text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-lg group-hover:text-purple-700">Sessão Mestra (Completa)</h3>
+                  <p className="text-sm text-gray-600">Jornada guiada: Insight Emocional + Pontos + Áudio ZenFlow.</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-gray-300 absolute right-4 top-1/2 -translate-y-1/2 group-hover:text-purple-500 group-hover:translate-x-1 transition-all" />
+              </button>
+            </div>
+
+            <p className="text-xs text-center text-gray-400 mt-6">
+              Ambas as opções são personalizadas para sua emoção.
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

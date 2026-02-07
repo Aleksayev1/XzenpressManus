@@ -14,6 +14,7 @@ export interface EmotionalState {
     description: string;
     primaryPoints: string[]; // IDs dos pontos principais
     recommendedProtocol?: string; // ID do protocolo recomendado
+    zenFlowExerciseId?: string; // ID do exercício de Qi Gong específico
     cycle?: {
         mother: string;
         son: string;
@@ -38,6 +39,7 @@ export const emotionalStates: EmotionalState[] = [
             'yongquan-r1-kd1'
         ],
         recommendedProtocol: 'harmonia-mental',
+        zenFlowExerciseId: 'reg-calm', // Acalmar o Mar Interno
         cycle: {
             mother: 'fire',
             son: 'metal',
@@ -60,6 +62,7 @@ export const emotionalStates: EmotionalState[] = [
             'anmian-extra'
         ],
         recommendedProtocol: 'harmonia-mental',
+        zenFlowExerciseId: 'reg-calm', // Acalmar o Fogo
         cycle: {
             mother: 'wood',
             son: 'earth',
@@ -82,6 +85,7 @@ export const emotionalStates: EmotionalState[] = [
             'neiguan-pc6'
         ],
         recommendedProtocol: 'harmonia-mental',
+        zenFlowExerciseId: 'rel-chest', // Abrir o Coração
         cycle: {
             mother: 'earth',
             son: 'water',
@@ -99,6 +103,7 @@ export const emotionalStates: EmotionalState[] = [
         description: 'Frustração, pavio curto, sensação de injustiça ou explosão iminente.',
         primaryPoints: ['xingjian-lv2', 'lv3-taichong', 'ren14-juque', 'ynsa-zf-figado'],
         recommendedProtocol: 'equilibrio-raiva',
+        zenFlowExerciseId: 'rel-liver', // Grito Silencioso / Soltar a Raiva
         cycle: {
             mother: 'water', // Rim nutre Fígado
             son: 'fire',   // Fígado alimenta Coração (F2 Drena)
@@ -116,6 +121,7 @@ export const emotionalStates: EmotionalState[] = [
         description: 'Dificuldade em escolher, falta de coragem, sentir-se travado ou tímido.',
         primaryPoints: ['gb40-qiuxu', 'gb34-yanglingquan', 'ynsa-zf-vesicula'],
         recommendedProtocol: 'decisao-coragem',
+        zenFlowExerciseId: 'int-flow', // Fluidez / Confiança
         cycle: {
             mother: 'water', // Água dá coragem à Madeira
             son: 'fire',
@@ -138,6 +144,7 @@ export const emotionalStates: EmotionalState[] = [
             'ynsa-brain-m1'
         ],
         recommendedProtocol: 'superando-medo', // ID correto do protocolo
+        zenFlowExerciseId: 'reg-ground', // Raízes Profundas / Segurança
         cycle: {
             mother: 'metal', // Metal (Pulmão) gera Água -> R7
             son: 'wood',     // Água gera Madeira -> R1
@@ -161,6 +168,7 @@ export const emotionalStates: EmotionalState[] = [
             'ynsa-ponto-d'
         ],
         recommendedProtocol: 'harmonia-mental',
+        zenFlowExerciseId: 'rel-chest', // Abrir o Coração / Conexão
         cycle: {
             mother: 'wood',
             son: 'earth',
@@ -184,6 +192,7 @@ export const emotionalStates: EmotionalState[] = [
             'cerebro-cerebelo'
         ],
         recommendedProtocol: 'sono-reparador',
+        zenFlowExerciseId: 'reg-calm', // Acalmar o Mar Interno
         cycle: {
             mother: 'metal',
             son: 'wood',

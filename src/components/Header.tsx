@@ -31,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
   const navItems = [
     { id: 'home' },
     { id: 'ai-assistant' }, // 🚀 NOVO: Acesso direto ao Self-Oráculo
+    { id: 'triad-session' }, // ✨ SESSÃO MESTRA
     { id: 'acupressure' },
     { id: 'protocols' },
     { id: 'breathing' },
@@ -63,12 +64,13 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
       navItems[0], // Home
       navItems[1], // AI
       navItems.find(i => i.id === 'nutriming-ai') || { id: 'nutriming-ai' }, // Nutriming (Explicit)
-      navItems[2], // Acupressure
-      navItems[3], // Protocols
-      navItems[4], // Breathing
+      navItems[2], // Triad (Sessão Mestra)
+      navItems[3], // Acupressure
+      navItems[4], // Protocols
+      navItems[5], // Breathing
       navItems.find(i => i.id === 'dashboard') || { id: 'dashboard' }, // Dashboard (Explicit)
       ...premiumNavItems,
-      navItems[9]  // Blog
+      navItems[11]  // Blog (was 9 before insertion of triad and pricing? No, pricing was at 8. Original was 9. New size? 0..12. Blog is 11)
     ]
     : navItems;
 

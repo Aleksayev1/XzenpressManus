@@ -1,0 +1,44 @@
+[
+    {
+        "vice": "orgulho",
+        "virtue": "humildade",
+        "definition": "Reconhecer que não se sabe tudo; aceitar ajuda; ceder o lugar de fala.",
+        "mantra": "Eu me curvo diante da sabedoria maior que habita em todos."
+    },
+    {
+        "vice": "egoismo",
+        "virtue": "caridade",
+        "definition": "Sair da órbita do 'Eu' e perceber a necessidade real do Outro.",
+        "mantra": "Hoje minha alegria virá de servir, não de ser servido."
+    },
+    {
+        "vice": "raiva",
+        "virtue": "mansuetude",
+        "definition": "A força contida e serena. Responder, não reagir. Compreender a dor por trás do ataque.",
+        "mantra": "Minha paz é inegociável. Eu escolho a serenidade."
+    },
+    {
+        "vice": "medo",
+        "virtue": "fe_racional",
+        "definition": "Certeza raciocinada de que não há acaso no universo e que sou capaz de lidar com o que vier.",
+        "mantra": "Tudo o que vem é para o meu bem (Gam Zu L'Tovah)."
+    },
+    {
+        "vice": "preguica",
+        "virtue": "trabalho_util",
+        "definition": "Movimentar a energia vital para gerar valor. Sair da inércia.",
+        "mantra": "Eu sou co-criador da minha realidade através da ação."
+    },
+    {
+        "vice": "gula",
+        "virtue": "temperanca",
+        "definition": "O domínio do espírito sobre a matéria. O equilíbrio no nutrir.",
+        "mantra": "Meu corpo é um templo sagrado, não um depósito."
+    },
+    {
+        "vice": "luxuria",
+        "virtue": "castidade_mental",
+        "definition": "Pureza de intenção. Ver o outro como alma, não como objeto de prazer.",
+        "mantra": "Eu honro a divindade no outro."
+    }
+]

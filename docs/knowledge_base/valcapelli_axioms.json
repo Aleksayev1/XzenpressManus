@@ -1,0 +1,66 @@
+[
+    {
+        "organ": "estomago",
+        "element": "terra",
+        "emotion": "preocupacao",
+        "causality": "Não 'digerir' os fatos da vida. Crítica excessiva. Querer que o mundo seja do seu jeito, não como é.",
+        "symptom": "Gastrite, Refluxo, Queimação",
+        "virtue_needed": "Aceitação"
+    },
+    {
+        "organ": "figado",
+        "element": "madeira",
+        "emotion": "raiva",
+        "causality": "Resistência à mudança. Amargura crônica. Sentimento de injustiça. Agressividade represada.",
+        "symptom": "Enxaqueca, Tensão Muscular, Problemas Visuais",
+        "virtue_needed": "Mansuetude / Flexibilidade"
+    },
+    {
+        "organ": "pulmao",
+        "element": "metal",
+        "emotion": "tristeza",
+        "causality": "Cansaço da vida. Feridas emocionais profundas não curadas. Sentimento de sufoco ou abandono.",
+        "symptom": "Asma, Bronquite, Alergias Respiratórias",
+        "virtue_needed": "Alegria de Viver / Gratidão"
+    },
+    {
+        "organ": "rim",
+        "element": "agua",
+        "emotion": "medo",
+        "causality": "Medo do futuro. Insegurança existencial. Apego a mágoas antigas (pedras). Falta de apoio.",
+        "symptom": "Cálculo Renal, Dor Lombar, Cansaço Crônico",
+        "virtue_needed": "Fé / Coragem"
+    },
+    {
+        "organ": "coracao",
+        "element": "fogo",
+        "emotion": "ansiedade",
+        "causality": "Desconexão com a própria essência. Autoritarismo que sufoca o amor. Pressa de viver.",
+        "symptom": "Taquicardia, Insônia, Pressão Alta",
+        "virtue_needed": "Serenidade / Amor Incondicional"
+    },
+    {
+        "organ": "coluna_cervical",
+        "element": "estrutura",
+        "emotion": "teimosia",
+        "causality": "Inflexibilidade. Não querer olhar para os lados (outras opiniões). Orgulho mental.",
+        "symptom": "Torcicolo, Rigidez no pescoço",
+        "virtue_needed": "Humildade Intelectual"
+    },
+    {
+        "organ": "coluna_lombar",
+        "element": "estrutura",
+        "emotion": "insegurança_material",
+        "causality": "Medo da falta. Preocupação excessiva com dinheiro/sustento. Sentir-se sem suporte.",
+        "symptom": "Hérnia de Disco, Travamento Lombar",
+        "virtue_needed": "Confiança na Providência"
+    },
+    {
+        "organ": "joelhos",
+        "element": "estrutura",
+        "emotion": "orgulho",
+        "causality": "Dificuldade em se dobrar (ceder). Ego rígido. Não aceitar autoridade ou mudanças.",
+        "symptom": "Dor nos Joelhos, Menisco",
+        "virtue_needed": "Reverência / Flexibilidade"
+    }
+]

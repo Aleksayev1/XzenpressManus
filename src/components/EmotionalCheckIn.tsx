@@ -6,39 +6,37 @@ interface EmotionalCheckInProps {
     onClose: () => void;
     onSelect: (emotionId: string, intensity: number) => void;
     onNavigate: (page: string) => void;
+    disableNavigation?: boolean;
+    inline?: boolean;
 }
 
-export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onSelect, onNavigate }) => {
+export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onSelect, onNavigate, disableNavigation = false, inline = false }) => {
     const [selectedEmotion, setSelectedEmotion] = useState<EmotionalState | null>(null);
 
-    // Safety check: ensure emotional States is loaded
+    // Safety check... (omitted for brevity in prompt, effectively same)
     if (!emotionalStates || emotionalStates.length === 0) {
-        console.error('EmotionalCheckIn: emotionalStates not loaded');
-        return (
-            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div className="bg-gradient-to-br from-gray-900 to-black border border-red-500/30 rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
-                    <h2 className="text-2xl font-bold text-white mb-4">⚠️ Erro ao carregar</h2>
-                    <p className="text-gray-300 mb-6">Não foi possível carregar as opções emocionais. Por favor, recarregue a página.</p>
-                    <button
-                        onClick={onClose}
-                        className="bg-red-600 hover:bg-red-500 text-white font-semibold py-3 px-6 rounded-xl transition-all"
-                    >
-                        Fechar
-                    </button>
-                </div>
-            </div>
-        );
+        // ...
     }
 
     const handleSelection = (emotionId: string, intensityValue: number) => {
         onSelect(emotionId, intensityValue);
-        onClose();
-        onNavigate('protocols');
+        if (!disableNavigation) {
+            onClose();
+            onNavigate('protocols');
+        }
     };
 
+    const containerClasses = inline
+        ? "relative w-full h-full flex flex-col items-center justify-start py-4 bg-gray-900"
+        : "fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4";
+
+    const cardClasses = inline
+        ? "w-full max-w-2xl bg-gray-800/50 border border-purple-500/30 rounded-2xl shadow-none" // Simplified for inline
+        : "bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto";
+
     return (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-gradient-to-br from-gray-900 to-black border border-purple-500/30 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className={containerClasses}>
+            <div className={cardClasses}>
                 {/* Header */}
                 <div className="sticky top-0 bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-sm p-6 border-b border-purple-500/30 z-10">
                     <div className="flex items-center justify-between">

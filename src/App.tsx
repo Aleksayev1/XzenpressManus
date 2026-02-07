@@ -37,6 +37,7 @@ import { YNSAStudyPage } from './pages/YNSAStudyPage';
 import HormonalResearchPage from './components/HormonalResearchPage';
 import { ZSResearchFloating } from './components/ZSResearchFloating';
 import { ZenFlowPage } from './components/ZenFlowPage';
+import { SessaoMestraPage } from './components/SessaoMestraPage';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -228,6 +229,8 @@ function AppContent() {
         return <YNSAStudyPage />;
       case 'zenflow':
         return <ZenFlowPage onBack={() => setCurrentPage('home')} />;
+      case 'triad-session':
+        return <SessaoMestraPage onBack={() => setCurrentPage('home')} />;
       default:
         return <HomePage onPageChange={setCurrentPage} />;
     }

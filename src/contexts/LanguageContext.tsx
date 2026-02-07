@@ -38,6 +38,8 @@ const translations = {
     'nav.login': 'Entrar',
     'nav.logout': 'Sair',
     'nav.ai-assistant': 'Self Oracle (IA)',
+    'nav.triad-session': 'Sessão Mestra ✨',
+    'nav.pricing': 'Planos',
     'home.feature.ai-assistant.title': 'Self Oracle',
     'home.feature.ai-assistant.desc': 'Assistente de Evolução Humana que integra Acupressão, Ayurveda, Neurociência, Epigenética, Metafísica e Reforma Íntima.',
     'home.feature.ai-assistant.tagline': 'Decifre a linguagem do seu corpo e evolua.',

@@ -1,0 +1,30 @@
+[
+    {
+        "pattern_id": "vitima",
+        "name": "O Padrão da Vítima",
+        "trigger_question": "Você sente que o mundo/família é injusto com você?",
+        "insight": "Você não é vítima da sua família. Você escolheu este cenário exato para evoluir uma virtude que lhe faltava.",
+        "action": "Assuma Radical Autorresponsabilidade. O que VOCÊ pode fazer hoje, sem depender de ninguém?"
+    },
+    {
+        "pattern_id": "controlador",
+        "name": "O Padrão do Controlador",
+        "trigger_question": "Você se irrita quando as coisas saem do seu planejamento?",
+        "insight": "Sua tentativa de controlar tudo é medo disfarçado. A vida é fluxo, não arquitetura rígida.",
+        "action": "Pratique a entrega. Deixe um pequeno detalhe do dia 'errado' de propósito e observe sua reação."
+    },
+    {
+        "pattern_id": "salvador",
+        "name": "O Padrão do Salvador",
+        "trigger_question": "Você se sente exausto cuidando dos problemas dos outros?",
+        "insight": "Ajudar quem não pediu ajuda é invasão, não caridade. Você está buscando validação externa.",
+        "action": "Recolha sua energia. Diga 'não' hoje para uma demanda que não é sua."
+    },
+    {
+        "pattern_id": "rejeitado",
+        "name": "O Padrão da Rejeição",
+        "trigger_question": "Você se sente excluído ou não amado com frequência?",
+        "insight": "Você rejeita a si mesmo antes que os outros o façam. O mundo é um espelho.",
+        "action": "Faça algo de bom APENAS para você hoje. Nutra sua criança ferida."
+    }
+]

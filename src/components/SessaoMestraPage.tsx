@@ -293,7 +293,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
                 {/* PHASE 2: ACUPRESSURE */}
                 {phase === 'acupressure' && (
-                    <div className="absolute inset-0 flex flex-col items-center p-6 animate-in slide-in-from-right overflow-y-auto">
+                    <div className="absolute inset-0 flex flex-col items-center p-6 pb-32 animate-in slide-in-from-right overflow-y-auto">
                         <div className="text-center mb-8">
                             <h1 className="text-3xl font-bold text-yellow-400 mb-2 flex items-center justify-center gap-2">
                                 <Zap className="w-8 h-8" />
@@ -329,7 +329,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
                 {/* PHASE 3: ZENFLOW */}
                 {phase === 'zenflow' && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 animate-in slide-in-from-right bg-black overflow-y-auto">
+                    <div className="absolute inset-0 flex flex-col items-center p-6 pb-32 animate-in slide-in-from-right bg-black overflow-y-auto">
                         <div className="absolute inset-0 opacity-20 pointer-events-none">
                             <MatrixRain />
                         </div>

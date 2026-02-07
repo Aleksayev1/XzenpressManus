@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Play, Lock, Brain, Moon, Zap, Move, Smile, UserCheck, Hand, Shield, Coffee, Sparkles, Clock, CheckCircle, RotateCcw, ChevronRight, XCircle, Utensils } from 'lucide-react';
+import { ArrowLeft, Play, Brain, Moon, Zap, Move, Smile, UserCheck, Hand, Shield, Coffee, Sparkles, Clock, CheckCircle, RotateCcw, ChevronRight, XCircle, Utensils } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { acupressurePoints } from '../data/acupressurePoints';
 import { protocols } from '../data/protocols';
@@ -120,14 +120,6 @@ export const ProtocolPage: React.FC<ProtocolPageProps> = ({ onPageChange }) => {
         } else {
             // Finished
             setActiveStepIndex(selectedProtocol.steps.length); // Completion screen
-        }
-    };
-
-    const prevStep = () => {
-        if (activeStepIndex > 0) {
-            startStep(activeStepIndex - 1);
-        } else {
-            setActiveStepIndex(-1);
         }
     };
 

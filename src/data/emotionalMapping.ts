@@ -36,7 +36,9 @@ export const emotionalStates: EmotionalState[] = [
             'yintang-ex-hn3',
             'shenmen-c7',
             'neiguan-pc6',
-            'yongquan-r1-kd1'
+            'yongquan-r1-kd1',
+            'ren17-danzhong', // Add: Anxiety/Chest
+            'lu10-yuji'       // Add: Mental restless
         ],
         recommendedProtocol: 'harmonia-mental',
         zenFlowExerciseId: 'reg-calm', // Acalmar o Mar Interno
@@ -59,7 +61,9 @@ export const emotionalStates: EmotionalState[] = [
             'yintang-ex-hn3',
             'shenmen-c7',
             'ynsa-ponto-d',
-            'anmian-extra'
+            'anmian-extra',
+            'ren17-danzhong',      // Add: Tension release
+            'septicemia-hegu-li4'  // Add: General stress/pain
         ],
         recommendedProtocol: 'harmonia-mental',
         zenFlowExerciseId: 'reg-calm', // Acalmar o Fogo
@@ -82,7 +86,9 @@ export const emotionalStates: EmotionalState[] = [
             'ht5-tongli',
             'yongquan-r1-kd1',
             'ynsa-basal-ganglia',
-            'neiguan-pc6'
+            'neiguan-pc6',
+            'ren17-danzhong',    // Add: Anguish/Open Chest
+            'baihui-basic-vg20'  // Add: Lift Spirit
         ],
         recommendedProtocol: 'harmonia-mental',
         zenFlowExerciseId: 'rel-chest', // Abrir o Coração
@@ -101,7 +107,13 @@ export const emotionalStates: EmotionalState[] = [
         mtcElement: 'wood',
         mtcOrgan: 'Fígado',
         description: 'Frustração, pavio curto, sensação de injustiça ou explosão iminente.',
-        primaryPoints: ['xingjian-lv2', 'lv3-taichong', 'ren14-juque', 'ynsa-zf-figado'],
+        primaryPoints: [
+            'xingjian-lv2', // Add: Fire point (Effective)
+            'lv3-taichong',
+            'ren14-juque',
+            'ynsa-zf-figado',
+            'septicemia-hegu-li4' // Add: Move Qi
+        ],
         recommendedProtocol: 'equilibrio-raiva',
         zenFlowExerciseId: 'rel-liver', // Grito Silencioso / Soltar a Raiva
         cycle: {
@@ -119,7 +131,13 @@ export const emotionalStates: EmotionalState[] = [
         mtcElement: 'wood',
         mtcOrgan: 'Vesícula Biliar',
         description: 'Dificuldade em escolher, falta de coragem, sentir-se travado ou tímido.',
-        primaryPoints: ['gb40-qiuxu', 'gb34-yanglingquan', 'ynsa-zf-vesicula'],
+        primaryPoints: [
+            'gb40-qiuxu',
+            'gb34-yanglingquan',
+            'ynsa-zf-vesicula',
+            'baihui-basic-vg20', // Add: Mental Clarity
+            'gb20-fengchi'       // Add: Clear Wind/Mind
+        ],
         recommendedProtocol: 'decisao-coragem',
         zenFlowExerciseId: 'int-flow', // Fluidez / Confiança
         cycle: {
@@ -141,7 +159,9 @@ export const emotionalStates: EmotionalState[] = [
             'kd3-taixi', // Fonte (Terra) harmoniza
             'yongquan-r1-kd1', // Filho (Madeira) aterra
             'ynsa-zf-rim',
-            'ynsa-brain-m1'
+            'ynsa-brain-m1',
+            'lu10-yuji',        // Add: Calm Spirit/Fear
+            'cv4-guanyuan'      // Add: Root/Vitality
         ],
         recommendedProtocol: 'superando-medo', // ID correto do protocolo
         zenFlowExerciseId: 'reg-ground', // Raízes Profundas / Segurança
@@ -165,6 +185,7 @@ export const emotionalStates: EmotionalState[] = [
             'neiguan-pc6',
             'sp6-sanyinjiao',
             'yintang-ex-hn3',
+            'ren17-danzhong',   // Add: Emotional Connection
             'ynsa-ponto-d'
         ],
         recommendedProtocol: 'harmonia-mental',
@@ -189,7 +210,8 @@ export const emotionalStates: EmotionalState[] = [
             'shenmen-c7',
             'yintang-ex-hn3',
             'ynsa-ponto-d',
-            'cerebro-cerebelo'
+            'cerebro-cerebelo',
+            'septicemia-zusanli-st36' // Add: Grounding/Stomach
         ],
         recommendedProtocol: 'sono-reparador',
         zenFlowExerciseId: 'reg-calm', // Acalmar o Mar Interno

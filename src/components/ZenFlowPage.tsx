@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Wind, Activity, Zap, Play, Info } from 'lucide-react';
-import { useLanguage } from '../contexts/LanguageContext';
 import { ZenFlowSession } from './ZenFlowSession';
 import { ZenFlowSequence, zenFlowExercises } from '../data/zenFlowExercises';
 
@@ -9,7 +8,6 @@ interface ZenFlowPageProps {
 }
 
 export const ZenFlowPage: React.FC<ZenFlowPageProps> = ({ onBack }) => {
-    const { t } = useLanguage();
     const [activeSession, setActiveSession] = useState<ZenFlowSequence | null>(null);
 
     const categories = [

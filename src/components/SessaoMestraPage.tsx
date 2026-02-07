@@ -307,7 +307,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             {getRecommendedPoints().map(point => (
                                 <div key={point.id} className="bg-gray-800 rounded-2xl p-4 border border-yellow-500/30 flex gap-4 hover:border-yellow-400 transition-colors">
                                     <button
-                                        onClick={() => setSelectedImage(point.image)}
+                                        onClick={() => setSelectedImage(point.image || null)}
                                         className="w-24 h-24 bg-black rounded-lg overflow-hidden flex-shrink-0 cursor-zoom-in hover:opacity-80 transition-opacity ring-1 ring-white/10"
                                     >
                                         <img src={point.image} alt={point.name} className="w-full h-full object-cover" />

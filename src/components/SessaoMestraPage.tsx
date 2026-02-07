@@ -25,6 +25,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [selectedEmotion, setSelectedEmotion] = useState<EmotionalState | null>(null);
     const [intensity, setIntensity] = useState<number>(0);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [currentPointIndex, setCurrentPointIndex] = useState(0);
+    const [currentPointIndex, setCurrentPointIndex] = useState(0);
 
     // Chat State
     const [messages, setMessages] = useState<Message[]>([]);
@@ -292,42 +294,102 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     </div>
                 )}
 
-                {/* PHASE 2: ACUPRESSURE */}
+                {/* PHASE 2: GUIDED ACUPRESSURE */}
                 {phase === 'acupressure' && (
                     <div className="absolute inset-0 flex flex-col items-center p-6 pb-32 animate-in slide-in-from-right overflow-y-auto">
-                        <div className="text-center mb-8">
-                            <h1 className="text-3xl font-bold text-yellow-400 mb-2 flex items-center justify-center gap-2">
-                                <Zap className="w-8 h-8" />
+                        <div className="text-center mb-4">
+                            <h1 className="text-2xl font-bold text-yellow-400 mb-1 flex items-center justify-center gap-2">
+                                <Zap className="w-6 h-6" />
                                 Alinhamento Energético
                             </h1>
-                            <p className="text-gray-400">Pressione estes pontos por 1 minuto cada.</p>
+                            <p className="text-gray-400 text-sm">Siga a respiração e o som.</p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full mb-8">
-                            {getRecommendedPoints().map(point => (
-                                <div key={point.id} className="bg-gray-800 rounded-2xl p-4 border border-yellow-500/30 flex gap-4 hover:border-yellow-400 transition-colors">
-                                    <button
-                                        onClick={() => setSelectedImage(point.image || null)}
-                                        className="w-24 h-24 bg-black rounded-lg overflow-hidden flex-shrink-0 cursor-zoom-in hover:opacity-80 transition-opacity ring-1 ring-white/10"
-                                    >
-                                        <img src={point.image} alt={point.name} className="w-full h-full object-cover" />
-                                    </button>
-                                    <div>
-                                        <h3 className="text-xl font-bold text-white mb-1">{point.id} - {point.name}</h3>
-                                        {/* Use instructions or fallback to description */}
-                                        <p className="text-yellow-200/80 text-sm mb-2">{point.description || point.instructions}</p>
-                                        <p className="text-gray-400 text-xs">{(Array.isArray(point.benefits) ? point.benefits.join(', ') : point.benefits).slice(0, 100)}...</p>
+                        {/* Audio Player for Focus */}
+                        <div className="w-full max-w-md mb-6 h-20 bg-gray-900 rounded-xl overflow-hidden shadow-lg border border-yellow-500/20 flex-shrink-0">
+                            <iframe
+                                style={{ borderRadius: '12px' }}
+                                src={`${getSpotifyUrl()}?theme=0`}
+                                width="100%"
+                                height="80"
+                                frameBorder="0"
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                loading="lazy"
+                            ></iframe>
+                        </div>
+
+                        {/* Active Point Card */}
+                        {(() => {
+                            const points = getRecommendedPoints();
+                            const point = points[currentPointIndex];
+
+                            if (!point) return <div className="text-white">Carregando pontos...</div>;
+
+                            return (
+                                <div className="flex flex-col items-center w-full max-w-md text-center relative">
+                                    {/* Breathing Circle Background - 4s Pulse */}
+                                    <div className="absolute top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-yellow-500/5 rounded-full blur-3xl animate-[pulse_4s_ease-in-out_infinite] pointer-events-none"></div>
+
+                                    {/* Point Image */}
+                                    <div className="relative mb-6">
+                                        <button
+                                            onClick={() => setSelectedImage(point.image || null)}
+                                            className="w-40 h-40 bg-black rounded-full overflow-hidden border-4 border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.2)] hover:scale-105 transition-transform flex-shrink-0 z-10 relative"
+                                        >
+                                            <img src={point.image} alt={point.name} className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-center pb-2">
+                                                <span className="text-xs text-white/80">Ver Detalhe</span>
+                                            </div>
+                                        </button>
+                                        <div className="absolute -right-4 -top-2 bg-yellow-600 text-black font-bold text-xs px-2 py-1 rounded-full shadow-lg">
+                                            {currentPointIndex + 1}/{points.length}
+                                        </div>
+                                    </div>
+
+                                    <h2 className="text-2xl font-bold text-white mb-2">{point.id} - {point.name}</h2>
+
+                                    {/* Breathing Guide */}
+                                    <div className="bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl border border-yellow-500/20 w-full mb-8 shadow-xl relative overflow-hidden group">
+                                        <div className="absolute top-0 left-0 w-1 h-full bg-yellow-500/50"></div>
+                                        <p className="text-gray-300 text-lg leading-relaxed mb-4">{point.description || point.instructions}</p>
+
+                                        <div className="flex items-center justify-center gap-3 py-3 bg-yellow-500/10 rounded-xl border border-yellow-500/10">
+                                            <Activity className="w-5 h-5 text-yellow-400 animate-pulse" />
+                                            <p className="text-yellow-200 font-medium animate-[pulse_4s_ease-in-out_infinite]">
+                                                "Inspire profundamente... Pressione ao soltar."
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Navigation */}
+                                    <div className="flex gap-4 w-full z-10">
+                                        <button
+                                            onClick={() => currentPointIndex > 0 ? setCurrentPointIndex(prev => prev - 1) : null}
+                                            disabled={currentPointIndex === 0}
+                                            className="flex-1 py-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-gray-400 font-medium disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            Anterior
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (currentPointIndex < points.length - 1) {
+                                                    setCurrentPointIndex(prev => prev + 1);
+                                                } else {
+                                                    setPhase('zenflow');
+                                                }
+                                            }}
+                                            className="flex-1 py-4 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-black font-bold rounded-xl shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)] transition-all flex items-center justify-center gap-2"
+                                        >
+                                            {currentPointIndex < points.length - 1 ? (
+                                                <>Próximo Ponto <ArrowRight className="w-5 h-5" /></>
+                                            ) : (
+                                                <>Concluir <Sparkles className="w-5 h-5" /></>
+                                            )}
+                                        </button>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-
-                        <button
-                            onClick={() => setPhase('zenflow')}
-                            className="px-8 py-4 bg-yellow-600 hover:bg-yellow-700 text-black font-bold rounded-xl transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:scale-105"
-                        >
-                            Pronto. Liberar no Corpo <Activity className="w-5 h-5" />
-                        </button>
+                            );
+                        })()}
                     </div>
                 )}
 

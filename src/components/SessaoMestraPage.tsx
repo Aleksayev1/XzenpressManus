@@ -413,7 +413,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
                 {/* PHASE 4: SUMMARY */}
                 {phase === 'summary' && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center animate-in zoom-in bg-gray-900">
+                    <div className="absolute inset-0 flex flex-col items-center p-6 pb-32 text-center animate-in zoom-in bg-gray-900 overflow-y-auto">
                         <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(34,197,94,0.3)]">
                             <Sparkles className="w-12 h-12 text-green-400" />
                         </div>

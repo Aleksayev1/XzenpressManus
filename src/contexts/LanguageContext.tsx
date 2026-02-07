@@ -1672,7 +1672,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const t = (key: string): string => {
     const langTranslations = translations[currentLanguage.code as keyof typeof translations];
-    const translation = langTranslations?.[key as keyof typeof translations.pt];
+    const translation = (langTranslations as Record<string, string>)?.[key];
 
     if (!translation) {
       // Fallback cascade: current language → English → Portuguese

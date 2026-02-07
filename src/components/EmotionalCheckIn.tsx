@@ -27,7 +27,7 @@ export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onS
     };
 
     const containerClasses = inline
-        ? "relative w-full h-full flex flex-col items-center justify-start py-4 bg-gray-900"
+        ? "relative w-full h-full flex flex-col items-center justify-start py-4 pb-32 bg-gray-900 overflow-y-auto"
         : "fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4";
 
     const cardClasses = inline

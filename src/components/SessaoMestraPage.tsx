@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, Brain, Zap, Activity, Send, Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Brain, Zap, Activity, Send, Loader2, Sparkles, X } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
 import { emotionalStates, type EmotionalState } from '../data/emotionalMapping';
 import { acupressurePoints } from '../data/acupressurePoints';
@@ -24,6 +24,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [phase, setPhase] = useState<SessionPhase>('checkin'); // Start with Check-in
     const [selectedEmotion, setSelectedEmotion] = useState<EmotionalState | null>(null);
     const [intensity, setIntensity] = useState<number>(0);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     // Chat State
     const [messages, setMessages] = useState<Message[]>([]);
@@ -197,7 +198,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-gray-900 text-white flex flex-col">
+        <div className="fixed inset-0 z-50 bg-gray-900 text-white flex flex-col overscroll-none">
             {/* Immersive Header */}
             <div className="relative h-16 flex items-center justify-between px-4 border-b border-gray-800 bg-black/50 backdrop-blur-md">
                 <button onClick={onBack} className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center text-gray-300 gap-2">
@@ -305,9 +306,12 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full mb-8">
                             {getRecommendedPoints().map(point => (
                                 <div key={point.id} className="bg-gray-800 rounded-2xl p-4 border border-yellow-500/30 flex gap-4 hover:border-yellow-400 transition-colors">
-                                    <div className="w-24 h-24 bg-black rounded-lg overflow-hidden flex-shrink-0">
+                                    <button
+                                        onClick={() => setSelectedImage(point.image)}
+                                        className="w-24 h-24 bg-black rounded-lg overflow-hidden flex-shrink-0 cursor-zoom-in hover:opacity-80 transition-opacity ring-1 ring-white/10"
+                                    >
                                         <img src={point.image} alt={point.name} className="w-full h-full object-cover" />
-                                    </div>
+                                    </button>
                                     <div>
                                         <h3 className="text-xl font-bold text-white mb-1">{point.id} - {point.name}</h3>
                                         {/* Use instructions or fallback to description */}
@@ -443,6 +447,31 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         <button onClick={onBack} className="px-8 py-3 border border-gray-600 hover:bg-gray-800 text-white rounded-xl transition-all">
                             Voltar ao Menu Principal
                         </button>
+                    </div>
+                )}
+                {/* Image Modal */}
+                {selectedImage && (
+                    <div
+                        className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+                        onClick={() => setSelectedImage(null)}
+                    >
+                        <div className="relative max-w-4xl max-h-[90vh] w-full flex flex-col items-center justify-center">
+                            <button
+                                onClick={() => setSelectedImage(null)}
+                                className="absolute -top-16 right-0 md:-right-4 p-2 text-white hover:text-red-400 transition-colors z-50"
+                            >
+                                <div className="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
+                                    <span className="text-sm font-medium">Fechar</span>
+                                    <X className="w-5 h-5" />
+                                </div>
+                            </button>
+                            <img
+                                src={selectedImage}
+                                alt="Detalhe do ponto"
+                                className="w-full h-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                            />
+                            <p className="text-gray-400 text-sm mt-4 animate-pulse">Toque em qualquer lugar para fechar</p>
+                        </div>
                     </div>
                 )}
             </div>

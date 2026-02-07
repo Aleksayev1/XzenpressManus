@@ -38,7 +38,7 @@ export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onS
         <div className={containerClasses}>
             <div className={cardClasses}>
                 {/* Header */}
-                <div className="sticky top-0 bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-sm p-6 border-b border-purple-500/30 z-10">
+                <div className="relative bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-sm p-6 border-b border-purple-500/30 z-10">
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-bold text-white">😊 Como você está se sentindo?</h2>

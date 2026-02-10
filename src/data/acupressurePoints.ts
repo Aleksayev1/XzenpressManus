@@ -1856,7 +1856,7 @@ export const acupressurePoints: AcupressurePoint[] = [
     benefitsEn: ['ZS Point Superior Reference', 'Treats Sadness', 'Strengthens Immunity'],
     isPremium: true,
     category: 'ynsa',
-    additionalCategories: ['lung', 'immunity'],
+    additionalCategories: ['lung'],
     instructions: 'Palpar região temporal anterior superior.',
     duration: 120,
     pressure: 'leve'

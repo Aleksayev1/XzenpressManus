@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, Brain, Zap, Activity, Send, Loader2, Sparkles, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Brain, Zap, Activity, Send, Loader2, Sparkles, X, Crown } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
 import { emotionalStates, type EmotionalState } from '../data/emotionalMapping';
 import { acupressurePoints } from '../data/acupressurePoints';
@@ -10,7 +10,7 @@ import { useSessionHistory } from '../hooks/useSessionHistory';
 // Internal components for the phases
 import { EmotionalCheckIn } from './EmotionalCheckIn';
 
-type SessionPhase = 'checkin' | 'insight' | 'acupressure' | 'zenflow' | 'summary';
+type SessionPhase = 'checkin' | 'insight' | 'preparation' | 'acupressure' | 'zenflow' | 'summary';
 
 interface Message {
     role: 'user' | 'assistant';
@@ -26,7 +26,74 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [intensity, setIntensity] = useState<number>(0);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [currentPointIndex, setCurrentPointIndex] = useState(0);
-    const [currentPointIndex, setCurrentPointIndex] = useState(0);
+
+    // Usage Limit State
+    const [usageCount, setUsageCount] = useState(0);
+    const [showLimitModal, setShowLimitModal] = useState(false);
+    const USAGE_LIMIT = 3;
+
+    // Timer State
+    const [timeLeft, setTimeLeft] = useState(60);
+    const [isTimerActive, setIsTimerActive] = useState(false);
+    const [zenFlowStepIndex, setZenFlowStepIndex] = useState(0);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isTimerActive && timeLeft > 0) {
+            interval = setInterval(() => {
+                setTimeLeft((prev) => prev - 1);
+            }, 1000);
+        } else if (timeLeft === 0) {
+            if (phase === 'zenflow') {
+                const exercise = selectedEmotion?.zenFlowExerciseId
+                    ? zenFlowExercises.find(z => z.id === selectedEmotion?.zenFlowExerciseId)
+                    : zenFlowExercises[0];
+
+                if (exercise && zenFlowStepIndex < exercise.steps.length - 1) {
+                    const nextStep = zenFlowStepIndex + 1;
+                    setZenFlowStepIndex(nextStep);
+                    setTimeLeft(exercise.steps[nextStep].durationSeconds);
+                } else {
+                    setIsTimerActive(false);
+                }
+            } else {
+                setIsTimerActive(false);
+            }
+        }
+        return () => clearInterval(interval);
+    }, [isTimerActive, timeLeft, phase, zenFlowStepIndex, selectedEmotion]);
+
+    // Reset Timer on Phase/Step Change
+    useEffect(() => {
+        if (phase === 'acupressure') {
+            setTimeLeft(60); // 1 minute per point
+            setIsTimerActive(true);
+        } else if (phase === 'zenflow') {
+            const exercise = selectedEmotion?.zenFlowExerciseId
+                ? zenFlowExercises.find(z => z.id === selectedEmotion?.zenFlowExerciseId)
+                : zenFlowExercises[0];
+            if (exercise) {
+                setZenFlowStepIndex(0);
+                setTimeLeft(exercise.steps[0].durationSeconds);
+                setIsTimerActive(true);
+            }
+        } else {
+            setIsTimerActive(false);
+        }
+    }, [phase, currentPointIndex]);
+
+    const toggleTimer = () => setIsTimerActive(!isTimerActive);
+
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    useEffect(() => {
+        const count = parseInt(localStorage.getItem('sessao_mestra_usage_count') || '0');
+        setUsageCount(count);
+    }, []);
 
     // Chat State
     const [messages, setMessages] = useState<Message[]>([]);
@@ -65,6 +132,12 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
     // Handle Check-in Selection
     const handleCheckInComplete = (emotionId: string, intensityValue: number) => {
+        // Check Limit for Free Users
+        if (!user?.isPremium && usageCount >= USAGE_LIMIT) {
+            setShowLimitModal(true);
+            return;
+        }
+
         const emotion = emotionalStates.find(e => e.id === emotionId);
         if (emotion) {
             setSelectedEmotion(emotion);
@@ -186,14 +259,25 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     };
 
     const handleCompleteSession = () => {
+        // Increment usage count for free users
+        if (user && !user.isPremium) {
+            const currentCount = parseInt(localStorage.getItem('sessao_mestra_usage_count') || '0');
+            const newCount = currentCount + 1;
+            localStorage.setItem('sessao_mestra_usage_count', newCount.toString());
+            setUsageCount(newCount);
+        }
+
         // Record session completion
         if (selectedEmotion && user) {
             recordSession({
-                protocolId: 'sessao-mestra',
-                protocolName: `Sessão Mestra: ${selectedEmotion.namePortuguese}`,
-                durationSeconds: 600, // Avg 10 mins
+                sessionType: 'integrated',
+                durationSeconds: 600,
                 completedAt: new Date().toISOString(),
-                pointsStimulated: getRecommendedPoints().length
+                pointsUsed: getRecommendedPoints().map(p => p.id),
+                sessionData: {
+                    protocolName: `Sessão Mestra: ${selectedEmotion.namePortuguese}`,
+                    originalProtocolId: 'sessao-mestra'
+                }
             });
         }
         setPhase('summary');
@@ -209,6 +293,21 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 </button>
 
                 <div className="flex items-center space-x-2 md:space-x-6">
+                    {/* Free Usage Counter */}
+                    {!user?.isPremium && (
+                        <div className="flex items-center gap-2 bg-gray-800/80 px-3 py-1 rounded-full border border-gray-700">
+                            <div className="flex gap-1">
+                                {[...Array(USAGE_LIMIT)].map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className={`w-2 h-2 rounded-full ${i < usageCount ? 'bg-red-500' : 'bg-green-500'} ${i === usageCount ? 'animate-pulse' : ''}`}
+                                    />
+                                ))}
+                            </div>
+                            <span className="text-xs text-gray-400 hidden sm:inline">{usageCount}/{USAGE_LIMIT}</span>
+                        </div>
+                    )}
+
                     <div className={`flex items-center space-x-2 ${phase === 'insight' ? 'text-purple-400 font-bold' : 'text-gray-600'}`}>
                         <Brain className="w-4 h-4" />
                         <span className="text-xs uppercase tracking-wider hidden md:inline">Mente</span>
@@ -227,6 +326,40 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
                 <div className="w-10"></div>
             </div>
+
+            {/* Limit Reached Modal */}
+            {showLimitModal && (
+                <div className="absolute inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in">
+                    <div className="bg-gray-800 border border-yellow-500/30 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-b from-yellow-500/10 to-transparent pointer-events-none"></div>
+                        <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Crown className="w-8 h-8 text-yellow-400" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-white mb-2">Limite Gratuito Atingido</h2>
+                        <p className="text-gray-400 mb-6">
+                            Você já utilizou suas <strong>{USAGE_LIMIT} sessoes de degustação</strong> da Sessão Mestra.
+                            Para continuar harmonizando sua energia e ter acesso ilimitado, torne-se Premium.
+                        </p>
+                        <div className="space-y-3">
+                            <button
+                                onClick={() => { /* Navigate to Premium - handled by parent usually, or we show a toast */
+                                    alert("Redirecionando para Premium...");
+                                    /* In a real scenario, we might trigger a navigation callback here */
+                                }}
+                                className="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 rounded-xl font-bold text-black hover:scale-105 transition-transform"
+                            >
+                                Ser Premium Agora
+                            </button>
+                            <button
+                                onClick={() => setShowLimitModal(false)}
+                                className="w-full py-3 border border-gray-700 rounded-xl text-gray-400 hover:text-white transition-colors"
+                            >
+                                Voltar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Main Content */}
             <div className="flex-1 relative overflow-hidden bg-gray-900">
@@ -284,11 +417,75 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 </button>
                             </div>
                             <button
-                                onClick={() => setPhase('acupressure')}
+                                onClick={() => setPhase('preparation')}
                                 className="w-full mt-3 py-3 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl font-bold text-white hover:opacity-90 transition-all flex items-center justify-center gap-2"
                             >
-                                <span>Entendi. Ir para Tratamento</span>
+                                <span>Entendi. Iniciar Preparação</span>
                                 <ArrowRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* PHASE 1.5: PREPARATION (Sound & Breathing) */}
+                {phase === 'preparation' && (
+                    <div className="absolute inset-0 flex flex-col items-center p-6 pb-32 animate-in slide-in-from-right overflow-y-auto bg-gray-900">
+                        <div className="text-center mb-8 mt-4">
+                            <h1 className="text-2xl font-bold text-purple-400 mb-2 flex items-center justify-center gap-2">
+                                <Activity className="w-6 h-6" />
+                                Preparação Sensorial
+                            </h1>
+                            <p className="text-gray-300 max-w-md mx-auto">
+                                Antes de iniciarmos os pontos, vamos sintonizar sua frequência e respiração.
+                            </p>
+                        </div>
+
+                        <div className="w-full max-w-md space-y-8">
+                            {/* Step 1: Sound */}
+                            <div className="bg-gray-800/50 p-6 rounded-2xl border border-purple-500/20">
+                                <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                                    <span className="bg-purple-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                                    Conexão Sonora
+                                </h3>
+                                <p className="text-gray-400 text-sm mb-4">
+                                    Coloque seus fones e dê play na frequência escolhida para o elemento <strong>{selectedEmotion?.mtcElement}</strong>. O som irá guiar todo o processo.
+                                </p>
+                                <div className="h-20 bg-gray-900 rounded-xl overflow-hidden shadow-lg border border-gray-700">
+                                    <iframe
+                                        style={{ borderRadius: '12px' }}
+                                        src={`${getSpotifyUrl()}?theme=0`}
+                                        width="100%"
+                                        height="80"
+                                        frameBorder="0"
+                                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                        loading="lazy"
+                                    ></iframe>
+                                </div>
+                            </div>
+
+                            {/* Step 2: Breathing */}
+                            <div className="bg-gray-800/50 p-6 rounded-2xl border border-blue-500/20">
+                                <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                                    <span className="bg-blue-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                                    Respiração de Aterrissagem
+                                </h3>
+                                <p className="text-gray-400 text-sm mb-4">
+                                    Faça 3 respirações profundas. Inspire contando até 4, segure 2, solte em 6.
+                                    Isso sinaliza ao seu corpo que é seguro relaxar.
+                                </p>
+                                <div className="flex justify-center">
+                                    <div className="w-24 h-24 rounded-full border-4 border-blue-500/30 flex items-center justify-center animate-[pulse_4s_ease-in-out_infinite]">
+                                        <div className="w-16 h-16 bg-blue-500/20 rounded-full animate-bounce"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => setPhase('acupressure')}
+                                className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(147,51,234,0.3)] transition-all flex items-center justify-center gap-2"
+                            >
+                                <Zap className="w-5 h-5" />
+                                Estou Pronto para os Pontos
                             </button>
                         </div>
                     </div>
@@ -348,9 +545,25 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
                                     <h2 className="text-2xl font-bold text-white mb-2">{point.id} - {point.name}</h2>
 
+                                    {/* Timer Control */}
+                                    <div className="absolute top-4 right-4 z-20">
+                                        <button
+                                            onClick={toggleTimer}
+                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border transition-all ${timeLeft === 0 ? 'bg-green-500/20 border-green-500 text-green-400' : 'bg-gray-900/50 border-gray-600 text-gray-300'}`}
+                                        >
+                                            {timeLeft === 0 ? <Sparkles className="w-4 h-4" /> : <Activity className={`w-4 h-4 ${isTimerActive ? 'animate-pulse' : ''}`} />}
+                                            <span className="font-mono font-bold">{formatTime(timeLeft)}</span>
+                                        </button>
+                                    </div>
+
                                     {/* Breathing Guide */}
                                     <div className="bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl border border-yellow-500/20 w-full mb-8 shadow-xl relative overflow-hidden group">
-                                        <div className="absolute top-0 left-0 w-1 h-full bg-yellow-500/50"></div>
+                                        {/* Progress Bar Background */}
+                                        <div
+                                            className="absolute bottom-0 left-0 h-1 bg-yellow-500/50 transition-all duration-1000 ease-linear"
+                                            style={{ width: `${((60 - timeLeft) / 60) * 100}%` }}
+                                        ></div>
+
                                         <p className="text-gray-300 text-lg leading-relaxed mb-4">{point.description || point.instructions}</p>
 
                                         <div className="flex items-center justify-center gap-3 py-3 bg-yellow-500/10 rounded-xl border border-yellow-500/10">
@@ -445,12 +658,29 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                             </h3>
                                             <div className="space-y-6">
                                                 {exercise?.steps.map((step, idx) => (
-                                                    <div key={step.id} className="relative pl-6 border-l-2 border-blue-500/30">
-                                                        <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gray-900 border-2 border-blue-500 flex items-center justify-center">
-                                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></div>
+                                                    <div
+                                                        key={step.id}
+                                                        className={`relative pl-6 border-l-2 transition-all duration-500 ${idx === zenFlowStepIndex ? 'border-blue-500 bg-blue-500/10 p-4 rounded-r-xl' : 'border-blue-500/30 opacity-50'}`}
+                                                    >
+                                                        <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gray-900 border-2 transition-colors ${idx === zenFlowStepIndex ? 'border-blue-500 scale-125' : 'border-blue-500/30'} flex items-center justify-center`}>
+                                                            {idx === zenFlowStepIndex && <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></div>}
                                                         </div>
-                                                        <h4 className="text-blue-200 font-bold text-sm mb-1">{idx + 1}. {step.name} ({step.durationSeconds}s)</h4>
-                                                        <p className="text-gray-300 text-sm leading-relaxed">{step.instruction}</p>
+                                                        <div className="flex justify-between items-center mb-1">
+                                                            <h4 className={`font-bold text-sm ${idx === zenFlowStepIndex ? 'text-blue-200' : 'text-gray-400'}`}>
+                                                                {idx + 1}. {step.name}
+                                                            </h4>
+                                                            {idx === zenFlowStepIndex && (
+                                                                <span className="text-xs font-mono font-bold text-blue-300 bg-blue-900/50 px-2 py-1 rounded-md border border-blue-500/30">
+                                                                    {formatTime(timeLeft)}
+                                                                </span>
+                                                            )}
+                                                            {idx !== zenFlowStepIndex && (
+                                                                <span className="text-xs text-gray-500">
+                                                                    {step.durationSeconds}s
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className={`text-sm leading-relaxed ${idx === zenFlowStepIndex ? 'text-gray-300' : 'text-gray-500'}`}>{step.instruction}</p>
                                                     </div>
                                                 ))}
                                             </div>

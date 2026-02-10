@@ -1817,7 +1817,7 @@ export const acupressurePoints: AcupressurePoint[] = [
     nameEs: 'YNSA Punto ZS (Zeise-Suess) - Hormonas Femeninas',
     nameFr: 'YNSA Point ZS (Zeise-Suess) - Hormones Féminines',
     nameZh: 'YNSA ZS点 (泽泽-休斯) - 女性激素',
-    description: 'APENAS MULHERES. Ponto YNSA descoberto em 2008. Localização Exata: Marcado com X na imagem de referência. Situa-se entre os pontos Ypsilon do Pulmão e do Pericárdio. TÉCNICA DIAGNÓSTICA: Palpar a região entre Pulmão e Pericárdio para encontrar o ponto de maior sensibilidade.',
+    description: 'APENAS MULHERES. Ponto YNSA descoberto em 2008. Localização Exata: Marcado com X na imagem de referência. Situa-se entre os pontos Ypsilon do Pulmão e do Pericárdio. TÉCNICA DIAGNÓSTICA: Palpar a região entre Pulmão e Pericárdio para encontrar o ponto de maior sensibilidade. NOTA CIENTÍFICA: Efeito imunomodulador é extrapolação teórica baseada no eixo Hipófise-Adrenal (HPA → cortisol), não comprovado clinicamente para este ponto específico.',
     descriptionEn: 'WOMEN ONLY. YNSA point discovered in 2008. Exact Location: Marked with X on reference image. Located between Lung and Pericardium Ypsilon points. DIAGNOSTIC TECHNIQUE: Palpate the region between Lung and Pericardium to find the point of greatest sensitivity.',
     descriptionEs: 'SOLO MUJERES. Punto YNSA descubierto en 2008. Ubicación Exacta: Marcado con X en imagen de referencia. Ubicado entre puntos Ypsilon de Pulmón y Pericardio.',
     descriptionFr: 'FEMMES UNIQUEMENT. Point YNSA découvert en 2008. Localisation Exacte: Marqué d\'un X sur l\'image de référence. Situé entre les points Ypsilon du Poumon et du Péricarde.',

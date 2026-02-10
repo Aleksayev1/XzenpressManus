@@ -1830,7 +1830,8 @@ export const acupressurePoints: AcupressurePoint[] = [
       'Normaliza menstruação (hipermenorreia, amenorreia)',
       'Reduz síndrome pré-menstrual',
       'Melhora libido feminina',
-      'Influência direta na hipófise'
+      'Influência direta na hipófise',
+      'Imunomodulação via eixo HPA (cortisol anti-inflamatório)'
     ],
     benefitsEn: ['Regulates female hormones (99% efficacy)', 'Treats menopause (hot flashes, insomnia, depression)', 'Normalizes menstruation', 'Reduces PMS', 'Improves female libido', 'Direct pituitary influence'],
     benefitsEs: ['Regula hormonas femeninas (99% eficacia)', 'Trata menopausia', 'Normaliza menstruación', 'Reduce SPM', 'Mejora libido femenina', 'Influencia directa hipófisis'],

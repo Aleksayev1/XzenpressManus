@@ -32,14 +32,102 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
   const { recordSession } = useSessionHistory();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Função para encontrar imagem do ponto
+  // Função para encontrar imagem do ponto com suporte a múltiplas variações
   const findPointImage = (pointName: string) => {
-    const normalized = pointName.toLowerCase().replace(/[\s-]/g, '');
-    const point = acupressurePoints.find((p: any) => {
+    const normalized = pointName.toLowerCase().trim().replace(/[\s-]/g, '');
+
+    // Primeiro: busca exata por nome/ID/nameEn
+    let point = acupressurePoints.find((p: any) => {
       const pName = p.name.toLowerCase().replace(/[\s-]/g, '');
       const pId = p.id.toLowerCase().replace(/[\s-]/g, '');
-      return pName.includes(normalized) || pId.includes(normalized) || (p.nameEn && p.nameEn.toLowerCase().includes(normalized));
+      const pNameEn = p.nameEn ? p.nameEn.toLowerCase().replace(/[\s-]/g, '') : '';
+      return pName.includes(normalized) || pId.includes(normalized) || pNameEn.includes(normalized);
     });
+
+    if (point) return point.image;
+
+    // Segundo: busca por padrões especiais (YNSA, abreviações, códigos internacionais)
+    const upperName = pointName.toUpperCase().trim();
+
+    // Padrão YNSA A, B, C, D, E, F
+    if (/^YNSA\s*[A-F]$/i.test(upperName)) {
+      const letter = upperName.match(/[A-F]/i)?.[0].toLowerCase();
+      point = acupressurePoints.find((p: any) =>
+        p.id.toLowerCase().includes(`ynsa-ponto-${letter}`) ||
+        p.id.toLowerCase().includes(`ynsaponto${letter}`)
+      );
+      if (point) return point.image;
+    }
+
+    // Padrão para códigos de meridianos (IG4, LI4, F3, LV3, etc.)
+    // Mapeamento de abreviações portuguesas para internacionais
+    const meridianMap: Record<string, string[]> = {
+      'ig': ['li', 'ig'], // Intestino Grosso / Large Intestine
+      'li': ['li', 'ig'],
+      'f': ['lv', 'lr', 'f'], // Fígado / Liver
+      'lv': ['lv', 'lr', 'f'],
+      'lr': ['lv', 'lr', 'f'],
+      'p': ['lu', 'p'], // Pulmão / Lung
+      'lu': ['lu', 'p'],
+      'bp': ['sp', 'bp'], // Baço-Pâncreas / Spleen
+      'sp': ['sp', 'bp'],
+      'e': ['st', 'e'], // Estômago / Stomach
+      'st': ['st', 'e'],
+      'c': ['ht', 'he', 'c'], // Coração / Heart
+      'ht': ['ht', 'he', 'c'],
+      'he': ['ht', 'he', 'c'],
+      'id': ['si', 'id'], // Intestino Delgado / Small Intestine
+      'si': ['si', 'id'],
+      'b': ['bl', 'ub', 'b'], // Bexiga / Bladder
+      'bl': ['bl', 'ub', 'b'],
+      'ub': ['bl', 'ub', 'b'],
+      'r': ['ki', 'kd', 'r'], // Rim / Kidney
+      'ki': ['ki', 'kd', 'r'],
+      'kd': ['ki', 'kd', 'r'],
+      'cs': ['pc', 'cs'], // Circulação-Sexo / Pericardium
+      'pc': ['pc', 'cs'],
+      'ta': ['sj', 'tb', 'te', 'ta'], // Triplo Aquecedor / Triple Burner
+      'sj': ['sj', 'tb', 'te', 'ta'],
+      'tb': ['sj', 'tb', 'te', 'ta'],
+      'te': ['sj', 'tb', 'te', 'ta'],
+      'vb': ['gb', 'vb'], // Vesícula Biliar / Gallbladder
+      'gb': ['gb', 'vb'],
+      'vc': ['ren', 'cv', 'vc'], // Vaso Concepção / Conception Vessel
+      'ren': ['ren', 'cv', 'vc'],
+      'cv': ['ren', 'cv', 'vc'],
+      'vg': ['du', 'gv', 'vg'], // Vaso Governador / Governing Vessel
+      'du': ['du', 'gv', 'vg'],
+      'gv': ['du', 'gv', 'vg']
+    };
+
+    // Extrair meridiano e número (ex: IG4, LI4, F3, etc.)
+    const meridianMatch = upperName.match(/^([A-Z]{1,3})[\s-]*(\d{1,2}[A-Z]?)$/i);
+    if (meridianMatch) {
+      const [, meridian, number] = meridianMatch;
+      const meridianLower = meridian.toLowerCase();
+      const variations = meridianMap[meridianLower] || [meridianLower];
+
+      // Buscar por todas as variações possíveis
+      point = acupressurePoints.find((p: any) => {
+        const id = p.id.toLowerCase();
+        return variations.some(variant =>
+          id.includes(`${variant}${number}`) ||
+          id.includes(`${variant}-${number}`) ||
+          id.includes(`${variant}_${number}`)
+        );
+      });
+      if (point) return point.image;
+    }
+
+    // Busca por nome parcial mais flexível
+    point = acupressurePoints.find((p: any) => {
+      const searchTerms = pointName.toLowerCase().split(/[\s-]+/);
+      return searchTerms.every(term =>
+        p.name.toLowerCase().includes(term) ||
+        p.id.toLowerCase().includes(term)
+      );
+    });
+
     return point?.image || null;
   };
 

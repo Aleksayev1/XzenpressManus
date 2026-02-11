@@ -43,6 +43,9 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
 
     // Primeiro: busca exata por nome/ID/nameEn
     let point = acupressurePoints.find((p: any) => {
+      // Validação: ignora pontos sem propriedades necessárias
+      if (!p || !p.name || !p.id) return false;
+
       const pName = p.name.toLowerCase().replace(/[\s-]/g, '');
       const pId = p.id.toLowerCase().replace(/[\s-]/g, '');
       const pNameEn = p.nameEn ? p.nameEn.toLowerCase().replace(/[\s-]/g, '') : '';
@@ -58,8 +61,10 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
     if (/^YNSA\s*[A-F]$/i.test(upperName)) {
       const letter = upperName.match(/[A-F]/i)?.[0].toLowerCase();
       point = acupressurePoints.find((p: any) =>
-        p.id.toLowerCase().includes(`ynsa-ponto-${letter}`) ||
-        p.id.toLowerCase().includes(`ynsaponto${letter}`)
+        p && p.id && (
+          p.id.toLowerCase().includes(`ynsa-ponto-${letter}`) ||
+          p.id.toLowerCase().includes(`ynsaponto${letter}`)
+        )
       );
       if (point) return point.image;
     }
@@ -114,6 +119,7 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
 
       // Buscar por todas as variações possíveis
       point = acupressurePoints.find((p: any) => {
+        if (!p || !p.id) return false;
         const id = p.id.toLowerCase();
         return variations.some(variant =>
           id.includes(`${variant}${number}`) ||
@@ -126,6 +132,7 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
 
     // Busca por nome parcial mais flexível
     point = acupressurePoints.find((p: any) => {
+      if (!p || !p.name || !p.id) return false;
       const searchTerms = pointName.toLowerCase().split(/[\s-]+/);
       return searchTerms.every(term =>
         p.name.toLowerCase().includes(term) ||

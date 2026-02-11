@@ -140,6 +140,11 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
     const pointRegex = /\b((?:IG|LI|VB|GB|VC|Ren|CV|Du|GV|P|LU|C|HT|HE|TA|SJ|TB|CS|PC|F|LR|LV|R|KI|BP|SP|E|ST|ID|SI|B|BL|YNSA)\s?-?\s?\d{1,2}[a-zA-Z]?|YNSA\s+[a-zA-Z]+)\b/gi;
     const parts = content.split(pointRegex);
     return parts.map((part, i) => {
+      // Validação de segurança: ignora partes inválidas
+      if (!part || typeof part !== 'string' || !part.trim()) {
+        return part;
+      }
+
       if (part.match(pointRegex)) {
         const imageUrl = findPointImage(part);
         if (imageUrl) {

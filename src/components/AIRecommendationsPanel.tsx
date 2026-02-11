@@ -34,6 +34,11 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
 
   // Função para encontrar imagem do ponto com suporte a múltiplas variações
   const findPointImage = (pointName: string) => {
+    // Validação de segurança: retorna null se pointName for inválido
+    if (!pointName || typeof pointName !== 'string') {
+      return null;
+    }
+
     const normalized = pointName.toLowerCase().trim().replace(/[\s-]/g, '');
 
     // Primeiro: busca exata por nome/ID/nameEn

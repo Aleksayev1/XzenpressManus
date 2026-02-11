@@ -445,13 +445,20 @@ Toda interação terapêutica deve seguir RIGOROSAMENTE este fluxo:
         };
 
     } catch (error) {
-        console.error('Error in ai-chat function:', error);
+        console.error('=== ERROR IN AI-CHAT FUNCTION ===');
+        console.error('Error Type:', error.constructor.name);
+        console.error('Error Message:', error.message);
+        console.error('Error Stack:', error.stack);
+        console.error('================================');
+
         return {
             statusCode: 500,
             headers,
             body: JSON.stringify({
                 error: 'Erro interno do servidor',
-                details: process.env.NODE_ENV === 'development' ? error.message : undefined
+                message: error.message || 'Unknown error',
+                type: error.constructor.name,
+                details: process.env.NODE_ENV === 'development' ? error.stack : undefined
             })
         };
     }

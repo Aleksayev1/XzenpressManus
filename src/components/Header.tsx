@@ -217,11 +217,20 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
               )}
             </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden">
+            {/* Mobile menu and logout button */}
+            <div className="md:hidden flex items-center space-x-2">
+              {user && (
+                <button
+                  onClick={handleLogout}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                  title={t('nav.logout')}
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              )}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-700 hover:text-blue-600"
+                className="text-gray-700 hover:text-blue-600 p-2"
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -260,15 +269,26 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                 <div className="border-t border-gray-200 mt-4 pt-4">
                   {user ? (
                     <>
-                      <div className="flex items-center px-3 mb-4">
-                        <User className="w-5 h-5 text-gray-600 mr-2" />
-                        <span className="text-gray-700 font-medium">{user.name}</span>
-                        {user.isPremium && (
-                          <Crown className="w-4 h-4 text-yellow-500 ml-2" />
-                        )}
-                        {user.isAdmin && (
-                          <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full ml-2">ADMIN</span>
-                        )}
+                      <div className="flex items-center justify-between px-3 mb-4">
+                        <div className="flex items-center">
+                          <User className="w-5 h-5 text-gray-600 mr-2" />
+                          <span className="text-gray-700 font-medium truncate max-w-[120px]">{user.name}</span>
+                          {user.isPremium && (
+                            <Crown className="w-4 h-4 text-yellow-500 ml-2" />
+                          )}
+                          {user.isAdmin && (
+                            <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full ml-2">ADMIN</span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => {
+                            handleLogout();
+                            setIsMenuOpen(false);
+                          }}
+                          className="text-xs font-bold text-red-600 hover:underline px-2 py-1"
+                        >
+                          {t('nav.logout').toUpperCase()}
+                        </button>
                       </div>
 
                       {/* Tutorial Button Removed */}

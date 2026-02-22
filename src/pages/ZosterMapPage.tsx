@@ -269,14 +269,16 @@ export const ZosterMapPage: React.FC<ZosterMapPageProps> = ({ onBack }) => {
                 </div>
             )}
 
-            {/* HEADER */}
-            <header className="bg-gray-900 border-b border-gray-800 p-4 sticky top-0 z-50">
+            {/* HEADER - STICKY FOR ACCESSIBILITY */}
+            <header className="bg-gray-900/95 backdrop-blur-md border-b border-gray-800 p-4 sticky top-0 z-[100] shadow-xl">
                 <div className="max-w-4xl mx-auto flex items-center justify-between">
-                    <button onClick={onBack} className="text-gray-400 hover:text-white flex items-center"><ArrowLeft className="mr-2" /> Voltar</button>
-                    <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
-                        {herpesType === 'zoster' ? 'Protocolo Zoster (VZV)' : herpesType === 'labial' ? 'Protocolo Labial (HSV-1)' : 'Protocolo Genital (HSV-2)'}
+                    <button onClick={onBack} className="text-gray-400 hover:text-white flex items-center font-bold px-3 py-1 bg-gray-800 rounded-lg border border-gray-700"><ArrowLeft className="mr-2 w-4 h-4" /> Voltar</button>
+                    <h1 className="text-base md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 truncate px-2">
+                        {herpesType === 'zoster' ? 'Protocolo Zoster' : herpesType === 'labial' ? 'Protocolo Labial' : 'Protocolo Genital'}
                     </h1>
-                    <div className="w-10"></div>
+                    <button onClick={onBack} className="p-2 text-gray-500 hover:text-red-400 transition-colors" title="Sair do Protocolo">
+                        <X className="w-6 h-6" />
+                    </button>
                 </div>
             </header>
 

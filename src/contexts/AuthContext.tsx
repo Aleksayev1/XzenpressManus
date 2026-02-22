@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const mapSupabaseUserToLocalUser = async (supabaseUser: any) => {
     // ✅ LISTA VIP (Acesso Liberado Manualmente)
-    const VIP_EMAILS = ['camilla.vieira19@gmail.com'];
+    const VIP_EMAILS = ['camilla.vieira19@gmail.com', 'aleksayev@gmail.com'];
 
     // ✅ SEGURO: Verificar status Premium no banco de dados
     let isPremium = false;

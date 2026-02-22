@@ -21,9 +21,10 @@ interface PointProps {
     label: string;
     onClick: () => void;
     isActive?: boolean;
+    labelAlign?: 'start' | 'end';
 }
 
-const Point: React.FC<PointProps> = ({ cx, cy, r, color, label, onClick, isActive }) => (
+const Point: React.FC<PointProps> = ({ cx, cy, r, color, label, onClick, isActive, labelAlign = 'start' }) => (
     <g onClick={onClick} style={{ cursor: 'pointer' }}>
         <circle
             cx={cx}
@@ -39,11 +40,12 @@ const Point: React.FC<PointProps> = ({ cx, cy, r, color, label, onClick, isActiv
             <circle cx={cx} cy={cy} r={r * 2.5} fill={color} opacity="0.3" className="animate-pulse" />
         )}
         <text
-            x={cx + 18}
+            x={labelAlign === 'start' ? cx + 18 : cx - 18}
             y={cy + 5}
             fill="white"
             fontSize="12"
             fontWeight={isActive ? 'bold' : '500'}
+            textAnchor={labelAlign}
             style={{ pointerEvents: 'none', textShadow: '0px 1px 3px rgba(0,0,0,0.8)' }}
         >
             {label}
@@ -270,6 +272,7 @@ export const SpineMap: React.FC<SpineMapProps> = ({ highlightLevel }) => {
                                     label={activeLevel === level.id ? 'Huatuo' : ''}
                                     onClick={() => handlePointClick(level, 'huatuo')}
                                     isActive={activeLevel === level.id || selectedPoint?.level.id === level.id}
+                                    labelAlign="end"
                                 />
 
                                 {/* Outer Line (Shu) - Blue - On Organ Line */}
@@ -278,9 +281,10 @@ export const SpineMap: React.FC<SpineMapProps> = ({ highlightLevel }) => {
                                     cy={level.y}
                                     r={9}
                                     color="#3B82F6"
-                                    label={level.shu.split(' ')[0]}
+                                    label={level.shu === 'N/A' || level.shu.includes('N/A') ? '' : level.shu.split(' ')[0]}
                                     onClick={() => handlePointClick(level, 'shu')}
                                     isActive={activeLevel === level.id || selectedPoint?.level.id === level.id}
+                                    labelAlign="start"
                                 />
                             </g>
                         ))}

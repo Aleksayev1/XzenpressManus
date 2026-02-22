@@ -230,7 +230,7 @@ export const ZosterMapPage: React.FC<ZosterMapPageProps> = ({ onBack }) => {
     const activeTherapyPoint = isTherapyActive ? acupressurePoints.find(p => p.id === therapyQueue[currentTherapyPointIndex]) : null;
 
     return (
-        <div className="min-h-screen bg-gray-950 text-white pb-12 relative font-sans">
+        <div className="min-h-screen bg-gray-950 text-white pb-12 relative font-sans safe-p-bottom">
             {/* LIGHTBOX */}
             {selectedImage && (
                 <div className="fixed inset-0 z-[300] bg-black/95 flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
@@ -241,28 +241,30 @@ export const ZosterMapPage: React.FC<ZosterMapPageProps> = ({ onBack }) => {
 
             {/* THERAPY OVERLAY */}
             {isTherapyActive && (
-                <div className="fixed inset-0 z-[200] bg-gray-900 flex flex-col items-center justify-center p-6">
-                    <button onClick={endTherapy} className="absolute top-6 right-6 text-gray-400 hover:text-white flex items-center gap-2"><X /> Encerrar</button>
-                    <div className="w-full max-w-2xl text-center space-y-8">
+                <div className="fixed inset-0 z-[200] bg-gray-900 flex flex-col items-center justify-start p-4 md:p-6 overflow-y-auto safe-p-top safe-p-bottom">
+                    <button onClick={endTherapy} className="absolute top-4 right-4 md:top-6 md:right-6 text-gray-400 hover:text-white flex items-center gap-2 z-10"><X /> Encerrar</button>
+                    <div className="w-full max-w-2xl text-center space-y-4 md:space-y-8 pt-8">
                         <div>
                             <span className="text-blue-400 font-mono text-sm uppercase">Passo {currentTherapyPointIndex + 1} de {therapyQueue.length}</span>
-                            <h2 className="text-4xl font-bold mt-2">{activeTherapyPoint?.name}</h2>
-                            <p className="text-gray-300 mt-4 text-lg">{activeTherapyPoint?.instructions}</p>
+                            <h2 className="text-2xl md:text-4xl font-bold mt-2">{activeTherapyPoint?.name}</h2>
+                            <p className="text-gray-300 mt-2 md:mt-4 text-sm md:text-lg leading-relaxed">{activeTherapyPoint?.instructions}</p>
                             {activeTherapyPoint?.image && (
-                                <img src={activeTherapyPoint.image} className="h-64 mx-auto mt-6 rounded-xl border border-gray-700" onClick={() => setSelectedImage({ src: activeTherapyPoint.image!, alt: activeTherapyPoint.name })} />
+                                <img src={activeTherapyPoint.image} className="max-h-40 md:h-64 mx-auto mt-4 md:mt-6 rounded-xl border border-gray-700 shadow-lg object-contain" onClick={() => setSelectedImage({ src: activeTherapyPoint.image!, alt: activeTherapyPoint.name })} />
                             )}
                         </div>
-                        <div className="relative w-64 h-64 mx-auto flex items-center justify-center">
+                        <div className="relative w-40 h-40 md:w-64 md:h-64 mx-auto flex items-center justify-center">
                             <div className="absolute inset-0 rounded-full border-4 opacity-10 animate-ping" style={{ borderColor: breathingPhases[breathingPhase].color }}></div>
                             <div className="text-center">
-                                <div className="text-6xl font-bold" style={{ color: breathingPhases[breathingPhase].color }}>{breathingTimeLeft}</div>
-                                <div className="text-xl uppercase tracking-widest text-gray-500">{breathingPhases[breathingPhase].label}</div>
+                                <div className="text-4xl md:text-6xl font-bold" style={{ color: breathingPhases[breathingPhase].color }}>{breathingTimeLeft}</div>
+                                <div className="text-sm md:text-xl uppercase tracking-widest text-gray-500">{breathingPhases[breathingPhase].label}</div>
                             </div>
                         </div>
-                        <div className="bg-gray-800 p-6 rounded-2xl">
-                            <div className="text-4xl font-mono">{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</div>
+                        <div className="bg-gray-800 p-4 md:p-6 rounded-2xl inline-block mx-auto">
+                            <div className="text-2xl md:text-4xl font-mono">{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</div>
                         </div>
-                        <button onClick={nextPoint} className="bg-blue-600 px-8 py-3 rounded-full font-bold">Pular Ponto</button>
+                        <div>
+                            <button onClick={nextPoint} className="bg-blue-600 px-8 py-3 rounded-full font-bold shadow-xl active:scale-95 transition-transform">Próximo Ponto</button>
+                        </div>
                     </div>
                 </div>
             )}

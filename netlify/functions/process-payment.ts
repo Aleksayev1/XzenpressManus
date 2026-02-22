@@ -131,7 +131,7 @@ export const handler: Handler = async (event) => {
             metadata: {
                 orderId: orderId || `order_${Date.now()}`,
                 customerEmail: customerEmail || 'N/A',
-                userId: userId
+                user_id: userId
             },
             return_url: 'https://xzenpress.com/payment-success',
         });

@@ -190,8 +190,15 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
     } else {
         // Criar nova (fallback caso não exista)
         const metadata = paymentIntent.metadata || {};
+        const userId = metadata.user_id || metadata.userId; // Suporte a ambos os formatos
+
+        if (!userId) {
+            console.error('❌ Erro: Webhook recebido sem user_id nos metadados', paymentIntent.id);
+            return;
+        }
+
         await supabase.from('premium_subscriptions').insert({
-            user_id: metadata.user_id,
+            user_id: userId,
             stripe_payment_intent_id: paymentIntent.id,
             stripe_customer_id: paymentIntent.customer as string,
             status: 'active',

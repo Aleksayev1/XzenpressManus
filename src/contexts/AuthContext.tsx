@@ -71,6 +71,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let subscriptionId: string | undefined;
 
     try {
+      if (!supabase) {
+        console.warn('⚠️ Supabase client não inicializado em mapSupabaseUserToLocalUser');
+        return;
+      }
+
       // Buscar assinatura ativa do usuário
       const { data: subscription, error } = await supabase
         .from('premium_subscriptions')
@@ -99,6 +104,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       } else {
         console.log('ℹ️ Nenhuma assinatura Premium ativa encontrada');
+        if (error) {
+          console.error('❌ Erro ao buscar assinatura premium para o usuário:', {
+            userId: supabaseUser.id,
+            email: supabaseUser.email,
+            error
+          });
+        }
       }
     } catch (err) {
       console.error('❌ Erro ao verificar Premium:', err);

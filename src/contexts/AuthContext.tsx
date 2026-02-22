@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const mapSupabaseUserToLocalUser = async (supabaseUser: any) => {
     // ✅ LISTA VIP (Acesso Liberado Manualmente)
-    const VIP_EMAILS = ['camilla.vieira19@gmail.com', 'aleksayev@gmail.com'];
+    const VIP_EMAILS = ['camilla.vieira19@gmail.com', 'aleksayev@gmail.com', 'aleksayev1@gmail.com'];
 
     // ✅ SEGURO: Verificar status Premium no banco de dados
     let isPremium = false;
@@ -118,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // 🌟 VIP OVERRIDE: Forçar Premium se estiver na lista VIP
-    if (supabaseUser.email && VIP_EMAILS.includes(supabaseUser.email.toLowerCase())) {
+    if (supabaseUser.email && VIP_EMAILS.includes(supabaseUser.email.trim().toLowerCase())) {
       console.log('🌟 Usuário VIP detectado! Acesso Premium liberado:', supabaseUser.email);
       isPremium = true;
       hasPaidPremium = true; // Para evitar prompts de upgrade

@@ -44,9 +44,18 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
   // Filter helpers based on state
   const getPointsByCategory = (category: string) => {
     if (category === 'all') return points;
-    return points.filter(p =>
+
+    // Filter points by category
+    const filtered = points.filter(p =>
       p.category === category || p.additionalCategories?.includes(category)
     );
+
+    // Remove duplicates using Map (ensures unique IDs)
+    const uniquePoints = Array.from(
+      new Map(filtered.map(p => [p.id, p])).values()
+    );
+
+    return uniquePoints;
   };
 
   const getFreePoints = () => points.filter(p => !p.isPremium);
@@ -90,6 +99,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     { id: 'neuro', name: 'Neurologia', icon: '⚡', premium: true },
     { id: 'cardio', name: 'Cardio', icon: '❤️', premium: true },
     { id: 'atm', name: 'ATM', icon: '🦷', premium: true },
+    { id: 'zoster', name: 'Zoster (Herpes)', icon: '🔥', premium: true },
   ];
 
   const breathingPhases = {

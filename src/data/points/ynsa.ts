@@ -113,7 +113,7 @@ export const ynsaPoints: AcupressurePoint[] = [
     descriptionEs: 'Punto YNSA Ypsilon 1 correspondiente al meridiano del Riñón (MTC). Ubicación: Región temporal inferior de la cabeza. TÉCNICA DIAGNÓSTICA: El punto MÁS SENSIBLE indica desequilibrio energético del Riñón. Nutre Jing (esencia vital sexual), regula suprarrenales/ovarios/testículos.',
     descriptionFr: 'Point YNSA Ypsilon 1 correspondant au méridien du Rein (MTC). Localisation: Région temporale inférieure de la tête. TECHNIQUE DIAGNOSTIQUE: Le point le PLUS SENSIBLE indique déséquilibre énergétique du Rein. Nourrit Jing (essence vitale sexuelle).',
     position: { x: 85, y: 50 },
-    image: '/uploaded_media_1770049739813.png',
+    image: '/YNSA_Kidney_Correct.jpg',
     imageAlt: 'Localização YNSA Rim (Y-1) na região temporal para vitalidade sexual e energia reprodutiva',
     benefits: [
       'Nutre Jing (essência vital sexual)',
@@ -194,7 +194,7 @@ export const ynsaPoints: AcupressurePoint[] = [
     description: 'Ponto YNSA para raiva reprimida e estresse. ANÁLISE BIOLÓGICA: O Fígado na MTC rege o fluxo. Biologicamente, este ponto ajuda a regular o Sistema Nervoso Simpático (Luta ou Fuga), reduzindo a descarga de noradrenalina que causa a irritabilidade explosiva.',
     descriptionEn: 'YNSA point for repressed anger. BIO-ANALYSIS: Biologically, helps regulate Sympathetic Nervous System (Fight/Flight), reducing norepinephrine discharge that causes explosive irritability.',
     position: { x: 55, y: 25 },
-    image: '/ynsa_liver.jpg',
+    image: '/YNSA/ynsa-frontal-points-abd.jpg',
     imageAlt: 'Localização YNSA Fígado na testa',
     benefits: ['Libera raiva (Regula Noradrenalina)', 'Melhora planejamento', 'Trata insônia (1h-3h)', 'Desintoxicação emocional'],
     benefitsEn: ['Releases anger (Regulates Norepinephrine)', 'Improves planning', 'Treats insomnia (1-3am)', 'Emotional detox'],

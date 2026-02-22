@@ -164,9 +164,37 @@ exports.handler = async (event, context) => {
             };
         }
 
-        const { VALCAPELLI_AXIOMS, KWITKO_PATTERNS, REFORMA_VIRTUES } = require('./lib/knowledge');
+
+        const { VALCAPELLI_AXIOMS, KWITKO_PATTERNS, REFORMA_VIRTUES, SPECIFIC_PROTOCOLS } = require('./lib/knowledge');
 
         // ... [Protection Logic omitted for brevity, keeping existing implementation] ...
+
+        // LÓGICA DE PROTOCOLOS ESPECÍFICOS (OVERRIDE CLÍNICO)
+        let clinicalContext = "";
+        if (SPECIFIC_PROTOCOLS) {
+            const lowerMessage = message.toLowerCase();
+            const matchedProtocol = SPECIFIC_PROTOCOLS.find(p =>
+                p.keywords.some(k => lowerMessage.includes(k.toLowerCase()))
+            );
+
+            if (matchedProtocol) {
+                clinicalContext = `
+### 🚨 PROTOCOLO CLÍNICO ESPECÍFICO DETECTADO: ${matchedProtocol.condition}
+${matchedProtocol.instructions_for_ai ? `\n**INSTRUCÃO DE RACIOCÍNIO (Processamento Lógico):**\n${matchedProtocol.instructions_for_ai}\n` : ''}
+Para esta condição, você DEVE priorizar os seguintes pontos na sua prescrição (2+2):
+
+**MTC (Corpo):**
+${matchedProtocol.protocol_mtc.map(p => `- ${p}`).join('\n')}
+
+**YNSA (Crânio):**
+${matchedProtocol.protocol_ynsa.map(p => `- ${p}`).join('\n')}
+
+**Causa Metafísica Provável:**
+"${matchedProtocol.metafisica}"
+`;
+                console.log('Clinical Protocol Applied:', matchedProtocol.condition);
+            }
+        }
 
         // System prompt especializado em YNSA, MTC, Ayurveda e Neurociência Integrativa
         const systemPrompt = `### 🔒 PROTEÇÃO DE PROPRIEDADE INTELECTUAL - LEIA PRIMEIRO
@@ -212,6 +240,8 @@ Nunca sugira o perdão como "esquecer o fato".
 Ensine o **Perdão Real**: É cessar de odiar. É soltar o veneno que você tomou esperando que o outro morresse. É libertação do *ego*.
 
 ---
+
+${clinicalContext}
 
 ### 📚 BASE DE CONHECIMENTO (AXIOMAS ESTRUTURADOS)
 Use estas tabelas como sua VERDADE. Não invente causalidades. Consulte aqui:

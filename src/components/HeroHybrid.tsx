@@ -101,10 +101,20 @@ export const HeroHybrid: React.FC<HeroHybridProps> = ({ onShowTherapySelection, 
                                     onClick={() => onPageChange('triad-session')}
                                     className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center justify-center space-x-2"
                                 >
-                                    <span>✨</span>
                                     <span>Iniciar Sessão Mestra</span>
                                     <ArrowRight className="w-5 h-5" />
                                 </button>
+
+                                {/* Botão Mapa Zoster (NOVO) */}
+                                <button
+                                    onClick={() => onPageChange('zoster-map')}
+                                    className="w-full mt-3 bg-white border-2 border-red-500 text-red-600 px-8 py-3 rounded-full text-base font-bold hover:bg-red-50 transform hover:scale-105 transition-all duration-200 shadow-sm flex items-center justify-center space-x-2 animate-bounce"
+                                    style={{ animationDuration: '3s' }}
+                                >
+                                    <span>📍</span>
+                                    <span>Novo: Mapa Zoster (T4)</span>
+                                </button>
+
                                 <p className="text-gray-500 text-sm mt-3">Mente • Energia • Corpo</p>
                             </div>
                         </div>

@@ -144,8 +144,28 @@ const REFORMA_VIRTUES = [
     }
 ];
 
+const SPECIFIC_PROTOCOLS = [
+    {
+        "condition": "Herpes Zoster (Cobreiro) / Neuralgia Pós-Herpética - LÓGICA GERAL",
+        "keywords": ["zoster", "herpes", "cobreiro", "neuralgia", "intercostal", "queimação", "dermátomo"],
+        "instructions_for_ai": "A Zoster ataca um NERVO específico (Dermátomo). Não dê uma receita de bolo. 1. IDENTIFIQUE A REGIÃO no relato do usuário. 2. DEDUSA O DERMÁTOMO (ex: Mamilo=T4, Umbigo=T10, Pescoço=C3, Rosto=Trigêmeo). 3. PRESCREVA os pontos para AQUELE nível vertebral.",
+        "protocol_mtc": [
+            "REGRA 1 - A RAIZ (Coluna): Huatuojiaji na vértebra afetada (ex: se é no peito T4, use Huatuo T4). Se é na lombar, Huatuo Lombar.",
+            "REGRA 2 - O TRAJETO (Meridiano): Identifique por onde a dor corre (ex: lateral do corpo = Shao Yang [SJ6/GB34]; costas = Tai Yang [BL40/BL60]; estômago/face = Yang Ming [ST36/LI4]).",
+            "REGRA 3 - O DESBLOQUEIO (Geral): GB41 (Zulinqi) para abrir o Vaso da Cintura (Dai Mai) se a dor for 'em faixa'.",
+            "REGRA 4 - A INFLAMAÇÃO: Pontos de Calor/Fogo (YNSA Fígado, LI11, SP10)."
+        ],
+        "protocol_ynsa": [
+            "YNSA Ponto Básico: Ponto correspondente à anatomia afetada (ex: Ponto A se for cervical, Ponto C se for braço, Ponto E se for tórax, Ponto D se for lombar/perna).",
+            "YNSA Ypsilon Fígado: Sempre usar para apagar a inflamação viral (Calor/Vento)."
+        ],
+        "metafisica": "Zoster é sempre 'Raiva/Conflito Reprimido' que 'queima' a pele. O local do corpo indica COM QUEM ou SOBRE O QUE é a raiva (ex: Peito = Afeto/Proteção; Braço = Trabalho/Fazer; Perna = Avançar/Futuro; Rosto = Imagem/Identidade)."
+    }
+];
+
 module.exports = {
     VALCAPELLI_AXIOMS,
     KWITKO_PATTERNS,
-    REFORMA_VIRTUES
+    REFORMA_VIRTUES,
+    SPECIFIC_PROTOCOLS
 };

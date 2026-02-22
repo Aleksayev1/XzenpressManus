@@ -633,5 +633,104 @@ export const protocols: Protocol[] = [
                 customInstructions: '⚡ MTC KD3 (Taixi): Fonte do Rim. BILATERAL depressão tornozelo interno. Vitalidade sexual, hormônios, essência vital. SINCRONIZA com YNSA Rim (Y-1) para efeito máximo DUPLO: cabeça (SNC) + corpo (meridiano). Ideal 1-2h pré-intimidade.'
             }
         ]
+    },
+
+    // --- HERPES (HSV-1 / HSV-2 / ZOSTER) ---
+    {
+        id: 'herpes-labial-hsv1',
+        title: '💋 Herpes Labial',
+        subtitle: 'Surto Agudo & Prevenção HSV-1',
+        isPremium: true,
+        description: 'Protocolo para reduzir duração e intensidade do surto labial e fortalecer a imunidade anti-viral. Atua na raiz energética: Calor-Vento do Pulmão com Deficiência de Wei Qi (imunidade de superfície).',
+        iconName: 'Shield',
+        colorTheme: 'orange',
+        breathingOptimization: '💡 Surto ativo? A Respiração 4-7-8 reduz cortisol (principal gatilho do herpes) e ativa o sistema parassimpático anti-inflamatório. Pratique 5 min ANTES dos pontos para potencializar o resultado.',
+        benefits: ['Reduz duração e intensidade do surto', 'Alivia queimação e coceira labial', 'Fortalece imunidade anti-viral (Wei Qi)', 'Previne recidivas com uso contínuo'],
+        soundtrack: {
+            genre: 'frequency-528hz',
+            description: '528Hz — Frequência de reparação celular, amplifica a resposta imune e reduz inflamação viral.',
+            spotifyUrl: 'https://open.spotify.com/search/528hz%20immune%20healing'
+        },
+        nutrition: {
+            avoid: ['Arginina: Amendoim, chocolate, sementes de uva/girassol (alimentam o vírus)', 'Álcool (suprime imunidade em até 70% por 24h)', 'Açúcar refinado (prolonga o surto)'],
+            recommend: ['LISINA 1-3g/dia: Carnes brancas, laticínios, leguminosas (compete com Arginina)', 'ZINCO 30mg: Sementes de abóbora, ostras (antiviral direto)', 'PRÓPOLIS VERDE: antiviral natural de amplo espectro', 'VITAMINA C 1g + D3 5000UI: ativação imune'],
+            tip: 'Stack anti-surto: Lisina 3g ao acordar + Zinco à noite. Iniciar ao primeiro sinal (pródromo: formigamento). Estudo JAMA: reduz surtos em 87%.'
+        },
+        steps: [
+            {
+                pointId: 'ynsa-sensorial-boca',
+                durationSeconds: 120,
+                customInstructions: '🧠 YNSA Sensorial Boca (Couro Cabeludo): Ponto direto para herpes labial no crânio. Palpe suavemente a região da boca na frente do couro cabeludo. ONDE SENTIR MAIS DOR/SENSIBILIDADE = ponto correto. Pressão leve circular 2 min. Acalma o nervo trigêmeo que hospeda o vírus.'
+            },
+            {
+                pointId: 'septicemia-hegu-li4',
+                durationSeconds: 120,
+                customInstructions: '⚡ IG4 (Hegu): O grande imunomodulador da face. Controla toda a região da boca e lábios. Pressão firme no ponto entre polegar e indicador, bilateral. Dispersa Calor-Vento (energia do vírus).'
+            },
+            {
+                pointId: 'quchi-li11',
+                durationSeconds: 120,
+                customInstructions: '⚡ IG11 (Quchi): Dispersa Calor sistêmico e Vento (a "energia" do vírus). Excelente para febre associada ao surto. Cotovelo dobrado a 90°, ponto no fim da prega do cotovelo. Bilateral.'
+            },
+            {
+                pointId: 'zusanli-st36',
+                durationSeconds: 180,
+                customInstructions: '⚡ E36 (Zusanli): O Grande Fortalecedor. Aumenta células NK (Natural Killer) e Wei Qi (imunidade protetora). Base do tratamento preventivo. Pressão firme 4 dedos abaixo da patela, bilateral. Use diariamente para prevenir recidivas.'
+            },
+            {
+                pointId: 'ynsa-zf-pulmao',
+                durationSeconds: 120,
+                customInstructions: '🧠 YNSA Pulmão (Testa): O Pulmão governa a pele e a imunidade de superfície (Wei Qi) na MTC. Trata a raiz energética do herpes labial. Palpe a região do Pulmão na testa até sentir o ponto mais sensível. Pressão leve 2 min bilateral.'
+            }
+        ]
+    },
+    {
+        id: 'herpes-genital-hsv2',
+        title: '🔒 Herpes Genital',
+        subtitle: 'Surto Agudo & Eixo Emocional HSV-2',
+        isPremium: true,
+        description: 'Protocolo em 3 camadas: (1) Alívio da dor e queimação do surto ativo, (2) Fortalecimento imune pélvico e (3) Processamento emocional — vergonha e medo da rejeição são gatilhos documentados de recidiva do HSV-2.',
+        iconName: 'Heart',
+        colorTheme: 'purple',
+        breathingOptimization: '💡 CRÍTICO: O estresse é o principal gatilho do HSV-2 (cortisol suprime células T específicas para o vírus). A Respiração 4-7-8 interrompe esse ciclo. Pratique DIARIAMENTE — não só no surto — para aumentar o intervalo entre recidivas.',
+        benefits: ['Reduz duração e intensidade do surto', 'Alivia dor, queimação e coceira genital', 'Regula imunidade pélvica (Wei Qi)', 'Processa vergonha e medo (gatilhos emocionais)', 'Fortalece Jing (essência vital do Rim)', 'Aumenta intervalo entre surtos'],
+        soundtrack: {
+            genre: 'frequency-396hz',
+            description: '396Hz — Libera culpa, vergonha e medo (as bases emocionais que retroalimentam o HSV-2 via eixo neuroendócrino).',
+            spotifyUrl: 'https://open.spotify.com/search/396hz%20liberate%20guilt%20fear'
+        },
+        nutrition: {
+            avoid: ['Arginina: Amendoim, chocolate amargo, nozes, aveia (alimentam replicação viral)', 'Açúcar refinado (inflamação pélvica e supressão imune)', 'Álcool (suprime linfócitos CD4 — os guardiões do HSV-2)'],
+            recommend: ['LISINA 1-3g/dia: 3g no surto ativo, 1g na prevenção', 'ZINCO 30mg + VITAMINA C 1g (antiviral sinérgico)', 'ASHWAGANDHA 300-600mg: reduz cortisol 30% (anti-gatilho)', 'VITAMINA D3 5000UI: ativa resposta imune específica ao herpes', 'PRÓPOLIS + EXTRATO FOLHA DE OLIVEIRA: antivirais naturais'],
+            tip: 'Stack pró-ativo: Lisina (manhã) + Zinco + D3 (noite) + Ashwagandha (adaptógeno anti-estresse). Iniciar no PRÓDROMO (formigamento, pressão, ardor). Estudos: reduz surtos em 50-80%.'
+        },
+        steps: [
+            {
+                pointId: 'ynsa-zf-rim',
+                durationSeconds: 180,
+                customInstructions: '🧠 YNSA Rim (Temporal): Na MTC, o Rim é a sede do Medo e da Vergonha — as emoções que retroalimentam o HSV-2. Palpe a têmpora lateralmente até sentir o ponto mais sensível/dolorido = Rim ativo. PRESSÃO LEVE circular, 3 min bilateral. Restaura Jing (essência vital), fortalece imunidade pélvica no nível craniano e dissolve o medo de rejeição.'
+            },
+            {
+                pointId: 'bp6-sanyinjiao',
+                durationSeconds: 180,
+                customInstructions: '⚡ BP6 (Sanyinjiao) — Reunião dos 3 Yin: O ponto mais estratégico para HSV-2. Regula imunidade pélvica, elimina Umidade-Calor (ambiente onde o vírus prospera), equilibra hormônios e melhora circulação genital. BILATERAL: 4 dedos acima do maléolo interno. ATENÇÃO: Contraindicado em grávidas.'
+            },
+            {
+                pointId: 'zusanli-st36',
+                durationSeconds: 180,
+                customInstructions: '⚡ E36 (Zusanli): Fortalece Wei Qi global e aumenta células NK (Natural Killer) que combatem o vírus. Pressão firme bilateral abaixo do joelho. Use diariamente na prevenção — é a base do sistema imune na MTC.'
+            },
+            {
+                pointId: 'kd3-taixi',
+                durationSeconds: 180,
+                customInstructions: '⚡ R3 (Taixi) — Fonte do Rim: Trata o medo e a insegurança (raiz emocional do HSV-2). Nutre Yin do Rim, reduz Calor-Deficiência que alimenta surtos crônicos. Localizado entre o maléolo interno e o tendão de Aquiles. Bilateral. Complementa YNSA Rim para efeito duplo: crânio + corpo.'
+            },
+            {
+                pointId: 'lv3-taichong',
+                durationSeconds: 120,
+                customInstructions: '⚡ F3 (Taichong): Dispersa Calor do Fígado — a raiva, frustração e ressentimento reprimidos que frequentemente antecedem surtos. O Fígado governa a região genital e o fluxo de Qi pélvico. Dorso do pé entre 1º e 2º metatarsos. Bilateral. Finaliza a sequência promovendo fluxo livre de energia.'
+            }
+        ]
     }
 ];
+

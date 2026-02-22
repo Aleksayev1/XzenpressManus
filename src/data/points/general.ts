@@ -851,5 +851,29 @@ export const generalPoints: AcupressurePoint[] = [
     instructions: 'Localize a pele entre o dedão e o segundo dedo. Pressione FIRMEMENTE no sentido do dedinho. Massagem forte por 2 min.',
     duration: 120,
     pressure: 'firme'
+  },
+  {
+    id: 'lu7-lieque',
+    name: 'P7 (Lieque) - Vala Desunida',
+    nameEn: 'LU7 (Lieque) - Broken Sequence',
+    nameEs: 'P7 (Lieque) - Secuencia Rota',
+    nameFr: 'P7 (Lieque) - Séquence Brisée',
+    description: 'Ponto Luo do Pulmão, fortalece Wei Qi (energia defensiva), trata conexão Pulmão-Pele-Tristeza. Essencial para erupções cutâneas, tristeza/depressão e prevenção de recidivas virais. Localizado 1,5 cun acima da prega do punho (processo estilóide radial). Pressionar por 2 minutos, bilateral.',
+    descriptionEn: 'Lung Luo point, strengthens Wei Qi (defensive energy), treats Lung-Skin-Sadness connection. Essential for skin eruptions, sadness/depression and viral recurrence prevention. Located 1.5 cun above wrist crease (radial styloid process). Press for 2 minutes, bilateral.',
+    descriptionEs: 'Punto Luo del Pulmón, fortalece Wei Qi (energía defensiva), trata conexión Pulmón-Piel-Tristeza. Esencial para erupciones cutáneas, tristeza/depresión y prevención de recurrencias virales. Ubicado 1,5 cun arriba del pliegue de muñeca (proceso estiloideo radial). Presionar 2 minutos, bilateral.',
+    descriptionFr: 'Point Luo du Poumon, renforce Wei Qi (énergie défensive), traite connexion Poumon-Peau-Tristesse. Essentiel pour éruptions cutanées, tristesse/dépression et prévention récidives virales. Situé 1,5 cun au-dessus pli du poignet (processus styloïde radial). Presser 2 minutes, bilatéral.',
+    position: { x: 25, y: 35 }, // Punho
+    image: '/lu9_taiyuan_new.png',
+    imageAlt: 'Localização do ponto P7 Lieque no punho',
+    benefits: ['Fortalece Wei Qi (defesa)', 'Trata tristeza/depressão', 'Previne recidivas virais', 'Erupções cutâneas', 'Rigidez cervical', 'Paralisia facial', 'Sinergia com IG4'],
+    benefitsEn: ['Strengthens Wei Qi (defense)', 'Treats sadness/depression', 'Prevents viral recurrences', 'Skin eruptions', 'Cervical stiffness', 'Facial paralysis', 'Synergy with LI4'],
+    benefitsEs: ['Fortalece Wei Qi (defensa)', 'Trata tristeza/depresión', 'Previene recurrencias virales', 'Erupciones cutáneas', 'Rigidez cervical', 'Parálisis facial', 'Sinergia con IG4'],
+    benefitsFr: ['Renforce Wei Qi (défense)', 'Traite tristesse/dépression', 'Prévient récidives virales', 'Éruptions cutanées', 'Raideur cervicale', 'Paralysie faciale', 'Synergie avec GI4'],
+    isPremium: true,
+    category: 'zoster',
+    additionalCategories: ['general', 'emotional'],
+    instructions: 'Localizar 1,5 cun acima da prega do punho, no processo estilóide radial. Pressionar firmemente por 2 minutos em cada punho (bilateral). Aplicar durante respiração 4-7-8 para máxima eficácia.',
+    duration: 120,
+    pressure: 'moderada'
   }
 ];

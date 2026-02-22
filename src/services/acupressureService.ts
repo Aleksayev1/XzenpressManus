@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { AcupressurePoint } from '../types';
-import { acupressurePoints as staticPoints } from '../data/acupressurePoints';
+import { acupressurePoints as staticPoints } from '../data/points/index';
 
 export const acupressureService = {
     /**

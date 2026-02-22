@@ -1,10 +1,11 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Play, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2, Sparkles, Wind } from 'lucide-react';
+import { Play, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2, Sparkles, Wind, Activity } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { PartnershipModal } from './PartnershipModal';
 import { EmotionalCheckIn } from './EmotionalCheckIn';
 import { MatrixRain } from './MatrixRain';
+import { DashboardCard } from './DashboardCard';
 
 import { HappyNewYear2026 } from './HappyNewYear2026';
 import { HeroHybrid } from './HeroHybrid';
@@ -138,6 +139,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
       description: 'Recomendações personalizadas baseadas no seu perfil único',
       isPremium: true,
       pageId: 'personalization'
+    },
+    {
+      icon: <Activity className="w-8 h-8 text-red-600" />,
+      title: "Neuro-Anatomia Zoster",
+      description: "Mapa interativo da conexão Coluna-Órgão (T4).",
+      pageId: 'zoster-map'
     }
   ];
 
@@ -274,6 +281,31 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
 
                 <div className="text-xs text-green-600 font-semibold mt-auto pt-4 border-t border-gray-100 flex items-center justify-center gap-1 group-hover:gap-2 transition-all">
                   <span>DESBLOQUEAR CORPO</span> <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+
+            {/* Neuro-Anatomia Zoster (NEW) */}
+            <div
+              onClick={() => onPageChange('zoster-map')}
+              className="group bg-white rounded-3xl shadow-xl p-6 cursor-pointer transform hover:scale-105 transition-all duration-300 border-2 border-red-100 hover:border-red-400 flex flex-col relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg">NOVO</div>
+              <div className="text-center flex-1">
+                <div className="flex justify-center mb-6">
+                  <div className="p-4 bg-gradient-to-r from-red-600 to-orange-600 rounded-full group-hover:from-red-700 group-hover:to-orange-700 transition-all shadow-lg shadow-red-200">
+                    <Activity className="w-12 h-12 text-white" />
+                  </div>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                  Mapa Zoster (T4)
+                </h2>
+                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                  Neuro-anatomia visual: Conexão Raiz Nervosa (Huatuo) + Órgão (Shu).
+                </p>
+
+                <div className="text-xs text-red-600 font-semibold mt-auto pt-4 border-t border-gray-100 flex items-center justify-center gap-1 group-hover:gap-2 transition-all">
+                  <span>VISUALIZAR MAPA</span> <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
             </div>
@@ -437,6 +469,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
               >
                 📚 Ler Blog
               </button>
+
+              <button
+                onClick={() => onPageChange('zoster-map')}
+                className="bg-red-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-red-700 transition-all duration-200 shadow-lg flex items-center gap-2 animate-bounce"
+                style={{ animationDuration: '2s' }}
+              >
+                <Activity className="w-5 h-5" />
+                Novo: Mapa Zoster (T4)
+              </button>
+
               <button
                 onClick={() => onPageChange('login')}
                 className="border-2 border-purple-600 text-purple-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-purple-600 hover:text-white transition-all duration-200"

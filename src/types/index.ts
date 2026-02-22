@@ -47,11 +47,11 @@ export interface AcupressurePoint {
   benefitsEs?: string[];
   benefitsFr?: string[];
   isPremium: boolean;
-  category: 'general' | 'septicemia' | 'atm' | 'cranio' | 'neuro' | 'immunity' | 'cardio' | 'ynsa' | 'sexual' | 'kidney' | 'menstrual' | 'back_pain' | 'digestive' | 'headache' | 'neck' | 'lung';
+  category: 'general' | 'septicemia' | 'atm' | 'cranio' | 'neuro' | 'immunity' | 'cardio' | 'ynsa' | 'sexual' | 'kidney' | 'menstrual' | 'back_pain' | 'digestive' | 'headache' | 'neck' | 'lung' | 'zoster';
   additionalCategories?: string[];
   instructions?: string;
   duration?: number;
-  pressure?: 'muito leve' | 'leve' | 'moderada' | 'firme';
+  pressure?: 'muito leve' | 'leve' | 'moderada' | 'firme' | 'forte';
   // Internationalization extensions
   nameZh?: string;
   nameHi?: string;

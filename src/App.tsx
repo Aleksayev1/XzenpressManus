@@ -38,6 +38,8 @@ import HormonalResearchPage from './components/HormonalResearchPage';
 import { ZSResearchFloating } from './components/ZSResearchFloating';
 import { ZenFlowPage } from './components/ZenFlowPage';
 import { SessaoMestraPage } from './components/SessaoMestraPage';
+import { ZosterMapPage } from './pages/ZosterMapPage';
+import { HerpesHubPage } from './pages/HerpesHubPage';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -231,6 +233,10 @@ function AppContent() {
         return <ZenFlowPage onBack={() => setCurrentPage('home')} />;
       case 'triad-session':
         return <SessaoMestraPage onBack={() => setCurrentPage('home')} />;
+      case 'zoster-map':
+        return <ZosterMapPage onBack={() => setCurrentPage('home')} />;
+      case 'herpes-hub':
+        return <HerpesHubPage onBack={() => setCurrentPage('home')} onPageChange={setCurrentPage} />;
       default:
         return <HomePage onPageChange={setCurrentPage} />;
     }

@@ -61,7 +61,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const mapSupabaseUserToLocalUser = async (supabaseUser: any) => {
     // ✅ LISTA VIP (Acesso Liberado Manualmente)
-    const VIP_EMAILS = ['camilla.vieira19@gmail.com', 'aleksayev@gmail.com', 'aleksayev1@gmail.com'];
+    const VIP_EMAILS = [
+      'camilla.vieira19@gmail.com',
+      'aleksayev@gmail.com',
+      'aleksayev1@gmail.com',
+      'Aleksayev@gmail.com'
+    ];
 
     // ✅ SEGURO: Verificar status Premium no banco de dados
     let isPremium = false;
@@ -118,7 +123,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // 🌟 VIP OVERRIDE: Forçar Premium se estiver na lista VIP
-    if (supabaseUser.email && VIP_EMAILS.includes(supabaseUser.email.trim().toLowerCase())) {
+    const userEmail = supabaseUser.email?.trim().toLowerCase();
+    const isVip = userEmail && VIP_EMAILS.some(email => email.toLowerCase() === userEmail);
+
+    console.log('🔍 Checking VIP access for:', userEmail, 'Result:', isVip);
+
+    if (isVip) {
       console.log('🌟 Usuário VIP detectado! Acesso Premium liberado:', supabaseUser.email);
       isPremium = true;
       hasPaidPremium = true; // Para evitar prompts de upgrade
@@ -128,7 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: supabaseUser.id,
       email: supabaseUser.email || '',
       name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'Usuário',
-      isPremium: isPremium, // ✅ Agora vem do banco de dados!
+      isPremium: isPremium, // ✅ Agora vem do banco de dados ou lista VIP!
       hasPaidPremium,
       premiumActivatedAt,
       premiumExpiresAt,
@@ -136,6 +146,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAdmin: false,
       createdAt: supabaseUser.created_at,
     };
+
+    console.log('👤 Final Local User Object:', {
+      email: newUser.email,
+      isPremium: newUser.isPremium,
+      hasPaidPremium: newUser.hasPaidPremium
+    });
 
     setUser(newUser);
     // Salvar no localStorage para cache (mas não confiar nele para validação)

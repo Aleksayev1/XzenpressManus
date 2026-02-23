@@ -55,124 +55,107 @@ const Point: React.FC<PointProps> = ({ cx, cy, r, color, label, onClick, isActiv
 
 interface SpineMapProps {
     highlightLevel?: string | null;
+    onPointSelect?: (pointId: string) => void;
 }
 
-export const SpineMap: React.FC<SpineMapProps> = ({ highlightLevel }) => {
+export const SpineMap: React.FC<SpineMapProps> = ({ highlightLevel, onPointSelect }) => {
     const [internalActiveLevel, setInternalActiveLevel] = useState<string | null>(null);
     const activeLevel = highlightLevel || internalActiveLevel;
 
-    // Anatomical Data
+    // Anatomical Data with Database IDs
     const levels = [
         // --- CERVICAL (Face/Neck/Shoulder) ---
         {
-            id: 'C4', // Representative for C3-C4
+            id: 'C4',
+            huatuoId: 'huatuo-c4',
+            shuId: null,
             y: 50,
             huatuo: 'Huatuo C4',
-            shu: 'N/A (Cervical)',
-            organ: 'Pescoço/Diafragma',
-            description: 'Controle do pescoço e respiração alta.',
-            location_huatuo: 'Meio do pescoço, lateral à espinha.',
-            location_shu: 'Musculatura lateral do pescoço.',
-            action: 'Massagem suave para relaxar trapézio superior.'
+            shu: 'N/A',
+            organ: 'Pescoço/Diafragma'
         },
         {
-            id: 'C6', // Representative for C5-C7
+            id: 'C6',
+            huatuoId: 'huatuo-c6',
+            shuId: null,
             y: 70,
             huatuo: 'Huatuo C6',
-            shu: 'N/A (Braquial)',
-            organ: 'Ombro/Braço',
-            description: 'Raiz do Plexo Braquial. Irradia para o polegar.',
-            location_huatuo: 'Base do pescoço.',
-            location_shu: 'Topo do ombro.',
-            action: 'Pressionar para aliviar dor no braço.'
+            shu: 'N/A',
+            organ: 'Ombro/Braço'
         },
         // --- THORACIC (Organs/Chest) ---
         {
             id: 'T3',
+            huatuoId: 'huatuo-t3',
+            shuId: 'bl13',
             y: 90,
             huatuo: 'Huatuo T3',
             shu: 'BL13 (Pulmão)',
-            organ: 'Pulmão',
-            description: 'Centro da respiração e da tristeza acumulada.',
-            location_huatuo: 'Topo das escápulas. Bem na raiz do nervo.',
-            location_shu: 'Entre as escápulas, na altura da "espinha" da omoplata.',
-            action: 'Massagem circular suave para "soltar" o peito.'
+            organ: 'Pulmão'
         },
         {
             id: 'T4',
+            huatuoId: 'huatuo-t4',
+            shuId: 'bl14',
             y: 112,
             huatuo: 'Huatuo T4',
             shu: 'BL14 (Pericárdio)',
-            organ: 'Pericárdio',
-            description: 'Onde guardamos emoções reprimidas. Alvo do Zoster emocional.',
-            location_huatuo: 'Um dedo abaixo de T3.',
-            location_shu: 'Linha média das escápulas. Ponto sensível.',
-            action: 'Pressione por 10s e solte. Repita 3x.'
+            organ: 'Pericárdio'
         },
         {
             id: 'T5',
+            huatuoId: 'huatuo-t5',
+            shuId: 'bl15',
             y: 134,
             huatuo: 'Huatuo T5',
             shu: 'BL15 (Coração)',
-            organ: 'Coração',
-            description: 'A casa da mente e da ansiedade.',
-            location_huatuo: 'Abaixo de T4, centro das costas.',
-            location_shu: 'Logo abaixo da linha média das escápulas.',
-            action: 'Toque leve, respire visualizando luz rosa.'
+            organ: 'Coração'
         },
         {
             id: 'T9',
+            huatuoId: 'huatuo-t9',
+            shuId: 'bl18',
             y: 222,
             huatuo: 'Huatuo T9',
             shu: 'BL18 (Fígado)',
-            organ: 'Fígado',
-            description: 'Raiva, estresse e desintoxicação.',
-            location_huatuo: 'Abaixo das escápulas (linha do sutiã/coração).',
-            location_shu: 'Região muscular mais densa no meio das costas.',
-            action: 'Fricção vigorosa para esquentar.'
+            organ: 'Fígado'
         },
         // --- LOWER THORACIC (Waist) ---
         {
-            id: 'T10', // Representative for T10-T12
+            id: 'T10',
+            huatuoId: 'huatuo-t10',
+            shuId: 'bl19',
             y: 244,
             huatuo: 'Huatuo T10',
             shu: 'BL19 (Vesícula)',
-            organ: 'Vesícula/Biliar',
-            description: 'Decisões e coragem. Faixa da cintura.',
-            location_huatuo: 'Meio das costas inferiores.',
-            location_shu: 'Lateral da espinha, zona muscular.',
-            action: 'Massagem firme.'
+            organ: 'Vesícula/Biliar'
         },
         // --- LUMBAR (Legs) ---
         {
-            id: 'L2', // Representative for L2-L3
+            id: 'L2',
+            huatuoId: 'huatuo-l2',
+            shuId: 'bl23',
             y: 300,
             huatuo: 'Huatuo L2',
             shu: 'BL23 (Rim)',
-            organ: 'Rim (Vitalidade)',
-            description: 'Bateria da vida. Medo e insegurança.',
-            location_huatuo: 'Cintura, nível do umbigo (atrás).',
-            location_shu: 'Músculo forte da lombar.',
-            action: 'Aquecer com a mão ou bolsa térmica.'
+            organ: 'Rim'
         },
         // --- SACRAL (Pelvis) ---
         {
-            id: 'S1', // Representative for S1-S5
+            id: 'S1',
+            huatuoId: 'huatuo-s1',
+            shuId: 'bl27',
             y: 350,
             huatuo: 'Huatuo S1',
             shu: 'BL27 (Int. Delgado)',
-            organ: 'Sacro/Bexiga',
-            description: 'Base da coluna. Questões de sobrevivência/sexualidade.',
-            location_huatuo: 'Nos forames sacrais (buraquinhos do sacro).',
-            location_shu: 'Sobre o sacro.',
-            action: 'Friccionar até esquentar o osso.'
+            organ: 'Sacro/Bexiga'
         }
     ];
 
-    const [selectedPoint, setSelectedPoint] = useState<{ level: typeof levels[0], type: 'huatuo' | 'shu' } | null>(null);
-
-    const handlePointClick = (level: typeof levels[0], type: 'huatuo' | 'shu') => {
-        setSelectedPoint({ level, type });
+    const handlePointClick = (pointId: string | null) => {
+        if (pointId && onPointSelect) {
+            onPointSelect(pointId);
+        }
     };
 
     // Helper to render rudimentary vertebrae
@@ -270,8 +253,8 @@ export const SpineMap: React.FC<SpineMapProps> = ({ highlightLevel }) => {
                                     r={7}
                                     color="#EF4444"
                                     label={activeLevel === level.id ? 'Huatuo' : ''}
-                                    onClick={() => handlePointClick(level, 'huatuo')}
-                                    isActive={activeLevel === level.id || selectedPoint?.level.id === level.id}
+                                    onClick={() => handlePointClick(level.huatuoId)}
+                                    isActive={activeLevel === level.id}
                                     labelAlign="end"
                                 />
 
@@ -282,8 +265,8 @@ export const SpineMap: React.FC<SpineMapProps> = ({ highlightLevel }) => {
                                     r={9}
                                     color="#3B82F6"
                                     label={level.shu === 'N/A' || level.shu.includes('N/A') ? '' : level.shu.split(' ')[0]}
-                                    onClick={() => handlePointClick(level, 'shu')}
-                                    isActive={activeLevel === level.id || selectedPoint?.level.id === level.id}
+                                    onClick={() => handlePointClick(level.shuId)}
+                                    isActive={activeLevel === level.id}
                                     labelAlign="start"
                                 />
                             </g>
@@ -306,69 +289,6 @@ export const SpineMap: React.FC<SpineMapProps> = ({ highlightLevel }) => {
                     </div>
                 </div>
             </div>
-
-            {/* DETAIL MODAL (Overlay) */}
-            {selectedPoint && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200" onClick={() => setSelectedPoint(null)}>
-                    <div
-                        className="bg-gray-800 border-l-4 p-6 rounded-r-2xl rounded-l-md shadow-2xl relative w-full max-w-sm max-h-[90vh] overflow-y-auto"
-                        style={{ borderColor: selectedPoint.type === 'huatuo' ? '#EF4444' : '#3B82F6' }}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={() => setSelectedPoint(null)}
-                            className="absolute top-3 right-3 text-gray-400 hover:text-white"
-                        >
-                            ✕
-                        </button>
-
-                        <div className="mb-6">
-                            <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded bg-opacity-20 ${selectedPoint.type === 'huatuo' ? 'bg-red-500 text-red-400' : 'bg-blue-500 text-blue-400'}`}>
-                                {selectedPoint.type === 'huatuo' ? 'Nível Medular' : 'Ponto de Assentimento'}
-                            </span>
-                            <h4 className="text-2xl font-bold text-white mt-2">
-                                {selectedPoint.level.organ}
-                            </h4>
-                            <p className="text-gray-400 text-sm">{selectedPoint.level.shu} / {selectedPoint.level.huatuo}</p>
-                        </div>
-
-                        <div className="space-y-6">
-                            {/* Psycho-Emotional Aspect */}
-                            <div className="relative">
-                                <div className="absolute -left-10 top-0 w-8 h-8 rounded-full bg-purple-900/50 flex items-center justify-center text-purple-400">🧠</div>
-                                <h5 className="font-semibold text-purple-300 mb-1">Psico-Emocional</h5>
-                                <p className="text-sm text-gray-300 italic">"{selectedPoint.level.description}"</p>
-                            </div>
-
-                            {/* Location Guide */}
-                            <div className="relative">
-                                <div className="absolute -left-10 top-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-gray-400">📍</div>
-                                <h5 className="font-semibold text-gray-300 mb-1">Localização Exata</h5>
-                                <p className="text-sm text-gray-400 leading-relaxed">
-                                    {selectedPoint.type === 'huatuo' ? selectedPoint.level.location_huatuo : selectedPoint.level.location_shu}
-                                </p>
-                            </div>
-
-                            {/* Action Item */}
-                            <div className="bg-gray-700/30 p-4 rounded-xl border border-gray-600">
-                                <h5 className="font-bold text-yellow-400 mb-2 flex items-center gap-2">
-                                    <span>⚡</span> Ação Terapêutica
-                                </h5>
-                                <p className="text-sm text-white">
-                                    {selectedPoint.level.action}
-                                </p>
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={() => setSelectedPoint(null)}
-                            className="w-full mt-8 bg-white text-gray-900 hover:bg-gray-200 py-3 rounded-lg font-bold transition-all shadow-lg transform active:scale-95"
-                        >
-                            Fechar
-                        </button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

@@ -384,7 +384,10 @@ export const ZosterMapPage: React.FC<ZosterMapPageProps> = ({ onBack }) => {
                                             </div>
                                         )}
                                     </div>
-                                    <SpineMap highlightLevel={activeDermatome?.levels[0]} />
+                                    <SpineMap
+                                        highlightLevel={activeDermatome?.levels[0]}
+                                        onPointSelect={setViewingPointId}
+                                    />
                                 </div>
                             </section>
                         )}

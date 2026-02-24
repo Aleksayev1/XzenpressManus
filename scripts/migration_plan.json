@@ -1,0 +1,252 @@
+[
+  {
+    "id": "bl13",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "bl14",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "bl15",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "bl18",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "bl19",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "bl23",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "bl27",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "bl35-huiyang",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "gb41-zulinqi",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "huatuo-c4",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "huatuo-c6",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "huatuo-l2",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "huatuo-s1",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "huatuo-t10",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "huatuo-t3",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "huatuo-t4",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "huatuo-t5",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "huatuo-t9",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "r1-yongquan",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ren2",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "ren3",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "ren3-zhongji",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "ren4",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "ren4-guanyuan",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "ren5",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "ren7",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "ren8",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "sj6-zhigou",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "vc17-shanzhong",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "vg2-yaoshu",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-a",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-b",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-d",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-e",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-ear",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-eye",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-gb",
+    "category": "ynsa",
+    "target_file": "ynsa.ts"
+  },
+  {
+    "id": "ynsa-liver",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-mouth",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-nc1-rim",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-nc5-estomago",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-nc7-si",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-nose",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  },
+  {
+    "id": "ynsa-ypsilon-liver",
+    "category": "cranio",
+    "target_file": "cranio.ts"
+  },
+  {
+    "id": "zoster-huatuo-t4",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "zoster-jueyinshu-bl14",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "zoster-yanglingquan-gb34",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "zoster-zhigou-sj6",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "zoster-zulinqi-gb41",
+    "category": "general",
+    "target_file": "general.ts"
+  },
+  {
+    "id": "zs-point",
+    "category": "zoster",
+    "target_file": "septicemia.ts"
+  }
+]

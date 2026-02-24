@@ -505,4 +505,22 @@ export const cranioPoints: AcupressurePoint[] = [
     duration: 180,
     pressure: 'leve'
   }
+
+  {
+    id: 'ynsa-ypsilon-liver',
+    name: 'YNSA Ypsilon - Fígado (Wind)',
+    nameEn: 'YNSA Ypsilon - Liver',
+    description: 'Ponto Ypsilon do Fígado na têmpora. Trata condições de "Vento" e inflamação (Zoster é calor/vento). Essencial para dores agudas e queimação.',
+    descriptionEn: 'Liver Ypsilon point on temple. Treats "Wind" and inflammation (Zoster is heat/wind). Essential for acute burning pain.',
+    position: { x: 82, y: 26 },
+    image: '/YNSA/ynsa-basic-points-master.png',
+    imageAlt: 'YNSA Ypsilon Fígado na têmpora',
+    benefits: ['Herpes Zoster', 'Raiva/Irritabilidade', 'Dores Oculares', 'Desintoxicação'],
+    benefitsEn: ['Herpes Zoster', 'Anger/Irritability', 'Eye Pain', 'Detoxification'],
+    isPremium: true,
+    category: 'cranio',
+    instructions: 'Na têmpora, procurar ponto sensível na região anterior à orelha.',
+    duration: 180,
+    pressure: 'leve'
+  },
 ];

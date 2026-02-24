@@ -45,3 +45,42 @@ export {
   immunityPoints,
   ynsaPoints
 };
+
+// ===== QUERY HELPER FUNCTIONS =====
+
+/** Filter points by category */
+export const getPointsByCategory = (category: string, isPremium: boolean = false) => {
+  if (category === 'all') {
+    return isPremium ? acupressurePoints : acupressurePoints.filter(p => !p.isPremium);
+  }
+  if (category === 'mtc-premium') {
+    const generalPremium = acupressurePoints.filter(p => p.category === 'general' && p.isPremium);
+    return isPremium ? generalPremium : [];
+  }
+  const categoryPoints = acupressurePoints.filter(p =>
+    p.category === category || (p.additionalCategories && p.additionalCategories.includes(category))
+  );
+  return isPremium ? categoryPoints : categoryPoints.filter(p => !p.isPremium);
+};
+
+/** Return premium points */
+export const getPremiumPoints = () => acupressurePoints.filter(p => p.isPremium);
+
+/** Return free points */
+export const getFreePoints = () => acupressurePoints.filter(p => !p.isPremium);
+
+/** Find point by ID */
+export const getPointById = (id: string): AcupressurePoint | undefined =>
+  acupressurePoints.find(p => p.id === id);
+
+/** Return stats */
+export const getPointsStats = () => {
+  const categories = [...new Set(acupressurePoints.map(p => p.category))];
+  return {
+    totalPoints: acupressurePoints.length,
+    premiumCount: getPremiumPoints().length,
+    freeCount: getFreePoints().length,
+    categoriesCount: categories.length,
+    categories
+  };
+};

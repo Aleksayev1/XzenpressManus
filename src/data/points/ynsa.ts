@@ -236,4 +236,23 @@ export const ynsaPoints: AcupressurePoint[] = [
     duration: 180,
     pressure: 'leve'
   }
+
+  {
+    id: 'ynsa-gb',
+    name: 'YNSA Vesícula Biliar (Decisão)',
+    nameEn: 'YNSA Gallbladder (Decision)',
+    description: 'Ponto Ypsilon da Vesícula. Trata indecisão e coragem.',
+    descriptionEn: 'Ypsilon point of Gallbladder. Treats indecision and courage.',
+    position: { x: 80, y: 35 },
+    image: '/YNSA/ynsa-frontal-complete.png',
+    imageAlt: 'Localização YNSA Vesícula Biliar na testa',
+    benefits: ['Combate indecisão (Córtex Pré-Frontal)', 'Aumenta coragem e assertividade', 'Trata enxaqueca lateral', 'Alivia tensão nos ombros'],
+    benefitsEn: ['Combats indecision (Prefrontal Cortex)', 'Increases courage/assertiveness', 'Treats lateral migraine', 'Relieves shoulder tension'],
+    isPremium: true,
+    category: 'ynsa',
+    additionalCategories: ['mental', 'gallbladder', 'brain'],
+    instructions: 'Palpar na região frontal lateral. O ponto mais sensível trata a Vesícula. Pressionar levemente por 3 min.',
+    duration: 180,
+    pressure: 'leve'
+  },
 ];

@@ -841,7 +841,7 @@ export const generalPoints: AcupressurePoint[] = [
     description: 'Ponto de FOGO do Fígado (Seda Fogo). INDICADO PARA: Raiva explosiva, irritabilidade, dor de cabeça, olhos vermelhos, tontura, calor, AVC, sede, urina escura, medo, tristeza e prurido/corrimento genital.',
     descriptionEn: 'Fire Point of Liver (Sedates Fire). INDICATED FOR: Explosive anger, irritability, headache, red eyes, dizziness, heat, Stroke, thirst, dark urine, fear, sadness, genital itching/discharge.',
     position: { x: 50, y: 94 },
-    image: '/LV2_Xingjian_User_Correct.png',
+    image: '/LV2_Xingjian_Real_Final.png',
     imageAlt: 'Localização do ponto F2 (LV2) entre os dedos do pé',
     benefits: ['Seda Fogo do Fígado (Raiva/AVC)', 'Trata enxaqueca e olhos vermelhos', 'Alivia problemas genitais', 'Reduz calor e sede'],
     benefitsEn: ['Sedates Liver Fire (Anger/Stroke)', 'Treats migraine/red eyes', 'Relieves genital issues', 'Reduces heat/thirst'],

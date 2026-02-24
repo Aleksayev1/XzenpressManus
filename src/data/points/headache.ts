@@ -8,7 +8,7 @@ export const headachePoints: AcupressurePoint[] = [
     description: 'Ponto mestre para dores de cabeça, tensão na nuca, vertigem e resfriados (Vento). Clareia os olhos e a mente. Excelente para hipertensão e AVC.',
     descriptionEn: 'Master point for headaches, neck tension, vertigo, and colds (Wind). Clears eyes and mind. Excellent for hypertension and stroke.',
     position: { x: 45, y: 10 },
-    image: '/GB20_Fengchi.jpg',
+    image: '/GV20 Baihui.jpg',
     imageAlt: 'Localização do ponto VB20 (Fengchi) - Nuca',
     benefits: ['Alivia Dor de Cabeça/Enxaqueca', 'Relaxa Pescoço e Ombros', 'Trata Tontura/Labirintite', 'Clareia a Visão'],
     benefitsEn: ['Relieves Headache/Migraine', 'Relaxes Neck/Shoulders', 'Treats Dizziness/Vertigo', 'Clears Vision'],

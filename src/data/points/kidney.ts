@@ -8,7 +8,7 @@ export const kidneyPoints: AcupressurePoint[] = [
     description: 'Ponto Mu do Intestino Delgado. O local onde o Qi Original (Yuan Qi) é armazenado. Tonifica profundamente o Yang do Rim e o Qi vital. Indicado para exaustão profunda, infertilidade e fraqueza geral.',
     descriptionEn: 'Front-Mu Point of Small Intestine. Where Original Qi (Yuan Qi) is stored. Deeply tonifies Kidney Yang and vital Qi. Indicated for deep exhaustion, infertility, and general weakness.',
     position: { x: 50, y: 65 },
-    image: '/CV4_Guanyuan.jpg',
+    image: '/Ren_Abdominal_Points.png',
     imageAlt: 'Localização do ponto Ren 4 (CV4) - Abdômen Inferior',
     benefits: ['Restaura Energia Vital Profunda', 'Trata Infertilidade/Impotência', 'Combate Fadiga Crônica', 'Fortalece o "Core" Energético'],
     benefitsEn: ['Restores Deep Vital Energy', 'Treats Infertility/Impotence', 'Combats Chronic Fatigue', 'Strengthens Energy Core'],

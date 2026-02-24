@@ -8,7 +8,7 @@ export const sexualPoints: AcupressurePoint[] = [
     description: 'Ponto Mu (Alarme) da Bexiga. CRUCIAL para saúde urogenital. EVIDÊNCIA: Estudos mostram aumento de óxido nítrico e fluxo sanguíneo pélvico. Trata incontinência, problemas de próstata, impotência e disfunção sexual.',
     descriptionEn: 'Front-Mu Point of the Bladder. CRITICAL for urogenital health. EVIDENCE: Studies show increased nitric oxide and pelvic blood flow. Treats incontinence, prostate issues, impotence, and sexual dysfunction.',
     position: { x: 50, y: 70 },
-    image: '/CV3_Zhongji.jpg',
+    image: '/Ren_Abdominal_Points.png',
     imageAlt: 'Localização do ponto Ren 3 (CV3) - Abdômen Inferior',
     benefits: ['Aumenta Potência Sexual (Vasodilatação)', 'Trata Próstata e Bexiga', 'Alivia Cólicas Menstruais', 'Regula Micção'],
     benefitsEn: ['Increases Sexual Potency', 'Treats Prostate/Bladder', 'Relieves Menstrual Cramps', 'Regulates Urination'],

@@ -8,7 +8,7 @@ export const digestivePoints: AcupressurePoint[] = [
     description: 'Ponto Luo do Baço e Ponto de Abertura do Vaso Penetrador (Chong Mai). Harmoniza o Estômago, trata distúrbios menstruais e ansiedade gástrica.',
     descriptionEn: 'Luo Point of Spleen and Opening Point of Penetrating Vessel (Chong Mai). Harmonizes Stomach, treats menstrual disorders and gastric anxiety.',
     position: { x: 30, y: 95 },
-    image: '/BP4_Gongsun.jpg',
+    image: '/BP4_Gongsun_New.png',
     imageAlt: 'Localização do ponto BP4 (Gongsun) - Pé',
     benefits: ['Harmoniza Digestão', 'Trata Dor de Estômago', 'Regula Menstruação', 'Acalma a Mente'],
     benefitsEn: ['Harmonizes Digestion', 'Treats Stomach Pain', 'Regulates Menstruation', 'Calms Mind'],

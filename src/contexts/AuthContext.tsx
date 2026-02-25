@@ -30,18 +30,34 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // Hydrate instantly from localStorage so premium UI shows before Supabase resolves
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const cached = localStorage.getItem('user');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
   // Initialize Auth State Listener
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+      setIsLoading(false);
+      return;
+    }
 
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         mapSupabaseUserToLocalUser(session.user);
+      } else {
+        // No session — clear any stale cache
+        setUser(null);
+        localStorage.removeItem('user');
       }
+      setIsLoading(false);
     });
 
     // Listen for changes
@@ -143,7 +159,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       premiumActivatedAt,
       premiumExpiresAt,
       subscriptionId,
-      isAdmin: false,
+      isAdmin: isVip, // 🌟 VIPs agora são Master (Admin) por padrão
       createdAt: supabaseUser.created_at,
     };
 

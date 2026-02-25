@@ -57,13 +57,16 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
     // Segundo: busca por padrões especiais (YNSA, abreviações, códigos internacionais)
     const upperName = pointName.toUpperCase().trim();
 
-    // Padrão YNSA A, B, C, D, E, F
-    if (/^YNSA\s*[A-F]$/i.test(upperName)) {
-      const letter = upperName.match(/[A-F]/i)?.[0].toLowerCase();
+    // Padrão YNSA A, B, C, D, E, F, ZS
+    if (/^(YNSA|Ponto)\s*([A-Z]{1,2})$/i.test(upperName)) {
+      const match = upperName.match(/[A-Z]{1,2}/i);
+      const letter = match ? match[0].toLowerCase() : '';
+
       point = acupressurePoints.find((p: any) =>
         p && p.id && (
           p.id.toLowerCase().includes(`ynsa-ponto-${letter}`) ||
-          p.id.toLowerCase().includes(`ynsaponto${letter}`)
+          p.id.toLowerCase().includes(`ynsaponto${letter}`) ||
+          (letter === 'zs' && p.id.toLowerCase().includes('ynsa-zs-point'))
         )
       );
       if (point) return point.image;
@@ -149,7 +152,7 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
       return '';
     }
 
-    const pointRegex = /\b((?:IG|LI|VB|GB|VC|Ren|CV|Du|GV|P|LU|C|HT|HE|TA|SJ|TB|CS|PC|F|LR|LV|R|KI|BP|SP|E|ST|ID|SI|B|BL|YNSA)\s?-?\s?\d{1,2}[a-zA-Z]?|YNSA\s+[a-zA-Z]+)\b/gi;
+    const pointRegex = /\b((?:IG|LI|VB|GB|VC|Ren|CV|Du|GV|P|LU|C|HT|HE|TA|SJ|TB|CS|PC|F|LR|LV|R|KI|BP|SP|E|ST|ID|SI|B|BL|YNSA|Ponto)\s?-?\s?(?:\d{1,2}[a-zA-Z]?|[A-Z]{1,2})|YNSA\s+[a-zA-Z]+)\b/gi;
     const parts = content.split(pointRegex);
     return parts.map((part, i) => {
       // Validação de segurança: ignora partes inválidas

@@ -18,7 +18,7 @@ export const neuroPoints: AcupressurePoint[] = [
     benefitsEn: ['Restores consciousness', 'Treats Epilepsy/Seizures', 'Focus and Mental Clarity', 'Acute Post-Stroke Recovery'],
     isPremium: true,
     category: 'neuro',
-    additionalCategories: ['avc', 'cranio', 'general'],
+    additionalCategories: ['avc', 'general'],
     instructions: 'Pressionar firmemente com a unha ou ponta do dedo no terço superior do sulco entre o nariz e o lábio superior. Estímulo forte.',
     duration: 120,
     pressure: 'firme'
@@ -103,7 +103,7 @@ export const neuroPoints: AcupressurePoint[] = [
     ],
     isPremium: true,
     category: 'neuro',
-    additionalCategories: ['cranio', 'septicemia', 'avc'],
+    additionalCategories: ['avc'],
     instructions: 'Localizar a linha vertical imediatamente atrás do Ponto A. Palpar de cima para baixo. Cada nódulo sensível corresponde ao órgão/nervo específico (1 a 12).',
     duration: 300,
     pressure: 'moderada'

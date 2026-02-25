@@ -14,7 +14,7 @@ export const kidneyPoints: AcupressurePoint[] = [
     benefitsEn: ['Restores Deep Vital Energy', 'Treats Infertility/Impotence', 'Combats Chronic Fatigue', 'Strengthens Energy Core'],
     isPremium: true,
     category: 'kidney',
-    additionalCategories: ['sexual', 'immunity'],
+    additionalCategories: ['sexual'],
     instructions: 'Localizado na linha média, 3 cun (4 dedos) abaixo do umbigo. Massagem circular suave gera calor.',
     duration: 180,
     pressure: 'leve'

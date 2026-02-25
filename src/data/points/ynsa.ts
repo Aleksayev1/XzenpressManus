@@ -235,7 +235,7 @@ export const ynsaPoints: AcupressurePoint[] = [
     instructions: 'TÉCNICA DIAGNÓSTICA: Palpar suavemente a região temporal bilateralmente. ONDE SENTIR MAIOR SENSIBILIDADE/DOR = PONTO CORRETO. Pressão circular leve com dedo indicador 3 minutos cada lado. Respiração lenta.',
     duration: 180,
     pressure: 'leve'
-  }
+  },
 
   {
     id: 'ynsa-gb',

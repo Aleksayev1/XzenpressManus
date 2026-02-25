@@ -87,6 +87,7 @@ const translations = {
     'acupressure.categories.immunity': 'Imunidade',
     'acupressure.categories.cardio': 'Cardio',
     'acupressure.categories.avc': 'AVC / Derrame',
+    'acupressure.categories.zoster': 'Zoster (Herpes)',
     'acupressure.select.title': 'Selecione um Ponto',
     'acupressure.select.subtitle': 'Clique em um ponto para ver detalhes e iniciar a terapia integrada',
     'acupressure.timer.start': 'Iniciar Terapia Integrada',
@@ -578,6 +579,7 @@ const translations = {
     'acupressure.categories.immunity': 'Immunity',
     'acupressure.categories.cardio': 'Cardio',
     'acupressure.categories.avc': 'Stroke / CVA',
+    'acupressure.categories.zoster': 'Shingles (Zoster)',
     // Line 75 is PT.
     // Line 467 is EN.
     // Line 782 is ES.
@@ -991,6 +993,7 @@ const translations = {
     'acupressure.categories.immunity': 'Inmunidad',
     'acupressure.categories.cardio': 'Cardio',
     'acupressure.categories.avc': 'ACV / Derrame',
+    'acupressure.categories.zoster': 'Zóster (Herpes)',
     'acupressure.select.title': 'Seleccione un Punto',
     'acupressure.select.subtitle': 'Haga clic en un punto para ver detalles e iniciar terapia integrada',
     'acupressure.timer.start': 'Iniciar Terapia Integrada',

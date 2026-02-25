@@ -51,7 +51,7 @@ export const cardioPoints: AcupressurePoint[] = [
     benefitsEn: ['Blood Circulation', 'Anxiety and Shen', 'Palpitations', 'Emotional Balance'],
     isPremium: true,
     category: 'cardio',
-    additionalCategories: ['neuro'],
+    additionalCategories: [],
     instructions: 'Localizar na têmpora ou linha frontal conforme mapa YNSA (Ponto 4).',
     duration: 180,
     pressure: 'moderada'
@@ -69,7 +69,7 @@ export const cardioPoints: AcupressurePoint[] = [
     benefitsEn: ['Emotional Protection', 'Peripheral Circulation', 'Acute Stress', 'Chest Oppression'],
     isPremium: true,
     category: 'cardio',
-    additionalCategories: ['neuro'],
+    additionalCategories: [],
     instructions: 'Localizar na têmpora ou linha frontal conforme mapa YNSA (Ponto 3).',
     duration: 180,
     pressure: 'moderada'

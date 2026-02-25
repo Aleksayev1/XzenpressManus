@@ -148,7 +148,7 @@ export const atmPoints: AcupressurePoint[] = [
     benefitsEn: ['Vitality', 'Treatment Base', 'Sensitivity'],
     isPremium: true,
     category: 'atm',
-    additionalCategories: ['neuro'],
+    additionalCategories: [],
     instructions: 'Pressionar no ponto mais superior da linha de nervos cranianos.',
     duration: 120,
     pressure: 'moderada'
@@ -184,7 +184,7 @@ export const atmPoints: AcupressurePoint[] = [
     benefitsEn: ['Reduces Pain Stress', 'Muscle Relaxation', 'Fights Inflammation', 'Autonomic Balance'],
     isPremium: true,
     category: 'atm',
-    additionalCategories: ['neuro'],
+    additionalCategories: [],
     instructions: 'Localizado inferiormente na linha de nervos cranianos. Pressão suave e contínua.',
     duration: 180,
     pressure: 'leve'

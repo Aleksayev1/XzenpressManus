@@ -119,24 +119,6 @@ export const septicemiaPoints: AcupressurePoint[] = [
     pressure: 'moderada'
   },
   {
-    id: 'ynsa-zf-figado',
-    name: 'YNSA Fígado (Desintoxicação/Sangue)',
-    nameEn: 'YNSA Liver (Detox/Blood)',
-    description: 'Ponto YNSA Fígado (F). Trata hepatite, problemas hepáticos, raiva e stress. Fundamental para desintoxicação.',
-    descriptionEn: 'YNSA Point Liver (L). Treats hepatitis, liver problems, anger and stress. Fundamental for detoxification.',
-    position: { x: 50, y: 14 },
-    image: '/YNSA/ynsa-cranial-organs-map.jpg',
-    imageAlt: 'YNSA Ponto Fígado Face Yin',
-    benefits: ['Desintoxicação', 'Trata Hepatite', 'Reduz Stress/Raiva', 'Regula o Sangue'],
-    benefitsEn: ['Detoxification', 'Treats Hepatitis', 'Reduces Stress/Anger', 'Regulates Blood'],
-    isPremium: true,
-    category: 'septicemia',
-    additionalCategories: ['immunity'],
-    instructions: 'Localizar na zona frontal YIN (Face). Pressionar suavemente por 3 minutos.',
-    duration: 180,
-    pressure: 'moderada'
-  },
-  {
     id: 'ynsa-zf-baco',
     name: 'YNSA Baço/Pâncreas (Leucócitos/Imunidade)',
     nameEn: 'YNSA Spleen/Pancreas (WBC/Immunity)',
@@ -153,7 +135,7 @@ export const septicemiaPoints: AcupressurePoint[] = [
     instructions: 'Localizar na zona central da face YIN. Pressionar firmemente por 3-5 minutos.',
     duration: 300,
     pressure: 'moderada'
-  }
+  },
 
   {
     id: 'bl13',

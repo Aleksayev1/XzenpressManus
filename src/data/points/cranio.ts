@@ -350,24 +350,6 @@ export const cranioPoints: AcupressurePoint[] = [
     pressure: 'moderada'
   },
   {
-    id: 'ynsa-zf-vesicula',
-    name: 'YNSA Vesícula Biliar (Decisão/Fluidez)',
-    nameEn: 'YNSA Gallbladder (Decision/Fluidity)',
-    description: 'Ponto YNSA Vesícula Biliar (VB). Trata colecistite e auxilia na tomada de decisões e coragem.',
-    descriptionEn: 'YNSA Point Gallbladder (GB). Treats cholecystitis and aids in decision making and courage.',
-    position: { x: 52, y: 16 },
-    image: '/YNSA/ynsa-cranial-organs-map.jpg',
-    imageAlt: 'YNSA Ponto Vesícula Face Yin',
-    benefits: ['Trata Colecistite', 'Aumenta Coragem', 'Decisão Rápida', 'Digestão de Gorduras'],
-    benefitsEn: ['Treats Cholecystitis', 'Increases Courage', 'Quick Decision', 'Fat Digestion'],
-    isPremium: true,
-    category: 'cranio',
-    additionalCategories: ['septicemia'],
-    instructions: 'Localizar na linha frontal YIN. Pressionar firmemente por 2-3 minutos.',
-    duration: 180,
-    pressure: 'moderada'
-  },
-  {
     id: 'ynsa-zf-bexiga',
     name: 'YNSA Bexiga (B)',
     nameEn: 'YNSA Bladder (B)',
@@ -504,7 +486,7 @@ export const cranioPoints: AcupressurePoint[] = [
     instructions: 'APLICAÇÃO BILATERAL: Massagear as têmporas suavemente em círculos.',
     duration: 180,
     pressure: 'leve'
-  }
+  },
 
   {
     id: 'ynsa-ypsilon-liver',

@@ -24,6 +24,7 @@ export const protocols: Protocol[] = [
             tip: 'O Fígado odeia estagnação. Movimente-se ou grite em uma almofada para liberar a energia travada.'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'xingjian-lv2', durationSeconds: 120, customInstructions: 'Ponto DE FOGO (Filho). Dispersa o calor da raiva explosiva. "Apague o incêndio" pressionando firmemente.' },
             { pointId: 'lv3-taichong', durationSeconds: 120, customInstructions: 'Ponto FONTE (Terra). Harmoniza o fluxo do Qi após apagar o fogo. Transforme a tensão em planejamento.' },
             { pointId: 'ren14-juque', durationSeconds: 120, customInstructions: 'Ponto de Alarme do Coração. Acalma a agitação e a ansiedade gerada pela raiva.' },
@@ -46,6 +47,7 @@ export const protocols: Protocol[] = [
             spotifyUrl: 'https://open.spotify.com/search/417hz%20healing%20trauma'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'ren17-danzhong', durationSeconds: 180, customInstructions: 'Centro do peito. Massagem suave para soltar a angústia acumulada.' },
             { pointId: 'taiyuan-lu9', durationSeconds: 120, customInstructions: 'Ponto MÃE (Terra). Terra gera Metal. Tonifique para preencher o vazio da perda e fortalecer o Pulmão.' },
             { pointId: 'ht5-tongli', durationSeconds: 120, customInstructions: 'Conecta Coração e Fala. Ajuda a verbalizar ou expressar o que está preso.' },
@@ -68,6 +70,7 @@ export const protocols: Protocol[] = [
             spotifyUrl: 'https://open.spotify.com/search/396hz%20remove%20fear'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'kd3-taixi', durationSeconds: 180, customInstructions: 'Ponto FONTE (Terra). A base da bateria. Harmoniza a energia vital.' },
             { pointId: 'fuliu-kd7', durationSeconds: 180, customInstructions: 'Ponto MÃE (Metal). Metal gera Água. Tonifique este ponto para "encher o tanque" de coragem e força de vontade.' },
             { pointId: 'kd1-yongquan', durationSeconds: 120, customInstructions: 'Ponto FILHO (Madeira). Aterre o excesso de ansiedade e puxe a energia para o chão.' },
@@ -90,6 +93,7 @@ export const protocols: Protocol[] = [
             spotifyUrl: 'https://open.spotify.com/search/528hz%20action%20motivation'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'gb40-qiuxu', durationSeconds: 120, customInstructions: 'Ponto Fonte da Vesícula Biliar. Clareia a mente para tomadas de decisão difíceis.' },
             { pointId: 'gb34-yanglingquan', durationSeconds: 180, customInstructions: 'Ponto Mestre dos Tendões e da Ação. Flexibilidade para escolher e se mover.' },
             { pointId: 'ynsa-zf-vesicula', durationSeconds: 120, customInstructions: 'YNSA Z. Frontal (Vesícula). O "Botão da Decisão" no crânio. Pressione onde for mais sensível na testa lateral.' },
@@ -117,6 +121,7 @@ export const protocols: Protocol[] = [
             tip: 'O intestino produz 90% da serotonina. Evite inflamação.'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'yintang-ex-hn3', durationSeconds: 60, customInstructions: 'Foque na sua respiração.' },
             { pointId: 'neiguan-pc6', durationSeconds: 120, customInstructions: 'Pressione bilateralmente (punho esquerdo depois direito).' },
             { pointId: 'ynsa-ponto-e', durationSeconds: 120, customInstructions: 'Sinta o tórax expandir a cada respiração.' },
@@ -144,6 +149,7 @@ export const protocols: Protocol[] = [
             tip: 'Jante cedo. O processo digestivo compete com o sono reparador.'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'anmian-extra', durationSeconds: 180, customInstructions: 'Massageie atrás da orelha circularmente.' },
             { pointId: 'yintang-ex-hn3', durationSeconds: 60, customInstructions: 'Suavemente, como um carinho.' },
             { pointId: 'shenmen-c7', durationSeconds: 120, customInstructions: 'Ponto FILHO (Terra). Fogo gera Terra. Drena o excesso de agitação mental e ancora o espírito.' },
@@ -171,6 +177,7 @@ export const protocols: Protocol[] = [
             tip: 'O cérebro é 60% gordura. Hidrate-se para condução elétrica.'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'ynsa-cerebrum', durationSeconds: 120, customInstructions: 'Estimule diretamente o córtex para clareza.' },
             { pointId: 'baihui-basic-vg20', durationSeconds: 60, customInstructions: 'Eleve sua energia Yang.' },
             { pointId: 'zusanli-st36', durationSeconds: 120, customInstructions: 'Fortaleça a base energética do corpo (Terra).' },
@@ -200,6 +207,7 @@ export const protocols: Protocol[] = [
             tip: 'Suplementação Global: Magnésio (relaxamento muscular) e Vitamina B12 (saúde do nervo ciático).'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'ynsa-ponto-d', durationSeconds: 180, customInstructions: 'Massageie o ponto próximo à orelha (estará sensível quando pressionado).' },
             { pointId: 'ynsa-ponto-f', durationSeconds: 180, customInstructions: 'Ponto chave do Ciático. Pressione os pontos locais antes e depois da orelha (procure o ponto sensível).' },
             { pointId: 'huantiao-vb30', durationSeconds: 180, customInstructions: 'O "Desbloqueador de Ciático". Pressione profundamente no glúteo (use uma bola de tênis se preferir).' },
@@ -222,6 +230,7 @@ export const protocols: Protocol[] = [
             spotifyUrl: 'https://open.spotify.com/search/174hz%20migraine%20relief'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'ynsa-ponto-a', durationSeconds: 120, customInstructions: 'Ponto chave da cervical e cabeça.' },
             { pointId: 'septicemia-hegu-li4', durationSeconds: 120, customInstructions: 'O grande analgésico natural.' },
             { pointId: 'taiyang-extra', durationSeconds: 120, customInstructions: 'Nas têmporas, alivie a pressão lateral.' }
@@ -243,6 +252,7 @@ export const protocols: Protocol[] = [
             spotifyUrl: 'https://open.spotify.com/search/528hz%20muscle%20relaxation'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'ynsa-ponto-a', durationSeconds: 90, customInstructions: 'Trata a coluna cervical.' },
             { pointId: 'ynsa-ponto-b', durationSeconds: 120, customInstructions: 'Específico para o ombro e escápula.' },
             { pointId: 'septicemia-hegu-li4', durationSeconds: 60, customInstructions: 'Libera tensão superior.' },
@@ -265,6 +275,7 @@ export const protocols: Protocol[] = [
             spotifyUrl: 'https://open.spotify.com/search/174hz%20inflammation%20relief'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'ynsa-ponto-c', durationSeconds: 180, customInstructions: 'Ponto mestre do membro superior.' },
             { pointId: 'quchi-li11', durationSeconds: 120, customInstructions: 'Cotovelo: desinflama o braço inteiro.' },
             { pointId: 'neiguan-pc6', durationSeconds: 60, customInstructions: 'Libera o túnel do carpo.' }
@@ -286,6 +297,7 @@ export const protocols: Protocol[] = [
             spotifyUrl: 'https://open.spotify.com/search/174hz%20tmj%20relief'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'atm-xiaguan-st7', durationSeconds: 120, customInstructions: 'Abra e feche a boca suavemente enquanto pressiona.' },
             { pointId: 'atm-ermen-sj21', durationSeconds: 90, customInstructions: 'Pressione no portal da orelha.' },
             { pointId: 'ynsa-cranial-5', durationSeconds: 180, customInstructions: 'YNSA Cranial V (Trigêmeo): Ponto Mestre para toda dor e sensibilidade da face e ATM.' },
@@ -324,6 +336,7 @@ export const protocols: Protocol[] = [
         colorTheme: 'orange',
         benefits: ['Melhora digestão', 'Reduz inchaço', 'Alivia gastrite'],
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'zusanli-st36', durationSeconds: 180, customInstructions: 'O grande harmonizador da digestão.' },
             { pointId: 'neiguan-pc6', durationSeconds: 90, customInstructions: 'Acalma o estômago e náuseas.' },
             { pointId: 'ynsa-zf-baco', durationSeconds: 90, customInstructions: 'Regula a absorção dos alimentos.' }
@@ -345,6 +358,7 @@ export const protocols: Protocol[] = [
             spotifyUrl: 'https://open.spotify.com/search/741hz%20detox%20cleansing'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'ynsa-zf-figado', durationSeconds: 120, customInstructions: 'O grande laboratório de limpeza.' },
             { pointId: 'yongquan-r1-kd1', durationSeconds: 90, customInstructions: 'Filtra e purifica.' },
             { pointId: 'zusanli-st36', durationSeconds: 90, customInstructions: 'Acelera o metabolismo de eliminação.' },
@@ -374,6 +388,7 @@ export const protocols: Protocol[] = [
             tip: 'Burnout é "septicemia energética" - tratamento requer nutrição anti-inflamatória e adaptógenos.'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'ynsa-zf-rim', durationSeconds: 180, customInstructions: 'YNSA Ponto 1 (Rim): Restaura Jing (essência vital), força de vontade e combate fadiga crônica profunda.' },
             { pointId: 'ynsa-zf-baco', durationSeconds: 180, customInstructions: 'YNSA Ponto 8 (Baço-Pâncreas): Elimina "névoa cerebral", melhora concentração e reduz overthinking.' },
             { pointId: 'ynsa-zf-figado', durationSeconds: 180, customInstructions: 'YNSA Ponto 10 (Fígado): Libera irritabilidade, cinismo e raiva acumulada do trabalho.' },
@@ -397,6 +412,7 @@ export const protocols: Protocol[] = [
             spotifyUrl: 'https://open.spotify.com/search/528hz%20heart%20healing'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             { pointId: 'ren17-danzhong', durationSeconds: 180, customInstructions: 'Centro do Peito: O Mestre do Qi. Abra o coração para a cura.' },
             { pointId: 'neiguan-pc6', durationSeconds: 120, customInstructions: 'Portão Interno: O melhor ponto para acalmar o coração e a mente.' },
             { pointId: 'ynsa-cardio-heart', durationSeconds: 120, customInstructions: 'YNSA Coração: Regulação central da função cardíaca.' },
@@ -448,6 +464,7 @@ export const protocols: Protocol[] = [
             tip: 'STACK COMPLETO: Zinco (manhã) + Maca (café) + Ômega-3 (almoço) + L-Arginina (1-2h pré-intimidade). Ciclar Maca/Tongkat Ali a cada 4 semanas para evitar tolerância.'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             {
                 pointId: 'cv3-zhongji',
                 durationSeconds: 150,
@@ -522,6 +539,7 @@ export const protocols: Protocol[] = [
             tip: 'STACK NEUROENDÓCRINO: Ashwagandha (manhã) + Maca (café) + Zinco+Magnésio (jantar) + L-Tirosina (1h pré). Combine com protocolo para efeito máximo.'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             {
                 pointId: 'ynsa-zs-point',
                 durationSeconds: 180,
@@ -602,6 +620,7 @@ export const protocols: Protocol[] = [
             tip: 'STACK MASCULINO: Zinco (manhã) + Tribulus (café) + Maca (almoço) + L-Arginina (1-2h pré-intimidade). Ciclar Tribulus a cada 8 semanas.'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             {
                 pointId: 'ynsa-kidney-y1',
                 durationSeconds: 180,
@@ -657,6 +676,7 @@ export const protocols: Protocol[] = [
             tip: 'Stack anti-surto: Lisina 3g ao acordar + Zinco à noite. Iniciar ao primeiro sinal (pródromo: formigamento). Estudo JAMA: reduz surtos em 87%.'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             {
                 pointId: 'ynsa-sensorial-boca',
                 durationSeconds: 120,
@@ -705,6 +725,7 @@ export const protocols: Protocol[] = [
             tip: 'Stack pró-ativo: Lisina (manhã) + Zinco + D3 (noite) + Ashwagandha (adaptógeno anti-estresse). Iniciar no PRÓDROMO (formigamento, pressão, ardor). Estudos: reduz surtos em 50-80%.'
         },
         steps: [
+            { pointId: 'breathing-step', durationSeconds: 60, customInstructions: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia.' },
             {
                 pointId: 'ynsa-zf-rim',
                 durationSeconds: 180,

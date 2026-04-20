@@ -65,3 +65,6 @@ DEPLOY_NETLIFY_READY/
 ENTREGA_ANDROID_FINAL/
 XZENPRESS_*/
 deploy-ready/
+
+# Local Large Audio Files
+public/sounds/fusion/jazz.mp3

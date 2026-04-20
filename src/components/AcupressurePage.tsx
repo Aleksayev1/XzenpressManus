@@ -21,7 +21,6 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
   // State for data fetching
   const [points, setPoints] = useState<AcupressurePoint[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // Fetch points on mount
   useEffect(() => {
@@ -32,34 +31,21 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
         setPoints(data);
       } catch (err) {
         console.error('Failed to fetch points:', err);
-        setError('Failed to load acupressure points. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchPoints();
   }, []);
 
   // Filter helpers based on state
   const getPointsByCategory = (category: string) => {
     if (category === 'all') return points;
-
-    // Filter points by category
     const filtered = points.filter(p =>
       p.category === category || p.additionalCategories?.includes(category)
     );
-
-    // Remove duplicates using Map (ensures unique IDs)
-    const uniquePoints = Array.from(
-      new Map(filtered.map(p => [p.id, p])).values()
-    );
-
-    return uniquePoints;
+    return Array.from(new Map(filtered.map(p => [p.id, p])).values());
   };
-
-  const getFreePoints = () => points.filter(p => !p.isPremium);
-  const getPremiumPoints = () => points.filter(p => p.isPremium);
 
   // Helper function to get translated content
   const getTranslatedField = (point: any, field: string) => {
@@ -68,6 +54,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     const translatedField = `${field}${langSuffix}`;
     return point[translatedField] || point[field];
   };
+
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPoint, setSelectedPoint] = useState<string | null>(null);
   const [isTimerActive, setIsTimerActive] = useState(false);
@@ -108,7 +95,6 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     exhale: { duration: 8, next: 'inhale' as const, color: '#6B21A8', label: 'Expire' },
   };
 
-  const filteredPoints = getPointsByCategory(selectedCategory);
   const selectedPointData = selectedPoint ? points.find(p => p.id === selectedPoint) : null;
   const viewingPointData = viewingPoint ? points.find(p => p.id === viewingPoint) : null;
 
@@ -449,6 +435,16 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     );
   };
 
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const zusanliPoint = points.find(p => p.id === 'st36' || p.name.toLowerCase().includes('zusanli') || p.id === 'zs');
+
+  const filteredPoints = getPointsByCategory(selectedCategory).filter(p => 
+    p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.benefits && p.benefits.some(b => b.toLowerCase().includes(searchQuery.toLowerCase())))
+  );
+
   return (
     <div
       className="min-h-screen transition-all duration-1000 ease-in-out pt-24 relative"
@@ -467,63 +463,83 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header - Only show when not in active therapy */}
         {!isTimerActive && (
-          <div className="relative mb-8">
-            <div className="flex items-center absolute left-0 top-1 z-10">
-              <button
-                onClick={() => onPageChange('home')}
-                className="p-2 mr-4 bg-white/80 hover:bg-white rounded-full shadow-sm hover:shadow transition-all group border border-gray-100"
-                title="Voltar ao Início"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-green-600 transition-colors" />
-              </button>
-              {/* Visual Cue - Drawing */}
-              <div className="hidden sm:flex items-center gap-2 text-xs text-gray-400 font-handwriting opacity-80 animate-fade-in select-none">
-                <span>↵ Menu Principal</span>
+          <div className="relative mb-8 text-center pt-8 md:pt-2">
+            <div className="flex justify-center mb-4">
+              <div className="p-4 bg-gradient-to-r from-green-500 to-blue-500 rounded-full ring-4 ring-blue-50 shadow-xl">
+                <Target className="w-12 h-12 text-white" />
               </div>
             </div>
-
-            <div className="text-center pt-8 md:pt-2"> {/* Padding adjustment for mobile overlap */}
-              <div className="flex justify-center mb-4">
-                <div className="p-4 bg-gradient-to-r from-green-500 to-blue-500 rounded-full ring-4 ring-blue-50 shadow-xl">
-                  <Target className="w-12 h-12 text-white" />
-                </div>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
-                <span className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  {t('acupressure.title')}
-                </span>
-              </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                {t('acupressure.subtitle')}
-              </p>
-            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
+              <span className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                {t('acupressure.title')}
+              </span>
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              {t('acupressure.subtitle')}
+            </p>
           </div>
         )}
 
-        {/* Category Filter - Only show when not in active therapy */}
+        {/* Search & Categories - Only show when not in active therapy */}
         {!isTimerActive && (
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 max-w-4xl mx-auto">
-            <div className="flex flex-wrap justify-center gap-3">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  disabled={category.premium && !user?.isPremium}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${selectedCategory === category.id
-                    ? 'bg-green-500 text-white shadow-lg'
-                    : category.premium && !user?.isPremium
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                >
-                  <span>{category.icon}</span>
-                  <span>{t(`acupressure.categories.${category.id}`)}</span>
-                  {category.premium && !user?.isPremium && (
-                    <Lock className="w-4 h-4" />
-                  )}
-                </button>
-              ))}
+          <div className="max-w-4xl mx-auto space-y-6 mb-8">
+            {/* Search Bar */}
+            <div className="relative group">
+               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Target className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+               </div>
+               <input 
+                  type="text"
+                  placeholder="Pesquisar ponto (ex: ZS, Zusanli, Estresse)..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="block w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl shadow-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-gray-700 font-medium"
+               />
             </div>
+
+            {/* Category Filter */}
+            <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <div className="flex flex-wrap justify-center gap-3">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => { setSelectedCategory(category.id); setSearchQuery(''); }}
+                    disabled={category.premium && !user?.isPremium}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${selectedCategory === category.id
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : category.premium && !user?.isPremium
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-100'
+                      }`}
+                  >
+                    <span>{category.icon}</span>
+                    <span>{t(`acupressure.categories.${category.id}`)}</span>
+                    {category.premium && !user?.isPremium && (
+                      <Lock className="w-4 h-4" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ZS Highlight (if not searching) */}
+            {!searchQuery && selectedCategory === 'all' && zusanliPoint && (
+              <div 
+                onClick={() => setViewingPoint(zusanliPoint.id)}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white shadow-xl cursor-pointer transform hover:scale-[1.01] transition-all flex flex-col md:flex-row items-center justify-between gap-6"
+              >
+                <div className="flex items-center gap-4">
+                   <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-3xl">🧘</div>
+                   <div>
+                      <h3 className="text-xl font-bold">Destaque: Ponto Zusanli (ZS)</h3>
+                      <p className="text-blue-100 italic">"O ponto das cem doenças" - Fundamental para longevidade e imunidade.</p>
+                   </div>
+                </div>
+                <button className="bg-white text-blue-600 px-6 py-2 rounded-full font-bold hover:bg-blue-50 transition-colors">
+                   Acessar Agora
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -774,7 +790,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
               <div className="mb-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-3">Para que serve:</h3>
                 <div className="space-y-2 mb-4">
-                  {getTranslatedField(selectedPointData, 'benefits').slice(0, 4).map((benefit, index) => (
+                  {getTranslatedField(selectedPointData, 'benefits').slice(0, 4).map((benefit: string, index: number) => (
                     <div key={index} className="flex items-start space-x-2">
                       <div
                         className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
@@ -1147,7 +1163,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                           }
                           console.log('Clique na imagem do viewing point!', viewingPointData.image);
                           setShowZoomModal(true);
-                          setZoomImageUrl(viewingPointData.image);
+                          setZoomImageUrl(viewingPointData.image || null);
                         }}
                       >
                         <img
@@ -1189,7 +1205,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                   <div className="mb-6">
                     <h3 className="text-lg font-bold text-gray-800 mb-3">Para que serve:</h3>
                     <div className="space-y-2 mb-4">
-                      {getTranslatedField(viewingPointData, 'benefits').slice(0, 3).map((benefit, index) => (
+                      {getTranslatedField(viewingPointData, 'benefits').slice(0, 3).map((benefit: string, index: number) => (
                         <div key={index} className="flex items-start space-x-2">
                           <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                             <span className="text-white text-xs">✓</span>

@@ -29,21 +29,21 @@ const SoundFusion: React.FC = () => {
         {
             id: 'weightless',
             name: 'Weightless (Marconi Union)',
-            src: '/sounds/fusion/Weightless.mp3.mp3',
+            src: '/sounds/fusion/Weightless.mp3',
             icon: <Moon className="w-6 h-6 text-purple-400" />,
             defaultVolume: 0.6
         },
         {
             id: 'jazz',
             name: 'Baby Jazz (Relax & Sleep)',
-            src: '/sounds/fusion/jazz.mp3.mp3',
+            src: '/sounds/fusion/jazz.mp3',
             icon: <Music className="w-6 h-6 text-yellow-400" />,
             defaultVolume: 0.4
         },
         {
             id: 'rain',
             name: 'Relaxing Rain',
-            src: '/sounds/rain.mp3', // Using existing rain sound
+            src: '/sounds/fusion/rain.mp3', // Moved to fusion folder
             icon: <CloudRain className="w-6 h-6 text-blue-400" />,
             defaultVolume: 0.3
         }
@@ -66,6 +66,7 @@ const SoundFusion: React.FC = () => {
                 audio.pause();
                 audio.src = '';
             });
+            audioRefs.current = {};
         };
     }, []);
 

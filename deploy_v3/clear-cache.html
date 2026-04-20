@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XZenPress - Limpar Cache</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 10px;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .instructions {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .instructions ol {
+            margin-left: 20px;
+        }
+        .instructions li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🧘‍♂️</div>
+        <h1>🔄 Limpeza de Cache XZenPress</h1>
+        <p>Se você está tendo problemas para acessar o site, esta página vai limpar todo o cache e dados antigos.</p>
+        
+        <div id="status" class="status loading" style="display: none;">
+            Limpando cache...
+        </div>
+
+        <button id="clearBtn" onclick="clearAllCache()">🗑️ Limpar Cache Agora</button>
+        <button onclick="window.location.href='/'">🏠 Voltar ao Site</button>
+
+        <div class="instructions">
+            <h3>📋 Se o problema persistir, limpe manualmente:</h3>
+            <ol>
+                <li><strong>Chrome/Edge:</strong> Ctrl+Shift+Del → Selecione "Cookies" e "Imagens e arquivos em cache" → Limpar dados</li>
+                <li><strong>Firefox:</strong> Ctrl+Shift+Del → Selecione "Cookies" e "Cache" → Limpar agora</li>
+                <li><strong>Safari:</strong> Cmd+Option+E → Limpar histórico</li>
+                <li><strong>Após limpar:</strong> Feche TODAS as abas do XZenPress e reabra</li>
+            </ol>
+            <p style="margin-top: 15px; color: #667eea; font-weight: bold;">
+                💡 Dica: Use Ctrl+F5 (Windows) ou Cmd+Shift+R (Mac) para recarregar sem cache
+            </p>
+        </div>
+    </div>
+
+    <script>
+        async function clearAllCache() {
+            const statusDiv = document.getElementById('status');
+            const btn = document.getElementById('clearBtn');
+            
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status loading';
+            statusDiv.textContent = '🔄 Limpando cache...';
+            btn.disabled = true;
+
+            try {
+                // 1. Unregister all service workers
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                        console.log('Service Worker removido:', registration);
+                    }
+                }
+
+                // 2. Clear all caches
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    for (let cacheName of cacheNames) {
+                        await caches.delete(cacheName);
+                        console.log('Cache deletado:', cacheName);
+                    }
+                }
+
+                // 3. Clear localStorage
+                localStorage.clear();
+                console.log('localStorage limpo');
+
+                // 4. Clear sessionStorage
+                sessionStorage.clear();
+                console.log('sessionStorage limpo');
+
+                // Success!
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = `
+                    ✅ Cache limpo com sucesso!<br>
+                    <small>Redirecionando em 3 segundos...</small>
+                `;
+
+                // Redirect after 3 seconds
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3000);
+
+            } catch (error) {
+                console.error('Erro ao limpar cache:', error);
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `
+                    ❌ Erro ao limpar cache automaticamente.<br>
+                    <small>Por favor, use as instruções manuais abaixo.</small>
+                `;
+                btn.disabled = false;
+            }
+        }
+
+        // Auto executar  se veio com parâmetro ?auto=true
+        if (window.location.search.includes('auto=true')) {
+            setTimeout(clearAllCache, 1000);
+        }
+    </script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Globe } from 'lucide-react';
 import { Header } from './components/Header';
 import { HomePage } from './components/HomePage';
 import { LoginPage } from './components/LoginPage';
@@ -40,9 +41,11 @@ import { ZenFlowPage } from './components/ZenFlowPage';
 import { SessaoMestraPage } from './components/SessaoMestraPage';
 import { ZosterMapPage } from './pages/ZosterMapPage';
 import { HerpesHubPage } from './pages/HerpesHubPage';
+import LandingPage from './components/LandingPage';
+import { FeedbackPage } from './components/FeedbackPage';
 
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState('home');
+  const [currentPage, setCurrentPage] = useState('landing');
   const [showTutorial, setShowTutorial] = useState(false);
   const { user } = useAuth();
   console.log('App Loaded vZenFlow'); // Debug loading
@@ -51,8 +54,8 @@ function AppContent() {
 
   // Monitorar login do usuário e redirecionar
   React.useEffect(() => {
-    // Se usuário acabou de fazer login e está na página de login, redirecionar para home
-    if (user && currentPage === 'login') {
+    // Se usuário acabou de fazer login e está na página de login ou landing, redirecionar para home
+    if (user && (currentPage === 'login' || currentPage === 'landing')) {
       setCurrentPage('home');
     }
   }, [user, currentPage]);
@@ -176,6 +179,10 @@ function AppContent() {
 
   const renderPage = () => {
     switch (currentPage) {
+      case 'landing':
+        return <LandingPage onStart={() => setCurrentPage('login')} />;
+      case 'feedback':
+        return <FeedbackPage onPageChange={setCurrentPage} />;
       case 'home':
         return <HomePage onPageChange={setCurrentPage} />;
       case 'login':
@@ -238,7 +245,7 @@ function AppContent() {
       case 'herpes-hub':
         return <HerpesHubPage onBack={() => setCurrentPage('home')} onPageChange={setCurrentPage} />;
       default:
-        return <HomePage onPageChange={setCurrentPage} />;
+        return <LandingPage onStart={() => setCurrentPage('login')} />;
     }
   };
 
@@ -263,37 +270,41 @@ function AppContent() {
         </div>
       )}
 
-      {/* Google Translate Widget */}
+      {/* Google Translate Premium Bar */}
       <div style={{
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#3b82f6',
-        padding: '10px',
-        textAlign: 'center',
+        background: 'rgba(0, 0, 0, 0.6)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        padding: '8px 20px',
         zIndex: 9999,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-        minHeight: '45px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'flex-end',
+        height: '45px'
       }}>
-        <div style={{ color: 'white', fontSize: '13px', fontWeight: '600', marginRight: '12px' }}>
-          🌐 Tradutor:
+        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px', fontWeight: '500', marginRight: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Globe className="w-4 h-4" />
+          <span>Traduzir página</span>
         </div>
-        <div style={{ backgroundColor: 'white', padding: '4px 12px', borderRadius: '6px', minWidth: '150px' }}>
+        <div className="premium-translate-wrapper">
           <GoogleTranslateWidget />
         </div>
       </div>
 
       {/* Add top margin to account for fixed translate bar */}
       <div style={{ marginTop: '55px' }}>
-        <Header
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-          onShowTutorial={() => setShowTutorial(true)}
-        />
+        {currentPage !== 'landing' && (
+          <Header
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            onShowTutorial={() => setShowTutorial(true)}
+          />
+        )}
 
         {renderPage()}
 

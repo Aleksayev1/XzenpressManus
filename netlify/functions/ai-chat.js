@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+// Native fetch available in Node 18+ (Netlify Functions runtime)
 const { createClient } = require('@supabase/supabase-js');
 
 // Initialize Supabase Client (Service Role for logging)
@@ -155,12 +155,14 @@ exports.handler = async (event, context) => {
         }
 
         // Verificar se a API key está configurada
-        if (!process.env.OPENAI_API_KEY) {
-            console.error('OPENAI_API_KEY não configurada');
+        const geminiKey = process.env.GEMINI_API_KEY;
+        const openaiKey = process.env.OPENAI_API_KEY;
+        if (!geminiKey && !openaiKey) {
+            console.error('Nenhuma API key configurada. Adicione GEMINI_API_KEY no Netlify dashboard.');
             return {
                 statusCode: 500,
                 headers,
-                body: JSON.stringify({ error: 'Serviço temporariamente indisponível' })
+                body: JSON.stringify({ error: 'Serviço de IA temporariamente indisponível. Tente novamente em instantes.' })
             };
         }
 
@@ -291,75 +293,98 @@ Toda interação terapêutica deve seguir RIGOROSAMENTE este fluxo:
 ---
 `;
 
-        // Construir histórico de mensagens
-        const messages = [
-            { role: 'system', content: systemPrompt }
-        ];
+        // === CHAMADA À API DE IA (Gemini primeiro, OpenAI como fallback) ===
+        let reply;
+        let usageData = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
 
-        // Adicionar histórico de conversa (limitado a 10 últimas mensagens para economizar tokens)
-        const recentHistory = conversationHistory.slice(-10);
-        messages.push(...recentHistory);
+        if (process.env.GEMINI_API_KEY) {
+            // --- Google Gemini API ---
+            const geminiHistory = conversationHistory.slice(-10).map(msg => ({
+                role: msg.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: msg.content }]
+            }));
+            geminiHistory.push({ role: 'user', parts: [{ text: message }] });
 
-        // Adicionar mensagem atual do usuário
-        messages.push({ role: 'user', content: message });
+            const geminiRes = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        contents: geminiHistory,
+                        generationConfig: {
+                            temperature: 0.3,
+                            maxOutputTokens: 1200
+                        }
+                    })
+                }
+            );
 
-        // Chamada à OpenAI API
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-4o-mini',
-                messages: messages,
-                temperature: 0.3, // Baixa temperatura para respostas mais precisas e consistentes
-                max_tokens: 1000,
-                presence_penalty: 0.1,
-                frequency_penalty: 0.1
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('OpenAI API Error:', errorData);
-
-            // Tratamento de erros específicos da OpenAI
-            if (response.status === 401) {
+            if (!geminiRes.ok) {
+                const errText = await geminiRes.text();
+                console.error('Gemini API Error:', geminiRes.status, errText);
                 return {
                     statusCode: 500,
                     headers,
-                    body: JSON.stringify({ error: 'Erro de autenticação com a OpenAI. Verifique sua API Key.' })
+                    body: JSON.stringify({ error: 'Erro ao consultar a IA. Tente novamente em instantes.' })
                 };
             }
 
-            if (response.status === 429) {
-                // Verificar se é cota insuficiente
-                const isQuotaError = errorData.error && errorData.error.code === 'insufficient_quota';
-
-                return {
-                    statusCode: 429,
-                    headers,
-                    body: JSON.stringify({
-                        error: isQuotaError
-                            ? 'Créditos da OpenAI esgotados ou em processo de sincronização. Se você acabou de pagar, aguarde alguns minutos.'
-                            : 'OpenAI temporariamente sobrecarregada. Tente novamente em instantes.'
-                    })
+            const geminiData = await geminiRes.json();
+            reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Resposta indisponível no momento.';
+            
+            if (geminiData.usageMetadata) {
+                usageData = {
+                    promptTokens: geminiData.usageMetadata.promptTokenCount || 0,
+                    completionTokens: geminiData.usageMetadata.candidatesTokenCount || 0,
+                    totalTokens: geminiData.usageMetadata.totalTokenCount || 0
                 };
             }
 
-            return {
-                statusCode: 500,
-                headers,
+        } else {
+            // --- OpenAI Fallback ---
+            const messages = [
+                { role: 'system', content: systemPrompt },
+                ...conversationHistory.slice(-10),
+                { role: 'user', content: message }
+            ];
+
+            const oaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+                },
                 body: JSON.stringify({
-                    error: 'Erro ao processar sua solicitação pela IA',
-                    details: errorData.error ? errorData.error.message : 'Erro desconhecido'
+                    model: 'gpt-4o-mini',
+                    messages,
+                    temperature: 0.3,
+                    max_tokens: 1000
                 })
-            };
-        }
+            });
 
-        const data = await response.json();
-        let reply = data.choices[0].message.content;
+            if (!oaiRes.ok) {
+                const errorData = await oaiRes.json().catch(() => ({}));
+                console.error('OpenAI Error:', errorData);
+                return {
+                    statusCode: 500,
+                    headers,
+                    body: JSON.stringify({ error: errorData?.error?.message || 'Erro ao processar sua solicitação.' })
+                };
+            }
+
+            const oaiData = await oaiRes.json();
+            reply = oaiData.choices[0].message.content;
+            
+            if (oaiData.usage) {
+                usageData = {
+                    promptTokens: oaiData.usage.prompt_tokens || 0,
+                    completionTokens: oaiData.usage.completion_tokens || 0,
+                    totalTokens: oaiData.usage.total_tokens || 0
+                };
+            }
+        }
 
         // 🔒 CAMADA 3: DETECÇÃO DE VAZAMENTO (Post-Processing)
         const leakedKeywords = [
@@ -443,7 +468,7 @@ Toda interação terapêutica deve seguir RIGOROSAMENTE este fluxo:
                             user_email: userEmail || 'guest',
                             message: message,
                             response: reply,
-                            tokens_used: data.usage.total_tokens
+                            tokens_used: usageData.totalTokens
                         }
                     ]);
 
@@ -466,11 +491,7 @@ Toda interação terapêutica deve seguir RIGOROSAMENTE este fluxo:
                 reply: reply,
                 remaining: userEmail ? checkRateLimit(userEmail, isPremium ? 100 : 3).remaining : null,
                 flags: qualityFlags, // Retorna flags para frontend (futuro feedback UI)
-                usage: {
-                    promptTokens: data.usage.prompt_tokens,
-                    completionTokens: data.usage.completion_tokens,
-                    totalTokens: data.usage.total_tokens
-                }
+                usage: usageData
             })
         };
 

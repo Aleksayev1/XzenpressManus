@@ -1,8 +1,9 @@
-const fetch = require('node-fetch');
+﻿const fetch = require('node-fetch');
 
 async function testKey() {
     try {
-        const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCUb9NhnZj2FNSe2_4dKODRfKWK312KLKI';
+        const apiKey = process.env.GEMINI_API_KEY || 'SUA_CHAVE_AQUI';
+        const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey;
         const res = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

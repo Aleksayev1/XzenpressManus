@@ -68,3 +68,6 @@ deploy-ready/
 
 # Local Large Audio Files
 public/sounds/fusion/jazz.mp3
+
+# Local Netlify folder
+.netlify

@@ -152,7 +152,8 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
       return '';
     }
 
-    const pointRegex = /\b((?:IG|LI|VB|GB|VC|Ren|CV|Du|GV|P|LU|C|HT|HE|TA|SJ|TB|CS|PC|F|LR|LV|R|KI|BP|SP|E|ST|ID|SI|B|BL|YNSA|Ponto)\s?-?\s?(?:\d{1,2}[a-zA-Z]?|[A-Z]{1,2})|YNSA\s+[a-zA-Z]+)\b/gi;
+    // Regex corrigido: Meridiano padrão exige NÚMEROS depois (ex: IG4, E36). YNSA exige LETRAS (ex: YNSA A).
+    const pointRegex = /\b((?:IG|LI|VB|GB|VC|Ren|CV|Du|GV|P|LU|C|HT|HE|TA|SJ|TB|CS|PC|F|LR|LV|R|KI|BP|SP|E|ST|ID|SI|B|BL)\s?-?\s?\d{1,2}[a-zA-Z]?|YNSA\s?-?\s?[a-zA-Z]{1,2}|Ponto\s?-?\s?[a-zA-Z]{1,2})\b/gi;
     const parts = content.split(pointRegex);
     return parts.map((part, i) => {
       // Validação de segurança: ignora partes inválidas

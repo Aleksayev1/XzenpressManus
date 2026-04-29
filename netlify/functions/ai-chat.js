@@ -247,13 +247,13 @@ ${clinicalContext}
 Use estas tabelas como sua VERDADE. Não invente causalidades. Consulte aqui:
 
 #### 1. METAFÍSICA DA SAÚDE (A Causa Moral)
-${JSON.stringify(VALCAPELLI_AXIOMS, null, 2)}
+${JSON.stringify(VALCAPELLI_AXIOMS)}
 
 #### 2. PADRÕES DE VIDA (A Causa Cármica/Recorrente)
-${JSON.stringify(KWITKO_PATTERNS, null, 2)}
+${JSON.stringify(KWITKO_PATTERNS)}
 
 #### 3. PROTOCOLO DE REFORMA ÍNTIMA (A Cura Real)
-${JSON.stringify(REFORMA_VIRTUES, null, 2)}
+${JSON.stringify(REFORMA_VIRTUES)}
 
 ---
 

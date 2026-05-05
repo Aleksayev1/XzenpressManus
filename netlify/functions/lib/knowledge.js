@@ -1,6 +1,9 @@
-
 // knowledge.js - The Structured Wisdom Source (Layer 2)
+// v2.0 — Expandido com 9 protocolos específicos + tabela YNSA completa
 
+// =============================================================================
+// 1. METAFÍSICA DA SAÚDE (Causa Moral por Órgão)
+// =============================================================================
 const VALCAPELLI_AXIOMS = [
     {
         "organ": "estomago",
@@ -53,7 +56,7 @@ const VALCAPELLI_AXIOMS = [
     {
         "organ": "coluna_lombar",
         "element": "estrutura",
-        "emotion": "insegurança_material",
+        "emotion": "inseguranca_material",
         "causality": "Medo da falta. Preocupação excessiva com dinheiro/sustento. Sentir-se sem suporte.",
         "symptom": "Hérnia de Disco, Travamento Lombar",
         "virtue_needed": "Confiança na Providência"
@@ -65,9 +68,44 @@ const VALCAPELLI_AXIOMS = [
         "causality": "Dificuldade em se dobrar (ceder). Ego rígido. Não aceitar autoridade ou mudanças.",
         "symptom": "Dor nos Joelhos, Menisco",
         "virtue_needed": "Reverência / Flexibilidade"
+    },
+    {
+        "organ": "intestino_grosso",
+        "element": "metal",
+        "emotion": "apego",
+        "causality": "Dificuldade em 'soltar' o passado, pessoas, situações. Controle excessivo. Perfeccionismo.",
+        "symptom": "Constipação, Síndrome do Intestino Irritável",
+        "virtue_needed": "Desapego / Confiança"
+    },
+    {
+        "organ": "pele",
+        "element": "metal",
+        "emotion": "isolamento",
+        "causality": "Sentir-se separado do mundo. Dificuldade de contato emocional. Medo de ser tocado (emocionalmente).",
+        "symptom": "Dermatite, Psoríase, Eczema, Urticária",
+        "virtue_needed": "Pertencimento / Amor Próprio"
+    },
+    {
+        "organ": "cabeca_enxaqueca",
+        "element": "madeira_fogo",
+        "emotion": "controle_perfeccionismo",
+        "causality": "Exigência excessiva de si mesmo e dos outros. 'Minha cabeça está explodindo' de tanto pensar/controlar.",
+        "symptom": "Enxaqueca Crônica, Cefaleia Tensional",
+        "virtue_needed": "Leveza / Confiança no Processo"
+    },
+    {
+        "organ": "tireoide",
+        "element": "comunicacao",
+        "emotion": "expressao_bloqueada",
+        "causality": "Engolir palavras. Não poder se expressar. Criatividade reprimida. 'O que eu digo não importa.'",
+        "symptom": "Hipotireoidismo, Hipertireoidismo, Nódulos",
+        "virtue_needed": "Expressão Autêntica / Voz Própria"
     }
 ];
 
+// =============================================================================
+// 2. PADRÕES DE VIDA (Causa Recorrente / Kármica)
+// =============================================================================
 const KWITKO_PATTERNS = [
     {
         "pattern_id": "vitima",
@@ -96,9 +134,19 @@ const KWITKO_PATTERNS = [
         "trigger_question": "Você se sente excluído ou não amado com frequência?",
         "insight": "Você rejeita a si mesmo antes que os outros o façam. O mundo é um espelho.",
         "action": "Faça algo de bom APENAS para você hoje. Nutra sua criança ferida."
+    },
+    {
+        "pattern_id": "autocritico",
+        "name": "O Padrão do Autocrítico",
+        "trigger_question": "Você sente que nunca é bom o suficiente?",
+        "insight": "O crítico interno é a voz dos que não acreditaram em você. Mas você não é mais aquela criança.",
+        "action": "Escreva 3 coisas que você fez BEM hoje. Sem 'mas'. Sem ressalvas."
     }
 ];
 
+// =============================================================================
+// 3. REFORMA ÍNTIMA (Vícios → Virtudes)
+// =============================================================================
 const REFORMA_VIRTUES = [
     {
         "vice": "orgulho",
@@ -141,25 +189,228 @@ const REFORMA_VIRTUES = [
         "virtue": "castidade_mental",
         "definition": "Pureza de intenção. Ver o outro como alma, não como objeto de prazer.",
         "mantra": "Eu honro a divindade no outro."
+    },
+    {
+        "vice": "inveja",
+        "virtue": "admiracao_generosa",
+        "definition": "Transformar o desejo pelo bem alheio em inspiração para o próprio crescimento.",
+        "mantra": "O sucesso do outro não diminui o meu. Existe abundância para todos."
     }
 ];
 
+// =============================================================================
+// 4. REFERÊNCIA YNSA — PONTOS BÁSICOS E INDICAÇÕES
+// =============================================================================
+const YNSA_POINTS_REFERENCE = [
+    {
+        "point": "Ponto A (Somatotopo Básico A)",
+        "location": "Linha frontal do couro cabeludo, região central superior",
+        "indication": "Dor de cabeça, enxaqueca, ansiedade, insônia, pressão alta, clareza mental",
+        "side_rule": "Bilateral para condições sistêmicas; ipsilateral para dor local"
+    },
+    {
+        "point": "Ponto B (Somatotopo Básico B)",
+        "location": "Região temporal, anterior à orelha",
+        "indication": "Pescoço, cervical, ombro, braquialgia, tensão muscular superior",
+        "side_rule": "Ipsilateral para dor ortopédica"
+    },
+    {
+        "point": "Ponto C (Somatotopo Básico C)",
+        "location": "Região temporal posterior",
+        "indication": "Braço, cotovelo, punho, mão (membro superior)",
+        "side_rule": "Ipsilateral para dor; contralateral para neurológico"
+    },
+    {
+        "point": "Ponto D (Somatotopo Básico D)",
+        "location": "Região parietal lateral",
+        "indication": "Lombar, coluna dorsal, quadril, sacro",
+        "side_rule": "Ipsilateral para dor musculoesquelética"
+    },
+    {
+        "point": "Ponto E (Somatotopo Básico E)",
+        "location": "Região parieto-occipital",
+        "indication": "Joelho, coxa, perna, tornozelo, pé (membro inferior)",
+        "side_rule": "Ipsilateral para dor; contralateral para AVC e paralisia"
+    },
+    {
+        "point": "Ponto ZS (Yamamoto Sensei Special)",
+        "location": "Região frontal paramediana, 2-3 cm da linha média",
+        "indication": "Ponto universal de equilíbrio do SNC. Indicado para: AVC, paralisias, distúrbios neurológicos, tremores, Parkinson",
+        "side_rule": "SEMPRE contralateral ao lado afetado"
+    },
+    {
+        "point": "Ypsilon Fígado",
+        "location": "Mapeamento Ypsilon na região temporal-parietal",
+        "indication": "Inflamação, processos virais, detox, raiva, hipertensão, dor intensa",
+        "side_rule": "Bilateral na maioria dos casos inflamatórios"
+    },
+    {
+        "point": "Ypsilon Rim",
+        "location": "Mapeamento Ypsilon região posterior",
+        "indication": "Medo, insegurança, fadiga crônica, dor lombar profunda, questões urológicas",
+        "side_rule": "Bilateral"
+    },
+    {
+        "point": "Ypsilon Coração",
+        "location": "Mapeamento Ypsilon região frontal esquerda",
+        "indication": "Ansiedade, palpitação, insônia, trauma emocional, luto",
+        "side_rule": "Predominantemente esquerdo"
+    },
+    {
+        "point": "Nervos Cranianos (NC I-XII)",
+        "location": "Linha frontal do couro cabeludo, cada nervo tem ponto específico",
+        "indication": "NC I=Olfato; NC II=Visão; NC V=Trigêmeo/dor facial/ATM; NC VII=Paralisia facial; NC VIII=Zumbido/vertigem; NC X=Vagal/digestivo",
+        "side_rule": "Ipsilateral para nervos periféricos; bilateral para funções vegetativas"
+    }
+];
+
+// =============================================================================
+// 5. PROTOCOLOS CLÍNICOS ESPECÍFICOS
+// =============================================================================
 const SPECIFIC_PROTOCOLS = [
     {
-        "condition": "Herpes Zoster (Cobreiro) / Neuralgia Pós-Herpética - LÓGICA GERAL",
-        "keywords": ["zoster", "herpes", "cobreiro", "neuralgia", "intercostal", "queimação", "dermátomo"],
-        "instructions_for_ai": "A Zoster ataca um NERVO específico (Dermátomo). Não dê uma receita de bolo. 1. IDENTIFIQUE A REGIÃO no relato do usuário. 2. DEDUSA O DERMÁTOMO (ex: Mamilo=T4, Umbigo=T10, Pescoço=C3, Rosto=Trigêmeo). 3. PRESCREVA os pontos para AQUELE nível vertebral.",
+        "condition": "Herpes Zoster (Cobreiro) / Neuralgia Pós-Herpética",
+        "keywords": ["zoster", "herpes", "cobreiro", "neuralgia", "intercostal", "queimação na pele", "dermátomo"],
+        "instructions_for_ai": "A Zoster ataca um NERVO específico (Dermátomo). 1. IDENTIFIQUE A REGIÃO no relato do usuário. 2. DEDUZA O DERMÁTOMO (ex: Mamilo=T4, Umbigo=T10, Pescoço=C3, Rosto=Trigêmeo). 3. PRESCREVA os pontos para AQUELE nível vertebral.",
         "protocol_mtc": [
-            "REGRA 1 - A RAIZ (Coluna): Huatuojiaji na vértebra afetada (ex: se é no peito T4, use Huatuo T4). Se é na lombar, Huatuo Lombar.",
-            "REGRA 2 - O TRAJETO (Meridiano): Identifique por onde a dor corre (ex: lateral do corpo = Shao Yang [SJ6/GB34]; costas = Tai Yang [BL40/BL60]; estômago/face = Yang Ming [ST36/LI4]).",
-            "REGRA 3 - O DESBLOQUEIO (Geral): GB41 (Zulinqi) para abrir o Vaso da Cintura (Dai Mai) se a dor for 'em faixa'.",
-            "REGRA 4 - A INFLAMAÇÃO: Pontos de Calor/Fogo (YNSA Fígado, LI11, SP10)."
+            "REGRA 1 - A RAIZ (Coluna): Huatuojiaji na vértebra afetada",
+            "REGRA 2 - O TRAJETO (Meridiano): Lateral=SJ6+GB34; Costas=BL40+BL60; Face=ST36+LI4",
+            "REGRA 3 - O DESBLOQUEIO: GB41 (Zulinqi) se dor em faixa",
+            "REGRA 4 - A INFLAMAÇÃO: LI11 + SP10 para calor/fogo viral"
         ],
         "protocol_ynsa": [
-            "YNSA Ponto Básico: Ponto correspondente à anatomia afetada (ex: Ponto A se for cervical, Ponto C se for braço, Ponto E se for tórax, Ponto D se for lombar/perna).",
-            "YNSA Ypsilon Fígado: Sempre usar para apagar a inflamação viral (Calor/Vento)."
+            "Ponto Básico correspondente à anatomia: A(cabeça), B(cervical), C(braço), D(lombar), E(perna)",
+            "Ypsilon Fígado: sempre para apagar inflamação viral (Calor/Vento)"
         ],
-        "metafisica": "Zoster é sempre 'Raiva/Conflito Reprimido' que 'queima' a pele. O local do corpo indica COM QUEM ou SOBRE O QUE é a raiva (ex: Peito = Afeto/Proteção; Braço = Trabalho/Fazer; Perna = Avançar/Futuro; Rosto = Imagem/Identidade)."
+        "metafisica": "Zoster = Raiva/Conflito reprimido que 'queima' a pele. Local indica COM QUEM: Peito=afeto; Braço=trabalho; Perna=futuro; Rosto=identidade."
+    },
+    {
+        "condition": "Ansiedade / Transtorno Ansioso / Síndrome do Pânico",
+        "keywords": ["ansiedade", "ansioso", "angústia", "pânico", "ataque de pânico", "preocupação excessiva", "nervoso", "agitação", "inquietação", "coração acelerado de nervoso"],
+        "instructions_for_ai": "Ansiedade é sempre Fogo do Coração + Madeira do Fígado em desequilíbrio. Pergunte PRIMEIRO sobre o contexto (trabalho, relacionamento, futuro) para identificar a causa raiz emocional antes de prescrever.",
+        "protocol_mtc": [
+            "HT7 (Shenmen - Portão do Espírito): ponto mestre da mente, acalma o Shen",
+            "PC6 (Neiguan): regula o coração, alivia palpitações e ansiedade",
+            "LV3 (Taichong): libera o estagnamento do Fígado/raiva reprimida",
+            "SP6 (Sanyinjiao): acalma a mente, nutre o Yin, harmoniza 3 meridianos"
+        ],
+        "protocol_ynsa": [
+            "Ypsilon Coração: âncora emocional principal para ansiedade",
+            "Ponto A: equilíbrio do SNC e clareza mental"
+        ],
+        "metafisica": "Ansiedade = Desconfiança no futuro + falta de presença. 'Viver no amanhã que ainda não veio.' Causa: coração desconectado da essência. Virtude: Fé Racional + Serenidade."
+    },
+    {
+        "condition": "Hipertensão Arterial / Pressão Alta",
+        "keywords": ["pressão alta", "hipertensão", "hipertenso", "pressão elevada", "pressão arterial", "PA alta"],
+        "instructions_for_ai": "Hipertensão em MTC = Ascensão do Yang do Fígado + Deficiência do Yin do Rim. Pergunte sobre estresse, raiva reprimida e qualidade do sono. Nunca oriente a parar medicação.",
+        "protocol_mtc": [
+            "LV3 (Taichong) + LI4 (Hegu): combinação 'Quatro Portões' — baixa pressão e libera estagnamento",
+            "KD1 (Yongquan): ancora energia para baixo, equilibra Yang ascendente",
+            "PC6 (Neiguan): regula coração e pressão",
+            "GB20 (Fengchi): libera tensão cervical, melhora circulação cerebral"
+        ],
+        "protocol_ynsa": [
+            "Ypsilon Fígado: libera Yang ascendente e raiva represada",
+            "Ypsilon Rim: fortalece o Yin para ancorar o Yang"
+        ],
+        "metafisica": "Pressão Alta = 'Pressão interna' não expressa. Carga emocional sem válvula de escape. Raiva engolida ao longo do tempo. Virtude: Expressão Saudável + Mansuetude."
+    },
+    {
+        "condition": "Depressão / Tristeza Profunda / Melancolia",
+        "keywords": ["depressão", "deprimido", "tristeza", "melancolia", "vazio", "sem energia", "sem vontade", "anedonia", "choro sem motivo", "apatia"],
+        "instructions_for_ai": "Depressão em MTC = Estagnamento do Qi do Fígado + Deficiência do Yang do Baço/Coração. Diferencie: depressão por estagnamento (irritabilidade + tristeza) vs deficiência (frio, lentidão, vazio). Conduza com muita acolhida.",
+        "protocol_mtc": [
+            "LV3 (Taichong): move o Qi estagnado do Fígado",
+            "ST36 (Zusanli): tonifica o Baço, gera energia vital",
+            "GV20 (Baihui): eleva o Yang, clareia a mente",
+            "HT7 (Shenmen): acalma e nutre o Shen (espírito)"
+        ],
+        "protocol_ynsa": [
+            "Ypsilon Coração: reconecta com a essência e alegria de viver",
+            "Ponto A: levanta o Yang e ilumina o espírito"
+        ],
+        "metafisica": "Depressão = Luto não processado de algo que era esperado e não veio (amor, reconhecimento, justiça). O Pulmão guarda a tristeza. Virtude: Gratidão pelo que É + Alegria de Viver."
+    },
+    {
+        "condition": "Insônia / Distúrbios do Sono",
+        "keywords": ["insônia", "não consigo dormir", "dificuldade para dormir", "sono agitado", "acorda de madrugada", "pesadelos", "sono ruim", "dormir mal"],
+        "instructions_for_ai": "Insônia em MTC tem PADRÕES diferentes: acorda às 23h-1h=Vesícula Biliar/decisões; 1h-3h=Fígado/raiva; 3h-5h=Pulmão/tristeza; 5h-7h=Intestino Grosso/retenção. Pergunte o HORÁRIO em que acorda.",
+        "protocol_mtc": [
+            "HT7 (Shenmen): acalma o Shen, principal ponto de insônia",
+            "SP6 (Sanyinjiao): nutre o Yin, acalma a mente",
+            "KD6 (Zhaohai): abre o Vaso Yin Chiao, promove sono",
+            "An Mian (ponto extra): ponto específico para insônia, atrás da orelha"
+        ],
+        "protocol_ynsa": [
+            "Ypsilon Coração: acalma o fogo mental noturno",
+            "Ponto A: desacelera o sistema nervoso"
+        ],
+        "metafisica": "Insônia = A mente não para porque o coração não se sente seguro. 'E se...?' O futuro invade o presente. Virtude: Fé + Presença. Prática: Escrever 3 gratidões antes de dormir."
+    },
+    {
+        "condition": "Dor Crônica / Fibromialgia / Dor Difusa",
+        "keywords": ["dor crônica", "fibromialgia", "dor no corpo todo", "dor difusa", "dor muscular", "dor generalizada", "sensação de queimação", "hipersensibilidade à dor"],
+        "instructions_for_ai": "Dor crônica sem causa física clara = Qi e Sangue estagnados + Vento-Frio-Umidade obstruindo os meridianos. Pergunte sobre traumas emocionais passados — fibromialgia é frequentemente 'dor que não podia ser expressa'.",
+        "protocol_mtc": [
+            "GB34 (Yanglingquan): mestre dos tendões e músculos",
+            "SP21 (Dabao): ponto mestre de toda dor muscular difusa",
+            "LI4 + LV3 (Quatro Portões): move o Qi em todo o corpo",
+            "BL17 (Geshu): tonifica e move o Sangue"
+        ],
+        "protocol_ynsa": [
+            "Ponto ZS: recalibra o sistema nervoso central",
+            "Ponto correspondente à área de maior dor (A, B, C, D ou E)"
+        ],
+        "metafisica": "Fibromialgia = Dor que não tinha permissão de existir emocionalmente. O corpo vira o receptáculo da dor psíquica não expressa. Virtude: Auto-compaixão radical + Permissão para sentir."
+    },
+    {
+        "condition": "Burnout / Esgotamento / Estresse Crônico",
+        "keywords": ["burnout", "esgotamento", "estresse", "cansaço extremo", "não aguentar mais", "sobrecarga", "exaustão", "sem energia", "trabalho demais"],
+        "instructions_for_ai": "Burnout = Deficiência profunda do Qi do Rim + Fígado sobrecarregado. É uma crise espiritual disfarçada de crise física. Pergunte: 'O que você está fazendo que não tem mais sentido para você?'",
+        "protocol_mtc": [
+            "KD3 (Taixi): tonifica a essência renal — ponto raiz de toda energia vital",
+            "ST36 (Zusanli): recupera o Qi da Terra, gera força",
+            "CV4 (Guanyuan): tonifica o Yang original, reservatório de energia",
+            "SP6 (Sanyinjiao): nutre Rim, Fígado e Baço simultaneamente"
+        ],
+        "protocol_ynsa": [
+            "Ypsilon Rim: recarrega a bateria fundamental (Jing)",
+            "Ponto D: ancora e estabiliza a energia"
+        ],
+        "metafisica": "Burnout = Trair o próprio propósito por tempo demais. 'Fazer o que os outros esperam' vs 'o que a alma exige'. Virtude: Coragem de Dizer Não + Autorrespeito."
+    },
+    {
+        "condition": "Luto / Perda / Elaboração de Perdas",
+        "keywords": ["luto", "perda", "morte", "falecimento", "morreu", "perdi", "saudade", "trauma de perda", "separação", "divórcio", "fim de relacionamento"],
+        "instructions_for_ai": "O luto é o processo natural do Pulmão (Metal). Não patologize. Acolha primeiro. Pergunte: 'Você está conseguindo deixar essa dor sair — chorar, falar, expressar?' Luto retido vira doença no Pulmão.",
+        "protocol_mtc": [
+            "LU7 (Lieque): abre o Pulmão, libera a tristeza retida",
+            "KD6 (Zhaohai): par de LU7, equilibra Metal e Água",
+            "PC6 (Neiguan): protege o coração emocional",
+            "CV17 (Shanzhong): centro do coração, libera o bloqueio emocional no peito"
+        ],
+        "protocol_ynsa": [
+            "Ypsilon Coração + Ypsilon Pulmão: trabalha a dupla Metal-Fogo do luto",
+            "Ponto A: centra e estabiliza durante a tempestade emocional"
+        ],
+        "metafisica": "Luto = A alma aprendendo que o amor não morre com o corpo. O vínculo muda de forma, não desaparece. Virtude: Gratidão pelo que foi + Coragem de continuar amando."
+    },
+    {
+        "condition": "ATM / Dor de Mandíbula / Bruxismo",
+        "keywords": ["atm", "mandíbula", "bruxismo", "apertar os dentes", "ranger os dentes", "dor na mandíbula", "dor no rosto", "trava na mandíbula", "clique na mandíbula"],
+        "instructions_for_ai": "ATM em MTC = SJ (San Jiao) + Vesícula Biliar bloqueados na região lateral da face. O bruxismo é raiva/decisões não tomadas que 'rangi' os dentes durante o sono.",
+        "protocol_mtc": [
+            "ST6 (Jiache): ponto local principal para ATM",
+            "ST7 (Xiaguan): libera a articulação temporomandibular",
+            "SJ21 (Ermen): acima da orelha, ponto específico de ATM",
+            "LI4 (Hegu): analgésico geral da face e cabeça"
+        ],
+        "protocol_ynsa": [
+            "NC V (Trigêmeo): ponto dos nervos cranianos para dor facial",
+            "Ponto B: cervical e mandíbula, relaxa a musculatura"
+        ],
+        "metafisica": "Bruxismo/ATM = Raiva e decisões represadas. 'Engolir sapo' cronicamente. Dificuldade de 'morder' a vida e tomar decisões firmes. Virtude: Assertividade + Expressão da Raiva Saudável."
     }
 ];
 
@@ -167,5 +418,6 @@ module.exports = {
     VALCAPELLI_AXIOMS,
     KWITKO_PATTERNS,
     REFORMA_VIRTUES,
+    YNSA_POINTS_REFERENCE,
     SPECIFIC_PROTOCOLS
 };

@@ -167,7 +167,7 @@ exports.handler = async (event, context) => {
         }
 
 
-        const { VALCAPELLI_AXIOMS, KWITKO_PATTERNS, REFORMA_VIRTUES, SPECIFIC_PROTOCOLS } = require('./lib/knowledge');
+        const { VALCAPELLI_AXIOMS, KWITKO_PATTERNS, REFORMA_VIRTUES, YNSA_POINTS_REFERENCE, SPECIFIC_PROTOCOLS } = require('./lib/knowledge');
 
         // ... [Protection Logic omitted for brevity, keeping existing implementation] ...
 
@@ -256,6 +256,10 @@ ${JSON.stringify(KWITKO_PATTERNS, null, 2)}
 
 #### 3. PROTOCOLO DE REFORMA ÍNTIMA (A Cura Real)
 ${JSON.stringify(REFORMA_VIRTUES, null, 2)}
+
+#### 4. REFERÊNCIA YNSA — PONTOS E INDICAÇÕES
+Use esta tabela para SEMPRE escolher o ponto correto ao prescrever YNSA:
+${JSON.stringify(YNSA_POINTS_REFERENCE, null, 2)}
 
 ---
 

@@ -319,7 +319,7 @@ Toda interação terapêutica deve seguir RIGOROSAMENTE este fluxo:
                         contents: geminiHistory,
                         generationConfig: {
                             temperature: 0.3,
-                            maxOutputTokens: 1200
+                            maxOutputTokens: 2500
                         }
                     })
                 }
@@ -364,7 +364,7 @@ Toda interação terapêutica deve seguir RIGOROSAMENTE este fluxo:
                     model: 'gpt-4o-mini',
                     messages,
                     temperature: 0.3,
-                    max_tokens: 1000
+                    max_tokens: 2500
                 })
             });
 

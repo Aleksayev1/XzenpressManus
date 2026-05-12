@@ -16,7 +16,7 @@ import { User } from '../contexts/AuthContext';
 // TYPE DEFINITIONS - Contrato do Produto
 // ============================================
 
-export type SessionCategory = 'sleep' | 'stress' | 'focus' | 'meditation';
+export type SessionCategory = 'sleep' | 'stress' | 'focus' | 'meditation' | 'healing';
 
 export type SessionConfig = {
     id: string;
@@ -181,6 +181,23 @@ export const SESSION_MAP: Record<string, SessionConfig> = {
         free: {
             spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u'
         }
+    },
+
+    // ==================== HEALING ====================
+
+    'neuropatia-174hz': {
+        id: 'neuropatia-174hz',
+        title: 'Alívio da Dor (174 Hz)',
+        description: 'Frequência anestésica natural (174 Hz) com regulação vagal respiratória para alívio de dor neuropática.',
+        category: 'healing',
+        durationMinutes: 20,
+        premium: {
+            audioUrl: null,
+            loop: true
+        },
+        free: {
+            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX8QCb8iK37iM'
+        }
     }
 };
 
@@ -257,7 +274,7 @@ export function getSessionsByCategory(category: SessionCategory): SessionConfig[
 
 export function validateSessionMap(): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
-    const validCategories: SessionCategory[] = ['stress', 'focus', 'sleep', 'meditation'];
+    const validCategories: SessionCategory[] = ['stress', 'focus', 'sleep', 'meditation', 'healing'];
 
     for (const [id, config] of Object.entries(SESSION_MAP)) {
         if (config.id !== id) {

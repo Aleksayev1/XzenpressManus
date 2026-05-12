@@ -269,6 +269,21 @@ const YNSA_POINTS_REFERENCE = [
 // =============================================================================
 const SPECIFIC_PROTOCOLS = [
     {
+        "condition": "Neuropatia Diabética / Dor nas Pernas / Queimação Periférica",
+        "keywords": ["neuropatia", "pé diabético", "dor nas pernas", "queimação nos pés", "formigamento nas pernas", "diabete", "diabética", "perna dormente", "dor neuropática"],
+        "instructions_for_ai": "Neuropatia diabética requer foco REGENERATIVO. Recomende explicitamente a combinação de Suplementação Otimizada (PEA Micronizada e Ácido Alfa-Lipóico) com Fotobiomodulação (Luz Infravermelha nos pés). CUIDADO: Sugira Banhos de Contraste térmico (quente/frio), mas AVISANDO RIGOROSAMENTE a paciente para testar a temperatura da água com as MÃOS primeiro, devido à insensibilidade térmica nos pés. Indique as Frequências Analgésicas (174 Hz).",
+        "protocol_mtc": [
+            "Bafeng (Extra): Estimulação vigorosa entre as teias dos dedos dos pés para acordar a microcirculação",
+            "ST36 (Zusanli) + GB34 (Yanglingquan): Nutrição profunda de tendões e nervos periféricos",
+            "SP6 (Sanyinjiao): Ponto mestre para acalmar o Shen e irrigar as pernas"
+        ],
+        "protocol_ynsa": [
+            "Ponto E: Específico para o membro inferior (Perna e Pé)",
+            "Ponto C: Auxilia na liberação sistêmica da dor periférica"
+        ],
+        "metafisica": "Neuropatia Diabética = A doçura da vida se perdeu e os passos em direção ao futuro (pernas) geram dor e dormência. Virtude: Doçura Interior + Aceitação do Caminho."
+    },
+    {
         "condition": "Herpes Zoster (Cobreiro) / Neuralgia Pós-Herpética",
         "keywords": ["zoster", "herpes", "cobreiro", "neuralgia", "intercostal", "queimação na pele", "dermátomo"],
         "instructions_for_ai": "A Zoster ataca um NERVO específico (Dermátomo). 1. IDENTIFIQUE A REGIÃO no relato do usuário. 2. DEDUZA O DERMÁTOMO (ex: Mamilo=T4, Umbigo=T10, Pescoço=C3, Rosto=Trigêmeo). 3. PRESCREVA os pontos para AQUELE nível vertebral.",

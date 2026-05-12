@@ -356,11 +356,11 @@ export const ZosterMapPage: React.FC<ZosterMapPageProps> = ({ onBack }) => {
                             <section className="space-y-8 animate-in fade-in">
                                 <div className="bg-gray-900/50 p-6 rounded-2xl border border-gray-800">
                                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-green-400 font-sans"><Shield className="w-5 h-5" /> 1. Base Imunológica</h2>
-                                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 font-sans">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-sans">
                                         {PROTOCOL_BASE.map(p => (
-                                            <div key={p.id} onClick={() => setViewingPointId(p.id)} className="bg-black/40 p-4 rounded-xl border border-gray-700 text-center cursor-pointer hover:border-blue-500 transition-colors">
-                                                <span className="text-2xl">{p.icon}</span>
-                                                <div className="font-bold text-blue-300 text-sm mt-1">{p.name}</div>
+                                            <div key={p.id} onClick={() => setViewingPointId(p.id)} className="bg-black/40 p-6 rounded-2xl border border-gray-700 text-center cursor-pointer hover:border-blue-500 transition-colors">
+                                                <span className="text-3xl">{p.icon}</span>
+                                                <div className="font-bold text-blue-300 text-base mt-2">{p.name}</div>
                                             </div>
                                         ))}
                                     </div>
@@ -413,7 +413,7 @@ export const ZosterMapPage: React.FC<ZosterMapPageProps> = ({ onBack }) => {
             {/* POINT DETAIL MODAL */}
             {viewingPointData && (
                 <div className="fixed inset-0 z-[250] bg-black/80 flex items-center justify-center p-4" onClick={() => setViewingPointId(null)}>
-                    <div className="bg-gray-800 p-6 rounded-2xl border border-blue-500/50 w-full max-w-sm" onClick={e => e.stopPropagation()}>
+                    <div className="bg-gray-800 p-8 rounded-2xl border border-blue-500/50 w-full max-w-md" onClick={e => e.stopPropagation()}>
                         <h3 className="text-2xl font-bold text-white mb-2">{viewingPointData.name}</h3>
                         <p className="text-sm text-gray-400 mb-4">{viewingPointData.description}</p>
                         {viewingPointData.image && <img src={viewingPointData.image} className="rounded-xl mb-4 border border-gray-700" />}

@@ -318,9 +318,9 @@ export const ZosterMapPage: React.FC<ZosterMapPageProps> = ({ onBack }) => {
                                 { label: 'YNSA Vago', role: 'Anti-inflam.' },
                                 { label: 'NC5 Trigêmeo', role: 'Gate Control' }
                             ]).map((p, i) => (
-                                <div key={i} className="bg-black/30 p-3 rounded-lg text-center border border-gray-700">
-                                    <div className="font-bold text-xs text-blue-300">{p.label}</div>
-                                    <div className="text-[10px] text-gray-500 uppercase">{p.role}</div>
+                                <div key={i} className="bg-black/40 p-5 rounded-xl text-center border border-gray-700 hover:border-blue-500 transition-colors cursor-default">
+                                    <div className="font-bold text-sm text-blue-300 mb-1">{p.label}</div>
+                                    <div className="text-xs text-gray-500 uppercase tracking-wider">{p.role}</div>
                                 </div>
                             ))}
                         </div>
@@ -368,11 +368,11 @@ export const ZosterMapPage: React.FC<ZosterMapPageProps> = ({ onBack }) => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
                                     <div className="space-y-4">
                                         <h2 className="text-lg font-bold flex items-center gap-2 text-yellow-500"><Zap className="w-5 h-5" /> 2. Onde está a dor?</h2>
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                             {DERMATOMES.map(d => (
-                                                <button key={d.id} onClick={() => setSelectedRegion(d.id)} className={`p-4 rounded-xl border text-center transition-all ${selectedRegion === d.id ? 'bg-blue-600 border-blue-400' : 'bg-gray-800 border-gray-700 text-gray-400'}`}>
-                                                    <span className="text-2xl block mb-1">{d.icon}</span>
-                                                    <span className="text-xs font-bold">{d.label}</span>
+                                                <button key={d.id} onClick={() => setSelectedRegion(d.id)} className={`p-5 rounded-2xl border text-center transition-all ${selectedRegion === d.id ? 'bg-blue-600 border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700'}`}>
+                                                    <span className="text-3xl block mb-2">{d.icon}</span>
+                                                    <span className="text-sm font-bold">{d.label}</span>
                                                 </button>
                                             ))}
                                         </div>
@@ -396,11 +396,11 @@ export const ZosterMapPage: React.FC<ZosterMapPageProps> = ({ onBack }) => {
                             <section className="bg-gray-900/50 p-8 rounded-2xl border border-gray-800 text-center space-y-6">
                                 <h2 className="text-xl font-bold">YNSA Sistêmico (Cabeça)</h2>
                                 <p className="text-gray-400 max-w-lg mx-auto">Pontos Ypsilon e Nervos Cranianos que atuam em todo o corpo, reequilibrando os meridianos e estimulando o Vago.</p>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-4">
                                     {YNSA_NC.map(p => (
-                                        <div key={p.id} onClick={() => setViewingPointId(p.id)} className="bg-black/40 p-6 rounded-2xl border border-gray-700 cursor-pointer hover:border-purple-500">
-                                            <span className="text-3xl">{p.icon}</span>
-                                            <h3 className="font-bold text-purple-300 mt-2">{p.label}</h3>
+                                        <div key={p.id} onClick={() => setViewingPointId(p.id)} className="bg-black/40 p-8 rounded-2xl border border-gray-700 cursor-pointer hover:border-purple-500 hover:bg-gray-800/80 transition-all flex flex-col items-center justify-center">
+                                            <span className="text-4xl mb-3">{p.icon}</span>
+                                            <h3 className="font-bold text-purple-300 text-sm md:text-base">{p.label}</h3>
                                         </div>
                                     ))}
                                 </div>

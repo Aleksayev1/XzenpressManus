@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "git lfs pull && npm run build"
   publish = "dist"
   functions = "netlify/functions"
   environment = { NODE_VERSION = "20", GIT_LFS_ENABLED = "true", GIT_LFS_FETCH_INCLUDE = "*.mp3" }

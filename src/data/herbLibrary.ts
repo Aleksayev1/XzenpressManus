@@ -211,5 +211,93 @@ export const HERB_DATABASE: Herb[] = [
         description: 'Blend sinérgico que estimula a hipófise a produzir seu próprio GH de forma natural e pulsátil, evitando os colaterais do GH sintético. Melhora sono, queima de gordura e recuperação.',
         indications: ['Deficiência de GH', 'Composição corporal (perda de gordura)', 'Insônia grave', 'Recuperação lenta'],
         contraindications: ['Câncer ativo', 'Resistência severa à insulina', 'Uso sem jejum prévio (corta o efeito)']
+    },
+    {
+        id: 'semaglutida',
+        name: 'Semaglutida / Tirzepatida',
+        scientificName: 'Agonistas de GLP-1 / GIP',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo)',
+        mainAction: 'Regulação Metabólica e Emagrecimento',
+        description: 'Um dos peptídeos mais famosos do mundo (Ozempic/Wegovy). Imita o hormônio da saciedade, reduzindo drasticamente o apetite, retardando o esvaziamento gástrico e revertendo a resistência à insulina.',
+        indications: ['Obesidade e sobrepeso', 'Diabetes Tipo 2', 'Compulsão alimentar', 'Síndrome Metabólica'],
+        contraindications: ['Histórico de carcinoma medular de tireoide', 'Pancreatite', 'Gestantes']
+    },
+    {
+        id: 'pt-141',
+        name: 'PT-141 (Bremelanotide)',
+        scientificName: 'Peptídeo Melanocortínico',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo / Nasal)',
+        mainAction: 'Tratamento de Disfunção Sexual e Libido',
+        description: 'Ao contrário do Viagra (que atua nos vasos sanguíneos), o PT-141 atua diretamente no sistema nervoso central para aumentar severamente a libido e a excitação, tanto em homens quanto em mulheres.',
+        indications: ['Disfunção erétil refratária', 'Transtorno de desejo sexual hipoativo (TDSH)', 'Anorgasmia'],
+        contraindications: ['Hipertensão não controlada (pode causar pico de pressão no uso)']
+    },
+    {
+        id: 'selank',
+        name: 'Selank',
+        scientificName: 'Heptapeptídeo Nootrópico',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Nasal)',
+        mainAction: 'Ansiolítico e Modulação de Humor',
+        description: 'Desenvolvido na Rússia, atua nas vias de serotonina e dopamina para "desligar" a ansiedade quase instantaneamente, sem causar sono, dependência ou sedação. Excelente nootrópico para foco calmo.',
+        indications: ['Ansiedade generalizada (TAG)', 'Estresse agudo', 'Dificuldade de concentração por estresse', 'Transtorno do pânico'],
+        contraindications: ['Uso associado a excesso de antidepressivos IMAO']
+    },
+    {
+        id: 'semax',
+        name: 'Semax',
+        scientificName: 'Análogo de ACTH',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Nasal)',
+        mainAction: 'Foco Extremo e Neuroproteção',
+        description: 'Poderoso nootrópico russo. Aumenta os níveis de BDNF (Fator Neurotrófico Derivado do Cérebro) no hipocampo de forma brutal, promovendo memória fotográfica, foco laser e recuperação pós-AVC.',
+        indications: ['Déficit de atenção (TDAH)', 'Névoa mental (Brain fog)', 'Recuperação de danos neurológicos / AVC', 'Fadiga mental extrema'],
+        contraindications: ['Hiperatividade severa aguda', 'Episódios de mania']
+    },
+    {
+        id: 'mots-c',
+        name: 'MOTS-c',
+        scientificName: 'Peptídeo Derivado Mitocondrial',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo)',
+        mainAction: 'Saúde Mitocondrial e Desempenho Físico',
+        description: 'Um peptídeo exclusivo que atua diretamente nas mitocôndrias. Ele imita os efeitos de exercícios intensos, promovendo oxidação de ácidos graxos, prevenindo osteoporose e gerando energia celular massiva.',
+        indications: ['Fadiga crônica', 'Resistência à insulina no músculo', 'Baixo rendimento esportivo', 'Obesidade induzida por dieta'],
+        contraindications: ['Uso sem suporte de hidratação e minerais adequados']
+    },
+    {
+        id: 'll-37',
+        name: 'LL-37',
+        scientificName: 'Catelicidina',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo)',
+        mainAction: 'Imunidade e Ação Antimicrobiana',
+        description: 'O único peptídeo antimicrobiano da família das catelicidinas no corpo humano. Atua como um "antibiótico natural" de amplo espectro, perfurando as membranas de bactérias, vírus, fungos e até biofilmes.',
+        indications: ['Doenças autoimunes', 'Doença de Lyme crônica', 'Infecções fúngicas ou bacterianas resistentes', 'SIBO grave'],
+        contraindications: ['Doenças autoimunes em fase de explosão inflamatória (flare-up) severa']
+    },
+    {
+        id: 'tesamorelin',
+        name: 'Tesamorelin',
+        scientificName: 'Análogo de GHRH',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo)',
+        mainAction: 'Redução de Gordura Visceral',
+        description: 'Um secretagogo de GH tão potente que é o único peptídeo aprovado pela FDA (EUA) especificamente para derreter a gordura visceral (aquela perigosa ao redor dos órgãos) e melhorar marcadores de colesterol.',
+        indications: ['Gordura visceral excessiva', 'Lipodistrofia', 'Recuperação de níveis ótimos de GH', 'Síndrome Metabólica'],
+        contraindications: ['Câncer ativo', 'Gestação', 'Hipersensibilidade']
+    },
+    {
+        id: 'dihexa',
+        name: 'Dihexa',
+        scientificName: 'PNB-0408',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Oral / Tópico / Subcutâneo)',
+        mainAction: 'Neurogênese Extrema (Criação de Sinapses)',
+        description: 'Criado pela Universidade de Washington para o tratamento do Alzheimer. É considerado até 10 milhões de vezes mais forte que o BDNF nativo na criação de novas conexões neurais (sinapses). O "cálice sagrado" da cognição.',
+        indications: ['Declínio cognitivo', 'Doença de Alzheimer / Parkinson (pesquisa)', 'Danos cerebrais traumáticos', 'Aprimoramento cognitivo extremo'],
+        contraindications: ['Histórico de tumores cerebrais (devido ao seu altíssimo fator de crescimento neuronal)']
     }
 ];

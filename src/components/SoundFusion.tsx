@@ -26,7 +26,7 @@ const SoundFusion: React.FC = () => {
     const audioRefs = useRef<{ [key: string]: HTMLAudioElement }>({});
 
     // Supabase Storage CDN URLs - arquivos hospedados no bucket 'sounds/fusion'
-    const SUPABASE_AUDIO_BASE = 'https://dqjcbwjqrenubdzalicy.supabase.co/storage/v1/object/public/sounds/fusion';
+    const SUPABASE_AUDIO_BASE = 'https://dqjcbwjqrenubdzalicy.supabase.co/storage/v1/object/public/sounds/Fusion';
 
     const tracks: Track[] = [
         {

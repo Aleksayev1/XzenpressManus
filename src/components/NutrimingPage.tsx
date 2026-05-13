@@ -85,9 +85,25 @@ const SUPPLEMENT_DATABASE = {
         'L-Teanina': 'evening',
         'Glicina': 'evening',
 
-        // Adaptógenos
+        // Adaptógenos e Fitoterápicos (MTC & Brasileiros)
         'Ashwagandha': 'evening',
         'Rhodiola': 'morning',
+        'Ginseng': 'morning',
+        'Panax Ginseng': 'morning',
+        'Ginkgo Biloba': 'morning',
+        'Cordyceps': 'morning',
+        'Reishi': 'evening',
+        'Maca Peruana': 'morning',
+        'Guaraná': 'morning',
+        'Catuaba': 'morning',
+        'Marapuama': 'morning',
+        'Espinheira Santa': 'with-meal',
+        'Erva-Baleeira': 'with-meal',
+        'Unha de Gato': 'with-meal',
+        'Passiflora': 'evening',
+        'Mulungu': 'evening',
+        'Valeriana': 'evening',
+        'Goji Berry': 'morning',
 
         // Sono
         'Melatonina': 'evening',
@@ -106,14 +122,16 @@ const SUPPLEMENT_DATABASE = {
         female: ['Ferro', 'Cálcio', 'Ácido Fólico', 'Vitamina B12'],
         other: ['Vitamina D', 'Ômega-3', 'B-Complex']
     } as Record<string, string[]>,
-    // Suplementos por sintoma
+    // Suplementos e Fito por sintoma
     symptomSupplements: {
-        'Ansiedade': ['Magnésio', 'L-Teanina', 'Ashwagandha', 'Vitamina B-Complex'],
-        'Insônia': ['Magnésio', 'Melatonina', 'Glicina'],
-        'Fadiga': ['B-Complex', 'Ferro', 'Coenzima Q10', 'Vitamina D'],
-        'Dor nas articulações': ['Ômega-3', 'Curcumina', 'Glucosamina', 'Condroitina'],
-        'Imunidade baixa': ['Vitamina D', 'Vitamina C', 'Zinco', 'Probióticos'],
-        'Estresse': ['Magnésio', 'Ashwagandha', 'Rhodiola', 'Vitamina B-Complex'],
+        'Ansiedade': ['Magnésio', 'L-Teanina', 'Ashwagandha', 'Passiflora', 'Mulungu'],
+        'Insônia': ['Magnésio', 'Melatonina', 'Valeriana', 'Reishi', 'Mulungu'],
+        'Fadiga': ['Coenzima Q10', 'Ginseng', 'Cordyceps', 'Maca Peruana', 'Guaraná'],
+        'Dor nas articulações': ['Curcumina', 'Erva-Baleeira', 'Unha de Gato', 'Ômega-3'],
+        'Imunidade baixa': ['Vitamina D', 'Vitamina C', 'Zinco', 'Unha de Gato', 'Astragalus'],
+        'Estresse': ['Ashwagandha', 'Rhodiola', 'Reishi', 'Passiflora'],
+        'Problemas Digestivos': ['Probióticos', 'Espinheira Santa', 'Gengibre'],
+        'Foco e Memória': ['Ginkgo Biloba', 'Rhodiola', 'Maca Peruana', 'B-Complex']
     } as Record<string, string[]>
 };
 

@@ -41,6 +41,7 @@ import { ZenFlowPage } from './components/ZenFlowPage';
 import { SessaoMestraPage } from './components/SessaoMestraPage';
 import { ZosterMapPage } from './pages/ZosterMapPage';
 import { HerpesHubPage } from './pages/HerpesHubPage';
+import { PhytoLibraryPage } from './pages/PhytoLibraryPage';
 import LandingPage from './components/LandingPage';
 import { FeedbackPage } from './components/FeedbackPage';
 
@@ -244,6 +245,8 @@ function AppContent() {
         return <ZosterMapPage onBack={() => setCurrentPage('home')} />;
       case 'herpes-hub':
         return <HerpesHubPage onBack={() => setCurrentPage('home')} onPageChange={setCurrentPage} />;
+      case 'plantas-medicinais':
+        return <PhytoLibraryPage onPageChange={setCurrentPage} />;
       default:
         return <LandingPage onStart={() => setCurrentPage('login')} />;
     }

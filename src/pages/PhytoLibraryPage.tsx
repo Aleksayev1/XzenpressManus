@@ -1,0 +1,185 @@
+import React, { useState } from 'react';
+import { ArrowLeft, Leaf, Search, MapPin, AlertTriangle, BookOpen, Activity, Heart, Sprout } from 'lucide-react';
+import { HERB_DATABASE, Herb } from '../data/herbLibrary';
+
+interface PhytoLibraryPageProps {
+    onPageChange?: (page: string) => void;
+}
+
+export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange }) => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [activeTab, setActiveTab] = useState<'Todos' | 'Brasil' | 'China (MTC)'>('Todos');
+
+    const filteredHerbs = HERB_DATABASE.filter(herb => {
+        const matchesSearch =
+            herb.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            herb.scientificName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            herb.indications.some(i => i.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        const matchesTab = activeTab === 'Todos' || herb.origin === activeTab;
+
+        return matchesSearch && matchesTab;
+    });
+
+    const HerbCard = ({ herb }: { herb: Herb }) => {
+        const isBrasil = herb.origin === 'Brasil';
+
+        return (
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all flex flex-col">
+                <div className={`p-4 text-white flex justify-between items-start ${isBrasil ? 'bg-gradient-to-r from-emerald-600 to-green-500' : 'bg-gradient-to-r from-red-600 to-orange-500'}`}>
+                    <div>
+                        <h3 className="text-xl font-bold">{herb.name}</h3>
+                        <p className="text-sm opacity-90 italic">{herb.scientificName}</p>
+                    </div>
+                    <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                        {isBrasil ? <Sprout className="w-6 h-6 text-emerald-100" /> : <Leaf className="w-6 h-6 text-red-100" />}
+                    </div>
+                </div>
+
+                <div className="p-5 flex-1 flex flex-col">
+                    <div className="flex items-center text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        {herb.origin} • {herb.partUsed}
+                    </div>
+
+                    <div className="mb-4">
+                        <h4 className="text-sm font-bold text-gray-900 flex items-center mb-1">
+                            <Activity className="w-4 h-4 mr-1 text-blue-500" /> Ação Principal
+                        </h4>
+                        <p className="text-sm text-gray-700">{herb.mainAction}</p>
+                    </div>
+
+                    <p className="text-sm text-gray-600 mb-4 flex-1">
+                        {herb.description}
+                    </p>
+
+                    {/* MTC Specifics */}
+                    {!isBrasil && herb.nature && herb.tropism && (
+                        <div className="mb-4 bg-orange-50 rounded-xl p-3 border border-orange-100">
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div>
+                                    <span className="font-bold text-orange-900">Natureza:</span>
+                                    <span className="ml-1 text-orange-800">{herb.nature}</span>
+                                </div>
+                                <div>
+                                    <span className="font-bold text-orange-900">Sabor:</span>
+                                    <span className="ml-1 text-orange-800">{herb.flavor?.join(', ')}</span>
+                                </div>
+                                <div className="col-span-2">
+                                    <span className="font-bold text-orange-900">Tropismo:</span>
+                                    <span className="ml-1 text-orange-800">{herb.tropism.join(', ')}</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="space-y-3">
+                        <div>
+                            <h4 className="text-xs font-bold text-green-700 mb-1 flex items-center">
+                                <Heart className="w-3 h-3 mr-1" /> Indicações
+                            </h4>
+                            <div className="flex flex-wrap gap-1">
+                                {herb.indications.map(ind => (
+                                    <span key={ind} className="bg-green-50 text-green-700 text-[10px] px-2 py-1 rounded-md border border-green-200">
+                                        {ind}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 className="text-xs font-bold text-red-700 mb-1 flex items-center">
+                                <AlertTriangle className="w-3 h-3 mr-1" /> Contraindicações
+                            </h4>
+                            <ul className="text-xs text-red-600 space-y-1 pl-4 list-disc marker:text-red-300">
+                                {herb.contraindications.map(contra => (
+                                    <li key={contra}>{contra}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
+            <div className="max-w-7xl mx-auto">
+                {/* Header / Back Button */}
+                <div className="flex items-center mb-8">
+                    {onPageChange && (
+                        <button
+                            onClick={() => onPageChange('home')}
+                            className="p-2 mr-4 bg-white hover:bg-gray-100 rounded-full shadow-sm hover:shadow transition-all border border-gray-200"
+                            title="Voltar"
+                        >
+                            <ArrowLeft className="w-5 h-5 text-gray-600" />
+                        </button>
+                    )}
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                            <BookOpen className="w-8 h-8 mr-3 text-emerald-600" />
+                            Biblioteca de Plantas Medicinais
+                        </h1>
+                        <p className="text-gray-500 mt-1">Herbário completo com Fitoterapia Brasileira e Medicina Tradicional Chinesa.</p>
+                    </div>
+                </div>
+
+                {/* Search and Filters */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
+                    {/* Tabs */}
+                    <div className="flex space-x-2 bg-gray-100 p-1 rounded-xl w-full md:w-auto">
+                        {['Todos', 'Brasil', 'China (MTC)'].map(tab => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab as any)}
+                                className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === tab
+                                        ? 'bg-white text-emerald-700 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
+                                    }`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="relative w-full md:w-96">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Buscar planta, indicação ou nome científico..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm transition-colors"
+                        />
+                    </div>
+                </div>
+
+                {/* Herbs Grid */}
+                {filteredHerbs.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {filteredHerbs.map(herb => (
+                            <HerbCard key={herb.id} herb={herb} />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-20 bg-white rounded-3xl border border-gray-200">
+                        <Leaf className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Nenhuma planta encontrada</h3>
+                        <p className="text-gray-500">Tente buscar por outros termos ou verifique a ortografia.</p>
+                        <button
+                            onClick={() => { setSearchTerm(''); setActiveTab('Todos'); }}
+                            className="mt-4 text-emerald-600 font-bold hover:text-emerald-700"
+                        >
+                            Limpar busca
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};

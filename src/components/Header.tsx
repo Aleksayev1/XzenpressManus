@@ -68,6 +68,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
     { id: 'sounds', label: t('nav.sounds'), icon: <Waves className="w-4 h-4" /> },
     { id: 'zenflow', label: 'ZenFlow', icon: <Wind className="w-4 h-4 text-purple-600" /> },
     { id: 'nutriming-ai', label: 'Nutriming', icon: <Zap className="w-4 h-4 text-green-500" /> },
+    { id: 'plantas-medicinais', label: 'Plantas Medicinais', icon: <BookOpen className="w-4 h-4 text-emerald-600" /> },
     { id: 'protocols', label: t('nav.protocols'), icon: <Database className="w-4 h-4" /> },
     { id: 'zoster-map', label: 'Mapa Zoster', icon: <Activity className="w-4 h-4 text-red-400" /> },
     { id: 'hormonal-research', label: 'Estudo ZS', icon: <Brain className="w-4 h-4 text-purple-500" /> },

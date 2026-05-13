@@ -25,25 +25,28 @@ const SoundFusion: React.FC = () => {
 
     const audioRefs = useRef<{ [key: string]: HTMLAudioElement }>({});
 
+    // Supabase Storage CDN URLs - arquivos hospedados no bucket 'sounds/fusion'
+    const SUPABASE_AUDIO_BASE = 'https://dqjcbwjqrenubdzalicy.supabase.co/storage/v1/object/public/sounds/fusion';
+
     const tracks: Track[] = [
         {
             id: 'weightless',
             name: 'Weightless (Marconi Union)',
-            src: '/sounds/fusion/Weightless.mp3',
+            src: `${SUPABASE_AUDIO_BASE}/Weightless.mp3`,
             icon: <Moon className="w-6 h-6 text-purple-400" />,
             defaultVolume: 0.6
         },
         {
             id: 'jazz',
             name: 'Baby Jazz (Relax & Sleep)',
-            src: '/sounds/fusion/jazz.mp3',
+            src: `${SUPABASE_AUDIO_BASE}/jazz.mp3`,
             icon: <Music className="w-6 h-6 text-yellow-400" />,
             defaultVolume: 0.4
         },
         {
             id: 'rain',
             name: 'Relaxing Rain',
-            src: '/sounds/fusion/rain.mp3', // Moved to fusion folder
+            src: `${SUPABASE_AUDIO_BASE}/rain.mp3`,
             icon: <CloudRain className="w-6 h-6 text-blue-400" />,
             defaultVolume: 0.3
         }

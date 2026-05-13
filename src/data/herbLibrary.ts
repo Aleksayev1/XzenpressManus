@@ -2,7 +2,7 @@ export interface Herb {
     id: string;
     name: string;
     scientificName: string;
-    origin: 'Brasil' | 'China (MTC)';
+    origin: 'Brasil' | 'China (MTC)' | 'Peptídeo (Sintético/Bio-idêntico)';
     partUsed: string;
     mainAction: string;
     description: string;
@@ -154,5 +154,62 @@ export const HERB_DATABASE: Herb[] = [
         tropism: ['Baço', 'Pulmão', 'Coração'],
         indications: ['Fadiga extrema', 'Respiração curta', 'Palpitações', 'Impotência'],
         contraindications: ['Febre alta', 'Sinais de calor excessivo (hipertensão não controlada)']
+    },
+
+    // --- PEPTÍDEOS (BIOHACKING & LONGEVIDADE) ---
+    {
+        id: 'bpc-157',
+        name: 'BPC-157 (Body Protection Compound)',
+        scientificName: 'Pentadecapeptídeo Gástrico',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Oral / Subcutâneo)',
+        mainAction: 'Cura Acelerada de Tecidos e Intestino',
+        description: 'Um peptídeo derivado do suco gástrico humano. Conhecido por acelerar incrivelmente a cura de tendões, ligamentos, músculos e reparar a barreira intestinal (Leaky Gut).',
+        indications: ['Lesões articulares e tendíneas', 'Síndrome do Intestino Irritável', 'Úlceras', 'Inflamação sistêmica'],
+        contraindications: ['Histórico de câncer (estimula angiogênese - formação de novos vasos)']
+    },
+    {
+        id: 'tb-500',
+        name: 'TB-500 (Thymosin Beta-4)',
+        scientificName: 'Timosina Beta-4',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo)',
+        mainAction: 'Regeneração Muscular e Flexibilidade',
+        description: 'Proteína presente em todas as células animais. Atua sinergicamente com o BPC-157, focando principalmente na recuperação de fibras musculares, aumento de flexibilidade e redução de espasmos.',
+        indications: ['Lesões musculares graves', 'Recuperação pós-treino extrema', 'Cãibras crônicas', 'Queda de cabelo'],
+        contraindications: ['Histórico de câncer (devido à proliferação celular)']
+    },
+    {
+        id: 'epitalon',
+        name: 'Epitalon (Epithalon)',
+        scientificName: 'Tetrapeptídeo Pineal',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo)',
+        mainAction: 'Longevidade e Alongamento de Telômeros',
+        description: 'Considerado a "Fonte da Juventude" russa. Estimula a glândula pineal a produzir melatonina naturalmente e tem a capacidade comprovada de reativar a telomerase, alongando os telômeros (revertendo o envelhecimento celular).',
+        indications: ['Antienvelhecimento', 'Regulação avançada do ciclo circadiano', 'Prevenção de doenças senis'],
+        contraindications: ['Uso contínuo (deve ser ciclado, ex: 10-20 dias por ano)']
+    },
+    {
+        id: 'ghk-cu',
+        name: 'GHK-Cu (Peptídeo de Cobre)',
+        scientificName: 'Glicil-L-histidil-L-lisina',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Tópico / Subcutâneo)',
+        mainAction: 'Rejuvenescimento da Pele e Cicatrização',
+        description: 'Peptídeo natural que se liga ao cobre. Conhecido na dermatologia por reduzir rugas, manchas, inflamações e estimular o crescimento capilar ao reativar células-tronco do folículo.',
+        indications: ['Rugas e flacidez', 'Alopecia (Queda de cabelo)', 'Cicatrizes profundas', 'Danos UV'],
+        contraindications: ['Excesso (pode causar toxicidade por acúmulo de cobre se não houver pausas)']
+    },
+    {
+        id: 'cjc-1295-ipamorelin',
+        name: 'CJC-1295 / Ipamorelin',
+        scientificName: 'Secretagogos de GH',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo)',
+        mainAction: 'Estímulo do Hormônio do Crescimento (GH)',
+        description: 'Blend sinérgico que estimula a hipófise a produzir seu próprio GH de forma natural e pulsátil, evitando os colaterais do GH sintético. Melhora sono, queima de gordura e recuperação.',
+        indications: ['Deficiência de GH', 'Composição corporal (perda de gordura)', 'Insônia grave', 'Recuperação lenta'],
+        contraindications: ['Câncer ativo', 'Resistência severa à insulina', 'Uso sem jejum prévio (corta o efeito)']
     }
 ];

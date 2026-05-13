@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Leaf, Search, MapPin, AlertTriangle, BookOpen, Activity, Heart, Sprout } from 'lucide-react';
+import { ArrowLeft, Leaf, Search, MapPin, AlertTriangle, BookOpen, Activity, Heart, Sprout, Dna } from 'lucide-react';
 import { HERB_DATABASE, Herb } from '../data/herbLibrary';
 
 interface PhytoLibraryPageProps {
@@ -8,7 +8,7 @@ interface PhytoLibraryPageProps {
 
 export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange }) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState<'Todos' | 'Brasil' | 'China (MTC)'>('Todos');
+    const [activeTab, setActiveTab] = useState<'Todos' | 'Brasil' | 'China (MTC)' | 'Peptídeos'>('Todos');
 
     const filteredHerbs = HERB_DATABASE.filter(herb => {
         const matchesSearch =
@@ -16,23 +16,41 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
             herb.scientificName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             herb.indications.some(i => i.toLowerCase().includes(searchTerm.toLowerCase()));
 
-        const matchesTab = activeTab === 'Todos' || herb.origin === activeTab;
+        let matchesTab = true;
+        if (activeTab === 'Brasil') matchesTab = herb.origin === 'Brasil';
+        if (activeTab === 'China (MTC)') matchesTab = herb.origin === 'China (MTC)';
+        if (activeTab === 'Peptídeos') matchesTab = herb.origin === 'Peptídeo (Sintético/Bio-idêntico)';
 
         return matchesSearch && matchesTab;
     });
 
     const HerbCard = ({ herb }: { herb: Herb }) => {
         const isBrasil = herb.origin === 'Brasil';
+        const isPeptide = herb.origin === 'Peptídeo (Sintético/Bio-idêntico)';
+
+        let bgGradient = 'bg-gradient-to-r from-red-600 to-orange-500';
+        let IconCard = Leaf;
+        let iconColor = 'text-red-100';
+
+        if (isBrasil) {
+            bgGradient = 'bg-gradient-to-r from-emerald-600 to-green-500';
+            IconCard = Sprout;
+            iconColor = 'text-emerald-100';
+        } else if (isPeptide) {
+            bgGradient = 'bg-gradient-to-r from-indigo-600 to-blue-500';
+            IconCard = Dna;
+            iconColor = 'text-indigo-100';
+        }
 
         return (
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all flex flex-col">
-                <div className={`p-4 text-white flex justify-between items-start ${isBrasil ? 'bg-gradient-to-r from-emerald-600 to-green-500' : 'bg-gradient-to-r from-red-600 to-orange-500'}`}>
+                <div className={`p-4 text-white flex justify-between items-start ${bgGradient}`}>
                     <div>
                         <h3 className="text-xl font-bold">{herb.name}</h3>
                         <p className="text-sm opacity-90 italic">{herb.scientificName}</p>
                     </div>
                     <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                        {isBrasil ? <Sprout className="w-6 h-6 text-emerald-100" /> : <Leaf className="w-6 h-6 text-red-100" />}
+                        <IconCard className={`w-6 h-6 ${iconColor}`} />
                     </div>
                 </div>
 
@@ -54,7 +72,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                     </p>
 
                     {/* MTC Specifics */}
-                    {!isBrasil && herb.nature && herb.tropism && (
+                    {!isBrasil && !isPeptide && herb.nature && herb.tropism && (
                         <div className="mb-4 bg-orange-50 rounded-xl p-3 border border-orange-100">
                             <div className="grid grid-cols-2 gap-2 text-xs">
                                 <div>
@@ -120,17 +138,17 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                             <BookOpen className="w-8 h-8 mr-3 text-emerald-600" />
-                            Biblioteca de Plantas Medicinais
+                            Biblioteca Integrativa (Botânica & Biohacking)
                         </h1>
-                        <p className="text-gray-500 mt-1">Herbário completo com Fitoterapia Brasileira e Medicina Tradicional Chinesa.</p>
+                        <p className="text-gray-500 mt-1">Herbário completo com Fitoterapia e Banco de Peptídeos.</p>
                     </div>
                 </div>
 
                 {/* Search and Filters */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
                     {/* Tabs */}
-                    <div className="flex space-x-2 bg-gray-100 p-1 rounded-xl w-full md:w-auto">
-                        {['Todos', 'Brasil', 'China (MTC)'].map(tab => (
+                    <div className="flex space-x-2 bg-gray-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
+                        {['Todos', 'Brasil', 'China (MTC)', 'Peptídeos'].map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab as any)}

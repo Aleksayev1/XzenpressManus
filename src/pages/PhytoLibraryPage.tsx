@@ -10,19 +10,24 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<'Todos' | 'Brasil' | 'China (MTC)' | 'Peptídeos'>('Todos');
 
-    const filteredHerbs = HERB_DATABASE.filter(herb => {
-        const matchesSearch =
-            herb.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            herb.scientificName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            herb.indications.some(i => i.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = (herb: Herb) =>
+        herb.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        herb.scientificName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        herb.indications.some(i => i.toLowerCase().includes(searchTerm.toLowerCase()));
 
+    const filteredHerbs = HERB_DATABASE.filter(herb => {
         let matchesTab = true;
         if (activeTab === 'Brasil') matchesTab = herb.origin === 'Brasil';
         if (activeTab === 'China (MTC)') matchesTab = herb.origin === 'China (MTC)';
         if (activeTab === 'Peptídeos') matchesTab = herb.origin === 'Peptídeo (Sintético/Bio-idêntico)';
-
-        return matchesSearch && matchesTab;
+        return matchesSearch(herb) && matchesTab;
     });
+
+    // Grupos ordenados para a aba "Todos"
+    const brasilHerbs = HERB_DATABASE.filter(h => h.origin === 'Brasil' && matchesSearch(h));
+    const mtcHerbs = HERB_DATABASE.filter(h => h.origin === 'China (MTC)' && matchesSearch(h));
+    const peptideHerbs = HERB_DATABASE.filter(h => h.origin === 'Peptídeo (Sintético/Bio-idêntico)' && matchesSearch(h));
+    const isGroupedView = activeTab === 'Todos';
 
     const HerbCard = ({ herb }: { herb: Herb }) => {
         const isBrasil = herb.origin === 'Brasil';
@@ -178,7 +183,62 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                 </div>
 
                 {/* Herbs Grid */}
-                {filteredHerbs.length > 0 ? (
+                {isGroupedView ? (
+                    // Vista agrupada por categoria na aba "Todos"
+                    <div className="space-y-12">
+                        {brasilHerbs.length > 0 && (
+                            <section>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="flex items-center gap-2 bg-emerald-100 border border-emerald-200 rounded-full px-4 py-1.5">
+                                        <Sprout className="w-5 h-5 text-emerald-700" />
+                                        <span className="font-bold text-emerald-800 text-sm uppercase tracking-widest">Fitoterapia Brasileira</span>
+                                    </div>
+                                    <span className="text-xs text-gray-400 font-mono">{brasilHerbs.length} plantas</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {brasilHerbs.map(herb => <HerbCard key={herb.id} herb={herb} />)}
+                                </div>
+                            </section>
+                        )}
+                        {mtcHerbs.length > 0 && (
+                            <section>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="flex items-center gap-2 bg-orange-100 border border-orange-200 rounded-full px-4 py-1.5">
+                                        <Leaf className="w-5 h-5 text-orange-700" />
+                                        <span className="font-bold text-orange-800 text-sm uppercase tracking-widest">Medicina Tradicional Chinesa</span>
+                                    </div>
+                                    <span className="text-xs text-gray-400 font-mono">{mtcHerbs.length} ervas</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {mtcHerbs.map(herb => <HerbCard key={herb.id} herb={herb} />)}
+                                </div>
+                            </section>
+                        )}
+                        {peptideHerbs.length > 0 && (
+                            <section>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="flex items-center gap-2 bg-indigo-100 border border-indigo-200 rounded-full px-4 py-1.5">
+                                        <Dna className="w-5 h-5 text-indigo-700" />
+                                        <span className="font-bold text-indigo-800 text-sm uppercase tracking-widest">Peptídeos & Biohacking</span>
+                                    </div>
+                                    <span className="text-xs text-gray-400 font-mono">{peptideHerbs.length} compostos</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {peptideHerbs.map(herb => <HerbCard key={herb.id} herb={herb} />)}
+                                </div>
+                            </section>
+                        )}
+                        {brasilHerbs.length === 0 && mtcHerbs.length === 0 && peptideHerbs.length === 0 && (
+                            <div className="text-center py-20 bg-white rounded-3xl border border-gray-200">
+                                <Leaf className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">Nenhum item encontrado</h3>
+                                <p className="text-gray-500">Tente buscar por outros termos.</p>
+                                <button onClick={() => setSearchTerm('')} className="mt-4 text-emerald-600 font-bold hover:text-emerald-700">Limpar busca</button>
+                            </div>
+                        )}
+                    </div>
+                ) : filteredHerbs.length > 0 ? (
+                    // Vista filtrada por aba específica
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {filteredHerbs.map(herb => (
                             <HerbCard key={herb.id} herb={herb} />

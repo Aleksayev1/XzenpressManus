@@ -45,6 +45,8 @@ import { PhytoLibraryPage } from './pages/PhytoLibraryPage';
 import LandingPage from './components/LandingPage';
 import { FeedbackPage } from './components/FeedbackPage';
 
+import { PremiumPartnerPitch } from './pages/PremiumPartnerPitch';
+
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('landing');
   const [showTutorial, setShowTutorial] = useState(false);
@@ -247,6 +249,8 @@ function AppContent() {
         return <HerpesHubPage onBack={() => setCurrentPage('home')} onPageChange={setCurrentPage} />;
       case 'plantas-medicinais':
         return <PhytoLibraryPage onPageChange={setCurrentPage} />;
+      case 'premium-partner':
+        return <PremiumPartnerPitch onPageChange={setCurrentPage} />;
       default:
         return <LandingPage onStart={() => setCurrentPage('login')} />;
     }

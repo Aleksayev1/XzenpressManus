@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Leaf, Search, MapPin, AlertTriangle, BookOpen, Activity, Heart, Sprout, Dna } from 'lucide-react';
+import { ArrowLeft, Leaf, Search, MapPin, AlertTriangle, BookOpen, Activity, Heart, Sprout, Dna, ShoppingCart } from 'lucide-react';
 import { HERB_DATABASE, Herb } from '../data/herbLibrary';
 
 interface PhytoLibraryPageProps {
@@ -103,7 +103,12 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                             </h4>
                             <div className="flex flex-wrap gap-1">
                                 {herb.indications.map(ind => (
-                                    <span key={ind} className="bg-green-50 text-green-700 text-[10px] px-2 py-1 rounded-md border border-green-200">
+                                    <span 
+                                        key={ind} 
+                                        onClick={() => setSearchTerm(ind)}
+                                        className="bg-green-50 text-green-700 text-[10px] px-2 py-1 rounded-md border border-green-200 cursor-pointer hover:bg-green-100 hover:text-green-800 transition-colors"
+                                        title={`Buscar por ${ind}`}
+                                    >
                                         {ind}
                                     </span>
                                 ))}
@@ -119,6 +124,22 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                     <li key={contra}>{contra}</li>
                                 ))}
                             </ul>
+                        </div>
+                    </div>
+
+                    {/* Mockup de Parceiro (Apenas para demonstração comercial) */}
+                    <div className="px-5 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between group hover:bg-indigo-50 transition-colors -mx-5 -mb-5">
+                        <div className="flex items-center">
+                            <div className="w-9 h-9 bg-white border border-dashed border-gray-300 rounded-xl flex items-center justify-center mr-3 group-hover:border-indigo-300 group-hover:bg-indigo-100 transition-all">
+                                <ShoppingCart className="w-4 h-4 text-gray-400 group-hover:text-indigo-600" />
+                            </div>
+                            <div>
+                                <p className="text-[9px] text-gray-400 uppercase font-bold tracking-widest leading-none mb-1 group-hover:text-indigo-400">Oportunidade de Marca</p>
+                                <p className="text-xs font-bold text-gray-500 group-hover:text-indigo-700 italic">Espaço para Parceiro Premium</p>
+                            </div>
+                        </div>
+                        <div className="bg-white border border-gray-200 text-gray-400 text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-tighter group-hover:border-indigo-200 group-hover:text-indigo-600">
+                            Disponível
                         </div>
                     </div>
                 </div>

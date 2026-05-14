@@ -299,5 +299,196 @@ export const HERB_DATABASE: Herb[] = [
         description: 'Criado pela Universidade de Washington para o tratamento do Alzheimer. É considerado até 10 milhões de vezes mais forte que o BDNF nativo na criação de novas conexões neurais (sinapses). O "cálice sagrado" da cognição.',
         indications: ['Declínio cognitivo', 'Doença de Alzheimer / Parkinson (pesquisa)', 'Danos cerebrais traumáticos', 'Aprimoramento cognitivo extremo'],
         contraindications: ['Histórico de tumores cerebrais (devido ao seu altíssimo fator de crescimento neuronal)']
+    },
+
+    // --- FITOTERAPIA BRASILEIRA (EXPANSÃO) ---
+    {
+        id: 'curcuma',
+        name: 'Cúrcuma (Açafrão-da-terra)',
+        scientificName: 'Curcuma longa',
+        origin: 'Brasil',
+        partUsed: 'Rizoma (raiz)',
+        mainAction: 'Anti-inflamatório e Antioxidante Sistêmico',
+        description: 'Considerada o anti-inflamatório natural mais estudado do mundo. A curcumina (seu princípio ativo) inibe a mesma via inflamatória (NF-kB) que os anti-inflamatórios químicos, sem os efeitos colaterais. Amplamente cultivada no Brasil.',
+        indications: ['Artrite e artrose', 'Doenças inflamatórias intestinais', 'Prevenção de Alzheimer', 'Síndrome Metabólica', 'Câncer (adjuvante)'],
+        contraindications: ['Cálculos biliares (estimula contração da vesícula)', 'Uso em altas doses com anticoagulantes']
+    },
+    {
+        id: 'erva-de-sao-joao',
+        name: 'Erva-de-São-João (Hypericum)',
+        scientificName: 'Hypericum perforatum',
+        origin: 'Brasil',
+        partUsed: 'Parte aérea florida',
+        mainAction: 'Antidepressivo Natural e Ansiolítico',
+        description: 'Um dos fitoterápicos mais pesquisados do mundo. Possui eficácia comprovada em estudos clínicos para depressão leve a moderada, comparável a antidepressivos sintéticos. Atua inibindo a recaptação de serotonina, dopamina e norepinefrina.',
+        indications: ['Depressão leve a moderada', 'Ansiedade', 'Distúrbios do sono', 'TPM'],
+        contraindications: ['Interação grave com antidepressivos ISRS (risco de Síndrome Serotoninérgica)', 'Fotossensibilidade (evitar sol após uso)', 'Anticoagulantes e pílula anticoncepcional (reduz eficácia)']
+    },
+    {
+        id: 'valeriana',
+        name: 'Valeriana',
+        scientificName: 'Valeriana officinalis',
+        origin: 'Brasil',
+        partUsed: 'Raízes e Rizoma',
+        mainAction: 'Sedativo Natural e Regulador do Sono',
+        description: 'O sedativo vegetal mais utilizado no mundo ocidental. Atua nos receptores GABA (os mesmos dos benzodiazepínicos) sem criar dependência química. Amplamente cultivada no Sul do Brasil.',
+        indications: ['Insônia', 'Ansiedade generalizada', 'Espasmos musculares', 'Cólicas intestinais'],
+        contraindications: ['Crianças menores de 3 anos', 'Uso concomitante com sedativos/álcool (potencializa efeito)']
+    },
+    {
+        id: 'calendula',
+        name: 'Calêndula',
+        scientificName: 'Calendula officinalis',
+        origin: 'Brasil',
+        partUsed: 'Flores',
+        mainAction: 'Cicatrizante, Anti-inflamatório e Antifúngico Tópico',
+        description: 'A rainha das flores medicinais para uso externo. Possui flavonoides que promovem cicatrização, reduzem inflamação e combatem fungos. Usada em pomadas, cremes e cosméticos naturais de grau farmacêutico em todo o mundo.',
+        indications: ['Dermatite', 'Queimaduras leves', 'Eczema', 'Candidíase cutânea', 'Cicatrizes'],
+        contraindications: ['Alergia a plantas da família Asteraceae']
+    },
+    {
+        id: 'copaiba',
+        name: 'Copaíba',
+        scientificName: 'Copaifera langsdorffii',
+        origin: 'Brasil',
+        partUsed: 'Óleo-resina do tronco',
+        mainAction: 'Anti-inflamatório Amazônico de Alta Potência',
+        description: 'O "óleo sagrado" da Amazônia. O beta-cariofileno presente na copaíba é um canabinóide vegetal que se liga aos receptores CB2 (sistema endocanabinóide), gerando potente ação anti-inflamatória sem efeito psicoativo.',
+        indications: ['Dores musculares e articulares', 'Inflamações de pele e mucosas', 'Sinusite', 'Infecções urinárias'],
+        contraindications: ['Gestantes (abortivo em doses altas)', 'Doenças renais (uso interno prolongado)']
+    },
+    {
+        id: 'pau-darco',
+        name: 'Pau-d\'Arco (Ipê-Roxo)',
+        scientificName: 'Tabebuia impetiginosa',
+        origin: 'Brasil',
+        partUsed: 'Casca interna',
+        mainAction: 'Antifúngico, Antibacteriano e Imunomodulador',
+        description: 'Árvore sagrada dos índios Incas. A lapachona e o lapachol (princípios ativos) possuem comprovada ação antifúngica (inclusive contra Candida), antibacteriana e são estudados como agentes anticancerígenos.',
+        indications: ['Candidíase sistêmica', 'Infecções bacterianas', 'Leucemia (pesquisa)', 'Artrite reumatoide'],
+        contraindications: ['Gestantes', 'Uso de anticoagulantes', 'Doses altas podem ser hepatotóxicas']
+    },
+    {
+        id: 'jatoba',
+        name: 'Jatobá',
+        scientificName: 'Hymenaea courbaril',
+        origin: 'Brasil',
+        partUsed: 'Casca, resina e fruto',
+        mainAction: 'Energizante Natural e Antifúngico Pulmonar',
+        description: 'Conhecida como a "Árvore da Energia" do Cerrado. Possui ação antifúngica comprovada, especialmente no trato respiratório, além de ser um potente revigorante físico usado por indígenas antes de longas caçadas.',
+        indications: ['Bronquite fúngica', 'Anemia', 'Fadiga física profunda', 'Infecções respiratórias de repetição'],
+        contraindications: ['Gastrite severa (a resina pode irritar o estômago em jejum)']
+    },
+    {
+        id: 'garra-do-diabo',
+        name: 'Garra-do-Diabo',
+        scientificName: 'Harpagophytum procumbens',
+        origin: 'Brasil',
+        partUsed: 'Raiz secundária',
+        mainAction: 'Analgésico Natural e Anti-inflamatório Articular',
+        description: 'Um dos analgésicos naturais mais potentes conhecidos pela fitoterapia. Inibe as enzimas COX-1 e COX-2 (as mesmas da Aspirina e Ibuprofeno) sem agressão gástrica, sendo especialmente eficaz para dores lombares e articulares crônicas.',
+        indications: ['Lombalgia crônica', 'Osteoartrite', 'Tendinite', 'Gota'],
+        contraindications: ['Úlcera péptica ativa', 'Cálculos biliares', 'Gestantes']
+    },
+    {
+        id: 'passiflora',
+        name: 'Maracujá (Passiflora)',
+        scientificName: 'Passiflora incarnata',
+        origin: 'Brasil',
+        partUsed: 'Folhas e flores',
+        mainAction: 'Ansiolítico e Hipnótico (Indutor do Sono)',
+        description: 'O ansiolítico vegetal brasileiro por excelência. Amplamente estudado e reconhecido pela Anvisa. Atua nos receptores GABA-A, promovendo relaxamento profundo e sono reparador sem efeito de dependência ou ressaca matinal.',
+        indications: ['Ansiedade', 'Insônia leve a moderada', 'Palpitações por nervosismo', 'Síndrome do intestino irritável por estresse'],
+        contraindications: ['Gestantes', 'Uso concomitante com sedativos potentes']
+    },
+
+    // --- PEPTÍDEOS & MOLÉCULAS DE BIOHACKING (EXPANSÃO) ---
+    {
+        id: 'nad-plus',
+        name: 'NAD+ (Nicotinamida Adenina Dinucleotídeo)',
+        scientificName: 'NAD+ / NMN / NR',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (IV / Subcutâneo / Oral - NMN/NR)',
+        mainAction: 'Longevidade Celular e Energia Mitocondrial',
+        description: 'A molécula mais estudada na ciência da longevidade atualmente. Ativa as sirtuínas (proteínas da longevidade) e os genes PARP (reparo do DNA). Seus precursores (NMN e NR) são as formas orais mais populares no mundo do biohacking.',
+        indications: ['Envelhecimento acelerado', 'Fadiga crônica', 'Prevenção de doenças neurodegenerativas', 'Recuperação de dependência química'],
+        contraindications: ['Câncer ativo (as sirtuínas podem proteger células tumorais também)']
+    },
+    {
+        id: 'akg',
+        name: 'AKG (Alfa-Cetoglutarato de Cálcio)',
+        scientificName: 'Calcium Alpha-Ketoglutarate',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Oral)',
+        mainAction: 'Reversão do Envelhecimento Biológico e Metilação do DNA',
+        description: 'Um metabólito do Ciclo de Krebs que, em estudo clínico da Universidade da Califórnia, reduziu a idade biológica média de participantes em 8 anos em apenas 7 meses. Regula a metilação do DNA (epigenética) e inibe o mTOR (o acelerador do envelhecimento).',
+        indications: ['Antienvelhecimento epigenético', 'Sarcopenia (perda muscular)', 'Longevidade', 'Performance esportiva'],
+        contraindications: ['Gestantes', 'Uso com cautela em doença renal crônica avançada']
+    },
+    {
+        id: '5-amino-1mq',
+        name: '5-Amino-1MQ',
+        scientificName: '5-Amino-1-Methylquinolinium',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Oral)',
+        mainAction: 'Queima de Gordura e Regeneração de Células-Tronco',
+        description: 'Inibe a enzima NNMT (que "guarda" gordura em células adormecidas), forçando as células adiposas a se tornarem metabolicamente ativas novamente. Considerado um dos mais potentes lipolíticos (queimadores de gordura) sem efeito estimulante.',
+        indications: ['Obesidade resistente a dieta', 'Gordura localizada resistente', 'Regeneração de células musculares', 'Metabolismo lento'],
+        contraindications: ['Pesquisa ainda em fase inicial para uso humano — cautela máxima']
+    },
+    {
+        id: 'humanin',
+        name: 'Humanin',
+        scientificName: 'Mitocondrial Peptide Humanin',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo)',
+        mainAction: 'Proteção Neuronal e Resistência à Insulina',
+        description: 'Um peptídeo produzido nas mitocôndrias com uma capacidade protetora neuronal extraordinária. Níveis mais altos de Humanin estão correlacionados com maior longevidade em estudos com centenários. Protege neurônios contra o beta-amilóide do Alzheimer.',
+        indications: ['Prevenção de Alzheimer', 'Resistência à insulina cerebral', 'Longevidade', 'Infertilidade masculina (melhora qualidade do esperma)'],
+        contraindications: ['Dados clínicos em humanos ainda limitados — uso experimental']
+    },
+    {
+        id: 'ss-31',
+        name: 'SS-31 (Elamipretide)',
+        scientificName: 'D-Arg-Dmt-Lys-Phe-NH2',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo / IV)',
+        mainAction: 'Reparo Mitocondrial e Antienvelhescimento Cardíaco',
+        description: 'Peptídeo de última geração que penetra diretamente na membrana interna da mitocôndria e se liga à cardiolipina, restaurando a produção de ATP em células envelhecidas. Considerado um dos maiores avanços em medicina regenerativa mitocondrial.',
+        indications: ['Insuficiência cardíaca', 'Doenças mitocondriais raras', 'Longevidade de alta performance', 'Envelhecimento muscular acelerado'],
+        contraindications: ['Uso experimental — sem dados robustos de segurança de longo prazo em humanos']
+    },
+    {
+        id: 'aod-9604',
+        name: 'AOD-9604',
+        scientificName: 'Fragmento 176-191 do GH',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo)',
+        mainAction: 'Lipólise (Queima de Gordura) Seletiva e Regeneração Cartilaginosa',
+        description: 'Fragmento isolado da extremidade do GH (hormônio do crescimento) responsável exclusivamente pelo efeito lipolítico. Queima gordura localizada sem os efeitos colaterais do GH completo (sem retenção, sem resistência à insulina). Aprovado como alimento seguro pela FDA.',
+        indications: ['Gordura abdominal resistente', 'Osteoartrite (regeneração de cartilagem)', 'Emagrecimento sem perda de massa muscular'],
+        contraindications: ['Câncer ativo', 'Gestantes']
+    },
+    {
+        id: 'pinealon',
+        name: 'Pinealon',
+        scientificName: 'Tripeptídeo Glu-Asp-Arg',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Oral / Nasal)',
+        mainAction: 'Regulação da Glândula Pineal e Neuroproteção',
+        description: 'Peptídeo biorregulatório desenvolvido na Rússia para otimizar a função da glândula pineal. Demonstrou capacidade de restaurar o ritmo circadiano em idosos, melhorar a produção de melatonina e proteger neurônios contra hipóxia (falta de oxigênio).',
+        indications: ['Distúrbios graves do ciclo circadiano', 'Declínio cognitivo por envelhecimento', 'Recuperação pós-AVC', 'Jet lag severo e crônico'],
+        contraindications: ['Gestantes', 'Crianças (glândula pineal ainda em formação)']
+    },
+    {
+        id: 'foxo4-dri',
+        name: 'FOXO4-DRI (Peptídeo Senolítico)',
+        scientificName: 'FOXO4-p53 Disrupting Peptide',
+        origin: 'Peptídeo (Sintético/Bio-idêntico)',
+        partUsed: 'Laboratorial (Subcutâneo)',
+        mainAction: 'Eliminação de Células Senescentes (Rejuvenescimento Celular)',
+        description: 'Um dos peptídeos mais revolucionários da medicina da longevidade. Mata seletivamente apenas as "células zumbi" (células senescentes) — aquelas que param de funcionar mas se recusam a morrer e liberam toxinas inflamatórias. Em estudos com camundongos, restaurou pelos e capacidade física em animais velhos.',
+        indications: ['Antienvelhecimento avançado', 'Doenças inflamatórias crônicas', 'Fibrose tecidual', 'Longevidade extrema'],
+        contraindications: ['Pesquisa ainda em fase pré-clínica/inicial em humanos — uso experimental de alto nível']
     }
 ];

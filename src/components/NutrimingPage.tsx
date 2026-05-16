@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Brain, Sparkles, ArrowLeft, Plus, Trash2, Info, AlertCircle, Sun, Moon, Activity, Zap } from 'lucide-react';
+import { Clock, Brain, Sparkles, ArrowLeft, Plus, Trash2, Info, AlertCircle, Sun, Moon, Activity, Zap, Shield, Pill, ChevronDown, ChevronUp, Loader } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { findSupplementInfo, SUPPLEMENT_CATEGORY_STYLE } from '../data/supplementDatabase';
 
@@ -162,6 +162,52 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         message: string;
         details?: string;
     }>({ isOpen: false, type: 'dosage', title: '', message: '' });
+
+    // === VERIFICADOR DE INTERAÇÕES AI ===
+    const [medications, setMedications] = useState<string[]>([]);
+    const [newMedication, setNewMedication] = useState('');
+    const [interactionReport, setInteractionReport] = useState<any>(null);
+    const [interactionLoading, setInteractionLoading] = useState(false);
+    const [interactionError, setInteractionError] = useState('');
+    const [showInteractionChecker, setShowInteractionChecker] = useState(false);
+    const [showReportDetails, setShowReportDetails] = useState(false);
+
+    const addMedication = () => {
+        const m = newMedication.trim();
+        if (m && !medications.includes(m)) setMedications(prev => [...prev, m]);
+        setNewMedication('');
+    };
+
+    const runInteractionCheck = async () => {
+        if (supplements.length === 0 && medications.length === 0) return;
+        setInteractionLoading(true);
+        setInteractionError('');
+        setInteractionReport(null);
+        setShowReportDetails(false);
+        try {
+            const res = await fetch('/.netlify/functions/interaction-checker', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ medications, supplements: supplements.map(s => s.name) })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Erro na análise');
+            setInteractionReport(data.report);
+            setShowReportDetails(true);
+        } catch (err: any) {
+            setInteractionError(err.message || 'Erro ao verificar interações.');
+        } finally {
+            setInteractionLoading(false);
+        }
+    };
+
+    const riskColor: Record<string, string> = {
+        grave:        'bg-red-50 border-red-300 text-red-900',
+        moderada:     'bg-orange-50 border-orange-300 text-orange-900',
+        leve:         'bg-yellow-50 border-yellow-300 text-yellow-900',
+        segura:       'bg-emerald-50 border-emerald-300 text-emerald-900',
+        desconhecida: 'bg-gray-50 border-gray-300 text-gray-700',
+    };
 
     // Verificar consentimento legal ao carregar
     useEffect(() => {
@@ -1056,7 +1102,7 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                         )}
 
                         {/* Wellness Awareness Section - Pilares Naturais */}
-                        <div className="bg-emerald-50 rounded-2xl shadow-lg p-6 border border-emerald-200 mt-6">
+<div className="bg-emerald-50 rounded-2xl shadow-lg p-6 border border-emerald-200 mt-6">
                             <h3 className="text-lg font-bold text-emerald-900 mb-4 flex items-center">
                                 🌿 Pilares do Bem-Estar (Além da Suplementação)
                             </h3>
@@ -1098,7 +1144,141 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
 
                     </div>
                 </div>
+
+                {/* ═══ VERIFICADOR DE SEGURANÇA AI ═══ */}
+                <div className="mt-10 bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                    <button
+                        onClick={() => setShowInteractionChecker(v => !v)}
+                        className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 transition-colors"
+                    >
+                        <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center shadow-md">
+                                <Shield className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900">Verificador de Segurança AI</h3>
+                                <p className="text-sm text-slate-500">Analisa interações entre seus suplementos e medicamentos com base em literatura científica</p>
+                            </div>
+                        </div>
+                        {showInteractionChecker ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+                    </button>
+
+                    {showInteractionChecker && (
+                        <div className="px-6 pb-6 border-t border-slate-100 pt-5 space-y-5">
+                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start space-x-3">
+                                <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                                <p className="text-xs text-amber-800">
+                                    <strong>Ferramenta educacional.</strong> Baseada em literatura científica. Não substitui avaliação médica ou farmacêutica. Nem todas as interações são conhecidas — o relatório inclui essa honestidade.
+                                </p>
+                            </div>
+
+                            {supplements.length > 0 && (
+                                <div>
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Suplementos do Nutriming (incluídos automaticamente)</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {supplements.map(s => (
+                                            <span key={s.id} className="inline-flex items-center text-xs bg-green-100 text-green-800 px-3 py-1 rounded-full border border-green-200 font-medium">
+                                                <Activity className="w-3 h-3 mr-1" />{s.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div>
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Adicione seus medicamentos convencionais</p>
+                                <div className="flex space-x-2">
+                                    <input
+                                        type="text"
+                                        value={newMedication}
+                                        onChange={e => setNewMedication(e.target.value)}
+                                        onKeyDown={e => e.key === 'Enter' && addMedication()}
+                                        placeholder="Ex: Losartana, Metformina, Rivotril..."
+                                        className="flex-1 px-4 py-2 border border-slate-300 rounded-xl text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-rose-400 focus:outline-none"
+                                    />
+                                    <button onClick={addMedication} className="px-4 py-2 bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-700 flex items-center">
+                                        <Pill className="w-4 h-4 mr-1" /> Adicionar
+                                    </button>
+                                </div>
+                                {medications.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-3">
+                                        {medications.map(m => (
+                                            <span key={m} className="inline-flex items-center text-xs bg-slate-100 text-slate-700 px-3 py-1 rounded-full border border-slate-200 font-medium">
+                                                <Pill className="w-3 h-3 mr-1" />{m}
+                                                <button onClick={() => setMedications(prev => prev.filter(x => x !== m))} className="ml-2 text-slate-400 hover:text-red-500">✕</button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            <button
+                                onClick={runInteractionCheck}
+                                disabled={interactionLoading || (supplements.length === 0 && medications.length === 0)}
+                                className="w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center space-x-2 shadow-md"
+                            >
+                                {interactionLoading
+                                    ? <><Loader className="w-5 h-5 animate-spin" /><span>Analisando com IA...</span></>
+                                    : <><Shield className="w-5 h-5" /><span>Verificar Segurança do Protocolo</span></>
+                                }
+                            </button>
+
+                            {interactionError && (
+                                <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">{interactionError}</div>
+                            )}
+
+                            {interactionReport && showReportDetails && (
+                                <div className="space-y-4 mt-2">
+                                    <div className="bg-slate-800 text-white p-4 rounded-xl">
+                                        <p className="text-sm font-semibold">{interactionReport.resumoGeral}</p>
+                                        <p className="text-xs text-slate-400 mt-1">{interactionReport.totalInteracoes} combinações analisadas</p>
+                                    </div>
+                                    {interactionReport.alertasMedicos?.length > 0 && (
+                                        <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4">
+                                            <p className="font-bold text-red-800 mb-2 flex items-center"><AlertCircle className="w-4 h-4 mr-2" />Atenção Médica Necessária</p>
+                                            {interactionReport.alertasMedicos.map((a: string, i: number) => (
+                                                <p key={i} className="text-sm text-red-700 mb-1">• {a}</p>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {interactionReport.interacoes?.map((inter: any, i: number) => (
+                                        <div key={i} className={`rounded-xl p-4 border ${riskColor[inter.nivel] || riskColor['desconhecida']}`}>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <p className="font-bold text-sm">{inter.emoji} {inter.substancia1} + {inter.substancia2}</p>
+                                                <span className="text-xs font-black uppercase tracking-wider opacity-70">{inter.nivel}</span>
+                                            </div>
+                                            <p className="text-xs mb-1"><strong>Efeito:</strong> {inter.efeito}</p>
+                                            <p className="text-xs mb-1"><strong>Mecanismo:</strong> {inter.mecanismo}</p>
+                                            <p className="text-xs font-semibold">💡 {inter.recomendacao}</p>
+                                            {inter.fonte && <p className="text-[10px] opacity-60 mt-1">Fonte: {inter.fonte}</p>}
+                                        </div>
+                                    ))}
+                                    {interactionReport.combinacoesDesconhecidas?.length > 0 && (
+                                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                                            <p className="font-bold text-gray-700 text-sm mb-2">⚪ Combinações sem Dados Suficientes</p>
+                                            {interactionReport.combinacoesDesconhecidas.map((c: string, i: number) => (
+                                                <p key={i} className="text-xs text-gray-600 mb-1">• {c}</p>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {interactionReport.recomendacoesGerais?.length > 0 && (
+                                        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                                            <p className="font-bold text-emerald-800 text-sm mb-2">✅ Recomendações para Otimizar Segurança</p>
+                                            {interactionReport.recomendacoesGerais.map((r: string, i: number) => (
+                                                <p key={i} className="text-xs text-emerald-700 mb-1">• {r}</p>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {interactionReport.disclaimer && (
+                                        <p className="text-[10px] text-slate-400 text-center italic">{interactionReport.disclaimer}</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
             </div>
-        </div >
+        </div>
     );
 };

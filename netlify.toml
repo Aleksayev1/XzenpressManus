@@ -3,3 +3,9 @@
   publish = "dist"
   functions = "netlify/functions"
   environment = { NODE_VERSION = "20", GIT_LFS_ENABLED = "true", GIT_LFS_FETCH_INCLUDE = "*.mp3" }
+
+# ═══ Funções Agendadas — Atualização Automática do Conhecimento ═══
+[functions."weekly-knowledge-refresh"]
+  schedule = "0 3 * * 1"
+  # Roda toda segunda-feira às 03:00 UTC (00:00 Brasília)
+  # Atualiza o banco de suplementos, interações e deficiências via Gemini AI

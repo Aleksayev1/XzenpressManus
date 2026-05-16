@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Brain, Sparkles, ArrowLeft, Plus, Trash2, Info, AlertCircle, Sun, Moon } from 'lucide-react';
+import { Clock, Brain, Sparkles, ArrowLeft, Plus, Trash2, Info, AlertCircle, Sun, Moon, Activity, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { findSupplementInfo, SUPPLEMENT_CATEGORY_STYLE } from '../data/supplementDatabase';
 
 interface NutrimingPageProps {
     onPageChange: (page: string) => void;
@@ -863,8 +864,33 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                                             <div className="space-y-3">
                                                 {sups.map(sup => (
                                                     <div key={sup.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                                        <div className="flex-1">
-                                                            <p className="font-medium text-gray-900">{sup.name}</p>
+                                                         <div className="flex-1">
+                                                            <p className="font-semibold text-gray-900">{sup.name}</p>
+                                                            {/* Ação Principal - mesmo padrão da PhytoLibrary */}
+                                                            {(() => {
+                                                                const info = findSupplementInfo(sup.name);
+                                                                if (info) {
+                                                                    const style = SUPPLEMENT_CATEGORY_STYLE[info.category];
+                                                                    return (
+                                                                        <div className="mt-1 mb-1">
+                                                                            <span className={`inline-flex items-center text-[9px] font-bold px-2 py-0.5 rounded-full border ${style.bg} ${style.color} uppercase tracking-wider mr-2`}>
+                                                                                {style.label}
+                                                                            </span>
+                                                                            <span className="text-xs font-medium text-blue-700 flex items-center mt-1">
+                                                                                <Activity className="w-3 h-3 mr-1 shrink-0" />
+                                                                                {info.mainAction}
+                                                                            </span>
+                                                                            {info.warnings && (
+                                                                                <p className="text-[10px] text-amber-700 mt-0.5 flex items-center">
+                                                                                    <Zap className="w-3 h-3 mr-1 shrink-0" />
+                                                                                    {info.warnings}
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                                return null;
+                                                            })()}
                                                             <div className="flex flex-col">
                                                                 <p className="text-sm text-gray-500">{sup.dosage}</p>
                                                                 {(() => {

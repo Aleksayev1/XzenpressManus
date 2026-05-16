@@ -278,6 +278,31 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                         </button>
                     </div>
                 )}
+
+                {/* Rodapé Legal / Disclaimer */}
+                <div className="mt-16 pt-8 border-t border-gray-200">
+                    <div className="bg-gray-100 rounded-2xl p-6 border border-gray-200">
+                        <div className="flex items-start gap-4">
+                            <AlertTriangle className="w-6 h-6 text-amber-500 shrink-0 mt-1" />
+                            <div>
+                                <h4 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wider">Isenção de Responsabilidade Legal</h4>
+                                <p className="text-xs text-gray-600 leading-relaxed">
+                                    O **Xzenpress** atua exclusivamente como uma plataforma de curadoria, informação e educação em medicina integrativa. 
+                                    Não fabricamos, comercializamos ou garantimos a entrega de quaisquer produtos aqui listados. As indicações de parceiros 
+                                    "Hors-Concours" são baseadas em critérios técnicos de qualidade e reputação de mercado, mas a relação de consumo, 
+                                    logística e garantia é de responsabilidade exclusiva da empresa fabricante/vendedora.
+                                </p>
+                                <p className="text-xs text-gray-600 mt-3 font-semibold italic">
+                                    Atenção: O conteúdo desta biblioteca não substitui a consulta médica. Jamais inicie o uso de fitoterápicos ou 
+                                    peptídeos sem a orientação de um profissional de saúde qualificado.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="text-center mt-6 text-[10px] text-gray-400">
+                        © {new Date().getFullYear()} Xzenpress - Inteligência em Saúde Integrativa. Todos os direitos reservados.
+                    </div>
+                </div>
             </div>
         </div>
     );

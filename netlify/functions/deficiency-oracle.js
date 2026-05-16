@@ -128,27 +128,33 @@ Responda exclusivamente em JSON válido, seguindo o formato especificado no seu 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
                     contents: [{ role: 'user', parts: [{ text: userMessage }] }],
                     generationConfig: {
-                        temperature: 0.3,       // Mais preciso/científico, menos criativo
+                        temperature: 0.3,
                         maxOutputTokens: 4096,
-                        responseMimeType: 'application/json',
-                    }
+                    },
+                    safetySettings: [
+                        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+                        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+                    ]
                 })
             }
         );
 
-        const geminiData = await geminiRes.json();
-
         if (!geminiRes.ok) {
-            console.error('Gemini API Error:', JSON.stringify(geminiData));
+            const errText = await geminiRes.text();
+            console.error('Gemini API Error:', geminiRes.status, errText);
             return {
                 statusCode: 502,
                 headers,
                 body: JSON.stringify({ error: 'Erro ao consultar o Oracle. Tente novamente.' })
             };
         }
+
+        const geminiData = await geminiRes.json();
 
         const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 

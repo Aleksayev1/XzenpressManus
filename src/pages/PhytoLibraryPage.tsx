@@ -1,14 +1,63 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Leaf, Search, MapPin, AlertTriangle, BookOpen, Activity, Heart, Sprout, Dna, ShoppingCart } from 'lucide-react';
+import { 
+    ArrowLeft, Leaf, Search, MapPin, AlertTriangle, BookOpen, Activity, 
+    Heart, Sprout, Dna, ShoppingCart, Sparkles, Brain, Compass, Clock, 
+    Utensils, ChevronDown, ChevronUp, Loader, RotateCcw, Shield, HelpCircle 
+} from 'lucide-react';
 import { HERB_DATABASE, Herb } from '../data/herbLibrary';
 
 interface PhytoLibraryPageProps {
     onPageChange?: (page: string) => void;
 }
 
+interface OracleProtocol {
+    titulo: string;
+    visaoIntegrativa: string;
+    deficiencias: Array<{
+        nutriente: string;
+        probabilidade: string;
+        mecanismo: string;
+        evidencia: string;
+    }>;
+    protocolo: {
+        alimentacao: {
+            priorizar: string[];
+            evitar: string[];
+            receitaMTC: string;
+        };
+        suplementos: Array<{
+            nome: string;
+            dose: string;
+            timing: string;
+            sinergia: string;
+        }>;
+        fitoterapia: {
+            plantasBrasileiras: string[];
+            plantasMTC: string[];
+        };
+        peptideos?: {
+            indicados: string[];
+            nota: string;
+        };
+        pontosYNSA?: string[];
+        pontosMTC?: string[];
+        praticasComplementares?: string[];
+    };
+    epigenetica: string;
+    almaEmocional: string;
+    alertas: string[];
+    fontes: string[];
+}
+
 export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<'Todos' | 'Brasil' | 'China (MTC)' | 'Peptídeos'>('Todos');
+    
+    // Estados do Oráculo de Deficiências
+    const [oracleResult, setOracleResult] = useState<OracleProtocol | null>(null);
+    const [isOracleLoading, setIsOracleLoading] = useState(false);
+    const [oracleError, setOracleError] = useState<string | null>(null);
+    const [showOracleDetails, setShowOracleDetails] = useState(true);
 
     const matchesSearch = (herb: Herb) =>
         herb.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -28,6 +77,48 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
     const mtcHerbs = HERB_DATABASE.filter(h => h.origin === 'China (MTC)' && matchesSearch(h));
     const peptideHerbs = HERB_DATABASE.filter(h => h.origin === 'Peptídeo (Sintético/Bio-idêntico)' && matchesSearch(h));
     const isGroupedView = activeTab === 'Todos';
+
+    // Chamada à Netlify Function deficiency-oracle
+    const handleConsultOracle = async (customTerm?: string) => {
+        const query = (customTerm || searchTerm).trim();
+        if (!query || query.length < 3) {
+            setOracleError('Por favor, digite um sintoma ou queixa com pelo menos 3 caracteres.');
+            return;
+        }
+
+        setIsOracleLoading(true);
+        setOracleError(null);
+        setOracleResult(null);
+
+        try {
+            const response = await fetch('/.netlify/functions/deficiency-oracle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symptom: query })
+            });
+
+            if (!response.ok) {
+                throw new Error('Não foi possível se conectar com o Oráculo no momento.');
+            }
+
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            if (data.protocol) {
+                setOracleResult(data.protocol);
+                setShowOracleDetails(true);
+            } else {
+                throw new Error('Nenhum protocolo foi gerado. Tente reformular a queixa.');
+            }
+        } catch (err: any) {
+            console.error('Erro ao consultar Oráculo:', err);
+            setOracleError(err.message || 'Erro ao processar sua consulta de saúde integrativa.');
+        } finally {
+            setIsOracleLoading(false);
+        }
+    };
 
     const HerbCard = ({ herb }: { herb: Herb }) => {
         const isBrasil = herb.origin === 'Brasil';
@@ -105,7 +196,11 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                 {herb.indications.map(ind => (
                                     <span 
                                         key={ind} 
-                                        onClick={() => setSearchTerm(ind)}
+                                        onClick={() => {
+                                            setSearchTerm(ind);
+                                            // Rola para a busca
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }}
                                         className="bg-green-50 text-green-700 text-[10px] px-2 py-1 rounded-md border border-green-200 cursor-pointer hover:bg-green-100 hover:text-green-800 transition-colors"
                                         title={`Buscar por ${ind}`}
                                     >
@@ -163,10 +258,10 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                     )}
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                            <BookOpen className="w-8 h-8 mr-3 text-emerald-600" />
+                            <BookOpen className="w-8 h-8 mr-3 text-emerald-600 animate-[pulse_3s_infinite]" />
                             Biblioteca Integrativa (Botânica & Biohacking)
                         </h1>
-                        <p className="text-gray-500 mt-1">Herbário completo com Fitoterapia e Banco de Peptídeos.</p>
+                        <p className="text-gray-500 mt-1">Herbário completo com Fitoterapia, Peptídeos e Consulta ao Oráculo de Deficiências.</p>
                     </div>
                 </div>
 
@@ -188,20 +283,298 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                         ))}
                     </div>
 
-                    {/* Search Bar */}
-                    <div className="relative w-full md:w-96">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="h-5 w-5 text-gray-400" />
+                    {/* Search Bar & Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto items-stretch">
+                        <div className="relative flex-1 md:w-80">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Search className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Busque planta ou digite sintoma..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 sm:text-sm transition-all"
+                            />
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Buscar planta, indicação ou nome científico..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm transition-colors"
-                        />
+                        {searchTerm.trim().length >= 3 && (
+                            <button
+                                onClick={() => handleConsultOracle()}
+                                disabled={isOracleLoading}
+                                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center justify-center space-x-2 text-sm shrink-0 active:scale-95 disabled:opacity-50"
+                            >
+                                {isOracleLoading ? (
+                                    <Loader className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Sparkles className="w-4 h-4 text-amber-200" />
+                                )}
+                                <span>Perguntar ao Oráculo AI</span>
+                            </button>
+                        )}
                     </div>
                 </div>
+
+                {/* Banner de atalho para consulta ao Oráculo */}
+                {searchTerm.trim().length > 0 && searchTerm.trim().length < 3 && (
+                    <div className="mb-6 p-3 bg-purple-50 border border-purple-100 rounded-xl flex items-center justify-between text-xs text-purple-800 animate-fadeIn">
+                        <span className="flex items-center"><HelpCircle className="w-4 h-4 mr-1 text-purple-500" /> Digite pelo menos 3 caracteres para liberar a consulta de sintomas via Oráculo de Deficiências AI.</span>
+                    </div>
+                )}
+
+                {/* AREA DE EXIBIÇÃO DE RESULTADO DO ORÁCULO DE DEFICIÊNCIAS (AI) */}
+                {isOracleLoading && (
+                    <div className="mb-10 bg-slate-900 border border-purple-500/30 rounded-3xl p-8 text-center text-white relative overflow-hidden shadow-xl shadow-purple-500/5">
+                        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-purple-500 via-pink-500 to-emerald-500 animate-pulse" />
+                        <Loader className="w-12 h-12 text-purple-400 animate-spin mx-auto mb-4" />
+                        <h3 className="text-xl font-bold mb-2 text-purple-200 animate-pulse">Oráculo Xzenpress Recalibrando Frequências...</h3>
+                        <p className="text-sm text-slate-400 max-w-md mx-auto">
+                            Consultando literatura científica, bases clínicas e a sabedoria da Medicina Tradicional Chinesa para formular o Protocolo Integral 360°...
+                        </p>
+                    </div>
+                )}
+
+                {oracleError && (
+                    <div className="mb-10 bg-red-50 border border-red-200 rounded-3xl p-6 flex items-start space-x-3 max-w-2xl mx-auto shadow-sm">
+                        <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                            <h3 className="text-lg font-bold text-red-900">Erro na Análise de Sintomas</h3>
+                            <p className="text-sm text-red-700 mt-1">{oracleError}</p>
+                            <button 
+                                onClick={() => handleConsultOracle()} 
+                                className="mt-3 bg-red-100 hover:bg-red-200 text-red-800 font-bold px-3 py-1.5 rounded-lg text-xs transition-colors flex items-center space-x-1"
+                            >
+                                <RotateCcw className="w-3 h-3" />
+                                <span>Tentar novamente</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {oracleResult && (
+                    <div className="mb-12 bg-slate-950 border border-purple-900/50 rounded-3xl shadow-2xl overflow-hidden animate-fadeIn relative">
+                        {/* Glow decorativo de fundo */}
+                        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
+                        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
+
+                        {/* Top Banner */}
+                        <div className="p-6 sm:p-8 bg-gradient-to-r from-purple-950 via-slate-900 to-emerald-950 border-b border-purple-900/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div className="flex items-center space-x-3">
+                                <div className="p-3 bg-purple-900/40 rounded-2xl border border-purple-500/30 text-purple-300">
+                                    <Brain className="w-8 h-8 animate-pulse" />
+                                </div>
+                                <div>
+                                    <div className="flex items-center space-x-2">
+                                        <span className="bg-purple-900/60 text-purple-200 text-[10px] font-black px-2 py-0.5 rounded border border-purple-500/30 uppercase tracking-widest">Protocolo 360° Gerado</span>
+                                        <span className="bg-emerald-950/60 text-emerald-300 text-[10px] font-black px-2 py-0.5 rounded border border-emerald-500/20 uppercase tracking-widest flex items-center gap-0.5"><Sparkles className="w-2.5 h-2.5" /> IA Viva</span>
+                                    </div>
+                                    <h2 className="text-2xl font-black text-white mt-1">{oracleResult.titulo}</h2>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={() => handleConsultOracle()}
+                                    className="p-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-white border border-slate-850 transition-colors flex items-center space-x-1 text-xs font-bold"
+                                    title="Recalcular Análise"
+                                >
+                                    <RotateCcw className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Recalcular</span>
+                                </button>
+                                <button
+                                    onClick={() => setOracleResult(null)}
+                                    className="p-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-red-400 border border-slate-850 transition-colors text-xs font-bold"
+                                >
+                                    Fechar Diagnóstico
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Corpo do Resultado */}
+                        <div className="p-6 sm:p-8 space-y-8">
+                            
+                            {/* Visão Integrativa */}
+                            <div className="bg-slate-900/50 border border-slate-850 rounded-2xl p-5 sm:p-6">
+                                <h3 className="text-sm font-black text-purple-400 uppercase tracking-widest mb-2 flex items-center"><Compass className="w-4 h-4 mr-1" /> Visão Sistêmica & Causalidade</h3>
+                                <p className="text-sm sm:text-base text-slate-200 leading-relaxed italic">
+                                    "{oracleResult.visaoIntegrativa}"
+                                </p>
+                            </div>
+
+                            {/* Grid de Informações */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                
+                                {/* Coluna 1: Deficiências Prováveis & Bioquímica */}
+                                <div className="space-y-6 lg:col-span-2">
+                                    
+                                    {/* Deficiências */}
+                                    <div>
+                                        <h3 className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-4 flex items-center"><Activity className="w-4 h-4 mr-1.5" /> Deficiências Nutricionais Rastreadas</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {oracleResult.deficiencias.map((def, idx) => (
+                                                <div key={idx} className="bg-slate-900/40 border border-slate-850 hover:border-emerald-500/20 p-4 rounded-2xl transition-all">
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <h4 className="text-sm font-bold text-white">{def.nutriente}</h4>
+                                                        <span className={`text-[9px] font-black px-2 py-0.5 rounded border uppercase tracking-wider ${
+                                                            def.probabilidade === 'alta' ? 'bg-red-950/40 text-red-400 border-red-500/20' :
+                                                            def.probabilidade === 'moderada' ? 'bg-amber-950/40 text-amber-400 border-amber-500/20' :
+                                                            'bg-emerald-950/40 text-emerald-400 border-emerald-500/20'
+                                                        }`}>
+                                                            Probabilidade {def.probabilidade}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-xs text-slate-300 leading-relaxed mb-3">{def.mecanismo}</p>
+                                                    <p className="text-[10px] text-slate-500 italic bg-black/30 p-2 rounded-lg border border-slate-900">📚 Evidência: {def.evidencia}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Alimentação Funcional e Receita MTC */}
+                                    <div>
+                                        <h3 className="text-xs font-black text-orange-400 uppercase tracking-widest mb-4 flex items-center"><Utensils className="w-4 h-4 mr-1.5" /> Nutrição Funcional & Culinária Terapêutica</h3>
+                                        <div className="bg-slate-900/30 border border-slate-850 rounded-2xl p-5 space-y-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <h4 className="text-xs font-bold text-emerald-400 mb-1 flex items-center">✓ Alimentos para Priorizar:</h4>
+                                                    <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 marker:text-emerald-500">
+                                                        {oracleResult.protocolo.alimentacao.priorizar.map((item, idx) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-xs font-bold text-rose-400 mb-1 flex items-center">✗ Alimentos para Evitar:</h4>
+                                                    <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 marker:text-rose-500">
+                                                        {oracleResult.protocolo.alimentacao.evitar.map((item, idx) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div className="border-t border-slate-950 pt-4">
+                                                <h4 className="text-xs font-bold text-orange-300 mb-1">🍵 Receita Baseada nos 5 Elementos da MTC:</h4>
+                                                <p className="text-xs text-slate-300 leading-relaxed bg-orange-950/10 p-3 rounded-xl border border-orange-950/20">{oracleResult.protocolo.alimentacao.receitaMTC}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Acupressão (MTC & YNSA) */}
+                                    {((oracleResult.protocolo.pontosYNSA && oracleResult.protocolo.pontosYNSA.length > 0) || 
+                                      (oracleResult.protocolo.pontosMTC && oracleResult.protocolo.pontosMTC.length > 0)) && (
+                                        <div>
+                                            <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center"><MapPin className="w-4 h-4 mr-1.5" /> Pontos de Acupressão (MTC & Craniopuntura YNSA)</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {oracleResult.protocolo.pontosYNSA && (
+                                                    <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-2xl">
+                                                        <h4 className="text-xs font-bold text-purple-300 mb-2 uppercase tracking-wide">Craniopuntura de Yamamoto (YNSA)</h4>
+                                                        <ul className="text-xs text-slate-300 space-y-2 list-disc pl-4 marker:text-purple-500">
+                                                            {oracleResult.protocolo.pontosYNSA.map((p, idx) => <li key={idx}>{p}</li>)}
+                                                        </ul>
+                                                    </div>
+                                                )}
+                                                {oracleResult.protocolo.pontosMTC && (
+                                                    <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-2xl">
+                                                        <h4 className="text-xs font-bold text-orange-300 mb-2 uppercase tracking-wide">Meridianos da Medicina Tradicional Chinesa</h4>
+                                                        <ul className="text-xs text-slate-300 space-y-2 list-disc pl-4 marker:text-orange-500">
+                                                            {oracleResult.protocolo.pontosMTC.map((p, idx) => <li key={idx}>{p}</li>)}
+                                                        </ul>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Coluna 2: Suplementos, Peptídeos & Mente */}
+                                <div className="space-y-6">
+                                    
+                                    {/* Suplementação Orientada */}
+                                    <div>
+                                        <h3 className="text-xs font-black text-purple-400 uppercase tracking-widest mb-4 flex items-center"><Heart className="w-4 h-4 mr-1.5" /> Suplementação Integrativa</h3>
+                                        <div className="space-y-3">
+                                            {oracleResult.protocolo.suplementos.map((sup, idx) => (
+                                                <div key={idx} className="bg-slate-900/30 border border-slate-850 p-4 rounded-xl flex items-start space-x-2">
+                                                    <div className="p-1.5 bg-purple-950 text-purple-400 border border-purple-500/20 rounded-lg text-xs font-bold mt-0.5">S{idx+1}</div>
+                                                    <div>
+                                                        <h4 className="text-xs font-bold text-white">{sup.nome}</h4>
+                                                        <div className="flex flex-wrap gap-1 my-1 text-[9px] text-slate-400">
+                                                            <span className="bg-slate-950 px-2 py-0.5 rounded border border-slate-850 flex items-center gap-0.5"><Compass className="w-2.5 h-2.5" /> {sup.dose}</span>
+                                                            <span className="bg-slate-950 px-2 py-0.5 rounded border border-slate-850 flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" /> {sup.timing}</span>
+                                                        </div>
+                                                        <p className="text-[10px] text-slate-500 italic mt-1 leading-tight"><span className="text-emerald-400 font-bold">✨ Sinergia:</span> {sup.sinergia}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Fitoterapia Complementar */}
+                                    <div>
+                                        <h3 className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-4 flex items-center"><Sprout className="w-4 h-4 mr-1.5" /> Fitoterapia Personalizada</h3>
+                                        <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-2xl space-y-3">
+                                            <div>
+                                                <h4 className="text-xs font-bold text-emerald-400">🇧🇷 Plantas Brasileiras Comprovadas:</h4>
+                                                <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 mt-1 marker:text-emerald-500">
+                                                    {oracleResult.protocolo.fitoterapia.plantasBrasileiras.map((p, idx) => <li key={idx}>{p}</li>)}
+                                                </ul>
+                                            </div>
+                                            <div className="border-t border-slate-950 pt-3">
+                                                <h4 className="text-xs font-bold text-orange-400">🏮 Fitoterapia Chinesa (Pinyin):</h4>
+                                                <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 mt-1 marker:text-orange-500">
+                                                    {oracleResult.protocolo.fitoterapia.plantasMTC.map((p, idx) => <li key={idx}>{p}</li>)}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Peptídeos & Biohacking Epigenético */}
+                                    {oracleResult.protocolo.peptideos && oracleResult.protocolo.peptideos.indicados.length > 0 && (
+                                        <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-2xl relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 w-12 h-12 bg-indigo-500/10 rounded-full blur-lg" />
+                                            <h3 className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2 flex items-center"><Dna className="w-4 h-4 mr-1.5 animate-pulse" /> Peptídeos de Biohacking</h3>
+                                            <ul className="text-xs text-slate-300 space-y-1.5 list-disc pl-4 marker:text-indigo-500">
+                                                {oracleResult.protocolo.peptideos.indicados.map((pep, idx) => <li key={idx}>{pep}</li>)}
+                                            </ul>
+                                            <p className="text-[9px] text-slate-500 italic mt-3 bg-black/30 p-2 rounded-lg border border-slate-950/50">🔬 {oracleResult.protocolo.peptideos.nota}</p>
+                                        </div>
+                                    )}
+
+                                    {/* Psicossomática e Alma Emocional */}
+                                    <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-2xl">
+                                        <h3 className="text-xs font-black text-rose-400 uppercase tracking-widest mb-2 flex items-center"><Brain className="w-4 h-4 mr-1.5" /> Psicossomática & Campo Emocional</h3>
+                                        <p className="text-xs text-slate-300 leading-relaxed italic">
+                                            {oracleResult.almaEmocional}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Epigenética e Visão Científica */}
+                            <div className="bg-slate-900/20 border border-slate-850 rounded-2xl p-5 flex flex-col md:flex-row gap-4 items-start">
+                                <div className="p-2.5 bg-indigo-950 text-indigo-300 border border-indigo-500/20 rounded-xl shrink-0">
+                                    <Dna className="w-6 h-6 animate-pulse" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-1">Mecanismo Epigenético e Reversibilidade</h4>
+                                    <p className="text-xs text-slate-400 leading-relaxed">{oracleResult.epigenetica}</p>
+                                </div>
+                            </div>
+
+                            {/* Alertas de Segurança */}
+                            <div className="bg-red-950/20 border border-red-500/20 rounded-2xl p-5 space-y-2">
+                                <h4 className="text-xs font-black text-red-400 uppercase tracking-widest flex items-center"><Shield className="w-4 h-4 mr-1.5" /> Alertas de Segurança & Interações</h4>
+                                <ul className="text-xs text-red-300 space-y-1 list-disc pl-4 marker:text-red-500">
+                                    {oracleResult.alertas.map((alerta, idx) => <li key={idx}>{alerta}</li>)}
+                                </ul>
+                            </div>
+
+                            {/* Fontes Científicas */}
+                            <div className="text-[10px] text-slate-500 space-y-1">
+                                <p className="font-bold">🔬 Referências Científicas e Literárias:</p>
+                                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                                    {oracleResult.fontes.map((f, idx) => <span key={idx} className="hover:text-slate-400 transition-colors">[{idx+1}] {f}</span>)}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                )}
 
                 {/* Herbs Grid */}
                 {isGroupedView ? (
@@ -252,9 +625,27 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                         {brasilHerbs.length === 0 && mtcHerbs.length === 0 && peptideHerbs.length === 0 && (
                             <div className="text-center py-20 bg-white rounded-3xl border border-gray-200">
                                 <Leaf className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">Nenhum item encontrado</h3>
-                                <p className="text-gray-500">Tente buscar por outros termos.</p>
-                                <button onClick={() => setSearchTerm('')} className="mt-4 text-emerald-600 font-bold hover:text-emerald-700">Limpar busca</button>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">Nenhum item encontrado na Biblioteca</h3>
+                                <p className="text-gray-500 mb-4">Que tal perguntar diretamente ao Oráculo de Deficiências Xzenpress AI?</p>
+                                
+                                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                                    <button 
+                                        onClick={() => setSearchTerm('')} 
+                                        className="text-gray-500 font-bold hover:text-gray-700 text-sm border border-gray-300 px-4 py-2 rounded-xl"
+                                    >
+                                        Limpar busca
+                                    </button>
+                                    
+                                    {searchTerm.trim().length >= 3 && (
+                                        <button 
+                                            onClick={() => handleConsultOracle()}
+                                            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-5 py-2 rounded-xl transition-all shadow-md flex items-center space-x-2 text-sm shrink-0 active:scale-95"
+                                        >
+                                            <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
+                                            <span>Consultar Oráculo AI para "{searchTerm}"</span>
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -269,13 +660,25 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                     <div className="text-center py-20 bg-white rounded-3xl border border-gray-200">
                         <Leaf className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Nenhuma planta encontrada</h3>
-                        <p className="text-gray-500">Tente buscar por outros termos ou verifique a ortografia.</p>
-                        <button
-                            onClick={() => { setSearchTerm(''); setActiveTab('Todos'); }}
-                            className="mt-4 text-emerald-600 font-bold hover:text-emerald-700"
-                        >
-                            Limpar busca
-                        </button>
+                        <p className="text-gray-500 mb-4">Tente buscar por outros termos ou consulte o Oráculo AI para uma análise sistêmica.</p>
+                        
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                            <button
+                                onClick={() => { setSearchTerm(''); setActiveTab('Todos'); }}
+                                className="text-gray-500 font-bold hover:text-gray-700 text-sm border border-gray-300 px-4 py-2 rounded-xl"
+                            >
+                                Limpar busca
+                            </button>
+                            {searchTerm.trim().length >= 3 && (
+                                <button 
+                                    onClick={() => handleConsultOracle()}
+                                    className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-5 py-2 rounded-xl transition-all shadow-md flex items-center space-x-2 text-sm shrink-0 active:scale-95"
+                                >
+                                    <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
+                                    <span>Consultar Oráculo AI para "{searchTerm}"</span>
+                                </button>
+                            )}
+                        </div>
                     </div>
                 )}
 

@@ -133,6 +133,7 @@ Gere o relatório completo de segurança em JSON, cobrindo TODAS as combinaçõe
             return { statusCode: 502, headers, body: JSON.stringify({ error: 'Erro ao consultar a análise de segurança.' }) };
         }
 
+        const geminiData = await geminiRes.json();
         const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
         let report;

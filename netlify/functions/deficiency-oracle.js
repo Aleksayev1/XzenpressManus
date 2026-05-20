@@ -110,6 +110,7 @@ FORMATO DA SUA RESPOSTA — SEMPRE JSON VÁLIDO:
 
 REGRAS ABSOLUTAS:
 - Responda APENAS com o JSON. Sem texto antes ou depois.
+- REGRA DE OURO YNSA (PONTOS Y / YPSILON): Sempre que sugerir Pontos Y (Ypsilons) da craniopuntura, declare e recomende explicitamente que eles são BILATERAIS (devem ser estimulados em ambos os lados da têmpora/cabeça). Por exemplo: "Ponto Ypsilon do Fígado (Bilateral - estimule em ambas as têmporas)".
 - Nunca invente estudos. Se não souber a fonte exata, escreva "Literatura de nutrição funcional — consulte profissional especializado."
 - Sempre inclua o aviso de que não substitui consulta médica nos alertas.
 - Se o sintoma for uma emergência (dor no peito, AVC, etc.), coloque um alerta urgente como primeiro item dos alertas.

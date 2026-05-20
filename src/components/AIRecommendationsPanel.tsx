@@ -39,6 +39,10 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
       return null;
     }
 
+    if (pointName.toLowerCase().includes('ypsilon')) {
+      return '/YNSA/ynsa-ypsilon-chart-hd.png';
+    }
+
     const normalized = pointName.toLowerCase().trim().replace(/[\s-]/g, '');
 
     // Primeiro: busca exata por nome/ID/nameEn
@@ -152,7 +156,7 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
       return '';
     }
 
-    const pointRegex = /\b((?:IG|LI|VB|GB|VC|Ren|CV|Du|GV|P|LU|C|HT|HE|TA|SJ|TB|CS|PC|F|LR|LV|R|KI|BP|SP|E|ST|ID|SI|B|BL)\s?-?\s?\d{1,2}|(?:YNSA\s+Ponto|YNSA|Ponto)\s?-?\s?(?:A|B|C|D|E|F|G|H|I|J|K|ZS))\b/gi;
+    const pointRegex = /\b((?:IG|LI|VB|GB|VC|Ren|CV|Du|GV|P|LU|C|HT|HE|TA|SJ|TB|CS|PC|F|LR|LV|R|KI|BP|SP|E|ST|ID|SI|B|BL)\s?-?\s?\d{1,2}\b|(?:YNSA\s+Ponto|YNSA|Ponto)\s?-?\s?(?:A|B|C|D|E|F|G|H|I|J|K|ZS)\b|(?:Ypsilon|Ponto)\s+[a-zA-Záéíóúçãõâêîôû\-]+)/gi;
     const parts = content.split(pointRegex);
     return parts.map((part, i) => {
       // Validação de segurança: ignora partes inválidas

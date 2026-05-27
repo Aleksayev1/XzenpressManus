@@ -61,6 +61,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
     const [isOracleLoading, setIsOracleLoading] = useState(false);
     const [oracleError, setOracleError] = useState<string | null>(null);
     const [showOracleDetails, setShowOracleDetails] = useState(true);
+    const [chronicity, setChronicity] = useState<'agudo' | 'cronico' | 'misto'>('misto');
 
     // Estados do Zoom Modal de Imagens
     const [showZoomModal, setShowZoomModal] = useState(false);
@@ -155,7 +156,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
             const response = await fetch(`${baseApiUrl}/.netlify/functions/deficiency-oracle`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ symptom: query })
+                body: JSON.stringify({ symptom: query, chronicity })
             });
 
             if (!response.ok) {
@@ -345,8 +346,8 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                     </div>
 
                     {/* Search Bar & Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto items-stretch">
-                        <div className="relative flex-1 md:w-80">
+                    <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto items-center">
+                        <div className="relative w-full md:w-80">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <Search className="h-5 w-5 text-gray-400" />
                             </div>
@@ -359,18 +360,58 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                             />
                         </div>
                         {searchTerm.trim().length >= 3 && (
-                            <button
-                                onClick={() => handleConsultOracle()}
-                                disabled={isOracleLoading}
-                                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center justify-center space-x-2 text-sm shrink-0 active:scale-95 disabled:opacity-50"
-                            >
-                                {isOracleLoading ? (
-                                    <Loader className="w-4 h-4 animate-spin" />
-                                ) : (
-                                    <Sparkles className="w-4 h-4 text-amber-200" />
-                                )}
-                                <span>Perguntar ao Oráculo AI</span>
-                            </button>
+                            <div className="flex flex-col sm:flex-row items-center gap-3 bg-purple-50 p-2 rounded-xl border border-purple-100 w-full md:w-auto">
+                                <div className="flex flex-col items-start gap-1">
+                                    <span className="text-[10px] font-bold text-purple-700 uppercase tracking-wider px-1">Como descreve o sintoma?</span>
+                                    <div className="flex gap-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => setChronicity('agudo')}
+                                            className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                                                chronicity === 'agudo'
+                                                    ? 'bg-red-500 text-white border-red-650 shadow-sm'
+                                                    : 'bg-white text-gray-700 border-gray-250 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            🔴 Agudo
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setChronicity('cronico')}
+                                            className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                                                chronicity === 'cronico'
+                                                    ? 'bg-blue-500 text-white border-blue-650 shadow-sm'
+                                                    : 'bg-white text-gray-700 border-gray-250 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            🔵 Crônico
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setChronicity('misto')}
+                                            className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                                                chronicity === 'misto'
+                                                    ? 'bg-purple-500 text-white border-purple-650 shadow-sm'
+                                                    : 'bg-white text-gray-700 border-gray-250 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            🟣 Misto
+                                        </button>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => handleConsultOracle()}
+                                    disabled={isOracleLoading}
+                                    className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center justify-center space-x-2 text-sm shrink-0 active:scale-95 disabled:opacity-50 self-end"
+                                >
+                                    {isOracleLoading ? (
+                                        <Loader className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <Sparkles className="w-4 h-4 text-amber-200" />
+                                    )}
+                                    <span>Oráculo AI</span>
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>

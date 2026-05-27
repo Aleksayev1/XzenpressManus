@@ -38,13 +38,22 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     fetchPoints();
   }, []);
 
-  // Filter helpers based on state
   const getPointsByCategory = (category: string) => {
     if (category === 'all') return points;
+
+    // Filter points by category (include ynsa points when cranio is selected)
     const filtered = points.filter(p =>
-      p.category === category || p.additionalCategories?.includes(category)
+      p.category === category ||
+      p.additionalCategories?.includes(category) ||
+      (category === 'cranio' && (p.category === 'ynsa' || p.additionalCategories?.includes('ynsa')))
     );
-    return Array.from(new Map(filtered.map(p => [p.id, p])).values());
+
+    // Remove duplicates using Map (ensures unique IDs)
+    const uniquePoints = Array.from(
+      new Map(filtered.map(p => [p.id, p])).values()
+    );
+
+    return uniquePoints;
   };
 
   // Helper function to get translated content
@@ -56,6 +65,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
   };
 
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState('all');
   const [selectedPoint, setSelectedPoint] = useState<string | null>(null);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -89,10 +99,47 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     { id: 'zoster', name: 'Zoster (Herpes)', icon: '🔥', premium: true },
   ];
 
+  const cranioSubcategories = [
+    { id: 'all', name: 'Todos os Grupos', icon: '🧠', color: 'bg-gray-100 text-gray-800 border-gray-300', description: 'Todos os pontos e grupos de craniopuntura de Yamamoto (YNSA).' },
+    { id: 'basic', name: 'Básicos (A-K)', icon: '🔵', color: 'bg-blue-100 text-blue-800 border-blue-300', description: 'Tratamento de dores físicas gerais, aparelho locomotor, cervical, torcicolo, lombalgia, problemas articulares.' },
+    { id: 'ypsilon', name: 'Ypsilon Bilaterais', icon: '🟡', color: 'bg-yellow-100 text-yellow-800 border-yellow-300', description: 'Tratamento de desequilíbrios nos órgãos internos (Zang Fu) na região temporal. Palpar bilateralmente e tratar o lado de maior sensibilidade dolorosa.' },
+    { id: 'sensory', name: 'Sensoriais/Cerebrais', icon: '🟢', color: 'bg-green-100 text-green-800 border-green-300', description: 'Distúrbios de órgãos dos sentidos (olhos, nariz, boca, ouvido), bem como pontos de gânglios basais e cerebrais para regulação emocional profunda.' },
+    { id: 'cranial-nerve', name: 'Nervos Cranianos', icon: '🔴', color: 'bg-red-100 text-red-800 border-red-300', description: 'Tratamento neurológico premium e avançado (I-XII), indicado para sequelas pós-AVC, paralisia fácil, neuralgia do trigêmeo e modulação central orgânica.' }
+  ];
+
   const breathingPhases = {
     inhale: { duration: 4, next: 'hold' as const, color: '#1E40AF', label: 'Inspire' },
     hold: { duration: 7, next: 'exhale' as const, color: '#047857', label: 'Segure' },
     exhale: { duration: 8, next: 'inhale' as const, color: '#6B21A8', label: 'Expire' },
+  };
+
+  const getSubcategoryBadge = (sub: string) => {
+    switch (sub) {
+      case 'basic':
+        return { name: 'YNSA Básico', styles: 'bg-blue-50 text-blue-800 border border-blue-200' };
+      case 'ypsilon':
+        return { name: 'YNSA Ypsilon', styles: 'bg-yellow-50 text-yellow-800 border border-yellow-200' };
+      case 'sensory':
+        return { name: 'YNSA Sensorial', styles: 'bg-green-50 text-green-800 border border-green-200' };
+      case 'cranial-nerve':
+        return { name: 'YNSA Nervo Craniano', styles: 'bg-red-50 text-red-800 border border-red-200' };
+      case 'zs':
+        return { name: 'YNSA ZS', styles: 'bg-purple-50 text-purple-800 border border-purple-200' };
+      case 'brain':
+        return { name: 'YNSA Cerebral', styles: 'bg-indigo-50 text-indigo-800 border border-indigo-200' };
+      case 'organ':
+        return { name: 'YNSA Órgão', styles: 'bg-pink-50 text-pink-800 border border-pink-200' };
+      default:
+        return { name: sub, styles: 'bg-gray-50 text-gray-800 border border-gray-200' };
+    }
+  };
+
+  const getFilteredPoints = () => {
+    let pts = getPointsByCategory(selectedCategory);
+    if (selectedCategory === 'cranio' && selectedSubcategory !== 'all') {
+      pts = pts.filter(p => p.subcategory === selectedSubcategory);
+    }
+    return pts;
   };
 
   const selectedPointData = selectedPoint ? points.find(p => p.id === selectedPoint) : null;
@@ -439,7 +486,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
 
   const zusanliPoint = points.find(p => p.id === 'st36' || p.name.toLowerCase().includes('zusanli') || p.id === 'zs');
 
-  const filteredPoints = getPointsByCategory(selectedCategory).filter(p => 
+  const filteredPoints = getFilteredPoints().filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (p.benefits && p.benefits.some(b => b.toLowerCase().includes(searchQuery.toLowerCase())))
@@ -521,6 +568,52 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                 ))}
               </div>
             </div>
+
+            {/* Subcategory Filter for Yamamoto Craniopuntura */}
+            {selectedCategory === 'cranio' && (
+              <div className="bg-white/70 backdrop-blur-md rounded-2xl p-5 border border-purple-100 shadow-sm space-y-4 transition-all duration-300">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-purple-50 pb-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-purple-900 uppercase tracking-wider">Subgrupos YNSA (Yamamoto)</h3>
+                    <p className="text-xs text-gray-500">Selecione uma categoria clínica da Craniopuntura de Yamamoto</p>
+                  </div>
+                  <div className="text-[10px] font-bold bg-purple-100 text-purple-800 px-2.5 py-1 rounded-full uppercase tracking-wider self-start md:self-center">
+                    Diagnóstico Clínico
+                  </div>
+                </div>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {cranioSubcategories.map((sub) => (
+                    <button
+                      key={sub.id}
+                      onClick={() => setSelectedSubcategory(sub.id)}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-semibold border transition-all ${
+                        selectedSubcategory === sub.id
+                          ? 'bg-purple-600 text-white border-purple-600 shadow-md transform scale-[1.02]'
+                          : 'bg-white text-gray-700 hover:bg-purple-50 border-purple-100'
+                      }`}
+                    >
+                      <span>{sub.icon}</span>
+                      <span>{sub.name}</span>
+                    </button>
+                  ))}
+                </div>
+                {/* Banner explicativo do subgrupo selecionado */}
+                {(() => {
+                  const activeSub = cranioSubcategories.find(s => s.id === selectedSubcategory) || cranioSubcategories[0];
+                  return (
+                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-500 p-3.5 rounded-r-xl">
+                      <div className="flex gap-2">
+                        <span className="text-lg">{activeSub.icon}</span>
+                        <div>
+                          <h4 className="text-xs font-bold text-purple-900 uppercase tracking-wider">{activeSub.name}</h4>
+                          <p className="text-xs text-purple-800 mt-1 leading-relaxed">{activeSub.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
 
             {/* ZS Highlight (if not searching) */}
             {!searchQuery && selectedCategory === 'all' && zusanliPoint && (
@@ -1022,7 +1115,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                         </p>
 
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center flex-wrap gap-2">
                             <div className={`px-2 py-1 rounded-full text-xs font-medium ${point.category === 'general' ? 'bg-blue-100 text-blue-800' :
                               point.category === 'cranio' ? 'bg-purple-100 text-purple-800' :
                                 point.category === 'septicemia' ? 'bg-red-100 text-red-800' :
@@ -1041,6 +1134,11 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                                           point.category === 'cardio' ? 'Cardiologia' :
                                             point.category}
                             </div>
+                            {point.category === 'cranio' && point.subcategory && (
+                              <div className={`px-2 py-1 rounded-full text-xs font-semibold ${getSubcategoryBadge(point.subcategory).styles}`}>
+                                {getSubcategoryBadge(point.subcategory).name}
+                              </div>
+                            )}
                             {point.isPremium && (
                               <div className="flex items-center space-x-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
                                 <Crown className="w-3 h-3" />

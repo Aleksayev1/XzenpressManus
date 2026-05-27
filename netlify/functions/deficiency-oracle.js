@@ -19,9 +19,11 @@ exports.handler = async (event) => {
     }
 
     let symptom = '';
+    let chronicity = 'misto';
     try {
         const body = JSON.parse(event.body || '{}');
         symptom = (body.symptom || '').trim();
+        chronicity = (body.chronicity || 'misto').trim();
     } catch {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'JSON inválido' }) };
     }
@@ -119,6 +121,15 @@ REGRAS ABSOLUTAS:
     const userMessage = `Analise este sintoma/condição e gere o Protocolo Integral 360° completo do Xzenpress:
 
 "${sanitized}"
+
+A condição é clinicamente descrita como: ${chronicity.toUpperCase()} (aguda, crônica ou mista).
+
+CRITÉRIO CRUCIAL DE PRESCRIÇÃO YNSA:
+- Se a condição for AGUDA (dor forte, início recente), dê prioridade absoluta aos Pontos dos Nervos Cranianos (occipital) que trazem modulação neural imediata e alívio rápido, indicando também Pontos Ypsilon como suporte.
+- Se for CRÔNICA (condição que vai e vem há semanas/meses), dê prioridade aos Pontos Ypsilon bilaterais (região temporal) para reeducação orgânica profunda e somatotópica gradual, indicando Nervos Cranianos como reforço se necessário.
+- Se for MISTA (crise aguda em cima de um quadro crônico), prescreva e dê igual prioridade a ambos (Pontos Ypsilon bilaterais na têmpora + Pontos de Nervos Cranianos no occipital).
+
+Escreva a justificativa clínica dessa escolha no campo "visaoIntegrativa" e prescreva os pontos exatos em "pontosYNSA".
 
 Responda exclusivamente em JSON válido, seguindo o formato especificado no seu sistema. Seja completo, profundo e verdadeiramente útil para o usuário.`;
 

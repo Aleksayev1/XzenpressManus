@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo YNSA para Burnout | XZenPress</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2d3748;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .evidence-box {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .evidence-box h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .point-card {
+            border-left: 5px solid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .point-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), transparent);
+            border-radius: 0 20px 0 100%;
+        }
+
+        .point-rim {
+            border-left-color: #f093fb;
+        }
+
+        .point-baco {
+            border-left-color: #4facfe;
+        }
+
+        .point-figado {
+            border-left-color: #43e97b;
+        }
+
+        .point-vesicula {
+            border-left-color: #feca57;
+        }
+
+        h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .point-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .icon {
+            font-size: 1.5em;
+            margin-right: 8px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .protocol-steps {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: #2d3748;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .protocol-steps h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .result-item {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-number {
+            font-size: 2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #f5576c;
+        }
+
+        .tip-box strong {
+            color: #c53030;
+        }
+
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            header,
+            footer {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div style="margin-bottom: 20px;">
+                <img src="/uploaded_image_1767874578974.png" alt="Banner Burnout"
+                    style="max-width: 100%; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            </div>
+            <h1>🧠 Protocolo YNSA para Burnout</h1>
+            <p class="subtitle">Craniopuntura Yamamoto via Acupressão</p>
+            <div class="badge">✅ Validado Cientificamente</div>
+
+            <div style="margin-top: 30px; padding: 20px; background: #f7fafc; border-radius: 15px;">
+                <h3 style="margin-bottom: 15px; color: #2d3748;">📍 Mapa dos 4 Pontos YNSA (Face Frontal)</h3>
+                <img src="/uploaded_image_1767875935762.jpg" alt="Mapa YNSA Pontos Cranianos"
+                    style="max-width: 100%; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                <p style="margin-top: 10px; color: #718096; font-size: 0.9em;">Use este mapa para localizar os 4 pontos
+                    cranianos</p>
+            </div>
+        </header>
+
+        <div class="evidence-box">
+            <h3>📊 Evidência Científica: Estudo Pinheiro (2016)</h3>
+            <p><strong>Septicemia em UTI tratada com YNSA via Acupressão</strong></p>
+            <div class="results">
+                <div class="result-item">
+                    <div class="result-number">19.000→32.340</div>
+                    <div>Leucócitos/ml</div>
+                    <div style="font-size: 0.9em; color: #718096;">em 1 hora</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-number">100%</div>
+                    <div>Recuperação</div>
+                    <div style="font-size: 0.9em; color: #718096;">sem sequelas</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-number">2x/dia</div>
+                    <div>Frequência</div>
+                    <div style="font-size: 0.9em; color: #718096;">16 min/sessão</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎯 O que é YNSA?</h2>
+            <p><strong>Yamamoto New Scalp Acupuncture</strong> é um microssistema craniano descoberto em 1973 pelo Dr.
+                Toshikatsu Yamamoto.</p>
+            <ul>
+                <li>Pontos no couro cabeludo correspondentes a órgãos do corpo</li>
+                <li>Pode ser aplicada via <strong>acupressão</strong> (não apenas agulhas)</li>
+                <li>Segura e eficaz para autoaplicação</li>
+                <li>Modula sistema nervoso autônomo e eixo HPA</li>
+            </ul>
+        </div>
+
+        <div class="image-container">
+            <h3 style="margin-bottom: 15px;">📍 Mapa dos Pontos YNSA</h3>
+            <p style="color: #718096; margin-bottom: 15px;">Face YIN (Frontal) - Pontos dos Órgãos</p>
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect fill='%23f7fafc' width='400' height='300'/%3E%3Ctext x='200' y='150' font-size='20' text-anchor='middle' fill='%23718096'%3EMapa YNSA - Face Frontal%3C/text%3E%3Ctext x='200' y='180' font-size='14' text-anchor='middle' fill='%23a0aec0'%3E(Consulte imagem original para localização exata)%3C/text%3E%3C/svg%3E"
+                alt="Mapa YNSA">
+        </div>
+
+        <h2 style="margin: 40px 0 20px 0; text-align: center;">🔹 4 Pontos Cranianos para Burnout</h2>
+
+        <div class="card point-card point-rim">
+            <h3><span class="point-number">1</span> Ponto do Rim</h3>
+            <p><strong>📍 Localização:</strong> Linha vertical frontal, próximo à linha do cabelo, região inferior</p>
+            <p><strong>🎯 Para que serve:</strong></p>
+            <ul>
+                <li>Fadiga crônica e exaustão profunda</li>
+                <li>Perda de motivação e força interior</li>
+                <li>Depleção energética fundamental</li>
+            </ul>
+            <p><strong>✋ Técnica:</strong> Pressão circular firme por 3 minutos bilateral</p>
+        </div>
+
+        <div class="card point-card point-baco">
+            <h3><span class="point-number">8</span> Ponto do Baço-Pâncreas</h3>
+            <p><strong>📍 Localização:</strong> Linha vertical frontal, região média</p>
+            <p><strong>🎯 Para que serve:</strong></p>
+            <ul>
+                <li>Fadiga mental ("névoa cerebral")</li>
+                <li>Dificuldade de concentração</li>
+                <li>Redução da eficácia profissional</li>
+                <li>Overthinking e preocupação excessiva</li>
+            </ul>
+            <p><strong>✋ Técnica:</strong> Pressão gentil e rítmica por 3 minutos bilateral</p>
+        </div>
+
+        <div class="card point-card point-figado">
+            <h3><span class="point-number">10</span> Ponto do Fígado</h3>
+            <p><strong>📍 Localização:</strong> Linha vertical frontal, região média-superior</p>
+            <p><strong>🎯 Para que serve:</strong></p>
+            <ul>
+                <li>Irritabilidade e frustração</li>
+                <li>Cinismo e negativismo</li>
+                <li>Tensão emocional acumulada</li>
+                <li>Raiva reprimida do ambiente de trabalho</li>
+            </ul>
+            <p><strong>✋ Técnica:</strong> Pressão sustentada com pequenos círculos por 3 minutos bilateral</p>
+        </div>
+
+        <div class="card point-card point-vesicula">
+            <h3><span class="point-number">11</span> Ponto da Vesícula Biliar ⭐</h3>
+            <p><strong>📍 Localização:</strong> Onde a orelha se conecta ao escalpo, porção superior</p>
+            <p><strong>🎯 Para que serve:</strong></p>
+            <ul>
+                <li>Indecisão crônica ("paralisia decisória")</li>
+                <li>Falta de confiança e autoeficácia</li>
+                <li>Procrastinação por medo de errar</li>
+                <li>Hesitação e desencorajamento</li>
+            </ul>
+            <p><strong>✋ Técnica:</strong> Pressão firme constante por 3 minutos bilateral</p>
+            <div class="tip-box" style="margin-top: 15px;">
+                <strong>💡 Dica Especial:</strong> Se você está com indecisão paralisante no trabalho, dedique 5 minutos
+                EXTRAS somente ao ponto 11 durante o dia, especialmente antes de reuniões ou tarefas que exijam decisões
+                importantes.
+            </div>
+        </div>
+
+        <div class="protocol-steps">
+            <h3>⏱️ Protocolo Diário (16 minutos por sessão)</h3>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Preparação (1 min)</strong><br>
+                Sente-se confortavelmente, respire profundamente 3 vezes, localize os pontos
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Aplicação dos 4 Pontos (12 min)</strong><br>
+                • Ponto 1 - Rim (3 min)<br>
+                • Ponto 8 - Baço-Pâncreas (3 min)<br>
+                • Ponto 10 - Fígado (3 min)<br>
+                • Ponto 11 - Vesícula Biliar (3 min)
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Massagem Geral (2 min)</strong><br>
+                Massagem suave de toda região frontal do couro cabeludo com movimentos circulares
+            </div>
+
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>Integração (1 min)</strong><br>
+                Respire profundamente, visualize energia fluindo harmoniosamente, agradeça ao seu corpo
+            </div>
+
+            <p style="margin-top: 20px; background: white; padding: 15px; border-radius: 10px;">
+                <strong>📅 Frequência:</strong> 2x ao dia (manhã ao acordar + noite antes de dormir)<br>
+                <strong>💪 Intensidade:</strong> Pressão firme mas confortável, sem causar dor<br>
+                <strong>⏳ Resultados:</strong> Clareza mental imediata, efeito acumulativo em 7-14 dias
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>🔬 Por que Funciona?</h2>
+            <h3>Mecanismo de Ação</h3>
+            <ul>
+                <li><strong>Reflexos Neurovasculares:</strong> Estimula fluxo sanguíneo cerebral</li>
+                <li><strong>Sistema Nervoso Autônomo:</strong> Ativa parassimpático (descansar e digerir)</li>
+                <li><strong>Eixo HPA:</strong> Regula produção de cortisol através de conexões neurais</li>
+                <li><strong>Bioeletricidade:</strong> Modula campos bioelétricos cranianos</li>
+            </ul>
+        </div>
+
+        <div class="card" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+            <h2>💡 Insight: Burnout = "Septicemia Energética"</h2>
+            <p>O estudo de Septicemia revelou o mesmo padrão de depleção energética dos <strong>6 órgãos</strong> que
+                aparecem no burnout:</p>
+            <ul>
+                <li>✅ Rim deficiente → Fadiga crônica</li>
+                <li>✅ Fígado estagnado → Irritabilidade, cinismo</li>
+                <li>✅ Baço deficiente → Fadiga mental</li>
+                <li>✅ Vesícula Biliar deficiente → Indecisão</li>
+                <li>✅ Coração deficiente → Ansiedade, insônia</li>
+                <li>✅ Pulmão afetado → Respiração superficial</li>
+            </ul>
+            <p style="margin-top: 15px;"><strong>Se YNSA restaurou homeostase em condição crítica infecciosa
+                    (septicemia), é ideal para burnout - uma "infecção energética" crônica.</strong></p>
+        </div>
+
+        <div class="card">
+            <h2>🎵 Recursos de Áudio Terapêutico</h2>
+            <p style="margin-bottom: 20px;">Combine a acupressão YNSA com frequências sonoras para potencializar os
+                resultados:</p>
+
+            <h3 style="margin-top: 30px;">✅ Áudios XZenPress (Já Disponíveis)</h3>
+            <ul>
+                <li><strong>Sono Profundo 2Hz</strong> - Para recuperação do sistema nervoso durante o sono</li>
+                <li><strong>Meditação Guiada</strong> - Para acalmar Shen (mente-espírito)</li>
+            </ul>
+
+            <h3 style="margin-top: 30px;">🎧 Playlists Recomendadas (Spotify)</h3>
+
+            <div class="protocol-steps" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h3 style="color: white; margin-bottom: 15px;">528Hz - Cura Celular 💚</h3>
+                <div class="step">
+                    <strong>Para:</strong> Exaustão emocional, transformação de padrões negativos<br>
+                    <strong>Quando usar:</strong> Durante acupressão YNSA, manhã (15 min), noite (20-30 min)<br>
+                    <strong>Busque no Spotify:</strong> "528Hz healing frequency" ou "528Hz Solfeggio"<br>
+                    <strong>Artistas sugeridos:</strong> Meditation Relax Club, Music for Body and Spirit
+                </div>
+
+                <h3 style="color: white; margin: 30px 0 15px 0;">432Hz - Paz Profunda 💙</h3>
+                <div class="step">
+                    <strong>Para:</strong> Ansiedade, insônia, desconexão com propósito<br>
+                    <strong>Quando usar:</strong> Tarde (transição), noite antes de dormir (30 min)<br>
+                    <strong>Busque no Spotify:</strong> "432Hz relaxation" ou "432Hz sleep"<br>
+                    <strong>Artistas sugeridos:</strong> Inner Lotus Music, Malte Marten, Meditative Mind
+                </div>
+
+                <h3 style="color: white; margin: 30px 0 15px 0;">Binaural Beats - Sincronização Cerebral 🎧</h3>
+                <div class="step">
+                    <strong>⚠️ Exigem fones de ouvido!</strong><br><br>
+                    <strong>Theta (4-8Hz):</strong> Meditação profunda, criatividade (15-20 min)<br>
+                    <strong>Alpha (8-13Hz):</strong> Foco relaxado durante trabalho<br>
+                    <strong>Delta (1-4Hz):</strong> Sono reparador (contínuo durante a noite)<br><br>
+                    <strong>Busque no Spotify:</strong> "binaural beats theta alpha delta" ou "binaural beats
+                    meditation"
+                </div>
+            </div>
+
+            <div class="tip-box" style="margin-top: 20px;">
+                <strong>💡 Dica:</strong> Durante a acupressão YNSA (16 min), use 528Hz com luz verde. Para dormir, use
+                432Hz ou Delta binaural beats com luz azul escura.
+            </div>
+        </div>
+
+        <footer>
+            <h3>🚀 Próximo Passo</h3>
+            <p>Comece hoje mesmo! A primeira sessão leva apenas 16 minutos.</p>
+            <p style="margin-top: 15px; color: #718096; font-size: 0.9em;">
+                Protocolo desenvolvido por XZenPress<br>
+                Baseado em evidências científicas (Estudo Pinheiro 2016)<br>
+                100% Natural | Não-Farmacológico | Autoaplicável
+            </p>
+        </footer>
+    </div>
+</body>
+
+</html>

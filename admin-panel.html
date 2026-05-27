@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XzenPress — Painel Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c28;
+      --border: rgba(255,255,255,0.07);
+      --accent: #7c5cfc;
+      --accent2: #5c8dfc;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --text: #e8e8f0;
+      --text2: #8888a8;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── LOCK SCREEN ── */
+    #lockScreen {
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 40% 20%, #1a0f3a 0%, #0a0a0f 70%);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .lock-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px;
+      width: 400px;
+      text-align: center;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,92,252,0.15);
+    }
+    .lock-logo {
+      font-size: 36px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #7c5cfc, #5c8dfc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .lock-sub { color: var(--text2); font-size: 13px; margin-bottom: 32px; }
+    .lock-box label { display: block; text-align: left; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+    .lock-box input {
+      width: 100%; padding: 12px 16px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 14px;
+      outline: none; transition: border 0.2s;
+      margin-bottom: 16px;
+    }
+    .lock-box input:focus { border-color: var(--accent); }
+    .btn-primary {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white; font-weight: 600; font-size: 15px;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:active { transform: scale(0.98); }
+    .lock-error { color: var(--red); font-size: 12px; margin-top: 12px; }
+    .lock-hint { color: var(--text2); font-size: 11px; margin-top: 20px; }
+    .lock-hint a { color: var(--accent); text-decoration: none; }
+
+    /* ── SETUP SCREEN ── */
+    #setupScreen {
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 60% 80%, #0f1a3a 0%, #0a0a0f 70%);
+      display: none; align-items: center; justify-content: center;
+      z-index: 999;
+    }
+    .setup-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px;
+      width: 520px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+    }
+    .setup-box h2 { font-size: 20px; margin-bottom: 8px; }
+    .setup-box p { color: var(--text2); font-size: 13px; margin-bottom: 28px; line-height: 1.6; }
+    .setup-box label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+    .setup-box input, .setup-box textarea {
+      width: 100%; padding: 12px 16px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 13px;
+      font-family: 'Inter', monospace; outline: none; transition: border 0.2s;
+      margin-bottom: 16px;
+    }
+    .setup-box input:focus, .setup-box textarea:focus { border-color: var(--accent); }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
+    .badge-info { background: rgba(92,141,252,0.15); color: var(--accent2); }
+
+    /* ── MAIN APP ── */
+    #app { display: none; flex-direction: column; min-height: 100vh; }
+
+    header {
+      padding: 16px 32px;
+      background: rgba(19,19,26,0.9);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      backdrop-filter: blur(10px);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-logo { font-size: 18px; font-weight: 700; background: linear-gradient(135deg, #7c5cfc, #5c8dfc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .header-tag { font-size: 11px; color: var(--text2); margin-left: 8px; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .btn-sm {
+      padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+      border: 1px solid var(--border); background: var(--surface2); color: var(--text2);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-sm:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+    main { flex: 1; padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; }
+
+    /* stats row */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 24px;
+    }
+    .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+    .stat-value { font-size: 28px; font-weight: 700; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.accent { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* toolbar */
+    .toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; gap: 16px;
+    }
+    .search-input {
+      flex: 1; max-width: 360px; padding: 10px 16px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 14px;
+      outline: none; transition: border 0.2s;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .btn-add {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white; font-weight: 600; font-size: 14px;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn-add:hover { opacity: 0.88; }
+
+    /* table */
+    .table-container {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--surface2); }
+    th { padding: 13px 20px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; }
+    td { padding: 14px 20px; font-size: 13px; border-top: 1px solid var(--border); vertical-align: middle; }
+    tbody tr { transition: background 0.15s; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    .email-cell { font-weight: 500; }
+    .email-cell small { display: block; color: var(--text2); font-size: 11px; margin-top: 2px; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
+    .pill-green { background: rgba(34,197,94,0.15); color: var(--green); }
+    .pill-red { background: rgba(239,68,68,0.15); color: var(--red); }
+    .pill-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
+    .pill-gray { background: rgba(255,255,255,0.07); color: var(--text2); }
+
+    .dot { width: 6px; height: 6px; border-radius: 50%; }
+    .dot-green { background: var(--green); }
+    .dot-red { background: var(--red); }
+    .dot-yellow { background: var(--yellow); }
+
+    .actions { display: flex; gap: 8px; }
+    .btn-action {
+      padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 500;
+      border: 1px solid transparent; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-extend { background: rgba(124,92,252,0.12); color: var(--accent); border-color: rgba(124,92,252,0.2); }
+    .btn-extend:hover { background: rgba(124,92,252,0.22); }
+    .btn-revoke { background: rgba(239,68,68,0.1); color: var(--red); border-color: rgba(239,68,68,0.2); }
+    .btn-revoke:hover { background: rgba(239,68,68,0.2); }
+    .btn-password { background: rgba(34,197,94,0.1); color: var(--green); border-color: rgba(34,197,94,0.2); }
+    .btn-password:hover { background: rgba(34,197,94,0.2); }
+    .btn-grant { background: rgba(124,92,252,0.12); color: var(--accent); border-color: rgba(124,92,252,0.2); }
+    .btn-grant:hover { background: rgba(124,92,252,0.22); }
+
+    /* tabs */
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 4px; width: fit-content; }
+    .tab-btn { padding: 8px 20px; border-radius: 9px; border: none; background: transparent; color: var(--text2); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .tab-btn.active { background: var(--surface2); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
+    .empty-state svg { margin-bottom: 16px; opacity: 0.3; }
+
+    .loading { text-align: center; padding: 40px; color: var(--text2); }
+    .loading::after { content: ''; display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-left: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      display: none; align-items: center; justify-content: center;
+      z-index: 500; backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 36px; width: 480px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .modal h3 { font-size: 18px; margin-bottom: 6px; }
+    .modal p { color: var(--text2); font-size: 13px; margin-bottom: 24px; }
+    .modal label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+    .modal input, .modal select {
+      width: 100%; padding: 11px 14px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 14px;
+      outline: none; transition: border 0.2s; margin-bottom: 16px;
+    }
+    .modal input:focus, .modal select:focus { border-color: var(--accent); }
+    .modal select option { background: var(--surface2); }
+    .modal-actions { display: flex; gap: 12px; margin-top: 8px; }
+    .btn-cancel {
+      flex: 1; padding: 12px; border-radius: 10px;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text2); font-size: 14px; font-weight: 500; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-cancel:hover { color: var(--text); }
+    .btn-confirm {
+      flex: 1; padding: 12px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white; font-size: 14px; font-weight: 600; border: none; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-confirm:hover { opacity: 0.88; }
+
+    /* toast */
+    #toast {
+      position: fixed; bottom: 32px; right: 32px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 20px;
+      font-size: 14px; font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      transform: translateY(20px); opacity: 0;
+      transition: all 0.3s; z-index: 9999;
+      pointer-events: none;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.success { border-color: rgba(34,197,94,0.3); color: var(--green); }
+    #toast.error { border-color: rgba(239,68,68,0.3); color: var(--red); }
+
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+  </style>
+</head>
+<body>
+
+<!-- ────────────────── LOCK SCREEN ────────────────── -->
+<div id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-logo">XzenPress</div>
+    <div class="lock-sub">Painel Administrativo</div>
+    <label for="adminPass">Senha de Admin</label>
+    <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')unlock()" />
+    <button class="btn-primary" onclick="unlock()">Entrar</button>
+    <div class="lock-error" id="lockError"></div>
+    <div class="lock-hint" style="margin-top:24px">
+      Primeira vez? <a href="#" onclick="showSetup()">Configurar credenciais</a>
+    </div>
+  </div>
+</div>
+
+<!-- ────────────────── SETUP SCREEN ────────────────── -->
+<div id="setupScreen" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); align-items:center; justify-content:center; z-index:1001;">
+  <div class="setup-box">
+    <h2>⚙️ Configuração Inicial</h2>
+    <p>Cole aqui suas credenciais do Supabase. Elas ficam salvas <strong>somente neste navegador</strong> (localStorage) — nunca são enviadas para nenhum servidor.</p>
+
+    <label>Supabase URL</label>
+    <input type="text" id="cfgUrl" value="https://dqjcbwjqrenubdzalicy.supabase.co" />
+
+    <label>Service Role Key <span class="badge badge-info">necessário para criar usuários</span></label>
+    <input type="text" id="cfgServiceKey" placeholder="eyJhbGciOiJIUzI1NiIs..." />
+    <div style="font-size:11px; color:var(--text2); margin-top:-10px; margin-bottom:16px;">
+      Supabase Dashboard → Project Settings → API → service_role secret
+    </div>
+
+    <label>Anon Key (já preenchido)</label>
+    <input type="text" id="cfgAnonKey" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxamNid2pxcmVudWJkemFsaWN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5MzE0MjcsImV4cCI6MjA3OTUwNzQyN30.KxH3diGoF-tkwLdPdPuxC5yQ8Rjpr2grV4VgGNUk5Vo" />
+
+    <div class="divider"></div>
+
+    <label>Senha do Admin</label>
+    <input type="password" id="cfgPass" placeholder="Defina uma senha para proteger este painel" />
+
+    <div class="modal-actions" style="margin-top:8px">
+      <button class="btn-cancel" onclick="closeSetup()">Cancelar</button>
+      <button class="btn-confirm" onclick="saveSetup()">Salvar e Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ────────────────── MAIN APP ────────────────── -->
+<div id="app">
+  <header>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="header-logo">XzenPress</div>
+      <span class="header-tag">Admin</span>
+    </div>
+    <div class="header-right">
+      <span id="headerProject" style="font-size:12px;color:var(--text2)"></span>
+      <button class="btn-sm" onclick="loadUsers()">↺ Atualizar</button>
+      <button class="btn-sm" onclick="logout()">Sair</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Total de Usuários</div>
+        <div class="stat-value accent" id="statTotal">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Acessos Ativos</div>
+        <div class="stat-value green" id="statActive">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Expiram Esta Semana</div>
+        <div class="stat-value" style="color:var(--yellow)" id="statExpiring">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Expirados / Inativos</div>
+        <div class="stat-value" style="color:var(--red)" id="statExpired">—</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-subs" onclick="switchTab('subs')">🏅 Assinaturas Premium</button>
+      <button class="tab-btn" id="tab-all" onclick="switchTab('all')">👥 Todos os Usuários</button>
+    </div>
+
+    <!-- Subscriptions Tab -->
+    <div id="panel-subs">
+      <div class="toolbar">
+        <input class="search-input" type="text" placeholder="🔍 Buscar por email..." id="searchInput" oninput="filterTable()" />
+        <button class="btn-add" onclick="openAddModal()">+ Novo Acesso</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Usuário</th><th>Plano</th><th>Status</th><th>Validade</th><th>Criado em</th><th>Ações</th></tr></thead>
+          <tbody id="userTable"><tr><td colspan="6" class="loading">Carregando usuários</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- All Users Tab -->
+    <div id="panel-all" style="display:none">
+      <div class="toolbar">
+        <input class="search-input" type="text" placeholder="🔍 Buscar por email..." id="searchAllInput" oninput="filterAllTable()" />
+        <span style="font-size:12px;color:var(--text2)">Usuários cadastrados no Supabase Auth</span>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Email</th><th>Cadastrado em</th><th>Último login</th><th>Status Premium</th><th>Ações</th></tr></thead>
+          <tbody id="allUserTable"><tr><td colspan="5" class="loading">Carregando</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ────────────────── ADD/EDIT MODAL ────────────────── -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <h3 id="modalTitle">➕ Novo Acesso</h3>
+    <p id="modalDesc">Preencha os dados para liberar acesso premium ao usuário.</p>
+
+    <label>Email</label>
+    <input type="email" id="newEmail" placeholder="usuario@email.com" />
+
+    <label>Senha temporária</label>
+    <input type="text" id="newPassword" placeholder="Ex: Xzen2026!" />
+    <div style="font-size:11px;color:var(--text2);margin-top:-10px;margin-bottom:16px">
+      O usuário poderá trocar depois. Deixe em branco para gerar automaticamente.
+    </div>
+
+    <label>Validade do acesso</label>
+    <select id="newValidity">
+      <option value="7">7 dias</option>
+      <option value="14">14 dias</option>
+      <option value="30" selected>30 dias</option>
+      <option value="60">60 dias</option>
+      <option value="90">90 dias</option>
+      <option value="180">180 dias</option>
+      <option value="365">1 ano</option>
+      <option value="9999">Vitalício</option>
+      <option value="custom">Personalizado...</option>
+    </select>
+
+    <div id="customDateDiv" style="display:none">
+      <label>Data de expiração</label>
+      <input type="date" id="customDate" />
+    </div>
+
+    <label>Plano</label>
+    <select id="newPlan">
+      <option value="monthly">Monthly</option>
+      <option value="annual">Annual</option>
+      <option value="lifetime">Lifetime</option>
+      <option value="convenio">Convênio</option>
+    </select>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('addModal')">Cancelar</button>
+      <button class="btn-confirm" id="modalConfirmBtn" onclick="createAccess()">Criar Acesso</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXTEND MODAL -->
+<div class="modal-overlay" id="extendModal">
+  <div class="modal">
+    <h3>⏳ Estender Acesso</h3>
+    <p id="extendUserEmail" style="color:var(--accent);font-weight:500;"></p>
+
+    <label>Nova validade</label>
+    <select id="extendValidity">
+      <option value="7">+ 7 dias</option>
+      <option value="14">+ 14 dias</option>
+      <option value="30" selected>+ 30 dias</option>
+      <option value="60">+ 60 dias</option>
+      <option value="90">+ 90 dias</option>
+      <option value="365">+ 1 ano</option>
+      <option value="absolute">Data exata...</option>
+    </select>
+    <div id="extendDateDiv" style="display:none;margin-top:-10px">
+      <label>Expira em</label>
+      <input type="date" id="extendDate" />
+    </div>
+
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn-cancel" onclick="closeModal('extendModal')">Cancelar</button>
+      <button class="btn-confirm" onclick="confirmExtend()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SET PASSWORD MODAL -->
+<div class="modal-overlay" id="passwordModal">
+  <div class="modal">
+    <h3>🔑 Definir Senha</h3>
+    <p id="passwordUserEmail" style="color:var(--accent);font-weight:500;"></p>
+
+    <label>Nova senha</label>
+    <input type="text" id="newPasswordField" placeholder="Ex: Xzen@2026!" />
+    <div style="font-size:11px;color:var(--text2);margin-top:-10px;margin-bottom:16px">
+      Deixe em branco para gerar automaticamente.
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('passwordModal')">Cancelar</button>
+      <button class="btn-confirm" id="passwordConfirmBtn" onclick="confirmSetPassword()">Definir Senha</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+  // ──────────────────────────────────────────────
+  //  CONFIG & STATE
+  // ──────────────────────────────────────────────
+  let CFG = {};
+  let allUsers = [];
+  let extendTarget = null;
+
+  const ADMIN_PASS_DEFAULT = 'xzenpress2026';
+
+  function loadConfig() {
+    try {
+      const s = localStorage.getItem('xz_admin_cfg');
+      return s ? JSON.parse(s) : null;
+    } catch { return null; }
+  }
+
+  function saveToStorage(cfg) {
+    localStorage.setItem('xz_admin_cfg', JSON.stringify(cfg));
+  }
+
+  // ──────────────────────────────────────────────
+  //  LOCK SCREEN
+  // ──────────────────────────────────────────────
+  function unlock() {
+    const cfg = loadConfig();
+    const pass = document.getElementById('adminPass').value;
+    const storedPass = cfg?.adminPass || ADMIN_PASS_DEFAULT;
+
+    if (pass === storedPass) {
+      if (!cfg || !cfg.serviceKey) {
+        showSetup();
+        return;
+      }
+      CFG = cfg;
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      document.getElementById('headerProject').textContent = new URL(CFG.url).hostname.split('.')[0];
+      loadUsers();
+    } else {
+      document.getElementById('lockError').textContent = 'Senha incorreta.';
+    }
+  }
+
+  function logout() {
+    document.getElementById('lockScreen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('adminPass').value = '';
+  }
+
+  // ──────────────────────────────────────────────
+  //  SETUP
+  // ──────────────────────────────────────────────
+  function showSetup() {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('setupScreen').style.display = 'flex';
+  }
+
+  function closeSetup() {
+    document.getElementById('setupScreen').style.display = 'none';
+  }
+
+  function saveSetup() {
+    const url = document.getElementById('cfgUrl').value.trim();
+    const serviceKey = document.getElementById('cfgServiceKey').value.trim();
+    const anonKey = document.getElementById('cfgAnonKey').value.trim();
+    const pass = document.getElementById('cfgPass').value;
+
+    if (!serviceKey) { toast('Cole a Service Role Key do Supabase!', 'error'); return; }
+    if (!pass) { toast('Defina uma senha de admin!', 'error'); return; }
+
+    const cfg = { url, serviceKey, anonKey, adminPass: pass };
+    saveToStorage(cfg);
+    CFG = cfg;
+
+    closeSetup();
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('headerProject').textContent = new URL(url).hostname.split('.')[0];
+    loadUsers();
+    toast('Configuração salva! ✅', 'success');
+  }
+
+  // ──────────────────────────────────────────────
+  //  SUPABASE API
+  // ──────────────────────────────────────────────
+  async function sbFetch(path, opts = {}) {
+    const res = await fetch(`${CFG.url}${path}`, {
+      ...opts,
+      headers: {
+        'apikey': CFG.serviceKey,
+        'Authorization': `Bearer ${CFG.serviceKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+        ...(opts.headers || {})
+      }
+    });
+    const text = await res.text();
+    try { return JSON.parse(text); } catch { return text; }
+  }
+
+  async function sbQuery(table, params = '') {
+    return sbFetch(`/rest/v1/${table}?${params}`);
+  }
+
+  // ──────────────────────────────────────────────
+  //  LOAD USERS
+  // ──────────────────────────────────────────────
+  async function loadUsers() {
+    document.getElementById('userTable').innerHTML = '<tr><td colspan="6" class="loading">Carregando usuários</td></tr>';
+
+    try {
+      // Get users from auth + subscriptions
+      const subs = await sbQuery('premium_subscriptions', 'select=*,user_id&order=activated_at.desc');
+      const authUsers = await sbFetch('/auth/v1/admin/users?per_page=500');
+
+      const authMap = {};
+      if (authUsers?.users) {
+        authUsers.users.forEach(u => { authMap[u.id] = u; });
+      }
+
+      allUsers = (subs || []).map(s => ({
+        ...s,
+        email: authMap[s.user_id]?.email || '(email não encontrado)',
+        last_sign_in: authMap[s.user_id]?.last_sign_in_at
+      }));
+
+      renderTable(allUsers);
+      updateStats(allUsers);
+
+    } catch (e) {
+      document.getElementById('userTable').innerHTML = `<tr><td colspan="6" style="color:var(--red);padding:24px 20px">Erro ao carregar: ${e.message}</td></tr>`;
+    }
+  }
+
+  function renderTable(users) {
+    const tbody = document.getElementById('userTable');
+    if (!users.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhum usuário encontrado.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = users.map(u => {
+      const { statusPill, daysLeft } = getStatus(u);
+      const created = u.activated_at ? new Date(u.activated_at).toLocaleDateString('pt-BR') : '—';
+      const expires = u.expires_at ? new Date(u.expires_at).toLocaleDateString('pt-BR') : '∞ Vitalício';
+      const planLabel = { monthly: 'Mensal', annual: 'Anual', lifetime: 'Vitalício', convenio: 'Convênio' }[u.plan_id] || u.plan_id;
+
+      return `<tr>
+        <td class="email-cell">
+          ${u.email}
+          <small>${u.user_id?.slice(0,8)}...</small>
+        </td>
+        <td><span class="pill pill-gray">${planLabel}</span></td>
+        <td>${statusPill}</td>
+        <td style="font-size:12px">${expires}${daysLeft}</td>
+        <td style="font-size:12px;color:var(--text2)">${created}</td>
+        <td>
+          <div class="actions">
+            <button class="btn-action btn-extend" onclick="openExtend('${u.id}','${u.email}','${u.expires_at || ''}')">Estender</button>
+            <button class="btn-action btn-password" onclick="openSetPassword('${u.user_id}','${u.email}')">🔑 Senha</button>
+            <button class="btn-action btn-revoke" onclick="revokeAccess('${u.id}','${u.email}')">Revogar</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function getStatus(u) {
+    if (u.status !== 'active') {
+      return { statusPill: `<span class="pill pill-red"><span class="dot dot-red"></span>Inativo</span>`, daysLeft: '' };
+    }
+    if (!u.expires_at) {
+      return { statusPill: `<span class="pill pill-green"><span class="dot dot-green"></span>Ativo</span>`, daysLeft: '' };
+    }
+    const now = new Date();
+    const exp = new Date(u.expires_at);
+    const diff = Math.ceil((exp - now) / 86400000);
+    if (diff < 0) {
+      return { statusPill: `<span class="pill pill-red"><span class="dot dot-red"></span>Expirado</span>`, daysLeft: '' };
+    }
+    if (diff <= 7) {
+      return { statusPill: `<span class="pill pill-yellow"><span class="dot dot-yellow"></span>Expirando</span>`, daysLeft: `<br><small style="color:var(--yellow)">${diff}d restantes</small>` };
+    }
+    return { statusPill: `<span class="pill pill-green"><span class="dot dot-green"></span>Ativo</span>`, daysLeft: `<br><small style="color:var(--text2)">${diff}d restantes</small>` };
+  }
+
+  function updateStats(users) {
+    const now = new Date();
+    const active = users.filter(u => u.status === 'active' && (!u.expires_at || new Date(u.expires_at) > now));
+    const expiring = users.filter(u => {
+      if (!u.expires_at || u.status !== 'active') return false;
+      const diff = Math.ceil((new Date(u.expires_at) - now) / 86400000);
+      return diff >= 0 && diff <= 7;
+    });
+    const expired = users.filter(u => u.status !== 'active' || (u.expires_at && new Date(u.expires_at) <= now));
+
+    document.getElementById('statTotal').textContent = users.length;
+    document.getElementById('statActive').textContent = active.length;
+    document.getElementById('statExpiring').textContent = expiring.length;
+    document.getElementById('statExpired').textContent = expired.length;
+  }
+
+  function filterTable() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allUsers.filter(u => u.email.toLowerCase().includes(q));
+    renderTable(filtered);
+  }
+
+  // ──────────────────────────────────────────────
+  //  ALL USERS TAB
+  // ──────────────────────────────────────────────
+  let allAuthUsers = [];
+
+  function switchTab(tab) {
+    document.getElementById('panel-subs').style.display = tab === 'subs' ? 'block' : 'none';
+    document.getElementById('panel-all').style.display = tab === 'all' ? 'block' : 'none';
+    document.getElementById('tab-subs').classList.toggle('active', tab === 'subs');
+    document.getElementById('tab-all').classList.toggle('active', tab === 'all');
+    if (tab === 'all' && allAuthUsers.length === 0) loadAllAuthUsers();
+  }
+
+  async function loadAllAuthUsers() {
+    document.getElementById('allUserTable').innerHTML = '<tr><td colspan="5" class="loading">Carregando usuários</td></tr>';
+    try {
+      const res = await sbFetch('/auth/v1/admin/users?per_page=1000');
+      allAuthUsers = res?.users || [];
+      renderAllTable(allAuthUsers);
+    } catch(e) {
+      document.getElementById('allUserTable').innerHTML = `<tr><td colspan="5" style="color:var(--red);padding:24px 20px">Erro: ${e.message}</td></tr>`;
+    }
+  }
+
+  function renderAllTable(users) {
+    const tbody = document.getElementById('allUserTable');
+    // Build a set of user_ids that have subscriptions
+    const subUserIds = new Set(allUsers.map(u => u.user_id));
+
+    if (!users.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum usuário encontrado.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = users.map(u => {
+      const hasSub = subUserIds.has(u.id);
+      const created = u.created_at ? new Date(u.created_at).toLocaleDateString('pt-BR') : '—';
+      const lastLogin = u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString('pt-BR') : 'Nunca';
+      const statusBadge = hasSub
+        ? `<span class="pill pill-green"><span class="dot dot-green"></span>Premium</span>`
+        : `<span class="pill pill-gray">Free</span>`;
+      const grantBtn = hasSub
+        ? `<button class="btn-action btn-extend" onclick="switchTab('subs')">Ver</button>`
+        : `<button class="btn-action btn-grant" onclick="quickGrant('${u.id}','${u.email}')">+ Conceder Acesso</button>`;
+      return `<tr>
+        <td class="email-cell">${u.email}<small>${u.id.slice(0,8)}...</small></td>
+        <td style="font-size:12px;color:var(--text2)">${created}</td>
+        <td style="font-size:12px;color:var(--text2)">${lastLogin}</td>
+        <td>${statusBadge}</td>
+        <td><div class="actions">${grantBtn}<button class="btn-action btn-password" onclick="openSetPassword('${u.id}','${u.email}')">🔑 Senha</button></div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function filterAllTable() {
+    const q = document.getElementById('searchAllInput').value.toLowerCase();
+    const filtered = allAuthUsers.filter(u => u.email?.toLowerCase().includes(q));
+    renderAllTable(filtered);
+  }
+
+  async function quickGrant(userId, email) {
+    const days = prompt(`Quantos dias de acesso para ${email}?`, '30');
+    if (!days) return;
+    const d = new Date();
+    d.setDate(d.getDate() + parseInt(days));
+    const expiresAt = d.toISOString().split('T')[0];
+    try {
+      await sbFetch('/rest/v1/premium_subscriptions', {
+        method: 'POST',
+        body: JSON.stringify({
+          user_id: userId, status: 'active', plan_id: 'monthly',
+          expires_at: expiresAt,
+          stripe_payment_intent_id: `MANUAL_GRANT_${Date.now()}`,
+          amount: 0.01, currency: 'BRL'
+        })
+      });
+      toast(`✅ Acesso de ${days} dias concedido para ${email}!`, 'success');
+      await loadUsers();
+      allAuthUsers = []; // force refresh
+      renderAllTable(allAuthUsers.length ? allAuthUsers : []);
+      loadAllAuthUsers();
+    } catch(e) {
+      toast('Erro: ' + e.message, 'error');
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  //  CREATE ACCESS
+  // ──────────────────────────────────────────────
+  function openAddModal() {
+    document.getElementById('modalTitle').textContent = '➕ Novo Acesso';
+    document.getElementById('modalDesc').textContent = 'Preencha os dados para liberar acesso premium ao usuário.';
+    document.getElementById('newEmail').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('newValidity').value = '30';
+    document.getElementById('newPlan').value = 'monthly';
+    document.getElementById('customDateDiv').style.display = 'none';
+    document.getElementById('addModal').classList.add('open');
+  }
+
+  document.getElementById('newValidity').addEventListener('change', function() {
+    document.getElementById('customDateDiv').style.display = this.value === 'custom' ? 'block' : 'none';
+  });
+
+  async function createAccess() {
+    const email = document.getElementById('newEmail').value.trim();
+    let password = document.getElementById('newPassword').value.trim();
+    const validity = document.getElementById('newValidity').value;
+    const plan = document.getElementById('newPlan').value;
+
+    if (!email) { toast('Digite o email!', 'error'); return; }
+    if (!password) { password = 'Xzen' + Math.random().toString(36).slice(2, 8) + '!'; }
+
+    const btn = document.getElementById('modalConfirmBtn');
+    btn.textContent = 'Criando...'; btn.disabled = true;
+
+    try {
+      // 1. Create user in auth
+      const userRes = await sbFetch('/auth/v1/admin/users', {
+        method: 'POST',
+        body: JSON.stringify({ email, password, email_confirm: true })
+      });
+
+      let userId = userRes?.id;
+
+      if (!userId && userRes?.msg && userRes.msg.includes('already been registered')) {
+        // user exists, find them
+        const existing = await sbFetch('/auth/v1/admin/users?per_page=500');
+        const found = existing?.users?.find(u => u.email === email);
+        userId = found?.id;
+        toast('Usuário já existia — adicionando assinatura...', 'success');
+      }
+
+      if (!userId) throw new Error(JSON.stringify(userRes));
+
+      // 2. Calculate expires_at
+      let expiresAt;
+      if (validity === 'custom') {
+        expiresAt = document.getElementById('customDate').value;
+      } else if (validity === '9999') {
+        expiresAt = null; // no expiry
+      } else {
+        const d = new Date();
+        d.setDate(d.getDate() + parseInt(validity));
+        expiresAt = d.toISOString().split('T')[0];
+      }
+
+      // 3. Insert subscription
+      const subBody = {
+        user_id: userId,
+        status: 'active',
+        plan_id: plan,
+        expires_at: expiresAt,
+        stripe_payment_intent_id: `MANUAL_GRANT_${new Date().toISOString().replace(/\D/g,'').slice(0,14)}`,
+        amount: 0.01,
+        currency: 'BRL'
+      };
+
+      const subRes = await sbFetch('/rest/v1/premium_subscriptions', {
+        method: 'POST',
+        body: JSON.stringify(subBody)
+      });
+
+      closeModal('addModal');
+      toast(`✅ Acesso criado! Email: ${email} | Senha: ${password}`, 'success');
+      await loadUsers();
+
+    } catch (e) {
+      toast('Erro: ' + e.message, 'error');
+    } finally {
+      btn.textContent = 'Criar Acesso'; btn.disabled = false;
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  //  EXTEND
+  // ──────────────────────────────────────────────
+  function openExtend(subId, email, currentExpiry) {
+    extendTarget = { subId, email, currentExpiry };
+    document.getElementById('extendUserEmail').textContent = email;
+    document.getElementById('extendValidity').value = '30';
+    document.getElementById('extendDateDiv').style.display = 'none';
+    document.getElementById('extendModal').classList.add('open');
+  }
+
+  document.getElementById('extendValidity').addEventListener('change', function() {
+    document.getElementById('extendDateDiv').style.display = this.value === 'absolute' ? 'block' : 'none';
+  });
+
+  async function confirmExtend() {
+    const validity = document.getElementById('extendValidity').value;
+    let newExpiry;
+
+    if (validity === 'absolute') {
+      newExpiry = document.getElementById('extendDate').value;
+    } else {
+      const base = extendTarget.currentExpiry ? new Date(extendTarget.currentExpiry) : new Date();
+      if (base < new Date()) base.setTime(new Date().getTime()); // if already expired, start from today
+      base.setDate(base.getDate() + parseInt(validity));
+      newExpiry = base.toISOString().split('T')[0];
+    }
+
+    try {
+      await sbFetch(`/rest/v1/premium_subscriptions?id=eq.${extendTarget.subId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ expires_at: newExpiry, status: 'active' })
+      });
+      closeModal('extendModal');
+      toast(`✅ Acesso estendido até ${newExpiry}`, 'success');
+      await loadUsers();
+    } catch (e) {
+      toast('Erro: ' + e.message, 'error');
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  //  SET PASSWORD
+  // ──────────────────────────────────────────────
+  let passwordTarget = null;
+
+  function openSetPassword(userId, email) {
+    passwordTarget = { userId, email };
+    document.getElementById('passwordUserEmail').textContent = email;
+    document.getElementById('newPasswordField').value = '';
+    document.getElementById('passwordModal').classList.add('open');
+  }
+
+  async function confirmSetPassword() {
+    let newPass = document.getElementById('newPasswordField').value.trim();
+    if (!newPass) {
+      newPass = 'Xzen' + Math.random().toString(36).slice(2, 8).toUpperCase() + '!';
+    }
+    const btn = document.getElementById('passwordConfirmBtn');
+    btn.textContent = 'Salvando...'; btn.disabled = true;
+    try {
+      const res = await sbFetch(`/auth/v1/admin/users/${passwordTarget.userId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ password: newPass })
+      });
+      if (res?.id || res?.email) {
+        closeModal('passwordModal');
+        toast(`✅ Senha definida! ${passwordTarget.email} → ${newPass}`, 'success');
+      } else {
+        throw new Error(JSON.stringify(res));
+      }
+    } catch (e) {
+      toast('Erro: ' + e.message, 'error');
+    } finally {
+      btn.textContent = 'Definir Senha'; btn.disabled = false;
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  //  REVOKE
+  // ──────────────────────────────────────────────
+  async function revokeAccess(subId, email) {
+    if (!confirm(`Revogar acesso de ${email}?`)) return;
+    try {
+      await sbFetch(`/rest/v1/premium_subscriptions?id=eq.${subId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'cancelled' })
+      });
+      toast(`✅ Acesso de ${email} revogado.`, 'success');
+      await loadUsers();
+    } catch (e) {
+      toast('Erro: ' + e.message, 'error');
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  //  UTILS
+  // ──────────────────────────────────────────────
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  });
+
+  function toast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `show ${type}`;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.className = '', 3500);
+  }
+
+  // ──────────────────────────────────────────────
+  //  INIT
+  // ──────────────────────────────────────────────
+  (function init() {
+    const cfg = loadConfig();
+    if (!cfg) {
+      // Show setup on first use
+      document.getElementById('setupScreen').style.display = 'flex';
+    }
+    // If have cfg, show lock screen (already shown by default)
+  })();
+</script>
+</body>
+</html>

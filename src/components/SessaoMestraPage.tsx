@@ -286,7 +286,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     return (
         <div className="fixed inset-0 z-50 bg-gray-900 text-white flex flex-col overscroll-none">
             {/* Immersive Header */}
-            <div className="relative h-16 flex items-center justify-between px-4 border-b border-gray-800 bg-black/50 backdrop-blur-md">
+            <div className="relative z-10 h-16 flex items-center justify-between px-4 border-b border-gray-800 bg-black/50 backdrop-blur-md">
                 <button onClick={onBack} className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center text-gray-300 gap-2">
                     <ArrowLeft className="w-5 h-5" />
                     <span className="hidden md:inline text-sm">Sair da Sessão</span>
@@ -423,6 +423,13 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 <span>Entendi. Iniciar Preparação</span>
                                 <ArrowRight className="w-4 h-4" />
                             </button>
+                            <button
+                                onClick={onBack}
+                                className="w-full mt-3 py-3 border border-gray-700 rounded-xl font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                <span>Desistir e Voltar</span>
+                            </button>
                         </div>
                     </div>
                 )}
@@ -486,6 +493,13 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             >
                                 <Zap className="w-5 h-5" />
                                 Estou Pronto para os Pontos
+                            </button>
+                            <button
+                                onClick={onBack}
+                                className="w-full mt-4 py-4 border border-gray-700 bg-transparent rounded-xl font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+                            >
+                                <ArrowLeft className="w-5 h-5" />
+                                <span>Cancelar e Voltar</span>
                             </button>
                         </div>
                     </div>

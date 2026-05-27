@@ -1,0 +1,54 @@
+functionsDirectory = "C:\\Users\\Alexandre\\.gemini\\antigravity\\scratch\\XzenpressManus\\netlify\\functions"
+functionsDirectoryOrigin = "config-v1"
+plugins = []
+headers = []
+
+[build]
+publish = "C:\\Users\\Alexandre\\.gemini\\antigravity\\scratch\\XzenpressManus\\dist"
+publishOrigin = "config"
+commandOrigin = "config"
+command = "npm run build"
+functions = "C:\\Users\\Alexandre\\.gemini\\antigravity\\scratch\\XzenpressManus\\netlify\\functions"
+
+[build.environment]
+NODE_VERSION = "20"
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[functions]
+
+[functions."*"]
+
+[[redirects]]
+from = "/.well-known/assetlinks.json"
+to = "/.well-known/assetlinks.json"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]

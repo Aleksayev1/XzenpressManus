@@ -85,6 +85,15 @@ export const SUPPLEMENT_INTERACTIONS: Interaction[] = [
         source: 'FDA Warning'
     },
     {
+        id: 'ginkgo-warfarin',
+        substances: ['ginkgo biloba', 'ginkgo', 'varfarina', 'marevan', 'aspirina', 'aas', 'anticoagulante'],
+        type: 'drug-interaction',
+        title: 'RISCO DE HEMORRAGIA',
+        description: 'O Ginkgo Biloba possui forte efeito antiplaquetário. Combinado com anticoagulantes ou aspirina, aumenta severamente o risco de sangramentos e hemorragias.',
+        severity: 'high',
+        source: 'Mayo Clinic'
+    },
+    {
         id: 'potassium-ace',
         substances: ['potássio', 'cloreto de potássio', 'losartana', 'enalapril', 'captopril'],
         type: 'drug-interaction',

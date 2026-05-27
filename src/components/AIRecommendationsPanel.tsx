@@ -39,6 +39,10 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
       return null;
     }
 
+    if (pointName.toLowerCase().includes('ypsilon')) {
+      return '/YNSA/ynsa-ypsilon-chart-hd.png';
+    }
+
     const normalized = pointName.toLowerCase().trim().replace(/[\s-]/g, '');
 
     // Primeiro: busca exata por nome/ID/nameEn
@@ -312,21 +316,26 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
     }
 
     try {
-      // Simulação para Localhost (Evita erro 404 da Netlify Function)
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      // Simulação para Localhost ou Mobile Local (Evita erro 404 da Netlify Function)
+      const isLocalHost = window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1' || 
+                          window.location.hostname.startsWith('192.168.') || 
+                          window.location.hostname.startsWith('10.');
+                          
+      if (import.meta.env.DEV || isLocalHost) {
         await new Promise(resolve => setTimeout(resolve, 1500)); // Delay artificial
 
         const mockResponses = [
-          "No contexto da Medicina Tradicional Chinesa, esse ponto ajuda a equilibrar o Qi.",
-          "Para essa condição, o ponto Yintang é frequentemente recomendado para acalmar a mente.",
-          "A respiração 4-7-8 pode ser uma excelente prática complementar.",
-          "Lembre-se que na MTC, observamos o corpo como um todo integrado."
+           "No contexto da Medicina Tradicional Chinesa, essa condição pede equilíbrio do Yin e Yang.",
+           "Para essa condição, o ponto Yintang é frequentemente recomendado para acalmar a mente.",
+           "A respiração 4-7-8 pode ser uma excelente prática complementar.",
+           "Lembre-se que na MTC, observamos o corpo como um todo integrado."
         ];
         const randomResponse = mockResponses[Math.floor(Math.random() * mockResponses.length)];
 
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: `[MODO SIMULAÇÃO LOCAL]\n\n${randomResponse}\n\n(A IA real funcionará após o deploy)`,
+          content: `[MODO SIMULAÇÃO DIRECIONADA]\n\n${randomResponse}\n\n(A IA real funcionará após o deploy na nuvem)`,
           timestamp: new Date()
         }]);
         setIsLoading(false);
@@ -351,6 +360,12 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
           isPremium: user?.isPremium || false
         })
       });
+
+      // Validar tipo de conteúdo antes de tentar decodificar JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Conexão com a Inteligência Artificial indisponível no momento.");
+      }
 
       const data = await response.json();
 

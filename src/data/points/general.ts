@@ -39,6 +39,25 @@ export const generalPoints: AcupressurePoint[] = [
     pressure: 'leve'
   },
   {
+    id: 'breathing-step',
+    name: 'Respiração Preparatória 4-7-8',
+    nameEn: 'Preparatory Breathing 4-7-8',
+    nameEs: 'Respiración Preparatoria 4-7-8',
+    nameFr: 'Respiration Préparatoire 4-7-8',
+    description: 'Inicie com a Respiração 4-7-8 para oxigenar o cérebro, reduzir o cortisol e preparar o sistema nervoso para a terapia. Inspire por 4s, segure por 7s e expire por 8s.',
+    descriptionEn: 'Start with 4-7-8 Breathing to oxygenate the brain, reduce cortisol, and prepare the nervous system for therapy. Inhale for 4s, hold for 7s, and exhale for 8s.',
+    position: { x: 50, y: 50 },
+    image: '/robo-zen-meditando.png',
+    imageAlt: 'Preparação com Respiração 4-7-8',
+    benefits: ['Reduz cortisol', 'Oxigena o cérebro', 'Ativa o parassimpático'],
+    benefitsEn: ['Reduces cortisol', 'Oxygenates the brain', 'Activates parasympathetic'],
+    isPremium: false,
+    category: 'general',
+    instructions: 'Respire profundamente seguindo o ritmo 4-7-8.',
+    duration: 60,
+    pressure: 'leve'
+  },
+  {
     id: 'baihui-basic-vg20',
     name: 'Baihui Básico (VG20)',
     nameEn: 'Basic Hundred Meetings',

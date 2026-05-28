@@ -78,18 +78,95 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
         if (!pointStr) return undefined;
         const cleanStr = pointStr.toLowerCase();
         
-        // Casos especiais de correspondência para Ponto ZS da Craniopuntura
-        if (cleanStr.includes('zs') || cleanStr.includes('zeise-suess') || cleanStr.includes('zeise suess')) {
+        // 1. CASOS ESPECIAIS DE CORRESPONDÊNCIA YNSA
+        // Ponto ZS (Mestre Hormonal Feminino)
+        if (cleanStr.includes('zs') || cleanStr.includes('zeise') || cleanStr.includes('suess')) {
             return acupressurePoints.find(p => p.id === 'ynsa-zs-point' || p.id === 'hormonal-feminino-zs');
         }
         
-        // Busca por correspondência exata do ID
+        // Cérebro / Cerebrum (M1)
+        if (cleanStr.includes('cérebro') || cleanStr.includes('cerebro') || cleanStr.includes('cerebrum') || cleanStr.includes('brain-m1') || cleanStr.includes('m1')) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-brain-m1');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon do Rim (Y-1 / Ypsilon 1)
+        if (cleanStr.includes('y-1') || cleanStr.includes('y1') || (cleanStr.includes('ypsilon') && cleanStr.includes('rim'))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-kidney-y1');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon do Pulmão (Y-2 / Ypsilon 2)
+        if (cleanStr.includes('y-2') || cleanStr.includes('y2') || (cleanStr.includes('ypsilon') && (cleanStr.includes('pulmão') || cleanStr.includes('pulmao')))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-lung');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon do Pericárdio (Y-3 / Ypsilon 3 / Pericardium)
+        if (cleanStr.includes('y-3') || cleanStr.includes('y3') || (cleanStr.includes('ypsilon') && (cleanStr.includes('pericárdio') || cleanStr.includes('pericardio') || cleanStr.includes('circulação') || cleanStr.includes('circulacao')))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-pericardium');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon do Estômago (Y-4 / Ypsilon 4 / Stomach)
+        if (cleanStr.includes('y-4') || cleanStr.includes('y4') || (cleanStr.includes('ypsilon') && (cleanStr.includes('estômago') || cleanStr.includes('estomago')))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-stomach');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon do Intestino Delgado (Y-5 / Ypsilon 5 / Small Intestine / SI)
+        if (cleanStr.includes('y-5') || cleanStr.includes('y5') || (cleanStr.includes('ypsilon') && (cleanStr.includes('delgado') || cleanStr.includes('intestino delgado')))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-si');
+            if (matched) return matched;
+        }
+
+        // 2. REGRA DE INTERCEPTAÇÃO DE PONTOS BÁSICOS YNSA (A a K)
+        // Evita falsos positivos com a palavra "ponto" ou letras soltas nas preposições (como "de", "do").
+        // Captura padrões como: "Ponto D (Lombar)", "Ponto A", "Grupo D YNSA", "Yamamoto Ponto B"
+        const matchBasic = cleanStr.match(/\b(?:ponto|grupo|ynsa|yamamoto)\s+([a-k])\b|\b([a-k])\s+(?:ynsa|yamamoto|ponto)\b/i);
+        if (matchBasic) {
+            const letter = (matchBasic[1] || matchBasic[2]).toLowerCase();
+            const matched = acupressurePoints.find(p => p.id === `ynsa-${letter}` || p.id === `ynsa-ponto-${letter}`);
+            if (matched) return matched;
+        }
+
+        // 3. REGRA DE INTERCEPTAÇÃO DE PONTOS MTC MAIS PRESCRITOS
+        // Evita colisões no loop genérico de termos
+        if (cleanStr.includes('b23') || cleanStr.includes('bl23') || cleanStr.includes('b-23') || cleanStr.includes('bl-23') || cleanStr.includes('shenshu')) {
+            const matched = acupressurePoints.find(p => p.id === 'bl23');
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('ig4') || cleanStr.includes('li4') || cleanStr.includes('ig-4') || cleanStr.includes('li-4') || cleanStr.includes('hegu')) {
+            const matched = acupressurePoints.find(p => p.id === 'septicemia-hegu-li4');
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('bp6') || cleanStr.includes('sp6') || cleanStr.includes('bp-6') || cleanStr.includes('sp-6') || cleanStr.includes('sanyinjiao')) {
+            const matched = acupressurePoints.find(p => p.id === 'sp6-sanyinjiao');
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('e36') || cleanStr.includes('st36') || cleanStr.includes('e-36') || cleanStr.includes('st-36') || cleanStr.includes('zusanli')) {
+            const matched = acupressurePoints.find(p => p.id === 'septicemia-zusanli-st36');
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('r3') || cleanStr.includes('kd3') || cleanStr.includes('r-3') || cleanStr.includes('kd-3') || cleanStr.includes('taixi')) {
+            const matched = acupressurePoints.find(p => p.id === 'kd3' || p.id === 'septicemia-taixi-kd3' || p.id.includes('kd3'));
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('pc6') || cleanStr.includes('neiguan') || cleanStr.includes('neiguan-pc6')) {
+            const matched = acupressurePoints.find(p => p.id === 'neiguan-pc6');
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('f3') || cleanStr.includes('lv3') || cleanStr.includes('lr3') || cleanStr.includes('taichong')) {
+            const matched = acupressurePoints.find(p => p.id === 'lv3-taichong');
+            if (matched) return matched;
+        }
+
+        // 4. CORRESPONDÊNCIA POR ID EXATO OU EQUIVALÊNCIAS
         for (const point of acupressurePoints) {
             const pid = point.id.toLowerCase();
             if (cleanStr.includes(pid)) return point;
             
             // Tratamento para prefixos de meridianos tradicionais em Português vs Inglês
-            // ex: R3 -> KD3, E36 -> ST36, IG4 -> LI4, BP6 -> SP6, VG20 -> GV20, VC17 -> CV17, ID3 -> SI3
             const pidMtc = pid
                 .replace('kd', 'r')
                 .replace('st', 'e')
@@ -102,10 +179,14 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
             if (cleanStr.includes(pidMtc)) return point;
         }
         
-        // Busca por correspondência de termos do nome (ex: "Zusanli", "Sanyinjiao", "Hegu")
+        // 5. CORRESPONDÊNCIA FALLBACK POR TERMOS DO NOME
         for (const point of acupressurePoints) {
             const nameParts = point.name.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
             for (const part of nameParts) {
+                // IGNORAR palavras genéricas/comuns que causam falsos positivos
+                if (['ponto', 'pontos', 'point', 'points', 'para', 'como', 'com', 'assentamento', 'ypsilon', 'ynsa', 'mtc', 'chinesa'].includes(part)) {
+                    continue;
+                }
                 if (part.length > 3 && cleanStr.includes(part)) {
                     return point;
                 }
@@ -573,7 +654,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                                                         <div className="text-xs text-slate-300 leading-relaxed font-semibold mb-2">• {p}</div>
                                                                         {matchedPoint && matchedPoint.image && (
                                                                             <div 
-                                                                                className="relative mt-2 rounded-xl overflow-hidden cursor-pointer border border-slate-800 hover:border-purple-500/50 transition-all max-w-[280px]"
+                                                                                className="relative mt-2 rounded-xl overflow-hidden cursor-pointer hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 max-w-[280px] group shadow-md border border-slate-800 hover:border-purple-500/50"
                                                                                 onClick={() => {
                                                                                     console.log('Oráculo YNSA image click:', matchedPoint.image);
                                                                                     setZoomImageUrl(getSafeImagePath(matchedPoint.image));
@@ -583,13 +664,13 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                                                                 <img 
                                                                                     src={getSafeImagePath(matchedPoint.image)} 
                                                                                     alt={matchedPoint.name} 
-                                                                                    className="w-full h-32 object-contain bg-slate-950 p-1 rounded-xl"
+                                                                                    className="w-full h-36 object-contain bg-gray-50 p-2 rounded-xl border border-gray-200 shadow-inner"
                                                                                     onError={(e) => {
                                                                                         e.currentTarget.style.display = 'none';
                                                                                     }}
                                                                                 />
-                                                                                <div className="absolute inset-0 bg-black/45 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
-                                                                                    <span className="text-[10px] text-white font-bold bg-purple-600/80 px-2 py-1 rounded-full flex items-center gap-1">
+                                                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200 rounded-xl">
+                                                                                    <span className="text-[10px] text-white font-bold bg-purple-600/90 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
                                                                                         <ZoomIn className="w-3 h-3" /> Ampliar
                                                                                     </span>
                                                                                 </div>
@@ -612,7 +693,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                                                         <div className="text-xs text-slate-300 leading-relaxed font-semibold mb-2">• {p}</div>
                                                                         {matchedPoint && matchedPoint.image && (
                                                                             <div 
-                                                                                className="relative mt-2 rounded-xl overflow-hidden cursor-pointer border border-slate-800 hover:border-orange-500/50 transition-all max-w-[280px]"
+                                                                                className="relative mt-2 rounded-xl overflow-hidden cursor-pointer hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 max-w-[280px] group shadow-md border border-slate-800 hover:border-orange-500/50"
                                                                                 onClick={() => {
                                                                                     console.log('Oráculo MTC image click:', matchedPoint.image);
                                                                                     setZoomImageUrl(getSafeImagePath(matchedPoint.image));
@@ -622,13 +703,13 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                                                                 <img 
                                                                                     src={getSafeImagePath(matchedPoint.image)} 
                                                                                     alt={matchedPoint.name} 
-                                                                                    className="w-full h-32 object-contain bg-slate-950 p-1 rounded-xl"
+                                                                                    className="w-full h-36 object-contain bg-gray-50 p-2 rounded-xl border border-gray-200 shadow-inner"
                                                                                     onError={(e) => {
                                                                                         e.currentTarget.style.display = 'none';
                                                                                     }}
                                                                                 />
-                                                                                <div className="absolute inset-0 bg-black/45 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
-                                                                                    <span className="text-[10px] text-white font-bold bg-orange-600/80 px-2 py-1 rounded-full flex items-center gap-1">
+                                                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200 rounded-xl">
+                                                                                    <span className="text-[10px] text-white font-bold bg-orange-600/90 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
                                                                                         <ZoomIn className="w-3 h-3" /> Ampliar
                                                                                     </span>
                                                                                 </div>

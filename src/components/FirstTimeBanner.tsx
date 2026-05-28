@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Play, ArrowRight, CheckCircle, Target, Brain, Heart, Crown } from 'lucide-react';
+import { X, Brain, Target, Sparkles, ArrowRight } from 'lucide-react';
 
 interface FirstTimeBannerProps {
   onStartTutorial: () => void;
@@ -39,84 +39,72 @@ export const FirstTimeBanner: React.FC<FirstTimeBannerProps> = ({ onStartTutoria
 
   return (
     <div
-      className={`fixed top-20 right-4 z-50 transition-all duration-500 ${isAnimating ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
-        }`}
+      className={`fixed top-20 right-4 z-50 transition-all duration-500 ${
+        isAnimating ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+      }`}
     >
-      <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-2xl p-1 max-w-sm">
-        <div className="bg-white rounded-xl p-6 relative">
-          {/* Close Button */}
-          <button
-            onClick={handleDismiss}
-            className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-
-          {/* Header */}
-          <div className="text-center mb-4">
-            <div className="flex justify-center mb-3">
-              <div className="p-2 bg-slate-100 rounded-full">
-                <Play className="w-6 h-6 text-slate-600" />
-              </div>
+      <div className="w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+        {/* Gradient header strip */}
+        <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 p-4 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-lg" />
+          <div className="relative z-10 flex items-start justify-between">
+            <div>
+              <div className="text-white font-bold text-base leading-tight">🌟 Primeira vez aqui?</div>
+              <div className="text-white/80 text-xs mt-0.5">Conheça o XZenPress em 2 minutos</div>
             </div>
-            <h3 className="text-lg font-bold text-gray-800 mb-1">
-              🌟 Primeira vez aqui?
-            </h3>
-            <p className="text-sm text-gray-600">
-              Descubra como aproveitar ao máximo o XZenPress
-            </p>
+            <button
+              onClick={handleDismiss}
+              className="p-1.5 hover:bg-white/20 rounded-lg transition-colors text-white/80 hover:text-white ml-2 flex-shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="p-4 space-y-2.5">
+          {/* Feature rows */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Target className="w-4 h-4 text-emerald-600" />
+            </div>
+            <span className="text-gray-700 text-sm">Pontos MTC + Craniopuntura YNSA</span>
           </div>
 
-          {/* Preview Benefits */}
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center space-x-2 text-sm">
-              <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
-                <Target className="w-2 h-2 text-blue-600" />
-              </div>
-              <span className="text-gray-700">Como usar os pontos de acupressão</span>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Brain className="w-4 h-4 text-purple-600" />
             </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center">
-                <Brain className="w-2 h-2 text-green-600" />
-              </div>
-              <span className="text-gray-700">Respiração 4-7-8 com cromoterapia</span>
-            </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <div className="w-4 h-4 bg-purple-100 rounded-full flex items-center justify-center">
-                <Heart className="w-2 h-2 text-purple-600" />
-              </div>
-              <span className="text-gray-700">Terapia integrada para máximo resultado</span>
-            </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <div className="w-4 h-4 bg-yellow-100 rounded-full flex items-center justify-center">
-                <Crown className="w-2 h-2 text-yellow-600" />
-              </div>
-              <span className="text-gray-700">Recursos Premium disponíveis</span>
-            </div>
+            <span className="text-gray-700 text-sm">Respiração 4-7-8 com cromoterapia</span>
           </div>
 
-          {/* CTA Button */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-4 h-4 text-amber-600" />
+            </div>
+            <span className="text-gray-700 text-sm">Self Oracle (IA) — diagnóstico inteligente</span>
+          </div>
+
+          {/* CTA */}
           <button
             onClick={handleStartTutorial}
-            className="w-full bg-slate-800 text-white py-3 rounded-lg font-semibold hover:bg-slate-900 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+            className="w-full mt-1 bg-gradient-to-r from-violet-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:opacity-90 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
           >
-            <Play className="w-4 h-4" />
             <span>Começar Tutorial</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
-          {/* Skip Option */}
           <button
             onClick={handleDismiss}
-            className="w-full mt-2 text-gray-500 hover:text-gray-700 text-sm transition-colors"
+            className="w-full text-gray-400 hover:text-gray-600 text-sm transition-colors py-1"
           >
-            Pular tutorial
+            Pular por agora
           </button>
-
-          {/* Floating Animation */}
-          <div className="absolute -top-2 -left-2 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
-          <div className="absolute -top-1 -left-1 w-2 h-2 bg-yellow-500 rounded-full"></div>
         </div>
+
+        {/* Floating Animation */}
+        <div className="absolute -top-2 -left-2 w-4 h-4 bg-yellow-400 rounded-full animate-ping" />
+        <div className="absolute -top-1 -left-1 w-2 h-2 bg-yellow-500 rounded-full" />
       </div>
     </div>
   );

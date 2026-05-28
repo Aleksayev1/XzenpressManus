@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, ArrowRight, ArrowLeft, CheckCircle, Target, Brain, Heart, Crown, Play, Zap } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, ArrowRight, ArrowLeft, CheckCircle, Target, Brain, Heart, Crown, Zap, Sparkles, Activity } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface TutorialModalProps {
@@ -13,12 +13,15 @@ interface TutorialStep {
   title: string;
   description: string;
   icon: React.ReactNode;
+  emoji: string;
   action?: {
     text: string;
     page: string;
   };
   tips: string[];
-  color: string;
+  gradient: string;
+  accentColor: string;
+  badgeText: string;
 }
 
 export const TutorialModal: React.FC<TutorialModalProps> = ({
@@ -27,115 +30,170 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
   onPageChange
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [animating, setAnimating] = useState(false);
   const { t } = useLanguage();
+
+  // Reset step when modal opens
+  useEffect(() => {
+    if (isVisible) {
+      setCurrentStep(0);
+    }
+  }, [isVisible]);
 
   const tutorialSteps: TutorialStep[] = [
     {
       id: 1,
-      title: t('tutorial.step1.title'),
-      description: t('tutorial.step1.description'),
-      icon: <Heart className="w-8 h-8 text-red-500" />,
+      title: 'Bem-vindo ao XZenPress!',
+      description: 'Sua plataforma completa de medicina integrativa — unindo milênios de sabedoria com ciência moderna',
+      emoji: '🌟',
+      icon: <Heart className="w-8 h-8 text-white" />,
       tips: [
-        t('tutorial.step1.tip1'),
-        t('tutorial.step1.tip2'),
-        t('tutorial.step1.tip3'),
-        t('tutorial.step1.tip4')
+        'Combine MTC, Craniopuntura YNSA e respiração científica em um só lugar',
+        'Todas as ferramentas básicas são gratuitas e disponíveis 24/7',
+        'Cada ponto terapêutico tem imagem de referência e timer integrado',
+        'A IA Self Oracle prescreve pontos personalizados para o seu caso',
       ],
-      color: 'red'
+      gradient: 'from-rose-500 via-pink-500 to-purple-600',
+      accentColor: '#f43f5e',
+      badgeText: 'Início',
     },
     {
       id: 2,
-      title: t('tutorial.step2.title'),
-      description: t('tutorial.step2.description'),
-      icon: <Target className="w-8 h-8 text-green-500" />,
+      title: 'Acupressão MTC — Pontos Clássicos',
+      description: 'Pontos milenares da Medicina Tradicional Chinesa para alívio natural e imediato de sintomas',
+      emoji: '🫴',
+      icon: <Target className="w-8 h-8 text-white" />,
       action: {
-        text: t('tutorial.step2.action'),
-        page: 'acupressure'
+        text: 'Explorar Pontos MTC',
+        page: 'acupressure',
       },
       tips: [
-        t('tutorial.step2.tip1'),
-        t('tutorial.step2.tip2'),
-        t('tutorial.step2.tip3'),
-        t('tutorial.step2.tip4')
+        'Pontos como ZS (Zusanli), BP6 e VB20 — referências clínicas testadas',
+        'Terapia integrada: acupressão + respiração 4-7-8 + cromoterapia simultâneas',
+        'Imagem anatômica de referência para localização precisa de cada ponto',
+        'Filtros por categoria: Geral, Neurologia, Imunidade, Cardio e mais',
       ],
-      color: 'green'
+      gradient: 'from-emerald-500 via-green-500 to-teal-600',
+      accentColor: '#10b981',
+      badgeText: 'MTC',
     },
     {
       id: 3,
-      title: t('tutorial.step3.title'),
-      description: t('tutorial.step3.description'),
-      icon: <Brain className="w-8 h-8 text-blue-500" />,
+      title: 'Craniopuntura YNSA — Yamamoto',
+      description: 'Nova Craniopuntura de Yamamoto: quatro grupos clínicos precisos no crânio para tratamento orgânico e neurológico',
+      emoji: '🧠',
+      icon: <Brain className="w-8 h-8 text-white" />,
       action: {
-        text: t('tutorial.step3.action'),
-        page: 'breathing'
+        text: 'Ver Craniopuntura',
+        page: 'acupressure',
       },
       tips: [
-        t('tutorial.step3.tip1'),
-        t('tutorial.step3.tip2'),
-        t('tutorial.step3.tip3'),
-        t('tutorial.step3.tip4')
+        'Pontos Básicos (A-K): dores físicas, locomotor, cervical e lombalgia',
+        'Ypsilon Bilaterais (têmpora): equilíbrio de órgãos internos — ação crônica e profunda',
+        'Sensoriais/Cerebrais: visão, audição, emoções e gânglios basais',
+        'Nervos Cranianos (I-XII): neurologia avançada — ação aguda e imediata',
+        'Ponto ZS Hormonal: exclusivo para mulheres — eixo hipotálamo-hipófise (eficácia 99%)',
       ],
-      color: 'blue'
+      gradient: 'from-violet-500 via-purple-500 to-indigo-600',
+      accentColor: '#8b5cf6',
+      badgeText: 'YNSA',
     },
     {
       id: 4,
-      title: t('tutorial.step4.title'),
-      description: t('tutorial.step4.description'),
-      icon: <Zap className="w-8 h-8 text-purple-500" />,
+      title: 'Self Oracle — IA de Diagnóstico',
+      description: 'Inteligência artificial que analisa seus sintomas e prescreve pontos clínicos com base em agudez ou cronicidade',
+      emoji: '🔮',
+      icon: <Sparkles className="w-8 h-8 text-white" />,
+      action: {
+        text: 'Consultar o Oráculo',
+        page: 'plantas-medicinais',
+      },
       tips: [
-        t('tutorial.step4.tip1'),
-        t('tutorial.step4.tip2'),
-        t('tutorial.step4.tip3'),
-        t('tutorial.step4.tip4')
+        'Selecione "Agudo" → IA prioriza Nervos Cranianos (ação imediata, occipital)',
+        'Selecione "Crônico" → IA prioriza Ypsilon Bilaterais (reequilíbrio orgânico, temporal)',
+        'Selecione "Misto" → protocolo combinado com prioridade dupla',
+        'Prescrição de pontos MTC + YNSA + fitoterápicos + plantas medicinais',
+        'Visualize imagens dos pontos prescritos diretamente no resultado',
       ],
-      color: 'purple'
+      gradient: 'from-amber-500 via-orange-500 to-red-500',
+      accentColor: '#f59e0b',
+      badgeText: 'IA Oracle',
     },
     {
       id: 5,
-      title: t('tutorial.step5.title'),
-      description: t('tutorial.step5.description'),
-      icon: <Crown className="w-8 h-8 text-yellow-500" />,
+      title: 'Respiração 4-7-8 + Cromoterapia',
+      description: 'Técnica científica validada com cores terapêuticas sincronizadas — ativa o sistema nervoso parassimpático',
+      emoji: '🌈',
+      icon: <Activity className="w-8 h-8 text-white" />,
       action: {
-        text: t('tutorial.step5.action'),
-        page: 'premium'
+        text: 'Experimentar Agora',
+        page: 'breathing',
       },
       tips: [
-        t('tutorial.step5.tip1'),
-        t('tutorial.step5.tip2'),
-        t('tutorial.step5.tip3'),
-        t('tutorial.step5.tip4')
+        '4s Inspire (Azul) → 7s Segure (Verde) → 8s Expire (Roxo)',
+        'Ativa o nervo vago e reduz cortisol em sessões de 3 minutos',
+        'Cromoterapia sincronizada potencializa o efeito em até 3x',
+        'Use antes ou durante a aplicação de pontos de acupressão',
       ],
-      color: 'yellow'
+      gradient: 'from-blue-500 via-cyan-500 to-sky-600',
+      accentColor: '#3b82f6',
+      badgeText: 'Respiração',
     },
     {
       id: 6,
-      title: t('tutorial.step6.title'),
-      description: t('tutorial.step6.description'),
-      icon: <CheckCircle className="w-8 h-8 text-green-600" />,
+      title: 'Sons Harmonizantes',
+      description: 'Biblioteca de frequências terapêuticas para criar seu ambiente de cura ideal',
+      emoji: '🎵',
+      icon: <Zap className="w-8 h-8 text-white" />,
       tips: [
-        t('tutorial.step6.tip1'),
-        t('tutorial.step6.tip2'),
-        t('tutorial.step6.tip3'),
-        t('tutorial.step6.tip4'),
-        t('tutorial.step6.tip5'),
-        t('tutorial.step6.tip6')
+        'Frequências binaurais: Alpha (relaxamento), Theta (meditação), Delta (sono)',
+        'Integração com Spotify Premium para assinantes',
+        'Combine sons com respiração e acupressão para potencializar resultados',
+        'Player compacto flutuante disponível em todas as páginas',
       ],
-      color: 'green'
-    }
+      gradient: 'from-pink-500 via-rose-500 to-fuchsia-600',
+      accentColor: '#ec4899',
+      badgeText: 'Sons',
+    },
+    {
+      id: 7,
+      title: 'Você está Pronto para Começar! ✨',
+      description: 'Sua jornada terapêutica integrativa começa agora — com a ciência do Oriente e do Ocidente ao seu lado',
+      emoji: '🚀',
+      icon: <CheckCircle className="w-8 h-8 text-white" />,
+      tips: [
+        '1. Descreva seu sintoma ao Self Oracle → receba pontos prescritos',
+        '2. Localize o ponto pela imagem → aplique com pressão leve circular',
+        '3. Ative a respiração 4-7-8 + cromoterapia durante a aplicação',
+        '4. Para dor aguda: priorize Nervos Cranianos (occipital)',
+        '5. Para condição crônica: priorize Ypsilon Bilaterais (têmpora)',
+        '6. Acompanhe sua evolução no Dashboard',
+      ],
+      gradient: 'from-green-500 via-emerald-500 to-teal-600',
+      accentColor: '#10b981',
+      badgeText: 'Concluído',
+    },
   ];
 
   const currentStepData = tutorialSteps[currentStep];
+  const isLast = currentStep === tutorialSteps.length - 1;
+  const isFirst = currentStep === 0;
+
+  const goToStep = (step: number) => {
+    if (animating) return;
+    setAnimating(true);
+    setTimeout(() => {
+      setCurrentStep(step);
+      setAnimating(false);
+    }, 200);
+  };
 
   const nextStep = () => {
-    if (currentStep < tutorialSteps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
+    if (currentStep < tutorialSteps.length - 1) goToStep(currentStep + 1);
   };
 
   const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+    if (currentStep > 0) goToStep(currentStep - 1);
   };
 
   const handleAction = () => {
@@ -151,67 +209,94 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
     onClose();
   };
 
-  const getColorClasses = (color: string) => {
-    const colors = {
-      red: 'from-red-500 to-pink-500 bg-red-50 border-red-200 text-red-600',
-      green: 'from-green-500 to-emerald-500 bg-green-50 border-green-200 text-green-600',
-      blue: 'from-blue-500 to-cyan-500 bg-blue-50 border-blue-200 text-blue-600',
-      purple: 'from-purple-500 to-violet-500 bg-purple-50 border-purple-200 text-purple-600',
-      yellow: 'from-yellow-400 to-orange-500 bg-yellow-50 border-yellow-200 text-yellow-600'
-    };
-    return colors[color as keyof typeof colors] || colors.blue;
-  };
-
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-        {/* Header */}
-        <div className={`bg-gradient-to-r ${getColorClasses(currentStepData.color).split(' ')[0]} ${getColorClasses(currentStepData.color).split(' ')[1]} p-6 text-white relative`}>
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div
+        className="bg-white rounded-3xl w-full max-w-2xl max-h-[92vh] overflow-hidden shadow-2xl flex flex-col"
+        style={{ boxShadow: `0 25px 80px -10px ${currentStepData.accentColor}40` }}
+      >
+        {/* ── HEADER GRADIENTE ── */}
+        <div className={`bg-gradient-to-br ${currentStepData.gradient} relative overflow-hidden flex-shrink-0`}>
+          {/* Background blur orbs */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-xl pointer-events-none" />
 
-          <div className="text-center">
-            <div className="flex justify-center mb-4">
-              <div className="p-3 bg-white bg-opacity-20 rounded-full backdrop-blur-sm">
+          <div className="relative z-10 p-6 pb-5">
+            {/* Top row: badge + step counter + close */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="bg-white/20 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  {currentStepData.badgeText}
+                </span>
+                <span className="text-white/70 text-xs font-medium">
+                  {currentStep + 1} / {tutorialSteps.length}
+                </span>
+              </div>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-white/20 rounded-xl transition-colors text-white/80 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Icon + title */}
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl flex-shrink-0">
                 {currentStepData.icon}
               </div>
+              <div className="pt-1">
+                <div className="text-3xl mb-1">{currentStepData.emoji}</div>
+                <h2 className="text-xl font-bold text-white leading-tight">{currentStepData.title}</h2>
+                <p className="text-white/85 text-sm mt-1 leading-relaxed">{currentStepData.description}</p>
+              </div>
             </div>
-            <h2 className="text-2xl font-bold mb-2">{currentStepData.title}</h2>
-            <p className="text-white text-opacity-90">{currentStepData.description}</p>
           </div>
-        </div>
 
-        {/* Content */}
-        <div className="p-6">
-          {/* Progress Indicator */}
-          <div className="flex items-center justify-center space-x-2 mb-6">
+          {/* Progress dots bar */}
+          <div className="relative z-10 px-6 pb-4 flex items-center gap-1.5">
             {tutorialSteps.map((_, index) => (
-              <div
+              <button
                 key={index}
-                className={`w-3 h-3 rounded-full transition-all ${index === currentStep
-                    ? `bg-gradient-to-r ${getColorClasses(currentStepData.color).split(' ')[0]} ${getColorClasses(currentStepData.color).split(' ')[1]}`
+                onClick={() => goToStep(index)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  index === currentStep
+                    ? 'bg-white w-8'
                     : index < currentStep
-                      ? 'bg-green-500'
-                      : 'bg-gray-200'
-                  }`}
+                    ? 'bg-white/60 w-4'
+                    : 'bg-white/25 w-4'
+                }`}
               />
             ))}
           </div>
+        </div>
 
-          {/* Step Content */}
-          <div className={`${getColorClasses(currentStepData.color).split(' ')[2]} border ${getColorClasses(currentStepData.color).split(' ')[3]} rounded-xl p-6 mb-6`}>
-            <h3 className="font-bold text-gray-800 mb-4">💡 {t('tutorial.tips')}:</h3>
+        {/* ── BODY ── */}
+        <div
+          className="flex-1 overflow-y-auto p-6 space-y-4"
+          style={{ opacity: animating ? 0.3 : 1, transition: 'opacity 0.2s ease' }}
+        >
+          {/* Tips list */}
+          <div
+            className="rounded-2xl p-5 border"
+            style={{
+              backgroundColor: `${currentStepData.accentColor}08`,
+              borderColor: `${currentStepData.accentColor}20`,
+            }}
+          >
+            <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: currentStepData.accentColor }}>
+              💡 O que você vai encontrar aqui
+            </h3>
             <div className="space-y-3">
               {currentStepData.tips.map((tip, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${getColorClasses(currentStepData.color).split(' ')[2]}`}>
-                    <CheckCircle className={`w-3 h-3 ${getColorClasses(currentStepData.color).split(' ')[4]}`} />
+                <div key={index} className="flex items-start gap-3">
+                  <div
+                    className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-white"
+                    style={{ backgroundColor: currentStepData.accentColor }}
+                  >
+                    <span className="text-[10px] font-bold">{index + 1}</span>
                   </div>
                   <span className="text-gray-700 text-sm leading-relaxed">{tip}</span>
                 </div>
@@ -219,52 +304,53 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
             </div>
           </div>
 
-          {/* Action Button */}
+          {/* Action button (optional) */}
           {currentStepData.action && (
-            <div className="mb-6">
-              <button
-                onClick={handleAction}
-                className={`w-full bg-gradient-to-r ${getColorClasses(currentStepData.color).split(' ')[0]} ${getColorClasses(currentStepData.color).split(' ')[1]} text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 flex items-center justify-center space-x-2`}
-              >
-                <span>{currentStepData.action.text}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between">
             <button
-              onClick={prevStep}
-              disabled={currentStep === 0}
-              className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleAction}
+              className={`w-full bg-gradient-to-r ${currentStepData.gradient} text-white py-3.5 rounded-xl font-semibold hover:opacity-90 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2`}
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>{t('tutorial.previous')}</span>
+              <span>{currentStepData.action.text}</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
+          )}
+        </div>
 
-            <div className="text-sm text-gray-500">
-              {currentStep + 1} {t('tutorial.of')} {tutorialSteps.length}
-            </div>
+        {/* ── NAVIGATION FOOTER ── */}
+        <div className="flex-shrink-0 border-t border-gray-100 px-6 py-4 flex items-center justify-between bg-gray-50/50">
+          <button
+            onClick={prevStep}
+            disabled={isFirst}
+            className="flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-gray-100"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm font-medium">Anterior</span>
+          </button>
 
-            {currentStep === tutorialSteps.length - 1 ? (
-              <button
-                onClick={handleFinish}
-                className="flex items-center space-x-2 bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors font-semibold"
-              >
-                <CheckCircle className="w-4 h-4" />
-                <span>{t('tutorial.finish')}</span>
-              </button>
-            ) : (
-              <button
-                onClick={nextStep}
-                className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                <span>{t('tutorial.next')}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+          <button
+            onClick={handleFinish}
+            className="text-xs text-gray-400 hover:text-gray-600 transition-colors underline underline-offset-2"
+          >
+            Pular tutorial
+          </button>
+
+          {isLast ? (
+            <button
+              onClick={handleFinish}
+              className={`flex items-center gap-2 bg-gradient-to-r ${currentStepData.gradient} text-white px-6 py-2.5 rounded-xl hover:opacity-90 transition-all font-semibold shadow-md`}
+            >
+              <CheckCircle className="w-4 h-4" />
+              <span className="text-sm">Começar!</span>
+            </button>
+          ) : (
+            <button
+              onClick={nextStep}
+              className={`flex items-center gap-2 bg-gradient-to-r ${currentStepData.gradient} text-white px-5 py-2.5 rounded-xl hover:opacity-90 transition-all font-semibold shadow-md`}
+            >
+              <span className="text-sm">Próximo</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     </div>

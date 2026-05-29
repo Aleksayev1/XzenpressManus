@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Send, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
 import { useAuth } from '../contexts/AuthContext';
@@ -415,21 +416,11 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       {/* Modal de Preview de Imagem (Smart Link) */}
-      {previewImage && (
-        <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setPreviewImage(null)}>
-          <div className="bg-white rounded-xl overflow-hidden max-w-sm w-full shadow-2xl animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
-            <div className="p-3 bg-gray-100 flex justify-between items-center border-b">
-              <h3 className="font-bold text-gray-800">{previewImage.title}</h3>
-              <button onClick={() => setPreviewImage(null)} className="p-1 hover:bg-gray-200 rounded-full">
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            <div className="p-1 bg-white">
-              <img src={previewImage.url} alt={previewImage.title} className="w-full h-auto object-contain rounded-lg" />
-            </div>
-          </div>
-        </div>
-      )}
+      <ImageZoomModal
+        isVisible={!!previewImage}
+        imageUrl={previewImage ? previewImage.url : null}
+        onClose={() => setPreviewImage(null)}
+      />
 
       <div className="bg-white rounded-2xl max-w-3xl w-full h-[85vh] flex flex-col shadow-2xl relative z-10">
         {/* Header */}
@@ -585,5 +576,96 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
         </div>
       </div>
     </div>
+  );
+};
+
+const ImageZoomModal: React.FC<{
+  isVisible: boolean;
+  imageUrl: string | null;
+  onClose: () => void;
+}> = ({ isVisible, imageUrl, onClose }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  console.log('🔍 ImageZoomModal AI render:', { isVisible, imageUrl, imageLoaded });
+
+  useEffect(() => {
+    if (isVisible) {
+      console.log('✅ Modal AI está visível, resetando imageLoaded');
+      setImageLoaded(false);
+    }
+  }, [isVisible, imageUrl]);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isVisible) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isVisible, onClose]);
+
+  if (!isVisible || !imageUrl) return null;
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-90 transition-opacity duration-300 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-6xl max-h-[95vh] flex items-center justify-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {!imageLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-white text-sm">Carregando imagem...</span>
+            </div>
+          </div>
+        )}
+
+        <img
+          src={imageUrl}
+          alt="Ponto de acupressão ampliado"
+          className={`max-w-full max-h-[95vh] object-contain rounded-xl shadow-2xl transition-opacity duration-300 cursor-pointer ${imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+          onClick={onClose}
+          onLoad={() => {
+            console.log('Imagem AI carregada com sucesso!');
+            setImageLoaded(true);
+          }}
+          onError={(e) => {
+            console.error('Erro ao carregar imagem AI:', imageUrl);
+            e.currentTarget.style.display = 'none';
+            setImageLoaded(true);
+          }}
+        />
+
+        <button
+          onClick={onClose}
+          className="absolute -top-14 right-0 bg-red-500 hover:bg-red-600 text-white transition-colors p-3 rounded-full shadow-lg hover:scale-110 transform duration-200"
+          aria-label="Fechar"
+          title="Fechar (ESC)"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
+        <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 px-6 py-3 rounded-full">
+          <div className="flex items-center gap-3 text-white text-sm">
+            <span className="opacity-90">💡 Clique na imagem ou pressione ESC para fechar</span>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
   );
 };

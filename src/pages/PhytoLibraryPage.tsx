@@ -196,6 +196,39 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
         return undefined;
     };
 
+    const handleSelectRecommendedItem = (itemName: string) => {
+        if (!itemName) return;
+        
+        // Limpa partes extras do texto (como dosagem ou parênteses, ex: "Huang Qi (Astragalus)" -> "Huang Qi" ou "Astragalus")
+        const cleanName = itemName.split(/[-–—(]/)[0].trim();
+        const searchStr = cleanName.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+        
+        // Tenta achar correspondência direta no banco de plantas/peptídeos
+        const matched = HERB_DATABASE.find(h => {
+            const hName = h.name.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+            const hSci = h.scientificName.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+            
+            return hName.includes(searchStr) || searchStr.includes(hName) || hSci.includes(searchStr);
+        });
+        
+        if (matched) {
+            // Define aba e termo de busca correspondente à planta encontrada
+            setSearchTerm(matched.name);
+            if (matched.origin === 'Brasil') setActiveTab('Brasil');
+            else if (matched.origin === 'China (MTC)') setActiveTab('China (MTC)');
+            else if (matched.origin.includes('Peptídeo')) setActiveTab('Peptídeos');
+        } else {
+            // Fallback: faz a busca pelo nome direto
+            setSearchTerm(cleanName);
+            setActiveTab('Todos');
+        }
+        
+        // Rola a tela suavemente para a seção de pesquisa/biblioteca
+        setTimeout(() => {
+            document.getElementById('phyto-library-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    };
+
     const matchesSearch = (herb: Herb) =>
         herb.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         herb.scientificName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -409,7 +442,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
+                <div id="phyto-library-section" className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
                     {/* Tabs */}
                     <div className="flex space-x-2 bg-gray-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
                         {['Todos', 'Brasil', 'China (MTC)', 'Peptídeos'].map(tab => (
@@ -754,15 +787,35 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                         <h3 className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-4 flex items-center"><Sprout className="w-4 h-4 mr-1.5" /> Fitoterapia Personalizada</h3>
                                         <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-2xl space-y-3">
                                             <div>
-                                                <h4 className="text-xs font-bold text-emerald-400">🇧🇷 Plantas Brasileiras Comprovadas:</h4>
-                                                <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 mt-1 marker:text-emerald-500">
-                                                    {(oracleResult.protocolo.fitoterapia?.plantasBrasileiras || []).map((p, idx) => <li key={idx}>{p}</li>)}
+                                                <h4 className="text-xs font-bold text-emerald-400 mb-1">🇧🇷 Plantas Brasileiras Comprovadas (Clique para ver):</h4>
+                                                <ul className="text-xs text-slate-300 space-y-1.5 pl-1.5">
+                                                    {(oracleResult.protocolo.fitoterapia?.plantasBrasileiras || []).map((p, idx) => (
+                                                        <li 
+                                                            key={idx} 
+                                                            onClick={() => handleSelectRecommendedItem(p)}
+                                                            className="hover:text-emerald-300 hover:underline cursor-pointer transition-colors duration-150 flex items-center py-0.5 group"
+                                                        >
+                                                            <span className="mr-2 text-emerald-500">•</span>
+                                                            <span>{p}</span>
+                                                            <Search className="w-3 h-3 ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-emerald-400 shrink-0" />
+                                                        </li>
+                                                    ))}
                                                 </ul>
                                             </div>
                                             <div className="border-t border-slate-950 pt-3">
-                                                <h4 className="text-xs font-bold text-orange-400">🏮 Fitoterapia Chinesa (Pinyin):</h4>
-                                                <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 mt-1 marker:text-orange-500">
-                                                    {(oracleResult.protocolo.fitoterapia?.plantasMTC || []).map((p, idx) => <li key={idx}>{p}</li>)}
+                                                <h4 className="text-xs font-bold text-orange-400 mb-1">🏮 Fitoterapia Chinesa / Pinyin (Clique para ver):</h4>
+                                                <ul className="text-xs text-slate-300 space-y-1.5 pl-1.5">
+                                                    {(oracleResult.protocolo.fitoterapia?.plantasMTC || []).map((p, idx) => (
+                                                        <li 
+                                                            key={idx} 
+                                                            onClick={() => handleSelectRecommendedItem(p)}
+                                                            className="hover:text-orange-300 hover:underline cursor-pointer transition-colors duration-150 flex items-center py-0.5 group"
+                                                        >
+                                                            <span className="mr-2 text-orange-500">•</span>
+                                                            <span>{p}</span>
+                                                            <Search className="w-3 h-3 ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-orange-400 shrink-0" />
+                                                        </li>
+                                                    ))}
                                                 </ul>
                                             </div>
                                         </div>
@@ -773,8 +826,18 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                         <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-2xl relative overflow-hidden">
                                             <div className="absolute top-0 right-0 w-12 h-12 bg-indigo-500/10 rounded-full blur-lg" />
                                             <h3 className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2 flex items-center"><Dna className="w-4 h-4 mr-1.5 animate-pulse" /> Peptídeos de Biohacking</h3>
-                                            <ul className="text-xs text-slate-300 space-y-1.5 list-disc pl-4 marker:text-indigo-500">
-                                                {oracleResult.protocolo.peptideos.indicados.map((pep, idx) => <li key={idx}>{pep}</li>)}
+                                            <ul className="text-xs text-slate-300 space-y-1.5 pl-1.5">
+                                                {oracleResult.protocolo.peptideos.indicados.map((pep, idx) => (
+                                                    <li 
+                                                        key={idx} 
+                                                        onClick={() => handleSelectRecommendedItem(pep)}
+                                                        className="hover:text-indigo-300 hover:underline cursor-pointer transition-colors duration-150 flex items-center py-0.5 group"
+                                                    >
+                                                        <span className="mr-2 text-indigo-500">•</span>
+                                                        <span>{pep}</span>
+                                                        <Search className="w-3 h-3 ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-indigo-400 shrink-0" />
+                                                    </li>
+                                                ))}
                                             </ul>
                                             <p className="text-[9px] text-slate-500 italic mt-3 bg-black/30 p-2 rounded-lg border border-slate-950/50">🔬 {oracleResult.protocolo.peptideos.nota}</p>
                                         </div>

@@ -157,8 +157,8 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
       return '';
     }
 
-    // Regex corrigido: Meridiano padrão exige NÚMEROS depois (ex: IG4, E36). YNSA exige LETRAS (ex: YNSA A).
-    const pointRegex = /\b((?:IG|LI|VB|GB|VC|Ren|CV|Du|GV|P|LU|C|HT|HE|TA|SJ|TB|CS|PC|F|LR|LV|R|KI|BP|SP|E|ST|ID|SI|B|BL)\s?-?\s?\d{1,2}[a-zA-Z]?|YNSA\s?-?\s?[a-zA-Z]{1,2}|Ponto\s?-?\s?[a-zA-Z]{1,2})\b/gi;
+    // Regex corrigido: Mapeia meridianos, pontos básicos YNSA (A-K), ponto ZS, e variações Ypsilon em português sem colidir com a palavra 'pontos'
+    const pointRegex = /((?:(?:YNSA|Ypsilon)\s+(?:do\s+|da\s+)?(?:Fígado|Figado|Rim|Vesícula|Vesicula|Estômago|Estomago|Pulmão|Pulmao|Pericárdio|Pericardio|Intestino\s+Delgado|Intestino\s+Grosso|Bexiga|Coração|Coracao|Triplo\s+Aquecedor|Baço|Baço-Pâncreas|Baco-Pancreas)|Ponto\s+(?:de\s+|do\s+|da\s+)?(?:[A-K]|ZS|Zeise-Suess|Cérebro|Cerebrum)|YNSA\s+[A-K]|\b(?:IG|LI|VB|GB|VC|Ren|CV|Du|GV|P|LU|C|HT|HE|TA|SJ|TB|CS|PC|F|LR|LV|R|KI|BP|SP|E|ST|ID|SI|B|BL)\s?-?\s?\d{1,2}[a-zA-Z]?\b))/gi;
     const parts = content.split(pointRegex);
     return parts.map((part, i) => {
       // Validação de segurança: ignora partes inválidas

@@ -86,7 +86,7 @@ export const
                                     <li>✓ <strong>Revogar</strong> consentimento a qualquer momento</li>
                                 </ul>
                                 <p className="mt-4 text-sm text-blue-700">
-                                    Para exercer seus direitos: <a href="mailto:contato@xzenpress.com" className="font-bold hover:underline">contato@xzenpress.com</a>
+                                    Para exercer seus direitos: <a href="mailto:aleksayevacupress@gmail.com" className="font-bold hover:underline">aleksayevacupress@gmail.com</a>
                                 </p>
                             </div>
 
@@ -114,7 +114,7 @@ export const
 
                             <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Contato</h2>
                             <p className="text-gray-700">
-                                Dúvidas sobre privacidade? Email: <a href="mailto:contato@xzenpress.com" className="text-blue-600 hover:underline font-bold">contato@xzenpress.com</a>
+                                Dúvidas sobre privacidade? Email: <a href="mailto:aleksayevacupress@gmail.com" className="text-blue-600 hover:underline font-bold">aleksayevacupress@gmail.com</a>
                             </p>
                         </div>
 

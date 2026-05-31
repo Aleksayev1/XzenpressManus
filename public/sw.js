@@ -1,9 +1,9 @@
 // XZenPress Service Worker - CSP Fix Optimized
-// VERSÃO 3.0.3 - Cache Invalidation Fix
-const CACHE_NAME = 'xzenpress-v3.0.3-cache-fix';
-const STATIC_CACHE = 'xzenpress-static-v3.0.3';
-const DYNAMIC_CACHE = 'xzenpress-dynamic-v3.0.3';
-const SOUNDS_CACHE = 'xzenpress-sounds-v3.0.3';
+// VERSÃO 3.0.4 - Cache Invalidation Fix
+const CACHE_NAME = 'xzenpress-v3.0.4-cache-fix';
+const STATIC_CACHE = 'xzenpress-static-v3.0.4';
+const DYNAMIC_CACHE = 'xzenpress-dynamic-v3.0.4';
+const SOUNDS_CACHE = 'xzenpress-sounds-v3.0.4';
 
 // Static assets to cache immediately
 const STATIC_ASSETS = [

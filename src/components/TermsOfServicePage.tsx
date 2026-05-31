@@ -158,7 +158,7 @@ export const TermsOfServicePage: React.FC<TermsOfServicePageProps> = ({ onPageCh
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">12. Contato</h2>
                         <p className="text-gray-700">
                             Para questões sobre estes Termos de Serviço, entre em contato conosco em:{' '}
-                            <a href="mailto:contato@xzenpress.com" className="text-blue-600 hover:underline">contato@xzenpress.com</a>
+                            <a href="mailto:aleksayevacupress@gmail.com" className="text-blue-600 hover:underline">aleksayevacupress@gmail.com</a>
                         </p>
                     </div>
 

@@ -59,7 +59,7 @@ export const RefundPolicyPage: React.FC<RefundPolicyPageProps> = ({ onPageChange
 
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Como Solicitar Reembolso</h2>
                         <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                            <p className="mb-4">Envie um email para: <a href="mailto:contato@xzenpress.com" className="text-green-600 hover:underline font-bold">contato@xzenpress.com</a></p>
+                            <p className="mb-4">Envie um email para: <a href="mailto:aleksayevacupress@gmail.com" className="text-green-600 hover:underline font-bold">aleksayevacupress@gmail.com</a></p>
                             <p className="text-sm text-gray-600">
                                 Processamos reembolsos em até <strong>5 dias úteis</strong>.
                             </p>

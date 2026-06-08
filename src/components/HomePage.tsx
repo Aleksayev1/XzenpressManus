@@ -593,7 +593,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
             </div>
 
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-              16 Jornadas Clínicas Completas
+              22 Jornadas Clínicas Completas
             </h2>
 
             <p className="text-xl text-cyan-100 max-w-3xl mx-auto mb-4">
@@ -641,7 +641,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
               </svg>
               <span>Explorar Jornadas Clínicas</span>
             </button>
-            <p className="text-cyan-200 text-sm mt-4">Ansiedade • Dor • Sono • Burnout • e mais 4 jornadas</p>
+            <p className="text-cyan-200 text-sm mt-4">Ansiedade • Dor • Sono • Burnout • e mais 18 jornadas</p>
           </div>
         </div>
       </section>

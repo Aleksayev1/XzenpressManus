@@ -178,7 +178,7 @@ export class EmailService {
                       <li>🤖 Assistente IA Especializado 24/7</li>
                       <li>🎯 66 Pontos de Acupressão Exclusivos</li>
                       <li>🎵 Biblioteca Completa de Sons Terapêuticos</li>
-                      <li>📊 16 Jornadas Clínicas Guiadas</li>
+                      <li>📊 22 Jornadas Clínicas Guiadas</li>
                       <li>✨ Acesso Ilimitado a Todos os Recursos</li>
                     </ul>
                   </td>
@@ -268,7 +268,7 @@ export class EmailService {
                     <ol style="margin: 0; padding-left: 20px; color: #374151; font-size: 14px; line-height: 1.8;">
                       <li>Explore os <strong>66 pontos de acupressão</strong> exclusivos</li>
                       <li>Converse com o <strong>Assistente IA</strong> especializado</li>
-                      <li>Experimente as <strong>16 Jornadas Clínicas</strong> guiadas</li>
+                      <li>Experimente as <strong>22 Jornadas Clínicas</strong> guiadas</li>
                       <li>Relaxe com nossa <strong>biblioteca de sons</strong> terapêuticos</li>
                     </ol>
                   </td>

@@ -292,9 +292,9 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onPageChange }) => {
                                 <span><strong>Nutriming ilimitado</strong> - Timing otimizado cronobiológico</span>
                             </li>
                             <li className="flex items-start space-x-3">
-                                <Check className="w-5 h-5 text-yellow-300 mt-0.5 flex-shrink-0" />
-                                <span><strong>66 Pontos + 16 Jornadas</strong> - Biblioteca YNSA+MTC completa</span>
-                            </li>
+                                 <Check className="w-5 h-5 text-yellow-300 mt-0.5 flex-shrink-0" />
+                                 <span><strong>66 Pontos + 22 Jornadas</strong> - Biblioteca YNSA+MTC completa</span>
+                             </li>
                             <li className="flex items-start space-x-3">
                                 <Check className="w-5 h-5 text-yellow-300 mt-0.5 flex-shrink-0" />
                                 <span><strong>Dashboard de Evolução</strong> - Acompanhe seus padrões</span>

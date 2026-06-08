@@ -129,7 +129,7 @@ export const YNSAStudyPage = () => {
                                 <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
                                     <h4 className="text-lg font-semibold text-purple-300 mb-3">Enquanto você aguarda...</h4>
                                     <p className="text-slate-400 text-sm mb-4">
-                                        Nossa plataforma já oferece 16 jornadas clínicas completas para ansiedade, sono e bem-estar.
+                                        Nossa plataforma já oferece 22 jornadas clínicas completas para ansiedade, sono e bem-estar.
                                     </p>
                                     <a href="/" className="text-white bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg font-medium transition-colors inline-block">
                                         Acessar Plataforma Agora

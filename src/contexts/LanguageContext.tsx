@@ -52,7 +52,7 @@ const translations = {
 
     // Home Features
     'home.feature.acupressure.title': 'Acupressão MTC',
-    'home.feature.acupressure.desc': '20 pontos terapêuticos da Medicina Tradicional Chinesa para alívio natural',
+    'home.feature.acupressure.desc': '108 pontos terapêuticos da Medicina Tradicional Chinesa para alívio natural',
     'home.feature.breathing.title': 'Respiração 4-7-8',
     'home.feature.breathing.desc': 'Técnica científica de respiração com cromoterapia sincronizada',
     'home.feature.cranio.title': 'Craniopuntura',
@@ -346,7 +346,7 @@ const translations = {
     'tutorial.step2.title': 'Acupressão MTC',
     'tutorial.step2.description': 'Pontos terapêuticos para alívio natural e imediato',
     'tutorial.step2.action': 'Explorar Pontos',
-    'tutorial.step2.tip1': '20 pontos baseados em Medicina Tradicional Chinesa',
+    'tutorial.step2.tip1': '108 pontos baseados em Medicina Tradicional Chinesa',
     'tutorial.step2.tip2': 'Terapia integrada: acupressão + respiração + cromoterapia',
     'tutorial.step2.tip3': 'Cada ponto tem indicações e contraindicações',
     'tutorial.step2.tip4': 'Resultados visíveis em minutos',
@@ -544,7 +544,7 @@ const translations = {
 
     // Home Features
     'home.feature.acupressure.title': 'TCM Acupressure',
-    'home.feature.acupressure.desc': '20 therapeutic points from Traditional Chinese Medicine for natural relief',
+    'home.feature.acupressure.desc': '108 therapeutic points from Traditional Chinese Medicine for natural relief',
     'home.feature.breathing.title': '4-7-8 Breathing',
     'home.feature.breathing.desc': 'Scientific breathing technique with synchronized chromotherapy',
     'home.feature.cranio.title': 'Craniopuncture',
@@ -958,7 +958,7 @@ const translations = {
 
     // Home Features
     'home.feature.acupressure.title': 'Acupresión MTC',
-    'home.feature.acupressure.desc': '20 puntos terapéuticos de Medicina Tradicional China para alivio natural',
+    'home.feature.acupressure.desc': '108 puntos terapéuticos de Medicina Tradicional China para alivio natural',
     'home.feature.breathing.title': 'Respiración 4-7-8',
     'home.feature.breathing.desc': 'Técnica científica de respiración con cromoterapia sincronizada',
     'home.feature.cranio.title': 'Craniopuntura',
@@ -1348,7 +1348,7 @@ const translations = {
 
     // Home Features
     'home.feature.acupressure.title': 'Agopressione MTC',
-    'home.feature.acupressure.desc': '20 punti terapeutici della Medicina Tradizionale Cinese per sollievo naturale',
+    'home.feature.acupressure.desc': '108 punti terapeutici della Medicina Tradizionale Cinese per sollievo naturale',
     'home.feature.breathing.title': 'Respirazione 4-7-8',
     'home.feature.breathing.desc': 'Tecnica scientifica di respirazione con cromoterapia sincronizzata',
     'home.feature.cranio.title': 'Craniopuntura',

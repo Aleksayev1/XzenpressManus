@@ -161,7 +161,7 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
                 </li>
               </ul>
               {/*               <p className="text-gray-600 mb-4">
-                <strong className="text-purple-700">+ 16 Jornadas Clínicas Completas</strong><br />
+                <strong className="text-purple-700">+ 22 Jornadas Clínicas Completas</strong><br />
                 <span className="text-sm">Protocolos guiados para Ansiedade, Dor, Sono e mais</span>
               </p> */}
               <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
@@ -240,7 +240,7 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
               </h2>
 
               <p className="text-cyan-100 text-lg text-center mb-8 max-w-3xl mx-auto leading-relaxed">
-                <strong className="text-white">Intervenção precoce</strong> não é apenas eficaz — é <strong className="text-white">financeiramente estratégica</strong>. Nossas 16 Jornadas Clínicas trabalham os sinais iniciais antes que se tornem crises custosas.
+                <strong className="text-white">Intervenção precoce</strong> não é apenas eficaz — é <strong className="text-white">financeiramente estratégica</strong>. Nossas 22 Jornadas Clínicas trabalham os sinais iniciais antes que se tornem crises custosas.
               </p>
 
               {/* Key Metrics */}
@@ -292,7 +292,7 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  <span>Explorar as 16 Jornadas Clínicas</span>
+                  <span>Explorar as 22 Jornadas Clínicas</span>
                 </button>
                 <p className="text-cyan-200 text-sm mt-4">Ansiedade • Dor Crônica • Sono • Burnout • e mais</p>
               </div>

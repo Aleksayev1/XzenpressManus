@@ -429,10 +429,44 @@ const SPECIFIC_PROTOCOLS = [
     }
 ];
 
+// =============================================================================
+// 6. DIRETRIZES FILOSÓFICO-CIENTÍFICAS (CONCEITOS DAS PALESTRAS)
+// =============================================================================
+const LECTURE_KNOWLEDGE = {
+    "PESAR_FLOW": {
+        "name": "O Mnemônico P.E.S.A.R. (Pensamento, Emoção, Sentimento, Ação, Reencarnação)",
+        "P": "Pensamento: A raiz de tudo. Combater pensamentos nocivos na fonte (técnica do 'Conte até 10') impede que ganhem força e se transformem em ação.",
+        "E": "Emoção: A 'flecha de fora'. Reações reativas, súbitas, passageiras e violentas (ira, medo, euforia) — indicativos de imperfeição/vício.",
+        "S": "Sentimento: A 'luz de dentro'. Estados estáveis, duradouros, serenos e irradiantes (amor, mansuetude, compaixão) — indicativos de virtude.",
+        "A": "Ação/Hábito: A manifestação no mundo físico. A repetição de escolhas define nosso padrão de vibração. 'O hábito faz o monge'.",
+        "R": "Reencarnação: O processo e a escola. 'Não somos matéria, estamos matéria'. Assim como a água muda de estado físico, o espírito passa temporariamente pela densidade da matéria para evoluir."
+    },
+    "PREVENTIVE_FORGIVENESS": {
+        "name": "O Perdão Antecipado",
+        "concept": "Pedir perdão e perdoar de antemão por débitos inconscientes ou mágoas de vidas passadas. Isso alivia instantaneamente a densidade cármica e os reflexos somáticos no corpo físico."
+    },
+    "AURA_GAPS_AND_BIOENERGY": {
+        "name": "Bioenergia e Lacunas na Aura",
+        "gaps": "Vícios e hábitos nocivos (álcool, drogas, gula, abusos) abrem lacunas (gaps) na aura humana (demonstráveis por bioelectrography/GDV), servindo de porta de entrada para que entidades espirituais drenem a energia vital.",
+        "water": "Sendo o corpo feito de 78% de água, nossos pensamentos e intenções ordenam a energia celular (comprovado pelos experimentos dos cristais de Masaru Emoto e dos potes de arroz).",
+        "restoration": "Interagir com parques, matas e a natureza reorganiza e expande a aura/energia vital."
+    },
+    "REFORMA_INTIMA_LIGHT": {
+        "name": "Reforma Íntima Sem Peso (Leveza)",
+        "concept": "A evolução não deve ser punitiva ou cheia de culpa. Devemos ser nossos melhores amigos no processo. Aceitar que temos limitações (se estamos 60% alinhados, já é uma vitória) e focar na melhoria diária gradual, sem autocrítica destrutiva."
+    },
+    "CHAKRAS_AND_MENTORS": {
+        "name": "Crop Circles, Chakras e Mentores",
+        "concept": "Geometrias sagradas (como Crop Circles que replicam os chakras) mostram a ordem cósmica. Lembrar que nunca estamos sozinhos: mentores e guias estão a postos para ajudar toda vez que sintonizamos com o alto (viramos o copo para cima)."
+    }
+};
+
 module.exports = {
     VALCAPELLI_AXIOMS,
     KWITKO_PATTERNS,
     REFORMA_VIRTUES,
     YNSA_POINTS_REFERENCE,
-    SPECIFIC_PROTOCOLS
+    SPECIFIC_PROTOCOLS,
+    LECTURE_KNOWLEDGE
 };
+

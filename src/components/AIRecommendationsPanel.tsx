@@ -188,7 +188,9 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
 
   // Auto-scroll para última mensagem
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 150);
   };
 
   useEffect(() => {

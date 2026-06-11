@@ -63,6 +63,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
   ];
 
   const libraryItems: NavItem[] = [
+    { id: 'mapa-vivo', label: '🗺️ Mapa Vivo', icon: <span className="text-base">🌳</span> },
     { id: 'acupressure', label: t('nav.acupressure'), icon: <Zap className="w-4 h-4" /> },
     { id: 'breathing', label: t('nav.breathing'), icon: <Activity className="w-4 h-4" /> },
     { id: 'sounds', label: t('nav.sounds'), icon: <Waves className="w-4 h-4" /> },

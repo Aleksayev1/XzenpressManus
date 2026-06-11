@@ -44,6 +44,7 @@ import { HerpesHubPage } from './pages/HerpesHubPage';
 import { PhytoLibraryPage } from './pages/PhytoLibraryPage';
 import LandingPage from './components/LandingPage';
 import { FeedbackPage } from './components/FeedbackPage';
+import { MapaVivoPage } from './components/MapaVivoPage';
 
 import { PremiumPartnerPitch } from './pages/PremiumPartnerPitch';
 
@@ -249,6 +250,8 @@ function AppContent() {
         return <HerpesHubPage onBack={() => setCurrentPage('home')} onPageChange={setCurrentPage} />;
       case 'plantas-medicinais':
         return <PhytoLibraryPage onPageChange={setCurrentPage} />;
+      case 'mapa-vivo':
+        return <MapaVivoPage onPageChange={setCurrentPage} />;
       case 'premium-partner':
         return <PremiumPartnerPitch onPageChange={setCurrentPage} />;
       default:

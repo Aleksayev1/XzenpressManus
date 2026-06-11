@@ -103,7 +103,8 @@ export const neuroPoints: AcupressurePoint[] = [
     ],
     isPremium: true,
     category: 'neuro',
-    additionalCategories: ['avc'],
+    subcategory: 'cranial-nerve',
+    additionalCategories: ['avc', 'cranio', 'ynsa'],
     instructions: 'Localizar a linha vertical imediatamente atrás do Ponto A. Palpar de cima para baixo. Cada nódulo sensível corresponde ao órgão/nervo específico (1 a 12).',
     duration: 300,
     pressure: 'moderada'

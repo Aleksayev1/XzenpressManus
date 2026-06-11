@@ -593,7 +593,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
             </div>
 
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-              16 Jornadas Clínicas Completas
+              22 Jornadas Clínicas Completas
             </h2>
 
             <p className="text-xl text-cyan-100 max-w-3xl mx-auto mb-4">
@@ -641,7 +641,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
               </svg>
               <span>Explorar Jornadas Clínicas</span>
             </button>
-            <p className="text-cyan-200 text-sm mt-4">Ansiedade • Dor • Sono • Burnout • e mais 4 jornadas</p>
+            <p className="text-cyan-200 text-sm mt-4">Ansiedade • Dor • Sono • Burnout • e mais 18 jornadas</p>
           </div>
         </div>
       </section>
@@ -830,6 +830,58 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
               </svg>
               <span className="text-sm font-medium">Stripe Verified</span>
             </div>
+          </div>
+
+          {/* Canais Principais de Contato */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pb-8 border-b border-gray-800 text-center">
+            {/* WhatsApp */}
+            <a 
+              href="https://wa.me/5562983316363" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex flex-col items-center p-5 bg-gray-800/30 hover:bg-gray-800/60 rounded-2xl border border-gray-800 hover:border-green-500/30 transition-all duration-300 group shadow-lg"
+            >
+              <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.03-5.112-2.905-6.986C16.559 1.88 14.09 .85 11.459.85c-5.44 0-9.863 4.42-9.867 9.864-.001 1.774.475 3.503 1.378 5.035L1.878 21.6l6.027-1.582-.258-.164zm10.413-7.678c-.33-.165-1.956-.967-2.257-1.077-.302-.11-.522-.165-.742.165-.22.33-.852 1.077-1.044 1.298-.192.22-.385.247-.715.082-1.393-.699-2.39-1.218-3.342-2.855-.25-.429.25-.398.715-1.32.083-.165.04-.309-.02-.44-.06-.13-.522-1.256-.715-1.72-.188-.452-.377-.39-.522-.397-.134-.007-.288-.008-.44-.008-.152 0-.401.057-.61.286-.21.23-.8.781-.8 1.905 0 1.124.817 2.209.931 2.361.114.152 1.61 2.458 3.899 3.447 2.289.988 2.289.658 2.729.618.44-.04 1.956-.8 2.23-1.57.275-.771.275-1.432.193-1.57-.083-.138-.303-.22-.633-.385z"/>
+                </svg>
+              </div>
+              <span className="text-sm font-semibold text-white mb-1">WhatsApp</span>
+              <span className="text-xs text-gray-400 font-mono">(62) 98331-6363</span>
+            </a>
+
+            {/* Instagram */}
+            <a 
+              href="https://instagram.com/xzenpress" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex flex-col items-center p-5 bg-gray-800/30 hover:bg-gray-800/60 rounded-2xl border border-gray-800 hover:border-pink-500/30 transition-all duration-300 group shadow-lg"
+            >
+              <div className="w-12 h-12 bg-pink-500/10 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                </svg>
+              </div>
+              <span className="text-sm font-semibold text-white mb-1">Instagram</span>
+              <span className="text-xs text-gray-400">@xzenpress</span>
+            </a>
+
+            {/* Email */}
+            <a 
+              href="mailto:aleksayevacupress@gmail.com"
+              className="flex flex-col items-center p-5 bg-gray-800/30 hover:bg-gray-800/60 rounded-2xl border border-gray-800 hover:border-blue-500/30 transition-all duration-300 group shadow-lg"
+            >
+              <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </div>
+              <span className="text-sm font-semibold text-white mb-1">E-mail</span>
+              <span className="text-xs text-gray-400">aleksayevacupress@gmail.com</span>
+            </a>
           </div>
 
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">

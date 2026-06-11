@@ -49,6 +49,10 @@ export interface AcupressurePoint {
   isPremium: boolean;
   category: 'general' | 'septicemia' | 'atm' | 'cranio' | 'neuro' | 'immunity' | 'cardio' | 'ynsa' | 'sexual' | 'kidney' | 'menstrual' | 'back_pain' | 'digestive' | 'headache' | 'neck' | 'lung' | 'zoster';
   additionalCategories?: string[];
+  /** Subgrupo clínico YNSA: 'basic' (A-K), 'ypsilon' (órgãos bilateral/temporal), 'sensory' (sensoriais frontais), 'cranial-nerve' (nervos cranianos/occipital) */
+  subcategory?: 'basic' | 'ypsilon' | 'sensory' | 'cranial-nerve' | 'organ' | 'brain';
+  /** Rótulo legível do grupo para exibição na UI */
+  groupLabel?: string;
   instructions?: string;
   duration?: number;
   pressure?: 'muito leve' | 'leve' | 'moderada' | 'firme' | 'forte';

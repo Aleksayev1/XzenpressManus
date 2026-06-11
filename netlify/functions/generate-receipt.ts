@@ -352,7 +352,7 @@ function generateReceiptHTML(data: {
       <p><strong>XZenPress Wellness</strong></p>
       <p>Medicina Integrativa e Bem-Estar Digital</p>
       <p style="margin-top: 15px;">
-        <a href="mailto:contato@xzenpress.com">contato@xzenpress.com</a> | 
+        <a href="mailto:aleksayevacupress@gmail.com">aleksayevacupress@gmail.com</a> | 
         <a href="https://xzenpress.com">xzenpress.com</a>
       </p>
       <p style="margin-top: 15px; font-size: 12px; color: #999;">

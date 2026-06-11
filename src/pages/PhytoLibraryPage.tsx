@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
     ArrowLeft, Leaf, Search, MapPin, AlertTriangle, BookOpen, Activity, 
     Heart, Sprout, Dna, ShoppingCart, Sparkles, Brain, Compass, Clock, 
-    Utensils, ChevronDown, ChevronUp, Loader, RotateCcw, Shield, HelpCircle 
+    Utensils, ChevronDown, ChevronUp, Loader, RotateCcw, Shield, HelpCircle,
+    ZoomIn, X
 } from 'lucide-react';
 import { HERB_DATABASE, Herb } from '../data/herbLibrary';
+import { acupressurePoints } from '../data/points/index';
 
 interface PhytoLibraryPageProps {
     onPageChange?: (page: string) => void;
@@ -58,6 +61,173 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
     const [isOracleLoading, setIsOracleLoading] = useState(false);
     const [oracleError, setOracleError] = useState<string | null>(null);
     const [showOracleDetails, setShowOracleDetails] = useState(true);
+    const [chronicity, setChronicity] = useState<'agudo' | 'cronico' | 'misto'>('misto');
+
+    // Estados do Zoom Modal de Imagens
+    const [showZoomModal, setShowZoomModal] = useState(false);
+    const [zoomImageUrl, setZoomImageUrl] = useState<string | null>(null);
+
+    // Helper de segurança de URLs para WebView de celular (Android/iOS)
+    const getSafeImagePath = (path: string | undefined | null): string => {
+        if (!path) return '';
+        return encodeURI(path);
+    };
+
+    // Helper para cruzar texto do Oráculo com dados reais dos pontos estáticos
+    const getMatchingPoint = (pointStr: string) => {
+        if (!pointStr) return undefined;
+        const cleanStr = pointStr.toLowerCase();
+        
+        // 1. CASOS ESPECIAIS DE CORRESPONDÊNCIA YNSA
+        // Ponto ZS (Mestre Hormonal Feminino)
+        if (cleanStr.includes('zs') || cleanStr.includes('zeise') || cleanStr.includes('suess')) {
+            return acupressurePoints.find(p => p.id === 'ynsa-zs-point' || p.id === 'hormonal-feminino-zs');
+        }
+        
+        // Cérebro / Cerebrum (M1)
+        if (cleanStr.includes('cérebro') || cleanStr.includes('cerebro') || cleanStr.includes('cerebrum') || cleanStr.includes('brain-m1') || cleanStr.includes('m1')) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-brain-m1');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon do Rim (Y-1 / Ypsilon 1)
+        if (cleanStr.includes('y-1') || cleanStr.includes('y1') || (cleanStr.includes('ypsilon') && cleanStr.includes('rim'))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-kidney-y1');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon do Pulmão (Y-2 / Ypsilon 2)
+        if (cleanStr.includes('y-2') || cleanStr.includes('y2') || (cleanStr.includes('ypsilon') && (cleanStr.includes('pulmão') || cleanStr.includes('pulmao')))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-lung');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon do Pericárdio (Y-3 / Ypsilon 3 / Pericardium)
+        if (cleanStr.includes('y-3') || cleanStr.includes('y3') || (cleanStr.includes('ypsilon') && (cleanStr.includes('pericárdio') || cleanStr.includes('pericardio') || cleanStr.includes('circulação') || cleanStr.includes('circulacao')))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-pericardium');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon do Estômago (Y-4 / Ypsilon 4 / Stomach)
+        if (cleanStr.includes('y-4') || cleanStr.includes('y4') || (cleanStr.includes('ypsilon') && (cleanStr.includes('estômago') || cleanStr.includes('estomago')))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-stomach');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon do Intestino Delgado (Y-5 / Ypsilon 5 / Small Intestine / SI)
+        if (cleanStr.includes('y-5') || cleanStr.includes('y5') || (cleanStr.includes('ypsilon') && (cleanStr.includes('delgado') || cleanStr.includes('intestino delgado')))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-si');
+            if (matched) return matched;
+        }
+
+        // 2. REGRA DE INTERCEPTAÇÃO DE PONTOS BÁSICOS YNSA (A a K)
+        // Evita falsos positivos com a palavra "ponto" ou letras soltas nas preposições (como "de", "do").
+        // Captura padrões como: "Ponto D (Lombar)", "Ponto A", "Grupo D YNSA", "Yamamoto Ponto B"
+        const matchBasic = cleanStr.match(/\b(?:ponto|grupo|ynsa|yamamoto)\s+([a-k])\b|\b([a-k])\s+(?:ynsa|yamamoto|ponto)\b/i);
+        if (matchBasic) {
+            const letter = (matchBasic[1] || matchBasic[2]).toLowerCase();
+            const matched = acupressurePoints.find(p => p.id === `ynsa-${letter}` || p.id === `ynsa-ponto-${letter}`);
+            if (matched) return matched;
+        }
+
+        // 3. REGRA DE INTERCEPTAÇÃO DE PONTOS MTC MAIS PRESCRITOS
+        // Evita colisões no loop genérico de termos
+        if (cleanStr.includes('b23') || cleanStr.includes('bl23') || cleanStr.includes('b-23') || cleanStr.includes('bl-23') || cleanStr.includes('shenshu')) {
+            const matched = acupressurePoints.find(p => p.id === 'bl23');
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('ig4') || cleanStr.includes('li4') || cleanStr.includes('ig-4') || cleanStr.includes('li-4') || cleanStr.includes('hegu')) {
+            const matched = acupressurePoints.find(p => p.id === 'septicemia-hegu-li4');
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('bp6') || cleanStr.includes('sp6') || cleanStr.includes('bp-6') || cleanStr.includes('sp-6') || cleanStr.includes('sanyinjiao')) {
+            const matched = acupressurePoints.find(p => p.id === 'sp6-sanyinjiao');
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('e36') || cleanStr.includes('st36') || cleanStr.includes('e-36') || cleanStr.includes('st-36') || cleanStr.includes('zusanli')) {
+            const matched = acupressurePoints.find(p => p.id === 'septicemia-zusanli-st36');
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('r3') || cleanStr.includes('kd3') || cleanStr.includes('r-3') || cleanStr.includes('kd-3') || cleanStr.includes('taixi')) {
+            const matched = acupressurePoints.find(p => p.id === 'kd3' || p.id === 'septicemia-taixi-kd3' || p.id.includes('kd3'));
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('pc6') || cleanStr.includes('neiguan') || cleanStr.includes('neiguan-pc6')) {
+            const matched = acupressurePoints.find(p => p.id === 'neiguan-pc6');
+            if (matched) return matched;
+        }
+        if (cleanStr.includes('f3') || cleanStr.includes('lv3') || cleanStr.includes('lr3') || cleanStr.includes('taichong')) {
+            const matched = acupressurePoints.find(p => p.id === 'lv3-taichong');
+            if (matched) return matched;
+        }
+
+        // 4. CORRESPONDÊNCIA POR ID EXATO OU EQUIVALÊNCIAS
+        for (const point of acupressurePoints) {
+            const pid = point.id.toLowerCase();
+            if (cleanStr.includes(pid)) return point;
+            
+            // Tratamento para prefixos de meridianos tradicionais em Português vs Inglês
+            const pidMtc = pid
+                .replace('kd', 'r')
+                .replace('st', 'e')
+                .replace('li', 'ig')
+                .replace('sp', 'bp')
+                .replace('gv', 'vg')
+                .replace('cv', 'vc')
+                .replace('si', 'id');
+            
+            if (cleanStr.includes(pidMtc)) return point;
+        }
+        
+        // 5. CORRESPONDÊNCIA FALLBACK POR TERMOS DO NOME
+        for (const point of acupressurePoints) {
+            const nameParts = point.name.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
+            for (const part of nameParts) {
+                // IGNORAR palavras genéricas/comuns que causam falsos positivos
+                if (['ponto', 'pontos', 'point', 'points', 'para', 'como', 'com', 'assentamento', 'ypsilon', 'ynsa', 'mtc', 'chinesa'].includes(part)) {
+                    continue;
+                }
+                if (part.length > 3 && cleanStr.includes(part)) {
+                    return point;
+                }
+            }
+        }
+        
+        return undefined;
+    };
+
+    const handleSelectRecommendedItem = (itemName: string) => {
+        if (!itemName) return;
+        
+        // Limpa partes extras do texto (como dosagem ou parênteses, ex: "Huang Qi (Astragalus)" -> "Huang Qi" ou "Astragalus")
+        const cleanName = itemName.split(/[-–—(]/)[0].trim();
+        const searchStr = cleanName.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+        
+        // Tenta achar correspondência direta no banco de plantas/peptídeos
+        const matched = HERB_DATABASE.find(h => {
+            const hName = h.name.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+            const hSci = h.scientificName.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+            
+            return hName.includes(searchStr) || searchStr.includes(hName) || hSci.includes(searchStr);
+        });
+        
+        if (matched) {
+            // Define aba e termo de busca correspondente à planta encontrada
+            setSearchTerm(matched.name);
+            if (matched.origin === 'Brasil') setActiveTab('Brasil');
+            else if (matched.origin === 'China (MTC)') setActiveTab('China (MTC)');
+            else if (matched.origin.includes('Peptídeo')) setActiveTab('Peptídeos');
+        } else {
+            // Fallback: faz a busca pelo nome direto
+            setSearchTerm(cleanName);
+            setActiveTab('Todos');
+        }
+        
+        // Rola a tela suavemente para a seção de pesquisa/biblioteca
+        setTimeout(() => {
+            document.getElementById('phyto-library-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    };
 
     const matchesSearch = (herb: Herb) =>
         herb.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -91,10 +261,16 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
         setOracleResult(null);
 
         try {
-            const response = await fetch('/.netlify/functions/deficiency-oracle', {
+            // Detecta dinamicamente se está rodando em ambiente mobile nativo (Capacitor/WebView)
+            const isNativeMobile = window.location.protocol === 'capacitor:' || 
+                                   window.location.protocol === 'file:' || 
+                                   (window.hasOwnProperty('Capacitor') && (window as any).Capacitor?.isNativePlatform?.());
+            const baseApiUrl = isNativeMobile ? 'https://xzenpress.com' : '';
+
+            const response = await fetch(`${baseApiUrl}/.netlify/functions/deficiency-oracle`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ symptom: query })
+                body: JSON.stringify({ symptom: query, chronicity })
             });
 
             if (!response.ok) {
@@ -266,7 +442,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
+                <div id="phyto-library-section" className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
                     {/* Tabs */}
                     <div className="flex space-x-2 bg-gray-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
                         {['Todos', 'Brasil', 'China (MTC)', 'Peptídeos'].map(tab => (
@@ -284,8 +460,8 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                     </div>
 
                     {/* Search Bar & Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto items-stretch">
-                        <div className="relative flex-1 md:w-80">
+                    <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto items-center">
+                        <div className="relative w-full md:w-80">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <Search className="h-5 w-5 text-gray-400" />
                             </div>
@@ -298,18 +474,58 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                             />
                         </div>
                         {searchTerm.trim().length >= 3 && (
-                            <button
-                                onClick={() => handleConsultOracle()}
-                                disabled={isOracleLoading}
-                                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center justify-center space-x-2 text-sm shrink-0 active:scale-95 disabled:opacity-50"
-                            >
-                                {isOracleLoading ? (
-                                    <Loader className="w-4 h-4 animate-spin" />
-                                ) : (
-                                    <Sparkles className="w-4 h-4 text-amber-200" />
-                                )}
-                                <span>Perguntar ao Oráculo AI</span>
-                            </button>
+                            <div className="flex flex-col sm:flex-row items-center gap-3 bg-purple-50 p-2 rounded-xl border border-purple-100 w-full md:w-auto">
+                                <div className="flex flex-col items-start gap-1">
+                                    <span className="text-[10px] font-bold text-purple-700 uppercase tracking-wider px-1">Como descreve o sintoma?</span>
+                                    <div className="flex gap-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => setChronicity('agudo')}
+                                            className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                                                chronicity === 'agudo'
+                                                    ? 'bg-red-500 text-white border-red-650 shadow-sm'
+                                                    : 'bg-white text-gray-700 border-gray-250 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            🔴 Agudo
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setChronicity('cronico')}
+                                            className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                                                chronicity === 'cronico'
+                                                    ? 'bg-blue-500 text-white border-blue-650 shadow-sm'
+                                                    : 'bg-white text-gray-700 border-gray-250 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            🔵 Crônico
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setChronicity('misto')}
+                                            className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                                                chronicity === 'misto'
+                                                    ? 'bg-purple-500 text-white border-purple-650 shadow-sm'
+                                                    : 'bg-white text-gray-700 border-gray-250 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            🟣 Misto
+                                        </button>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => handleConsultOracle()}
+                                    disabled={isOracleLoading}
+                                    className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center justify-center space-x-2 text-sm shrink-0 active:scale-95 disabled:opacity-50 self-end"
+                                >
+                                    {isOracleLoading ? (
+                                        <Loader className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <Sparkles className="w-4 h-4 text-amber-200" />
+                                    )}
+                                    <span>Oráculo AI</span>
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -458,22 +674,84 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                     {((oracleResult.protocolo.pontosYNSA && oracleResult.protocolo.pontosYNSA.length > 0) || 
                                       (oracleResult.protocolo.pontosMTC && oracleResult.protocolo.pontosMTC.length > 0)) && (
                                         <div>
-                                            <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center"><MapPin className="w-4 h-4 mr-1.5" /> Pontos de Acupressão (MTC & Craniopuntura YNSA)</h3>
+                                            <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center"><MapPin className="w-4 h-4 mr-1.5" /> Pontos de Acupressão Recomendados</h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                {oracleResult.protocolo.pontosYNSA && (
+                                                {oracleResult.protocolo.pontosYNSA && oracleResult.protocolo.pontosYNSA.length > 0 && (
                                                     <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-2xl">
-                                                        <h4 className="text-xs font-bold text-purple-300 mb-2 uppercase tracking-wide">Craniopuntura de Yamamoto (YNSA)</h4>
-                                                        <ul className="text-xs text-slate-300 space-y-2 list-disc pl-4 marker:text-purple-500">
-                                                            {oracleResult.protocolo.pontosYNSA.map((p, idx) => <li key={idx}>{p}</li>)}
-                                                        </ul>
+                                                        <h4 className="text-xs font-bold text-purple-300 mb-3 uppercase tracking-wide">Craniopuntura de Yamamoto (YNSA)</h4>
+                                                        <div className="space-y-4">
+                                                            {oracleResult.protocolo.pontosYNSA.map((p, idx) => {
+                                                                const matchedPoint = getMatchingPoint(p);
+                                                                return (
+                                                                    <div key={idx} className="border-b border-slate-900/40 last:border-0 pb-3 last:pb-0">
+                                                                        <div className="text-xs text-slate-300 leading-relaxed font-semibold mb-2">• {p}</div>
+                                                                        {matchedPoint && matchedPoint.image && (
+                                                                            <div 
+                                                                                className="relative mt-2 rounded-xl overflow-hidden cursor-pointer hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 max-w-[280px] group shadow-md border border-slate-800 hover:border-purple-500/50"
+                                                                                onClick={() => {
+                                                                                    console.log('Oráculo YNSA image click:', matchedPoint.image);
+                                                                                    setZoomImageUrl(getSafeImagePath(matchedPoint.image));
+                                                                                    setShowZoomModal(true);
+                                                                                }}
+                                                                            >
+                                                                                <img 
+                                                                                    src={getSafeImagePath(matchedPoint.image)} 
+                                                                                    alt={matchedPoint.name} 
+                                                                                    className="w-full h-36 object-contain bg-gray-50 p-2 rounded-xl border border-gray-200 shadow-inner"
+                                                                                    onError={(e) => {
+                                                                                        e.currentTarget.style.display = 'none';
+                                                                                    }}
+                                                                                />
+                                                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200 rounded-xl">
+                                                                                    <span className="text-[10px] text-white font-bold bg-purple-600/90 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+                                                                                        <ZoomIn className="w-3 h-3" /> Ampliar
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
                                                     </div>
                                                 )}
-                                                {oracleResult.protocolo.pontosMTC && (
+                                                {oracleResult.protocolo.pontosMTC && oracleResult.protocolo.pontosMTC.length > 0 && (
                                                     <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-2xl">
-                                                        <h4 className="text-xs font-bold text-orange-300 mb-2 uppercase tracking-wide">Meridianos da Medicina Tradicional Chinesa</h4>
-                                                        <ul className="text-xs text-slate-300 space-y-2 list-disc pl-4 marker:text-orange-500">
-                                                            {oracleResult.protocolo.pontosMTC.map((p, idx) => <li key={idx}>{p}</li>)}
-                                                        </ul>
+                                                        <h4 className="text-xs font-bold text-orange-300 mb-3 uppercase tracking-wide">Meridianos da Medicina Tradicional Chinesa</h4>
+                                                        <div className="space-y-4">
+                                                            {oracleResult.protocolo.pontosMTC.map((p, idx) => {
+                                                                const matchedPoint = getMatchingPoint(p);
+                                                                return (
+                                                                    <div key={idx} className="border-b border-slate-900/40 last:border-0 pb-3 last:pb-0">
+                                                                        <div className="text-xs text-slate-300 leading-relaxed font-semibold mb-2">• {p}</div>
+                                                                        {matchedPoint && matchedPoint.image && (
+                                                                            <div 
+                                                                                className="relative mt-2 rounded-xl overflow-hidden cursor-pointer hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 max-w-[280px] group shadow-md border border-slate-800 hover:border-orange-500/50"
+                                                                                onClick={() => {
+                                                                                    console.log('Oráculo MTC image click:', matchedPoint.image);
+                                                                                    setZoomImageUrl(getSafeImagePath(matchedPoint.image));
+                                                                                    setShowZoomModal(true);
+                                                                                }}
+                                                                            >
+                                                                                <img 
+                                                                                    src={getSafeImagePath(matchedPoint.image)} 
+                                                                                    alt={matchedPoint.name} 
+                                                                                    className="w-full h-36 object-contain bg-gray-50 p-2 rounded-xl border border-gray-200 shadow-inner"
+                                                                                    onError={(e) => {
+                                                                                        e.currentTarget.style.display = 'none';
+                                                                                    }}
+                                                                                />
+                                                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200 rounded-xl">
+                                                                                    <span className="text-[10px] text-white font-bold bg-orange-600/90 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+                                                                                        <ZoomIn className="w-3 h-3" /> Ampliar
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
@@ -509,15 +787,35 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                         <h3 className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-4 flex items-center"><Sprout className="w-4 h-4 mr-1.5" /> Fitoterapia Personalizada</h3>
                                         <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-2xl space-y-3">
                                             <div>
-                                                <h4 className="text-xs font-bold text-emerald-400">🇧🇷 Plantas Brasileiras Comprovadas:</h4>
-                                                <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 mt-1 marker:text-emerald-500">
-                                                    {oracleResult.protocolo.fitoterapia.plantasBrasileiras.map((p, idx) => <li key={idx}>{p}</li>)}
+                                                <h4 className="text-xs font-bold text-emerald-400 mb-1">🇧🇷 Plantas Brasileiras Comprovadas (Clique para ver):</h4>
+                                                <ul className="text-xs text-slate-300 space-y-1.5 pl-1.5">
+                                                    {(oracleResult.protocolo.fitoterapia?.plantasBrasileiras || []).map((p, idx) => (
+                                                        <li 
+                                                            key={idx} 
+                                                            onClick={() => handleSelectRecommendedItem(p)}
+                                                            className="hover:text-emerald-300 hover:underline cursor-pointer transition-colors duration-150 flex items-center py-0.5 group"
+                                                        >
+                                                            <span className="mr-2 text-emerald-500">•</span>
+                                                            <span>{p}</span>
+                                                            <Search className="w-3 h-3 ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-emerald-400 shrink-0" />
+                                                        </li>
+                                                    ))}
                                                 </ul>
                                             </div>
                                             <div className="border-t border-slate-950 pt-3">
-                                                <h4 className="text-xs font-bold text-orange-400">🏮 Fitoterapia Chinesa (Pinyin):</h4>
-                                                <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 mt-1 marker:text-orange-500">
-                                                    {oracleResult.protocolo.fitoterapia.plantasMTC.map((p, idx) => <li key={idx}>{p}</li>)}
+                                                <h4 className="text-xs font-bold text-orange-400 mb-1">🏮 Fitoterapia Chinesa / Pinyin (Clique para ver):</h4>
+                                                <ul className="text-xs text-slate-300 space-y-1.5 pl-1.5">
+                                                    {(oracleResult.protocolo.fitoterapia?.plantasMTC || []).map((p, idx) => (
+                                                        <li 
+                                                            key={idx} 
+                                                            onClick={() => handleSelectRecommendedItem(p)}
+                                                            className="hover:text-orange-300 hover:underline cursor-pointer transition-colors duration-150 flex items-center py-0.5 group"
+                                                        >
+                                                            <span className="mr-2 text-orange-500">•</span>
+                                                            <span>{p}</span>
+                                                            <Search className="w-3 h-3 ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-orange-400 shrink-0" />
+                                                        </li>
+                                                    ))}
                                                 </ul>
                                             </div>
                                         </div>
@@ -528,8 +826,18 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                         <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-2xl relative overflow-hidden">
                                             <div className="absolute top-0 right-0 w-12 h-12 bg-indigo-500/10 rounded-full blur-lg" />
                                             <h3 className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2 flex items-center"><Dna className="w-4 h-4 mr-1.5 animate-pulse" /> Peptídeos de Biohacking</h3>
-                                            <ul className="text-xs text-slate-300 space-y-1.5 list-disc pl-4 marker:text-indigo-500">
-                                                {oracleResult.protocolo.peptideos.indicados.map((pep, idx) => <li key={idx}>{pep}</li>)}
+                                            <ul className="text-xs text-slate-300 space-y-1.5 pl-1.5">
+                                                {oracleResult.protocolo.peptideos.indicados.map((pep, idx) => (
+                                                    <li 
+                                                        key={idx} 
+                                                        onClick={() => handleSelectRecommendedItem(pep)}
+                                                        className="hover:text-indigo-300 hover:underline cursor-pointer transition-colors duration-150 flex items-center py-0.5 group"
+                                                    >
+                                                        <span className="mr-2 text-indigo-500">•</span>
+                                                        <span>{pep}</span>
+                                                        <Search className="w-3 h-3 ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-indigo-400 shrink-0" />
+                                                    </li>
+                                                ))}
                                             </ul>
                                             <p className="text-[9px] text-slate-500 italic mt-3 bg-black/30 p-2 rounded-lg border border-slate-950/50">🔬 {oracleResult.protocolo.peptideos.nota}</p>
                                         </div>
@@ -706,7 +1014,108 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                         © {new Date().getFullYear()} Xzenpress - Inteligência em Saúde Integrativa. Todos os direitos reservados.
                     </div>
                 </div>
+
+                <ImageZoomModal
+                    isVisible={showZoomModal}
+                    imageUrl={zoomImageUrl}
+                    onClose={() => {
+                        console.log('🚪 Fechando modal oráculo');
+                        setShowZoomModal(false);
+                        setZoomImageUrl(null);
+                    }}
+                />
             </div>
         </div>
+    );
+};
+
+const ImageZoomModal: React.FC<{
+    isVisible: boolean;
+    imageUrl: string | null;
+    onClose: () => void;
+}> = ({ isVisible, imageUrl, onClose }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    console.log('🔍 ImageZoomModal oráculo render:', { isVisible, imageUrl, imageLoaded });
+
+    useEffect(() => {
+        if (isVisible) {
+            console.log('✅ Modal oráculo visível, resetando imageLoaded');
+            setImageLoaded(false);
+        }
+    }, [isVisible, imageUrl]);
+
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        if (isVisible) {
+            document.addEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'hidden';
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'unset';
+        };
+    }, [isVisible, onClose]);
+
+    if (!isVisible || !imageUrl) return null;
+
+    return createPortal(
+        <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-90 transition-opacity duration-300 p-4 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <div
+                className="relative w-full max-w-6xl max-h-[95vh] flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {!imageLoaded && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-white text-sm">Carregando imagem...</span>
+                        </div>
+                    </div>
+                )}
+
+                <img
+                    src={imageUrl}
+                    alt="Ponto de acupressão ampliado"
+                    className={`max-w-full max-h-[95vh] object-contain rounded-xl shadow-2xl transition-opacity duration-300 cursor-pointer ${imageLoaded ? 'opacity-100' : 'opacity-0'
+                        }`}
+                    onClick={onClose}
+                    onLoad={() => {
+                        console.log('Imagem oráculo carregada com sucesso!');
+                        setImageLoaded(true);
+                    }}
+                    onError={(e) => {
+                        console.error('Erro ao carregar imagem oráculo:', imageUrl);
+                        e.currentTarget.style.display = 'none';
+                        setImageLoaded(true);
+                    }}
+                />
+
+                <button
+                    onClick={onClose}
+                    className="absolute -top-14 right-0 bg-red-500 hover:bg-red-600 text-white transition-colors p-3 rounded-full shadow-lg hover:scale-110 transform duration-200"
+                    aria-label="Fechar"
+                    title="Fechar (ESC)"
+                >
+                    <X className="w-6 h-6" />
+                </button>
+
+                <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 px-6 py-3 rounded-full">
+                    <div className="flex items-center gap-3 text-white text-sm">
+                        <span className="opacity-90">💡 Clique na imagem ou pressione ESC para fechar</span>
+                    </div>
+                </div>
+            </div>
+        </div>,
+        document.body
     );
 };

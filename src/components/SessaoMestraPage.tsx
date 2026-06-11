@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowRight, Brain, Zap, Activity, Send, Loader2, Sparkles, X, Crown } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
 import { emotionalStates, type EmotionalState } from '../data/emotionalMapping';
@@ -25,7 +26,6 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [selectedEmotion, setSelectedEmotion] = useState<EmotionalState | null>(null);
     const [intensity, setIntensity] = useState<number>(0);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
     const [currentPointIndex, setCurrentPointIndex] = useState(0);
 
     // Usage Limit State
@@ -89,145 +89,6 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins}:${secs.toString().padStart(2, '0')}`;
-    };
-
-    // Função para encontrar imagem do ponto com suporte a múltiplas variações
-    const findPointImage = (pointName: string) => {
-        if (!pointName || typeof pointName !== 'string') {
-            return null;
-        }
-
-        if (pointName.toLowerCase().includes('ypsilon')) {
-            return '/YNSA/ynsa-ypsilon-chart-hd.png';
-        }
-
-        const normalized = pointName.toLowerCase().trim().replace(/[\s-]/g, '');
-
-        let point = acupressurePoints.find((p: any) => {
-            if (!p || !p.name || !p.id) return false;
-            const pName = p.name.toLowerCase().replace(/[\s-]/g, '');
-            const pId = p.id.toLowerCase().replace(/[\s-]/g, '');
-            const pNameEn = p.nameEn ? p.nameEn.toLowerCase().replace(/[\s-]/g, '') : '';
-            return pName.includes(normalized) || pId.includes(normalized) || pNameEn.includes(normalized);
-        });
-
-        if (point) return point.image;
-
-        const upperName = pointName.toUpperCase().trim();
-
-        if (/^(YNSA|Ponto)\s*([A-Z]{1,2})$/i.test(upperName)) {
-            const match = upperName.match(/[A-Z]{1,2}/i);
-            const letter = match ? match[0].toLowerCase() : '';
-
-            point = acupressurePoints.find((p: any) =>
-                p && p.id && (
-                    p.id.toLowerCase().includes(`ynsa-ponto-${letter}`) ||
-                    p.id.toLowerCase().includes(`ynsaponto${letter}`) ||
-                    (letter === 'zs' && p.id.toLowerCase().includes('ynsa-zs-point'))
-                )
-            );
-            if (point) return point.image;
-        }
-
-        const meridianMap: Record<string, string[]> = {
-            'ig': ['li', 'ig'],
-            'li': ['li', 'ig'],
-            'f': ['lv', 'lr', 'f'],
-            'lv': ['lv', 'lr', 'f'],
-            'lr': ['lv', 'lr', 'f'],
-            'p': ['lu', 'p'],
-            'lu': ['lu', 'p'],
-            'bp': ['sp', 'bp'],
-            'sp': ['sp', 'bp'],
-            'e': ['st', 'e'],
-            'st': ['st', 'e'],
-            'c': ['ht', 'he', 'c'],
-            'ht': ['ht', 'he', 'c'],
-            'he': ['ht', 'he', 'c'],
-            'id': ['si', 'id'],
-            'si': ['si', 'id'],
-            'b': ['bl', 'ub', 'b'],
-            'bl': ['bl', 'ub', 'b'],
-            'ub': ['bl', 'ub', 'b'],
-            'r': ['ki', 'kd', 'r'],
-            'ki': ['ki', 'kd', 'r'],
-            'kd': ['ki', 'kd', 'r'],
-            'cs': ['pc', 'cs'],
-            'pc': ['pc', 'cs'],
-            'ta': ['sj', 'tb', 'te', 'ta'],
-            'sj': ['sj', 'tb', 'te', 'ta'],
-            'tb': ['sj', 'tb', 'te', 'ta'],
-            'te': ['sj', 'tb', 'te', 'ta'],
-            'vb': ['gb', 'vb'],
-            'gb': ['gb', 'vb'],
-            'vc': ['ren', 'cv', 'vc'],
-            'ren': ['ren', 'cv', 'vc'],
-            'cv': ['ren', 'cv', 'vc'],
-            'vg': ['du', 'gv', 'vg'],
-            'du': ['du', 'gv', 'vg'],
-            'gv': ['du', 'gv', 'vg']
-        };
-
-        const meridianMatch = upperName.match(/^([A-Z]{1,3})[\s-]*(\d{1,2}[A-Z]?)$/i);
-        if (meridianMatch) {
-            const [, meridian, number] = meridianMatch;
-            const meridianLower = meridian.toLowerCase();
-            const variations = meridianMap[meridianLower] || [meridianLower];
-
-            point = acupressurePoints.find((p: any) => {
-                if (!p || !p.id) return false;
-                const id = p.id.toLowerCase();
-                return variations.some(variant =>
-                    id.includes(`${variant}${number}`) ||
-                    id.includes(`${variant}-${number}`) ||
-                    id.includes(`${variant}_${number}`)
-                );
-            });
-            if (point) return point.image;
-        }
-
-        point = acupressurePoints.find((p: any) => {
-            if (!p || !p.name || !p.id) return false;
-            const searchTerms = pointName.toLowerCase().split(/[\s-]+/);
-            return searchTerms.every(term =>
-                p.name.toLowerCase().includes(term) ||
-                p.id.toLowerCase().includes(term)
-            );
-        });
-
-        return point?.image || null;
-    };
-
-    const renderMessageContent = (content: string) => {
-        if (!content || typeof content !== 'string') {
-            return '';
-        }
-
-        const pointRegex = /\b((?:IG|LI|VB|GB|VC|Ren|CV|Du|GV|P|LU|C|HT|HE|TA|SJ|TB|CS|PC|F|LR|LV|R|KI|BP|SP|E|ST|ID|SI|B|BL)\s?-?\s?\d{1,2}\b|(?:YNSA\s+Ponto|YNSA|Ponto)\s?-?\s?(?:A|B|C|D|E|F|G|H|I|J|K|ZS)\b|(?:Ypsilon|Ponto)\s+[a-zA-Záéíóúçãõâêîôû\-]+)/gi;
-        const parts = content.split(pointRegex);
-        return parts.map((part, i) => {
-            if (!part || typeof part !== 'string' || !part.trim()) {
-                return part;
-            }
-
-            if (part.match(pointRegex)) {
-                const imageUrl = findPointImage(part);
-                if (imageUrl) {
-                    return (
-                        <button
-                            key={i}
-                            onClick={() => setPreviewImage({ url: imageUrl, title: part })}
-                            className="inline-flex items-center space-x-1 mx-1 px-1.5 py-0.5 bg-blue-900/40 hover:bg-blue-800 text-blue-300 rounded text-xs font-semibold transition-colors align-middle border border-blue-800/50"
-                            title="Ver imagem do ponto"
-                        >
-                            <span>{part}</span>
-                            <span className="text-[10px]">📸</span>
-                        </button>
-                    );
-                }
-            }
-            return part;
-        });
     };
 
     useEffect(() => {
@@ -390,7 +251,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         if (!selectedEmotion) return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4WYPdgoIcn6?utm_source=generator"; // Chill default
         switch (selectedEmotion.mtcElement) {
             case 'fire': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4WYPdgoIcn6"; // Chill/Piano (Calm Anxiety)
-            case 'wood': return "https://open.spotify.com/embed/playlist/37i9dQZF1DWXRqgorJj26U"; // Rock Classics (Release Anger)
+            case 'wood': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO"; // Nature Sounds (Wood/Forest Relaxation)
             case 'earth': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX6VdMW310YC7"; // Chill Vibes (Grounding)
             case 'metal': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX3qCx5yEZkcJ"; // Jazz (Comfort Sadness)
             case 'water': return "https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u"; // Peaceful Piano (Safety for Fear)
@@ -528,9 +389,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             {messages.map((msg, idx) => (
                                 <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`max-w-[85%] rounded-2xl px-5 py-4 ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-200 border border-gray-700'}`}>
-                                        <div className="whitespace-pre-wrap leading-relaxed">
-                                            {msg.role === 'assistant' ? renderMessageContent(msg.content) : msg.content}
-                                        </div>
+                                        <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                                     </div>
                                 </div>
                             ))}
@@ -897,51 +756,101 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         </button>
                     </div>
                 )}
-                {/* Preview Image Modal (Smart Links in Chat) */}
-                {previewImage && (
-                    <div
-                        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
-                        onClick={() => setPreviewImage(null)}
-                    >
-                        <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden max-w-sm w-full shadow-2xl animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
-                            <div className="p-3 bg-gray-900 flex justify-between items-center border-b border-gray-700">
-                                <h3 className="font-bold text-white">{previewImage.title}</h3>
-                                <button onClick={() => setPreviewImage(null)} className="p-1 hover:bg-gray-700 rounded-full transition-colors">
-                                    <X className="w-5 h-5 text-gray-400 hover:text-white" />
-                                </button>
-                            </div>
-                            <div className="p-1 bg-gray-950">
-                                <img src={previewImage.url} alt={previewImage.title} className="w-full h-auto object-contain rounded-lg shadow-xl" />
-                            </div>
-                        </div>
-                    </div>
-                )}
-                {/* Image Modal */}
-                {selectedImage && (
-                    <div
-                        className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
-                        onClick={() => setSelectedImage(null)}
-                    >
-                        <div className="relative max-w-4xl max-h-[90vh] w-full flex flex-col items-center justify-center">
-                            <button
-                                onClick={() => setSelectedImage(null)}
-                                className="absolute -top-16 right-0 md:-right-4 p-2 text-white hover:text-red-400 transition-colors z-50"
-                            >
-                                <div className="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
-                                    <span className="text-sm font-medium">Fechar</span>
-                                    <X className="w-5 h-5" />
-                                </div>
-                            </button>
-                            <img
-                                src={selectedImage}
-                                alt="Detalhe do ponto"
-                                className="w-full h-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
-                            />
-                            <p className="text-gray-400 text-sm mt-4 animate-pulse">Toque em qualquer lugar para fechar</p>
-                        </div>
-                    </div>
-                )}
+                {/* Standardized Image Zoom Modal */}
+                <ImageZoomModal
+                    isVisible={!!selectedImage}
+                    imageUrl={selectedImage}
+                    onClose={() => setSelectedImage(null)}
+                />
             </div>
         </div>
+    );
+};
+
+const ImageZoomModal: React.FC<{
+    isVisible: boolean;
+    imageUrl: string | null;
+    onClose: () => void;
+}> = ({ isVisible, imageUrl, onClose }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    // Reset imageLoaded when modal opens with new image
+    useEffect(() => {
+        if (isVisible) {
+            setImageLoaded(false);
+        }
+    }, [isVisible, imageUrl]);
+
+    // Handle keyboard events
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        if (isVisible) {
+            document.addEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'hidden';
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'unset';
+        };
+    }, [isVisible, onClose]);
+
+    if (!isVisible || !imageUrl) return null;
+
+    return createPortal(
+        <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-90 transition-opacity duration-300 p-4 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <div
+                className="relative w-full max-w-6xl max-h-[95vh] flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {!imageLoaded && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-white text-sm">Carregando imagem...</span>
+                        </div>
+                    </div>
+                )}
+
+                <img
+                    src={imageUrl}
+                    alt="Ponto de acupressão ampliado"
+                    className={`max-w-full max-h-[95vh] object-contain rounded-xl shadow-2xl transition-opacity duration-300 cursor-pointer ${
+                        imageLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    onClick={onClose}
+                    onLoad={() => setImageLoaded(true)}
+                    onError={(e) => {
+                        console.error('Erro ao carregar imagem:', imageUrl);
+                        e.currentTarget.style.display = 'none';
+                        setImageLoaded(true);
+                    }}
+                />
+
+                <button
+                    onClick={onClose}
+                    className="absolute -top-14 right-0 bg-red-500 hover:bg-red-600 text-white transition-colors p-3 rounded-full shadow-lg hover:scale-110 transform duration-200"
+                    aria-label="Fechar"
+                    title="Fechar (ESC)"
+                >
+                    <X className="w-6 h-6" />
+                </button>
+
+                <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 px-6 py-3 rounded-full">
+                    <div className="flex items-center gap-3 text-white text-sm">
+                        <span className="opacity-90">💡 Clique na imagem ou pressione ESC para fechar</span>
+                    </div>
+                </div>
+            </div>
+        </div>,
+        document.body
     );
 };

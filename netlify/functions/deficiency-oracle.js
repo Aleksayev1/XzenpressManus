@@ -19,9 +19,11 @@ exports.handler = async (event) => {
     }
 
     let symptom = '';
+    let chronicity = 'misto';
     try {
         const body = JSON.parse(event.body || '{}');
         symptom = (body.symptom || '').trim();
+        chronicity = (body.chronicity || 'misto').trim();
     } catch {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'JSON inválido' }) };
     }
@@ -120,6 +122,15 @@ REGRAS ABSOLUTAS:
 
 "${sanitized}"
 
+A condição é clinicamente descrita como: ${chronicity.toUpperCase()} (aguda, crônica ou mista).
+
+CRITÉRIO CRUCIAL DE PRESCRIÇÃO YNSA:
+- Se a condição for AGUDA (dor forte, início recente), dê prioridade absoluta aos Pontos dos Nervos Cranianos (occipital) que trazem modulação neural imediata e alívio rápido, indicando também Pontos Ypsilon como suporte.
+- Se for CRÔNICA (condição que vai e vem há semanas/meses), dê prioridade aos Pontos Ypsilon bilaterais (região temporal) para reeducação orgânica profunda e somatotópica gradual, indicando Nervos Cranianos como reforço se necessário.
+- Se for MISTA (crise aguda em cima de um quadro crônico), prescreva e dê igual prioridade a ambos (Pontos Ypsilon bilaterais na têmpora + Pontos de Nervos Cranianos no occipital).
+
+Escreva a justificativa clínica dessa escolha no campo "visaoIntegrativa" e prescreva os pontos exatos em "pontosYNSA".
+
 Responda exclusivamente em JSON válido, seguindo o formato especificado no seu sistema. Seja completo, profundo e verdadeiramente útil para o usuário.`;
 
     try {
@@ -170,6 +181,52 @@ Responda exclusivamente em JSON válido, seguindo o formato especificado no seu 
                 protocol = JSON.parse(match[1]);
             } else {
                 throw new Error('Resposta da IA não é JSON válido');
+            }
+        }
+
+        // normaliza a estrutura para garantir segurança completa no frontend
+        if (protocol && protocol.protocolo) {
+            // Garante que fitoterapia seja um objeto seguro
+            if (!protocol.protocolo.fitoterapia) {
+                protocol.protocolo.fitoterapia = { plantasBrasileiras: [], plantasMTC: [] };
+            } else if (Array.isArray(protocol.protocolo.fitoterapia)) {
+                const flatList = protocol.protocolo.fitoterapia;
+                protocol.protocolo.fitoterapia = {
+                    plantasBrasileiras: flatList.filter(p => !p.toLowerCase().includes('mtc') && !p.toLowerCase().includes('pinyin')),
+                    plantasMTC: flatList.filter(p => p.toLowerCase().includes('mtc') || p.toLowerCase().includes('pinyin'))
+                };
+            } else {
+                // Caso existam chaves alternativas ou grafias ligeiramente diferentes
+                if (!protocol.protocolo.fitoterapia.plantasBrasileiras) {
+                    const keys = Object.keys(protocol.protocolo.fitoterapia);
+                    const brKey = keys.find(k => k.toLowerCase().includes('brasil') || k.toLowerCase().includes('br') || k.toLowerCase() === 'plantasbrasileiras');
+                    protocol.protocolo.fitoterapia.plantasBrasileiras = brKey ? protocol.protocolo.fitoterapia[brKey] : [];
+                }
+                if (!protocol.protocolo.fitoterapia.plantasMTC) {
+                    const keys = Object.keys(protocol.protocolo.fitoterapia);
+                    const mtcKey = keys.find(k => k.toLowerCase().includes('mtc') || k.toLowerCase().includes('china') || k.toLowerCase() === 'plantasmtc');
+                    protocol.protocolo.fitoterapia.plantasMTC = mtcKey ? protocol.protocolo.fitoterapia[mtcKey] : [];
+                }
+            }
+
+            // Garante que as listas internas sejam de fato arrays
+            if (!Array.isArray(protocol.protocolo.fitoterapia.plantasBrasileiras)) {
+                protocol.protocolo.fitoterapia.plantasBrasileiras = [];
+            }
+            if (!Array.isArray(protocol.protocolo.fitoterapia.plantasMTC)) {
+                protocol.protocolo.fitoterapia.plantasMTC = [];
+            }
+
+            // Garante outros arrays recomendados
+            if (!Array.isArray(protocol.protocolo.pontosYNSA)) protocol.protocolo.pontosYNSA = [];
+            if (!Array.isArray(protocol.protocolo.pontosMTC)) protocol.protocolo.pontosMTC = [];
+            if (!Array.isArray(protocol.protocolo.suplementos)) protocol.protocolo.suplementos = [];
+            
+            if (!protocol.protocolo.alimentacao) {
+                protocol.protocolo.alimentacao = { priorizar: [], evitar: [], receitaMTC: "" };
+            } else {
+                if (!Array.isArray(protocol.protocolo.alimentacao.priorizar)) protocol.protocolo.alimentacao.priorizar = [];
+                if (!Array.isArray(protocol.protocolo.alimentacao.evitar)) protocol.protocolo.alimentacao.evitar = [];
             }
         }
 

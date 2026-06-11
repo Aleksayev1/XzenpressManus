@@ -364,7 +364,7 @@ const HormonalResearchPage: React.FC = () => {
                         A ciência do XZenPress já está disponível hoje. Não espere o estudo começar para cuidar de você.
                     </p>
                     <p className="text-lg mb-8">
-                        Nossa plataforma oferece <strong className="text-pink-400">16 Jornadas Clínicas</strong> completas e uma biblioteca de <strong className="text-cyan-400">sons neuro-acústicos</strong>.
+                        Nossa plataforma oferece <strong className="text-pink-400">22 Jornadas Clínicas</strong> completas e uma biblioteca de <strong className="text-cyan-400">sons neuro-acústicos</strong>.
                     </p>
                     <button
                         onClick={() => window.location.href = '/'}

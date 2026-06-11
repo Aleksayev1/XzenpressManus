@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapaVivoOnboarding } from './MapaVivoOnboarding';
+import { MapaVivoIntro, hasSeenMapaVivoIntro } from './MapaVivoIntro';
 import { GuardianDisplay } from './GuardianDisplay';
 import { WeeklyCheckin, type WeeklyCheckinData } from './WeeklyCheckin';
 import {
@@ -94,6 +95,7 @@ function computeXLI(state: MapaVivoState): number {
 }
 
 export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamneseProfile }) => {
+  const [showIntro, setShowIntro] = useState(!hasSeenMapaVivoIntro());
   const [state, setState] = useState<MapaVivoState>(() => {
     const persisted = loadState();
     // If user has never done the mapa-vivo but HAS done anamnese, seed with anamnese scores
@@ -117,7 +119,12 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
   const xli = computeXLI(state);
   const checkinDue = isCheckinDue(state.lastCheckinDate);
 
-  // ---- ONBOARDING ----
+  // ---- INTRO (first visit) ----
+  if (showIntro) {
+    return <MapaVivoIntro onComplete={() => setShowIntro(false)} />;
+  }
+
+  // ---- ONBOARDING handler ----
   const handleOnboardingComplete = (scores: GuardianScores, dominantId: GuardianElement['id']) => {
     setState(prev => ({
       ...prev,
@@ -128,7 +135,7 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
     setView('main');
   };
 
-  // ---- CHECK-IN ----
+  // ---- CHECK-IN handler ----
   const handleCheckinComplete = (data: WeeklyCheckinData) => {
     setState(prev => {
       const newScores = { ...prev.scores };
@@ -152,11 +159,23 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
     setView('main');
   };
 
-  // ---- GUARDIAN DETAIL ----
+  // ---- GUARDIAN DETAIL handler ----
   const handleGuardianClick = (guardian: GuardianElement) => {
     setSelectedGuardian(guardian);
     setView('guardian-detail');
   };
+
+  // ========================
+  // GUARDS — rendered after handlers
+  // ========================
+
+  if (showIntro) {
+    return <MapaVivoIntro onComplete={() => setShowIntro(false)} />;
+  }
+
+  if (!state.hasCompletedOnboarding) {
+    return <MapaVivoOnboarding onComplete={handleOnboardingComplete} />;
+  }
 
   // ========================
   // VIEWS

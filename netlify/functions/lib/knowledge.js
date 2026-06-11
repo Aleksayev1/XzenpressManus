@@ -1,5 +1,5 @@
 // knowledge.js - The Structured Wisdom Source (Layer 2)
-// v2.0 — Expandido com 9 protocolos específicos + tabela YNSA completa
+// v3.0 — Epigenética, mente-célula, Valcapelli completo, Kwitko ampliado, 10 protocolos clínicos
 
 // =============================================================================
 // 1. METAFÍSICA DA SAÚDE (Causa Moral por Órgão)
@@ -100,6 +100,46 @@ const VALCAPELLI_AXIOMS = [
         "causality": "Engolir palavras. Não poder se expressar. Criatividade reprimida. 'O que eu digo não importa.'",
         "symptom": "Hipotireoidismo, Hipertireoidismo, Nódulos",
         "virtue_needed": "Expressão Autêntica / Voz Própria"
+    },
+    {
+        "organ": "pancreas_diabetes",
+        "element": "terra",
+        "emotion": "amargura_doçura_perdida",
+        "causality": "A doçura da vida foi roubada ou nunca foi sentida. Relações amargas e ressentimento crônico. Dependência afetiva que esgota. Incapacidade de 'adoçar' a própria existência.",
+        "symptom": "Diabetes Tipo 2, Hipoglicemia, Obesidade abdominal",
+        "virtue_needed": "Doçura Interior / Autonutrição"
+    },
+    {
+        "organ": "cancer_geral",
+        "element": "todos",
+        "emotion": "ressentimento_profundo",
+        "causality": "Ressentimento antigo e não expresso que corrói por dentro. 'Uma mágoa que corroeu o coração por anos.' Sensação de que a vida 'não presta'. Autocomiseração crônica. A célula reflete a falta de sentido.",
+        "symptom": "Processos proliferativos, tumores",
+        "virtue_needed": "Perdão Radical / Renovação do Sentido de Vida"
+    },
+    {
+        "organ": "articulacoes_artrite",
+        "element": "madeira_metal",
+        "emotion": "critica_rigidez",
+        "causality": "Crítica inflexível a si mesmo e aos outros. 'Morder' a vida com rigor excessivo. Rigidez de pensamento que se manifesta como rigidez nas articulações.",
+        "symptom": "Artrite Reumatoide, Artrose, Dores articulares",
+        "virtue_needed": "Flexibilidade / Compaixão"
+    },
+    {
+        "organ": "bexiga_trato_urinario",
+        "element": "agua",
+        "emotion": "ansiedade_ansiosa",
+        "causality": "Ansiedade crônica que 'aperta' a bexiga. Medo de 'soltar o controle'. Irritabilidade com os outros ('está me irritando').",
+        "symptom": "Cistite de repetição, Incontinência Urinária, Cálculos",
+        "virtue_needed": "Confiança / Leveza"
+    },
+    {
+        "organ": "sistema_imune",
+        "element": "todos",
+        "emotion": "autoagressao",
+        "causality": "O sistema imune ataca o próprio corpo espelhando a dinâmica interna: autocrítica destrutiva, autossabotagem, sentimento de não merecer. 'Eu sou meu próprio inimigo.'",
+        "symptom": "Doenças Autoimunes (Lúpus, Esclerose Múltipla, Psoríase grave)",
+        "virtue_needed": "Amor Próprio / Autocompaixão"
     }
 ];
 
@@ -141,6 +181,34 @@ const KWITKO_PATTERNS = [
         "trigger_question": "Você sente que nunca é bom o suficiente?",
         "insight": "O crítico interno é a voz dos que não acreditaram em você. Mas você não é mais aquela criança.",
         "action": "Escreva 3 coisas que você fez BEM hoje. Sem 'mas'. Sem ressalvas."
+    },
+    {
+        "pattern_id": "fugitivo",
+        "name": "O Padrão do Fugitivo",
+        "trigger_question": "Você tende a escapar (comida, redes sociais, séries, trabalho excessivo) quando sente desconforto?",
+        "insight": "A fuga não resolve o problema — ela o encapsula, e cada vez que você retorna, ele está maior. O desconforto é o sinal do seu GPS interno mostrando onde crescer.",
+        "action": "Sente com o desconforto por 5 minutos sem fugir. Pergunte: 'O que este sentimento quer me dizer?'"
+    },
+    {
+        "pattern_id": "perfeccionista",
+        "name": "O Padrão do Perfeccionista",
+        "trigger_question": "Você demora para agir porque teme não fazer 'perfeito'?",
+        "insight": "O perfeccionismo é o medo do julgamento usando a fantasia da excelência como escudo. 80% feito e entregue vale mais que 100% nunca iniciado.",
+        "action": "Entregue algo hoje que está 'bom o suficiente'. Observe o medo que surge. Ele é o professor."
+    },
+    {
+        "pattern_id": "ruminador",
+        "name": "O Padrão do Ruminador",
+        "trigger_question": "Você revisita mentalmente situações passadas com raiva ou culpa com frequência?",
+        "insight": "Ruminar é beber veneno e esperar que o passado morra. O passado já está morto. A ruminação é o ego tentando reescrever uma história que já acabou.",
+        "action": "Escreva o episódio que rumina em um papel. Queime ou rasgue. Diga em voz alta: 'Eu libero. Eu aprendi. Eu sigo.'"
+    },
+    {
+        "pattern_id": "doador_excessivo",
+        "name": "O Padrão do Doador Excessivo (Codependente)",
+        "trigger_question": "Você sente que se não cuidar dos outros, algo de errado acontecerá?",
+        "insight": "Doação sem reserva é esgotamento disfarçado de amor. Você só pode dar o que tem. Copo vazio não serve ninguém.",
+        "action": "Identifique uma necessidade SUA — não de ninguém — e atenda-a hoje. Sem culpa."
     }
 ];
 
@@ -461,12 +529,55 @@ const LECTURE_KNOWLEDGE = {
     }
 };
 
+// =============================================================================
+// 7. EPIGENÉTICA E CIÊNCIA DA MENTE-CÉLULA
+// =============================================================================
+const EPIGENETICS_SCIENCE = {
+    "CORE_PRINCIPLE": {
+        "name": "O Dogma Central Revisado: Pensamentos Controlam Genes",
+        "mechanism": "A epigenética demonstra que apenas 5% das doenças são geneticamente determinadas. Os outros 95% são influenciados pelo AMBIENTE INTERNO — que é criado pelos seus pensamentos, emoções, crenças e estilo de vida. O DNA é um ARQUIVO, não um destino. Você tem o controle do que 'liga' e 'desliga' neste arquivo.",
+        "analogy": "Imagine o DNA como um imenso teclado de piano com 25.000 teclas. A maioria das pessoas acredita que o concerto já está gravado. A epigenética prova que VOCÊ é o pianista — seus pensamentos, emoções e escolhas decidem quais notas são tocadas e quais ficam em silêncio.",
+        "practical": "Quando você muda um pensamento habitual de medo para fé, você literalmente altera os sinais químicos que chegam às suas células e modifica quais genes se expressam."
+    },
+    "STRESS_BIOLOGY": {
+        "name": "A Biologia do Estresse Crônico (O Veneno Cotidiano)",
+        "hormones": "O estresse crônico mantém o corpo em modo de 'luta ou fuga' com cortisol e adrenalina elevados. Isto: (1) Contrai os vasos sanguíneos, reduzindo nutrição celular. (2) Suprime o sistema imune. (3) Ativa genes pró-inflamatórios. (4) Encurta os telômeros — os 'tampões' dos cromossomos que determinam longevidade celular.",
+        "emotional_link": "Raiva crônica → ativa NF-kB (fator nuclear inflamatório). Tristeza prolongada → suprime células NK (Natural Killer, guardiãs anticâncer). Medo persistente → eleva cortisol, causa resistência à insulina. Gratidão e amor → ativam genes de reparo celular e longevidade.",
+        "reversal": "Práticas de coerência cardíaca (respiração 4-7-8), meditação, perdão ativo e conexão social profunda revertem marcadores epigenéticos adversos em semanas."
+    },
+    "NEUROPEPTIDES": {
+        "name": "As Moléculas das Emoções (Neuropeptídeos)",
+        "discovery": "Cada emoção que você sente produz um neuropeptídeo específico — uma molécula química que circula por todo o corpo e se encaixa em receptores nas células como uma chave em uma fechadura. O corpo literalmente 'pensa' junto com o cérebro.",
+        "examples": "Felicidade → endorfinas e serotonina nutrem células. Amor → ocitocina regenera e cura tecidos. Raiva crônica → noradrenalina em excesso inflama. Culpa → altera o pH celular e acidifica o ambiente interno. Gratidão → ativa o nervo vago e o sistema parassimpático (modo de cura).",
+        "gut_brain": "95% da serotonina (hormônio do bem-estar) é produzida no intestino, não no cérebro. Isso explica porque ansiedade e medo causam problemas digestivos — e porque pensamentos negativos crônicos literalmente 'envenenam' o intestino."
+    },
+    "CELL_MEMBRANE_BELIEF": {
+        "name": "A Membrana como Cérebro da Célula",
+        "principle": "A inteligência da célula está na sua MEMBRANA, não no núcleo (DNA). A membrana lê o ambiente e decide como responder. O ambiente interno da célula é criado pelo SANGUE — e o sangue é 'temperado' pelos seus pensamentos e emoções através de hormônios e neuropeptídeos.",
+        "belief_effect": "Uma crença limitante ('não mereço saúde', 'minha família sempre teve essa doença') mantém as células em modo de defesa, impedindo crescimento e regeneração. Crenças expansivas ativam o modo de crescimento e cura. AMBOS OS MODOS NÃO PODEM OPERAR SIMULTANEAMENTE — crescimento ou proteção, nunca os dois ao mesmo tempo.",
+        "practical": "Cada vez que você escolhe conscientemente um pensamento de fé sobre medo, ou amor sobre julgamento, você muda literalmente o ambiente bioquímico de 37 trilhões de células."
+    },
+    "HEART_COHERENCE": {
+        "name": "A Coerência do Coração (Campo Eletromagnético)",
+        "field": "O coração gera um campo eletromagnético 60 vezes mais forte que o cérebro e 5000 vezes mais intenso do que qualquer outro órgão. Este campo se expende de 2 a 4 metros ao redor do corpo e pode ser medido por aparelhos.",
+        "coherence": "Quando estamos em estados de gratidão, amor e compaixão, o coração entra em 'coerência' — um padrão rítmico ordenado que sincroniza cérebro, sistema imune e todos os órgãos. Na incoerência (estresse, medo, raiva) os ritmos se fragmentam e a fisiologia se deteriora.",
+        "practice": "A técnica da respiração 4-7-8 do ZenFlow e a focalização na gratidão são formas diretas de induzir coerência cardíaca — e assim mudar a bioquímica do corpo em minutos."
+    },
+    "TELOMERES_AND_LONGEVITY": {
+        "name": "Telômeros, Estilo de Vida e Longevidade",
+        "science": "Os telômeros são as 'capas' protetoras dos cromossomos. Cada divisão celular os encurta — isso é o envelhecimento biológico. O que encurta ACELERADAMENTE os telômeros: estresse crônico, raiva habitual, isolamento social, propósito de vida ausente, sono ruim e pensamentos negativos ruminativos.",
+        "reversal": "O que ALONGA telômeros (rejuvenescimento celular comprovado): meditação regular, gratidão praticada, senso de propósito claro, relacionamentos profundos e amorosos, exercício físico moderado e — surpreendentemente — perdão ativo. Estudos mostram que praticantes meditantes têm telômeros significativamente mais longos que a média.",
+        "message": "Sua biologia é maleável. Você não está condenado pela genética dos seus antepassados — você está sendo convidado a escrever uma nova história celular através das suas escolhas conscientes diárias."
+    }
+};
+
 module.exports = {
     VALCAPELLI_AXIOMS,
     KWITKO_PATTERNS,
     REFORMA_VIRTUES,
     YNSA_POINTS_REFERENCE,
     SPECIFIC_PROTOCOLS,
-    LECTURE_KNOWLEDGE
+    LECTURE_KNOWLEDGE,
+    EPIGENETICS_SCIENCE
 };
 

@@ -45,12 +45,15 @@ import { PhytoLibraryPage } from './pages/PhytoLibraryPage';
 import LandingPage from './components/LandingPage';
 import { FeedbackPage } from './components/FeedbackPage';
 import { MapaVivoPage } from './components/MapaVivoPage';
+import { AnamnesePage } from './components/AnamnesePage';
+import { hasCompletedAnamnese, loadAnamneseProfile, type AnamneseProfile } from './data/anamneseProfile';
 
 import { PremiumPartnerPitch } from './pages/PremiumPartnerPitch';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('landing');
   const [showTutorial, setShowTutorial] = useState(false);
+  const [anamneseProfile, setAnamneseProfile] = useState<AnamneseProfile | null>(loadAnamneseProfile());
   const { user } = useAuth();
   console.log('App Loaded vZenFlow'); // Debug loading
 
@@ -60,7 +63,12 @@ function AppContent() {
   React.useEffect(() => {
     // Se usuário acabou de fazer login e está na página de login ou landing, redirecionar para home
     if (user && (currentPage === 'login' || currentPage === 'landing')) {
-      setCurrentPage('home');
+      // Se não fez anamnese ainda, redirecionar para ela primeiro
+      if (!hasCompletedAnamnese()) {
+        setCurrentPage('anamnese');
+      } else {
+        setCurrentPage('home');
+      }
     }
   }, [user, currentPage]);
 
@@ -251,7 +259,16 @@ function AppContent() {
       case 'plantas-medicinais':
         return <PhytoLibraryPage onPageChange={setCurrentPage} />;
       case 'mapa-vivo':
-        return <MapaVivoPage onPageChange={setCurrentPage} />;
+        return <MapaVivoPage onPageChange={setCurrentPage} anamneseProfile={anamneseProfile} />;
+      case 'anamnese':
+        return (
+          <AnamnesePage
+            onComplete={(profile) => {
+              setAnamneseProfile(profile);
+              setCurrentPage('home');
+            }}
+          />
+        );
       case 'premium-partner':
         return <PremiumPartnerPitch onPageChange={setCurrentPage} />;
       default:

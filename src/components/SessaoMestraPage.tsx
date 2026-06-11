@@ -7,6 +7,7 @@ import { acupressurePoints } from '../data/acupressurePoints';
 import { zenFlowExercises } from '../data/zenFlowExercises';
 import { useAuth } from '../contexts/AuthContext';
 import { useSessionHistory } from '../hooks/useSessionHistory';
+import { loadAnamneseProfile, generateOracleContext } from '../data/anamneseProfile';
 
 // Internal components for the phases
 import { EmotionalCheckIn } from './EmotionalCheckIn';
@@ -23,6 +24,9 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const { user } = useAuth();
     const { recordSession } = useSessionHistory();
     const [phase, setPhase] = useState<SessionPhase>('checkin'); // Start with Check-in
+    // Load anamnese profile to personalize Oracle context
+    const anamneseProfile = React.useMemo(() => loadAnamneseProfile(), []);
+    const oracleContext = React.useMemo(() => anamneseProfile ? generateOracleContext(anamneseProfile) : null, [anamneseProfile]);
     const [selectedEmotion, setSelectedEmotion] = useState<EmotionalState | null>(null);
     const [intensity, setIntensity] = useState<number>(0);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -168,7 +172,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     message: seedMessage,
                     conversationHistory: [], // Fresh start
                     userEmail: user?.email || 'guest',
-                    isPremium: user?.isPremium || false
+                    isPremium: user?.isPremium || false,
+                    anamneseContext: oracleContext,
                 })
             });
 
@@ -210,7 +215,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     message: input,
                     conversationHistory: history,
                     userEmail: user?.email,
-                    isPremium: user?.isPremium
+                    isPremium: user?.isPremium,
+                    anamneseContext: oracleContext,
                 })
             });
             const data = await response.json();

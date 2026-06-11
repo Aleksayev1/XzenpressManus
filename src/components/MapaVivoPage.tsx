@@ -9,10 +9,12 @@ import {
   type GuardianElement,
   type GuardianScores
 } from '../data/fiveElements';
+import { type AnamneseProfile } from '../data/anamneseProfile';
 import { ArrowLeft, X } from 'lucide-react';
 
 interface MapaVivoPageProps {
   onPageChange: (page: string) => void;
+  anamneseProfile?: AnamneseProfile | null;
 }
 
 interface MapaVivoState {
@@ -29,6 +31,20 @@ const STORAGE_KEY = 'xzenpress_mapa_vivo_v1';
 const defaultScores: GuardianScores = {
   madeira: 50, fogo: 50, terra: 50, metal: 50, agua: 50
 };
+
+function buildInitialScores(anamnese?: AnamneseProfile | null): GuardianScores {
+  if (anamnese?.guardianScores) {
+    // Use anamnese scores but clamp them to GuardianScores type
+    return {
+      madeira: anamnese.guardianScores.madeira,
+      fogo: anamnese.guardianScores.fogo,
+      terra: anamnese.guardianScores.terra,
+      metal: anamnese.guardianScores.metal,
+      agua: anamnese.guardianScores.agua,
+    };
+  }
+  return defaultScores;
+}
 
 function loadState(): MapaVivoState {
   try {
@@ -77,8 +93,20 @@ function computeXLI(state: MapaVivoState): number {
   });
 }
 
-export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange }) => {
-  const [state, setState] = useState<MapaVivoState>(loadState);
+export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamneseProfile }) => {
+  const [state, setState] = useState<MapaVivoState>(() => {
+    const persisted = loadState();
+    // If user has never done the mapa-vivo but HAS done anamnese, seed with anamnese scores
+    if (!persisted.hasCompletedOnboarding && anamneseProfile?.guardianScores) {
+      return {
+        ...persisted,
+        hasCompletedOnboarding: true, // Skip MTC onboarding — anamnese already captured this
+        scores: buildInitialScores(anamneseProfile),
+        dominantGuardianId: null,
+      };
+    }
+    return persisted;
+  });
   const [view, setView] = useState<'main' | 'checkin' | 'guardian-detail'>('main');
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianElement | null>(null);
 

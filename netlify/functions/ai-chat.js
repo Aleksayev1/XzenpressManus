@@ -62,7 +62,7 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        const { message, conversationHistory = [], userEmail, isPremium = false } = JSON.parse(event.body);
+        const { message, conversationHistory = [], userEmail, isPremium = false, anamneseContext = null } = JSON.parse(event.body);
 
         // Validação básica
         if (!message || message.trim().length === 0) {
@@ -256,6 +256,8 @@ Quando o usuário relatar abusos, vícios (álcool, drogas, gula, etc.) ou queda
 Ensine que geometrias sagradas (como Crop Circles que replicam chakras) demonstram a ordem no aparente caos. Lembre ao usuário que ele nunca está sozinho: guias e mentores espirituais estão a postos para ajudar assim que ele "vira o copo para cima" (sintoniza com o alto).
 
 ---
+
+${anamneseContext ? `### 👤 PERFIL PESSOAL DO USUÁRIO (Pilar 0 — Anamnese Evolutiva)\n${anamneseContext}\n\n---` : ''}
 
 ${clinicalContext}
 

@@ -29,6 +29,26 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
         setLoading(true);
         const data = await acupressureService.getAllPoints();
         setPoints(data);
+
+        // Dynamic link pre-selection from Mapa Vivo or other pages
+        const preselected = localStorage.getItem('preselected_acupressure_point');
+        if (preselected) {
+          const cleanPre = preselected.toLowerCase().trim();
+          const found = data.find(p => 
+            p.id.toLowerCase() === cleanPre || 
+            p.name.toLowerCase().includes(cleanPre) ||
+            p.id.toLowerCase().includes(cleanPre)
+          );
+          if (found) {
+            setSelectedPoint(found.id);
+            setViewingPoint(found.id);
+            // Auto switch category if needed to make it visible
+            if (found.category) {
+              setSelectedCategory(found.category);
+            }
+          }
+          localStorage.removeItem('preselected_acupressure_point');
+        }
       } catch (err) {
         console.error('Failed to fetch points:', err);
       } finally {

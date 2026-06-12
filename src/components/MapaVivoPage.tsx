@@ -11,7 +11,7 @@ import {
   type GuardianScores
 } from '../data/fiveElements';
 import { type AnamneseProfile } from '../data/anamneseProfile';
-import { ArrowLeft, X } from 'lucide-react';
+import { ArrowLeft, X, Sparkles } from 'lucide-react';
 
 interface MapaVivoPageProps {
   onPageChange: (page: string) => void;
@@ -229,6 +229,29 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
             </p>
           </div>
 
+          {/* AI Oracle Integration Button */}
+          {score < 60 && (
+            <button
+              onClick={() => {
+                const elementQueries: Record<string, string> = {
+                  madeira: 'Deficiência do Elemento Madeira (Fígado) com sintomas de raiva, frustração, irritabilidade e tensão na nuca',
+                  fogo: 'Deficiência do Elemento Fogo (Coração) com sintomas de ansiedade, agitação mental, insônia e palpitações',
+                  terra: 'Deficiência do Elemento Terra (Baço e Pâncreas) com sintomas de preocupação excessiva, ruminação mental e digestão lenta',
+                  metal: 'Deficiência do Elemento Metal (Pulmão) com sintomas de tristeza, melancolia, dificuldade em desapegar e pele seca',
+                  agua: 'Deficiência do Elemento Água (Rim) com sintomas de medo, insegurança, dor lombar crônica e pés frios'
+                };
+                const query = elementQueries[el.id] || `Deficiência do Elemento ${el.element}`;
+                localStorage.setItem('phyto_search_query', query);
+                localStorage.setItem('phyto_auto_oracle', 'true');
+                onPageChange('plantas-medicinais');
+              }}
+              className="w-full py-4 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-750 hover:to-indigo-750 text-white font-bold rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 border border-purple-500/20"
+            >
+              <Sparkles className="w-5 h-5 text-yellow-300 animate-pulse" />
+              <span>Consultar Oráculo AI (Protocolo 360°)</span>
+            </button>
+          )}
+
           {/* Info grid */}
           <div className="grid grid-cols-2 gap-3">
             {[
@@ -301,9 +324,16 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
             <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-3">🌿 Plantas Medicinais</h3>
             <div className="flex flex-wrap gap-2">
               {el.plants.map(p => (
-                <span key={p} className="text-xs px-3 py-1 rounded-full bg-green-900/20 text-green-400 border border-green-500/20">
-                  {p}
-                </span>
+                <button
+                  key={p}
+                  onClick={() => {
+                    localStorage.setItem('phyto_search_query', p);
+                    onPageChange('plantas-medicinais');
+                  }}
+                  className="text-xs px-3 py-1 rounded-full bg-green-900/20 text-green-400 border border-green-500/20 hover:bg-green-800/35 hover:scale-105 transition-all text-left font-medium active:scale-95"
+                >
+                  {p} ➔
+                </button>
               ))}
             </div>
           </div>
@@ -311,29 +341,47 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
           {/* Points */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
             <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-3">📍 Pontos de Acupressão</h3>
-            <div className="space-y-2">
-              {el.points.map(pt => (
-                <div key={pt} className="flex items-center gap-2">
-                  <span className="text-xs px-2 py-1 rounded-lg font-mono" style={{ backgroundColor: el.color + '22', color: el.color }}>
-                    {pt.split(' ')[0]}
-                  </span>
-                  <span className="text-xs text-gray-400">{pt.split(' ').slice(1).join(' ')}</span>
-                </div>
-              ))}
+            <div className="space-y-3">
+              {el.points.map(pt => {
+                const pointCode = pt.split(' ')[0];
+                const pointDesc = pt.split(' ').slice(1).join(' ');
+                return (
+                  <button
+                    key={pt}
+                    onClick={() => {
+                      localStorage.setItem('preselected_acupressure_point', pointCode);
+                      onPageChange('acupressure');
+                    }}
+                    className="w-full flex items-center justify-between text-left p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-blue-500/40 hover:scale-[1.01] transition-all group active:scale-[0.99]"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs px-2 py-1 rounded-lg font-mono" style={{ backgroundColor: el.color + '22', color: el.color }}>
+                        {pointCode}
+                      </span>
+                      <span className="text-xs text-gray-400">{pointDesc}</span>
+                    </div>
+                    <span className="text-xs text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">Ver Ponto ➔</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Frequency */}
           <div
-            className="p-4 rounded-2xl flex items-center gap-4"
+            onClick={() => onPageChange('sounds')}
+            className="p-4 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-gray-900 border border-transparent hover:border-indigo-500/20 transition-all group active:scale-[0.99]"
             style={{ backgroundColor: el.color + '11', border: `1px solid ${el.color}33` }}
           >
-            <span className="text-3xl">🎵</span>
-            <div>
-              <div className="text-xs text-gray-400">Frequência Sonora</div>
-              <div className="text-2xl font-bold" style={{ color: el.color }}>{el.frequency} Hz</div>
-              <div className="text-xs text-gray-500">Terapia sonora para este elemento</div>
+            <div className="flex items-center gap-4">
+              <span className="text-3xl">🎵</span>
+              <div>
+                <div className="text-xs text-gray-400">Frequência Sonora</div>
+                <div className="text-2xl font-bold" style={{ color: el.color }}>{el.frequency} Hz</div>
+                <div className="text-xs text-gray-500">Terapia sonora para este elemento</div>
+              </div>
             </div>
+            <span className="text-xs text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">Tocar Sons ➔</span>
           </div>
 
           {/* Tribo CTA */}

@@ -296,6 +296,22 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
         }
     };
 
+    useEffect(() => {
+        const query = localStorage.getItem('phyto_search_query');
+        const autoOracle = localStorage.getItem('phyto_auto_oracle');
+        if (query) {
+            setSearchTerm(query);
+            localStorage.removeItem('phyto_search_query');
+            if (autoOracle === 'true') {
+                localStorage.removeItem('phyto_auto_oracle');
+                // Call oracle after component state updates
+                setTimeout(() => {
+                    handleConsultOracle(query);
+                }, 150);
+            }
+        }
+    }, []);
+
     const HerbCard = ({ herb }: { herb: Herb }) => {
         const isBrasil = herb.origin === 'Brasil';
         const isPeptide = herb.origin === 'Peptídeo (Sintético/Bio-idêntico)';

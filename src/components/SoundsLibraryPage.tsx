@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, Music, Heart, Waves, CloudRain, Wind, Flame, Leaf, Star, Lock, Crown, ExternalLink, Zap, Cloud } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Music, Heart, Waves, CloudRain, Wind, Flame, Leaf, Star, Lock, Crown, ExternalLink, Zap, Cloud, ArrowLeft, Home, Activity } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { createSpotifyService } from '../services/spotifyService';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -24,6 +24,10 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
   const { user } = useAuth();
   const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [fromMapaVivo, setFromMapaVivo] = useState(false);
+  useEffect(() => {
+    setFromMapaVivo(localStorage.getItem('phyto_from_mapa_vivo') === 'true');
+  }, []);
   const [currentSound, setCurrentSound] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
@@ -268,6 +272,24 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header Back Button */}
+        <div className="flex items-center mb-6">
+          <button
+            onClick={() => {
+              if (fromMapaVivo) {
+                localStorage.removeItem('phyto_from_mapa_vivo');
+                onPageChange('mapa-vivo');
+              } else {
+                onPageChange('home');
+              }
+            }}
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors text-sm font-semibold bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>{fromMapaVivo ? 'Voltar ao Mapa Vivo' : 'Início'}</span>
+          </button>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">

@@ -321,6 +321,7 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
                 const query = elementQueries[el.id] || `Deficiência do Elemento ${el.element}`;
                 localStorage.setItem('phyto_search_query', query);
                 localStorage.setItem('phyto_auto_oracle', 'true');
+                localStorage.setItem('phyto_from_mapa_vivo', 'true');
                 onPageChange('plantas-medicinais');
               }}
               className="w-full py-4 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-750 hover:to-indigo-750 text-white font-bold rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 border border-purple-500/20"
@@ -406,6 +407,7 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
                   key={p}
                   onClick={() => {
                     localStorage.setItem('phyto_search_query', p);
+                    localStorage.setItem('phyto_from_mapa_vivo', 'true');
                     onPageChange('plantas-medicinais');
                   }}
                   className="text-xs px-3 py-1 rounded-full bg-green-900/20 text-green-400 border border-green-500/20 hover:bg-green-800/35 hover:scale-105 transition-all text-left font-medium active:scale-95"
@@ -428,6 +430,7 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
                     key={pt}
                     onClick={() => {
                       localStorage.setItem('preselected_acupressure_point', pointCode);
+                      localStorage.setItem('phyto_from_mapa_vivo', 'true');
                       onPageChange('acupressure');
                     }}
                     className="w-full flex items-center justify-between text-left p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-blue-500/40 hover:scale-[1.01] transition-all group active:scale-[0.99]"
@@ -447,7 +450,10 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
 
           {/* Frequency */}
           <div
-            onClick={() => onPageChange('sounds')}
+            onClick={() => {
+              localStorage.setItem('phyto_from_mapa_vivo', 'true');
+              onPageChange('sounds');
+            }}
             className="p-4 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-gray-900 border border-transparent hover:border-indigo-500/20 transition-all group active:scale-[0.99]"
             style={{ backgroundColor: el.color + '11', border: `1px solid ${el.color}33` }}
           >

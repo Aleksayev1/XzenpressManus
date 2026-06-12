@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Target, Crown, Lock, Clock, Play, Pause, RotateCcw, Volume2, X, ZoomIn, ArrowLeft, Loader2, Home } from 'lucide-react';
+import { Target, Crown, Lock, Clock, Play, Pause, RotateCcw, Volume2, X, ZoomIn, ArrowLeft, Loader2, Home, Activity } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSessionHistory } from '../hooks/useSessionHistory';
@@ -21,6 +21,11 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
   // State for data fetching
   const [points, setPoints] = useState<AcupressurePoint[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fromMapaVivo, setFromMapaVivo] = useState(false);
+
+  useEffect(() => {
+    setFromMapaVivo(localStorage.getItem('phyto_from_mapa_vivo') === 'true');
+  }, []);
 
   // Fetch points on mount
   useEffect(() => {
@@ -528,6 +533,26 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header Back Button */}
+        {!isTimerActive && (
+          <div className="flex items-center mb-6">
+            <button
+              onClick={() => {
+                if (fromMapaVivo) {
+                  localStorage.removeItem('phyto_from_mapa_vivo');
+                  onPageChange('mapa-vivo');
+                } else {
+                  onPageChange('home');
+                }
+              }}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors text-sm font-semibold bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>{fromMapaVivo ? 'Voltar ao Mapa Vivo' : 'Início'}</span>
+            </button>
+          </div>
+        )}
+
         {/* Header - Only show when not in active therapy */}
         {!isTimerActive && (
           <div className="relative mb-8 text-center pt-8 md:pt-2">
@@ -1206,11 +1231,20 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                         <span>← Voltar aos pontos</span>
                       </button>
                       <button
-                        onClick={() => onPageChange('home')}
-                        className="flex items-center space-x-2 text-green-600 hover:text-green-700 transition-colors text-sm font-medium"
+                        onClick={() => {
+                          if (fromMapaVivo) {
+                            localStorage.removeItem('phyto_from_mapa_vivo');
+                            onPageChange('mapa-vivo');
+                          } else {
+                            onPageChange('home');
+                          }
+                        }}
+                        className={`flex items-center space-x-2 transition-colors text-sm font-medium ${
+                          fromMapaVivo ? 'text-purple-400 hover:text-purple-300 font-bold' : 'text-green-600 hover:text-green-700'
+                        }`}
                       >
-                        <Home className="w-4 h-4" />
-                        <span>Início</span>
+                        {fromMapaVivo ? <Activity className="w-4 h-4" /> : <Home className="w-4 h-4" />}
+                        <span>{fromMapaVivo ? 'Voltar ao Mapa Vivo' : 'Início'}</span>
                       </button>
                     </div>
                     {viewingPointData.isPremium && (

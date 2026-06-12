@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { HERB_DATABASE, Herb } from '../data/herbLibrary';
 import { acupressurePoints } from '../data/points/index';
+import { supabase } from '../lib/supabase';
 
 interface PhytoLibraryPageProps {
     onPageChange?: (page: string) => void;
@@ -55,6 +56,11 @@ interface OracleProtocol {
 export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<'Todos' | 'Brasil' | 'China (MTC)' | 'Peptídeos'>('Todos');
+    const [fromMapaVivo, setFromMapaVivo] = useState(false);
+
+    useEffect(() => {
+        setFromMapaVivo(localStorage.getItem('phyto_from_mapa_vivo') === 'true');
+    }, []);
     
     // Estados do Oráculo de Deficiências
     const [oracleResult, setOracleResult] = useState<OracleProtocol | null>(null);
@@ -62,6 +68,51 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
     const [oracleError, setOracleError] = useState<string | null>(null);
     const [showOracleDetails, setShowOracleDetails] = useState(true);
     const [chronicity, setChronicity] = useState<'agudo' | 'cronico' | 'misto'>('misto');
+
+    // Estados de Protocolos Dinâmicos acumulados no Supabase
+    const [dynamicProtocols, setDynamicProtocols] = useState<Array<{ query: string; protocol: OracleProtocol }>>([]);
+    const [isDynamicLoading, setIsDynamicLoading] = useState(false);
+
+    // Efeito de busca de protocolos dinâmicos na base Supabase (Debounced)
+    useEffect(() => {
+        const fetchDynamicProtocols = async () => {
+            if (!supabase || searchTerm.trim().length < 3) {
+                setDynamicProtocols([]);
+                return;
+            }
+            
+            setIsDynamicLoading(true);
+            try {
+                const { data, error } = await supabase
+                    .from('xzen_oracle_protocols')
+                    .select('query, protocol')
+                    .ilike('query', `%${searchTerm.trim().toLowerCase()}%`)
+                    .limit(6);
+                
+                if (error) throw error;
+                
+                if (data) {
+                    setDynamicProtocols(data.map(item => ({
+                        query: item.query,
+                        protocol: item.protocol as unknown as OracleProtocol
+                    })));
+                } else {
+                    setDynamicProtocols([]);
+                }
+            } catch (err) {
+                console.error('Erro ao buscar protocolos dinâmicos:', err);
+                setDynamicProtocols([]);
+            } finally {
+                setIsDynamicLoading(false);
+            }
+        };
+
+        const timer = setTimeout(() => {
+            fetchDynamicProtocols();
+        }, 300); // 300ms debounce
+
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     // Estados do Zoom Modal de Imagens
     const [showZoomModal, setShowZoomModal] = useState(false);
@@ -285,6 +336,15 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
             if (data.protocol) {
                 setOracleResult(data.protocol);
                 setShowOracleDetails(true);
+                // Adiciona imediatamente à lista local para aparecer na busca sem recarregar
+                setDynamicProtocols(prev => {
+                    const queryKey = query.toLowerCase().trim();
+                    const exists = prev.some(p => p.query === queryKey);
+                    if (!exists) {
+                        return [{ query: queryKey, protocol: data.protocol }, ...prev];
+                    }
+                    return prev;
+                });
             } else {
                 throw new Error('Nenhum protocolo foi gerado. Tente reformular a queixa.');
             }
@@ -434,20 +494,91 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
         );
     };
 
+    const DynamicProtocolCard = ({ item }: { item: { query: string; protocol: OracleProtocol } }) => {
+        return (
+            <div 
+                onClick={() => {
+                    setOracleResult(item.protocol);
+                    setShowOracleDetails(true);
+                    // Rola para o topo do resultado do oráculo
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="bg-slate-950 rounded-2xl shadow-lg border border-purple-500/25 overflow-hidden hover:border-purple-500 hover:shadow-purple-500/10 transition-all flex flex-col cursor-pointer group transform hover:scale-[1.01]"
+            >
+                <div className="p-4 bg-gradient-to-r from-purple-950 to-slate-900 text-white flex justify-between items-start border-b border-purple-900/30">
+                    <div>
+                        <h3 className="text-xl font-bold flex items-center gap-1.5 text-purple-200">
+                            {item.protocol.titulo}
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-0.5">Termo pesquisado: "{item.query}"</p>
+                    </div>
+                    <div className="bg-purple-900/40 p-2 rounded-lg border border-purple-500/30">
+                        <Sparkles className="w-5 h-5 text-amber-300" />
+                    </div>
+                </div>
+
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center text-[10px] font-black text-purple-400 mb-3 uppercase tracking-wider">
+                            <Compass className="w-4 h-4 mr-1 text-purple-500 animate-pulse" /> 
+                            Conhecimento Sistêmico
+                        </div>
+                        <p className="text-sm text-slate-300 line-clamp-3 italic mb-4 leading-relaxed">
+                            "{item.protocol.visaoIntegrativa}"
+                        </p>
+                    </div>
+
+                    <div>
+                        <div className="space-y-2 border-t border-slate-900 pt-3">
+                            {item.protocol.protocolo.fitoterapia && ((item.protocol.protocolo.fitoterapia.plantasBrasileiras && item.protocol.protocolo.fitoterapia.plantasBrasileiras.length > 0) || (item.protocol.protocolo.fitoterapia.plantasMTC && item.protocol.protocolo.fitoterapia.plantasMTC.length > 0)) && (
+                                <div className="text-xs flex items-center gap-1.5 text-slate-400">
+                                    <Leaf className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                                    <span className="font-semibold text-slate-300">Fitoterapia:</span>
+                                    <span className="truncate text-slate-400">
+                                        {[...(item.protocol.protocolo.fitoterapia.plantasBrasileiras || []), ...(item.protocol.protocolo.fitoterapia.plantasMTC || [])].slice(0, 2).join(', ')}
+                                    </span>
+                                </div>
+                            )}
+                            {item.protocol.protocolo.suplementos && item.protocol.protocolo.suplementos.length > 0 && (
+                                <div className="text-xs flex items-center gap-1.5 text-slate-400">
+                                    <Activity className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                                    <span className="font-semibold text-slate-300">Suplementos:</span>
+                                    <span className="truncate text-slate-400">
+                                        {item.protocol.protocolo.suplementos.slice(0, 2).map(s => s.nome).join(', ')}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="mt-4 pt-3 border-t border-slate-900/50 flex items-center justify-between text-xs text-purple-400 font-bold group-hover:underline">
+                            <span>Acessar Protocolo Completo 360°</span>
+                            <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
             <div className="max-w-7xl mx-auto">
                 {/* Header / Back Button */}
                 <div className="flex items-center mb-8">
-                    {onPageChange && (
                         <button
-                            onClick={() => onPageChange('home')}
-                            className="p-2 mr-4 bg-white hover:bg-gray-100 rounded-full shadow-sm hover:shadow transition-all border border-gray-200"
-                            title="Voltar"
+                            onClick={() => {
+                                if (fromMapaVivo) {
+                                    localStorage.removeItem('phyto_from_mapa_vivo');
+                                    onPageChange('mapa-vivo');
+                                } else {
+                                    onPageChange('home');
+                                }
+                            }}
+                            className="p-2 mr-4 bg-white hover:bg-gray-100 rounded-full shadow-sm hover:shadow transition-all border border-gray-200 flex items-center justify-center"
+                            title={fromMapaVivo ? "Voltar ao Mapa Vivo" : "Voltar"}
                         >
                             <ArrowLeft className="w-5 h-5 text-gray-600" />
                         </button>
-                    )}
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                             <BookOpen className="w-8 h-8 mr-3 text-emerald-600 animate-[pulse_3s_infinite]" />
@@ -946,7 +1077,22 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                 </div>
                             </section>
                         )}
-                        {brasilHerbs.length === 0 && mtcHerbs.length === 0 && peptideHerbs.length === 0 && (
+                        {/* Seção de protocolos dinâmicos recuperados do Supabase */}
+                        {dynamicProtocols.length > 0 && (
+                            <section>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="flex items-center gap-2 bg-purple-950/40 border border-purple-500/30 rounded-full px-4 py-1.5">
+                                        <Sparkles className="w-5 h-5 text-purple-400" />
+                                        <span className="font-bold text-purple-300 text-sm uppercase tracking-widest text-white">Conhecimento Coletivo Descoberto</span>
+                                    </div>
+                                    <span className="text-xs text-purple-400 font-mono">{dynamicProtocols.length} protocolos</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {dynamicProtocols.map(item => <DynamicProtocolCard key={item.query} item={item} />)}
+                                </div>
+                            </section>
+                        )}
+                        {brasilHerbs.length === 0 && mtcHerbs.length === 0 && peptideHerbs.length === 0 && dynamicProtocols.length === 0 && (
                             <div className="text-center py-20 bg-white rounded-3xl border border-gray-200">
                                 <Leaf className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                                 <h3 className="text-xl font-bold text-gray-900 mb-2">Nenhum item encontrado na Biblioteca</h3>
@@ -973,12 +1119,30 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                             </div>
                         )}
                     </div>
-                ) : filteredHerbs.length > 0 ? (
-                    // Vista filtrada por aba específica
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        {filteredHerbs.map(herb => (
-                            <HerbCard key={herb.id} herb={herb} />
-                        ))}
+                ) : (filteredHerbs.length > 0 || dynamicProtocols.length > 0) ? (
+                    // Vista filtrada por aba específica com resultados ou protocolos dinâmicos
+                    <div className="space-y-12">
+                        {filteredHerbs.length > 0 && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {filteredHerbs.map(herb => (
+                                    <HerbCard key={herb.id} herb={herb} />
+                                ))}
+                            </div>
+                        )}
+                        {dynamicProtocols.length > 0 && (
+                            <section>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="flex items-center gap-2 bg-purple-950/40 border border-purple-500/30 rounded-full px-4 py-1.5">
+                                        <Sparkles className="w-5 h-5 text-purple-400" />
+                                        <span className="font-bold text-purple-300 text-sm uppercase tracking-widest text-white">Conhecimento Coletivo Descoberto</span>
+                                    </div>
+                                    <span className="text-xs text-purple-400 font-mono">{dynamicProtocols.length} protocolos</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {dynamicProtocols.map(item => <DynamicProtocolCard key={item.query} item={item} />)}
+                                </div>
+                            </section>
+                        )}
                     </div>
                 ) : (
                     <div className="text-center py-20 bg-white rounded-3xl border border-gray-200">

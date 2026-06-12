@@ -2,6 +2,13 @@
 // O Oracle de Deficiências do Xzenpress — Busca Integrativa e Viva
 // Retorna protocolo 360° baseado em sintoma do usuário
 
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase = createClient(
+    process.env.VITE_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || ''
+);
+
 exports.handler = async (event) => {
     const headers = {
         'Access-Control-Allow-Origin': '*',
@@ -34,6 +41,26 @@ exports.handler = async (event) => {
 
     // Sanitização básica
     const sanitized = symptom.replace(/<[^>]*>/g, '').substring(0, 500);
+    const queryKey = symptom.toLowerCase().trim();
+
+    try {
+        const { data: cachedData } = await supabase
+            .from('xzen_oracle_protocols')
+            .select('protocol')
+            .eq('query', queryKey)
+            .maybeSingle();
+
+        if (cachedData && cachedData.protocol) {
+            console.log(`ℹ️ [Oráculo Cache] Retornando dados em cache para: "${queryKey}"`);
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({ protocol: cachedData.protocol })
+            };
+        }
+    } catch (cacheErr) {
+        console.error('Erro ao consultar cache do Supabase:', cacheErr);
+    }
 
     const GEMINI_KEY = process.env.GEMINI_API_KEY;
     if (!GEMINI_KEY) {
@@ -241,6 +268,16 @@ Responda exclusivamente em JSON válido, seguindo o formato especificado no seu 
                 if (!Array.isArray(protocol.protocolo.alimentacao.evitar)) protocol.protocolo.alimentacao.evitar = [];
             }
         }
+
+        // Salvar no cache em background para agilizar a resposta ao usuário
+        supabase
+            .from('xzen_oracle_protocols')
+            .upsert({ query: queryKey, protocol: protocol })
+            .then(({ error }) => {
+                if (error) console.error('Erro ao salvar no cache do Supabase:', error);
+                else console.log(`✅ [Oráculo Cache] Termo "${queryKey}" salvo no banco.`);
+            })
+            .catch(err => console.error('Erro inesperado ao salvar no cache:', err));
 
         return {
             statusCode: 200,

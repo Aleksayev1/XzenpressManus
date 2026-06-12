@@ -11,7 +11,9 @@ import {
   type GuardianScores
 } from '../data/fiveElements';
 import { type AnamneseProfile } from '../data/anamneseProfile';
-import { ArrowLeft, X, Sparkles } from 'lucide-react';
+import { ArrowLeft, X, Sparkles, Loader2 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { MapaVivoStorageService } from '../services/mapaVivoStorageService';
 
 interface MapaVivoPageProps {
   onPageChange: (page: string) => void;
@@ -95,26 +97,82 @@ function computeXLI(state: MapaVivoState): number {
 }
 
 export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamneseProfile }) => {
+  const { user } = useAuth();
   const [showIntro, setShowIntro] = useState(!hasSeenMapaVivoIntro());
-  const [state, setState] = useState<MapaVivoState>(() => {
-    const persisted = loadState();
-    // If user has never done the mapa-vivo but HAS done anamnese, seed with anamnese scores
-    if (!persisted.hasCompletedOnboarding && anamneseProfile?.guardianScores) {
-      return {
-        ...persisted,
-        hasCompletedOnboarding: true, // Skip MTC onboarding — anamnese already captured this
-        scores: buildInitialScores(anamneseProfile),
-        dominantGuardianId: null,
-      };
-    }
-    return persisted;
+  const [state, setState] = useState<MapaVivoState>({
+    hasCompletedOnboarding: false,
+    scores: defaultScores,
+    dominantGuardianId: null,
+    checkins: [],
+    lastCheckinDate: null,
+    createdAt: new Date().toISOString()
   });
+  const [isLoading, setIsLoading] = useState(true);
   const [view, setView] = useState<'main' | 'checkin' | 'guardian-detail'>('main');
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianElement | null>(null);
 
+  // Carregar dados de forma assíncrona (Supabase com fallback LocalStorage)
   useEffect(() => {
-    saveState(state);
-  }, [state]);
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        if (user?.id) {
+          // 1. Sincroniza dados locais anônimos pendentes
+          await MapaVivoStorageService.syncLocalDataToCloud(user.id);
+
+          // 2. Carrega da nuvem
+          const cloudState = await MapaVivoStorageService.loadMapaVivoState(user.id);
+          const checkins = await MapaVivoStorageService.loadCheckins(user.id);
+
+          if (cloudState) {
+            setState({
+              ...cloudState,
+              checkins
+            });
+          } else if (anamneseProfile?.guardianScores) {
+            const seedScores = buildInitialScores(anamneseProfile);
+            const newState = {
+              hasCompletedOnboarding: true,
+              scores: seedScores,
+              dominantGuardianId: null,
+              checkins: checkins,
+              lastCheckinDate: null,
+              createdAt: new Date().toISOString()
+            };
+            await MapaVivoStorageService.saveMapaVivoState(user.id, newState);
+            setState(newState);
+          }
+        } else {
+          // Usuário deslogado / Convidado
+          const localState = loadState();
+          if (!localState.hasCompletedOnboarding && anamneseProfile?.guardianScores) {
+            const seedScores = buildInitialScores(anamneseProfile);
+            setState({
+              hasCompletedOnboarding: true,
+              scores: seedScores,
+              dominantGuardianId: null,
+              checkins: [],
+              lastCheckinDate: null,
+              createdAt: new Date().toISOString()
+            });
+          } else {
+            // Carregar checkins locais
+            const localCheckins = JSON.parse(localStorage.getItem('xzen_local_checkins') || '[]');
+            setState({
+              ...localState,
+              checkins: localCheckins
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Erro ao carregar dados do Mapa Vivo:", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [user?.id, anamneseProfile]);
 
   const xli = computeXLI(state);
   const checkinDue = isCheckinDue(state.lastCheckinDate);
@@ -125,37 +183,52 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
   }
 
   // ---- ONBOARDING handler ----
-  const handleOnboardingComplete = (scores: GuardianScores, dominantId: GuardianElement['id']) => {
-    setState(prev => ({
-      ...prev,
+  const handleOnboardingComplete = async (scores: GuardianScores, dominantId: GuardianElement['id']) => {
+    const newState = {
+      ...state,
       hasCompletedOnboarding: true,
       scores,
       dominantGuardianId: dominantId,
-    }));
+    };
+    setState(newState);
+    if (user?.id) {
+      await MapaVivoStorageService.saveMapaVivoState(user.id, newState);
+    } else {
+      saveState(newState);
+    }
     setView('main');
   };
 
   // ---- CHECK-IN handler ----
-  const handleCheckinComplete = (data: WeeklyCheckinData) => {
-    setState(prev => {
-      const newScores = { ...prev.scores };
-      // Improve scores slightly for all, reduce for the selected emotion guardian
-      Object.keys(newScores).forEach(k => {
-        newScores[k as keyof GuardianScores] = Math.min(100,
-          newScores[k as keyof GuardianScores] + (data.energyScore / 200)
-        );
-      });
-      // Reduce score for the most active emotion guardian slightly (it's being worked)
-      newScores[data.emotionGuardianId] = Math.max(5,
-        newScores[data.emotionGuardianId] - 5
+  const handleCheckinComplete = async (data: WeeklyCheckinData) => {
+    const newScores = { ...state.scores };
+    // Otimização de scores baseada nas respostas do checkin
+    Object.keys(newScores).forEach(k => {
+      newScores[k as keyof GuardianScores] = Math.min(100,
+        newScores[k as keyof GuardianScores] + (data.energyScore / 200)
       );
-      return {
-        ...prev,
-        scores: newScores,
-        checkins: [...prev.checkins, data],
-        lastCheckinDate: data.date,
-      };
     });
+    newScores[data.emotionGuardianId] = Math.max(5,
+      newScores[data.emotionGuardianId] - 5
+    );
+
+    const newState = {
+      ...state,
+      scores: newScores,
+      checkins: [...state.checkins, data],
+      lastCheckinDate: data.date,
+    };
+
+    setState(newState);
+
+    if (user?.id) {
+      await MapaVivoStorageService.saveCheckin(user.id, data);
+      await MapaVivoStorageService.saveMapaVivoState(user.id, newState);
+    } else {
+      saveState(newState);
+      const savedCheckins = JSON.parse(localStorage.getItem('xzen_local_checkins') || '[]');
+      localStorage.setItem('xzen_local_checkins', JSON.stringify([...savedCheckins, data]));
+    }
     setView('main');
   };
 
@@ -169,6 +242,15 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
   // GUARDS — rendered after handlers
   // ========================
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center text-white">
+        <Loader2 className="w-10 h-10 animate-spin text-purple-500 mb-4" />
+        <p className="text-gray-400 text-sm">Carregando seu Mapa Vivo de Evolução...</p>
+      </div>
+    );
+  }
+
   if (showIntro) {
     return <MapaVivoIntro onComplete={() => setShowIntro(false)} />;
   }
@@ -180,10 +262,6 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
   // ========================
   // VIEWS
   // ========================
-
-  if (!state.hasCompletedOnboarding) {
-    return <MapaVivoOnboarding onComplete={handleOnboardingComplete} />;
-  }
 
   if (view === 'checkin') {
     return (
@@ -462,15 +540,22 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
         {/* Reset onboarding (dev helper) */}
         <div className="px-4 pb-4 max-w-lg mx-auto">
           <button
-            onClick={() => {
-              setState({
+            onClick={async () => {
+              const resetState = {
                 hasCompletedOnboarding: false,
                 scores: defaultScores,
                 dominantGuardianId: null,
                 checkins: [],
                 lastCheckinDate: null,
                 createdAt: new Date().toISOString()
-              });
+              };
+              setState(resetState);
+              if (user?.id) {
+                await MapaVivoStorageService.resetUserData(user.id);
+              } else {
+                saveState(resetState);
+                localStorage.removeItem('xzen_local_checkins');
+              }
             }}
             className="w-full py-2 text-xs text-gray-700 hover:text-gray-500 transition-colors"
           >

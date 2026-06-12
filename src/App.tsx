@@ -72,6 +72,15 @@ function AppContent() {
     }
   }, [user, currentPage]);
 
+  // Sincronizar dados locais com o Supabase quando logar
+  React.useEffect(() => {
+    if (user?.id) {
+      import('./services/mapaVivoStorageService').then(({ MapaVivoStorageService }) => {
+        MapaVivoStorageService.syncLocalDataToCloud(user.id);
+      });
+    }
+  }, [user?.id]);
+
   // Deep Linking Support (e.g. ?page=pricing)
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -263,8 +272,12 @@ function AppContent() {
       case 'anamnese':
         return (
           <AnamnesePage
-            onComplete={(profile) => {
+            onComplete={async (profile) => {
               setAnamneseProfile(profile);
+              if (user?.id) {
+                const { MapaVivoStorageService } = await import('./services/mapaVivoStorageService');
+                await MapaVivoStorageService.saveAnamneseProfile(user.id, profile);
+              }
               setCurrentPage('home');
             }}
           />

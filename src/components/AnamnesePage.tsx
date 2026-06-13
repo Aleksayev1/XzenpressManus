@@ -95,11 +95,20 @@ function RevealScreen({ profile, onDone }: { profile: AnamneseProfile; onDone: (
   );
   const el = fiveElements.find(e => e.id === guardianFraco[0])!;
   const [phase, setPhase] = useState<'loading' | 'reveal'>('loading');
+  const [showPopup, setShowPopup] = useState(true);
+  const [animate, setAnimate] = useState(false);
 
   React.useEffect(() => {
     const t = setTimeout(() => setPhase('reveal'), 2200);
     return () => clearTimeout(t);
   }, []);
+
+  React.useEffect(() => {
+    if (phase === 'reveal') {
+      const t = setTimeout(() => setAnimate(true), 150);
+      return () => clearTimeout(t);
+    }
+  }, [phase]);
 
   if (phase === 'loading') {
     return (
@@ -121,8 +130,16 @@ function RevealScreen({ profile, onDone }: { profile: AnamneseProfile; onDone: (
   }
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6">
-      <div className="max-w-sm w-full text-center">
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Background decoration */}
+      <div 
+        className="absolute inset-0 z-0 pointer-events-none opacity-20 transition-all duration-1000"
+        style={{
+          background: `radial-gradient(circle at center, ${el.color}55 0%, transparent 70%)`
+        }}
+      />
+
+      <div className="max-w-sm w-full text-center z-10">
         {/* Guardian reveal */}
         <div
           className="text-8xl mb-6 animate-bounce"
@@ -169,6 +186,80 @@ function RevealScreen({ profile, onDone }: { profile: AnamneseProfile; onDone: (
           Entrar no meu Longevity OS
         </button>
       </div>
+
+      {/* POP-UP MODAL OVERLAY: SEU CORPO FALOU. AGORA, VEJA! */}
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+          <div 
+            className="relative w-full max-w-md bg-gray-900/90 border border-gray-800 rounded-3xl p-6 md:p-8 text-center shadow-2xl overflow-hidden transition-all duration-500 transform scale-100"
+            style={{
+              boxShadow: `0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px ${el.color}15`
+            }}
+          >
+            {/* Ambient light inside modal */}
+            <div 
+              className="absolute -top-20 -left-20 w-40 h-40 rounded-full blur-3xl pointer-events-none opacity-30"
+              style={{ backgroundColor: el.color }}
+            />
+
+            {/* Glowing Header */}
+            <h3 className="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-red-400 via-yellow-400 to-blue-400 bg-clip-text text-transparent mb-6 tracking-wide animate-pulse">
+              SEU CORPO FALOU. AGORA, VEJA!
+            </h3>
+
+            {/* 5 Elements Pre-filling animation */}
+            <div className="grid grid-cols-5 gap-1.5 mb-6">
+              {fiveElements.map(elem => {
+                const score = profile.guardianScores[elem.id as keyof typeof profile.guardianScores] || 0;
+                return (
+                  <div 
+                    key={elem.id} 
+                    className="flex flex-col items-center p-1.5 rounded-xl bg-gray-950/60 border border-gray-800/80"
+                  >
+                    <span className="text-2xl mb-1 filter drop-shadow-md animate-bounce" style={{ animationDelay: `${fiveElements.indexOf(elem) * 0.1}s`, animationDuration: '2s' }}>
+                      {elem.emoji}
+                    </span>
+                    <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+                      {elem.name.split(' ')[0]}
+                    </span>
+                    <div className="w-full bg-gray-800 h-16 rounded-full flex flex-col justify-end overflow-hidden p-0.5">
+                      <div 
+                        className="w-full rounded-full transition-all duration-[1500ms] ease-out"
+                        style={{
+                          height: animate ? `${score}%` : '0%',
+                          backgroundColor: elem.color,
+                          boxShadow: `0 0 10px ${elem.color}80`
+                        }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold mt-2 text-gray-300">
+                      {animate ? `${score}%` : '0%'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Empowerment & Prevention Text */}
+            <p className="text-gray-300 text-xs md:text-sm leading-relaxed text-left bg-gray-950/50 border border-gray-800/60 p-4 rounded-2xl mb-6">
+              <strong>Este é o seu Mapa Vivo de Evolução</strong>, um espelho visual único da sua saúde física, energética e emocional, pelos olhos da sabedoria milenar oriental. Ele não é um diagnóstico médico, mas um <strong>guia pessoal</strong> para você entender os primeiros sinais do seu corpo e, <strong>com o apoio de profissionais</strong>, agir proativamente para reescrever sua história de bem-estar. Bem-vindo à sua jornada de autoconhecimento e prevenção inteligente.
+            </p>
+
+            {/* Close CTA */}
+            <button
+              onClick={() => setShowPopup(false)}
+              className="w-full py-3.5 rounded-2xl font-extrabold text-white text-sm flex items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              style={{
+                background: `linear-gradient(135deg, ${el.color}ee, ${el.color}99)`,
+                boxShadow: `0 6px 20px ${el.color}33`
+              }}
+            >
+              <Sparkles className="w-4 h-4 animate-pulse" />
+              Visualizar Meu Guardião Primário
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

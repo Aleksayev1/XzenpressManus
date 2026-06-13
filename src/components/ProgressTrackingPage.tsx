@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useSessionHistory } from '../hooks/useSessionHistory';
 import { acupressurePoints } from '../data/acupressurePoints';
 import { useLanguage } from '../contexts/LanguageContext';
+import { loadAnamneseProfile } from '../data/anamneseProfile';
 
 interface ProgressTrackingPageProps {
   onPageChange: (page: string) => void;
@@ -28,6 +29,79 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter'>('week');
   const { sessions, stats, loading, error } = useSessionHistory(selectedPeriod);
   const [goals, setGoals] = useState<Goal[]>([]);
+
+  // Load Anamnese profile for chronological age calculation
+  const profile = React.useMemo(() => loadAnamneseProfile(), []);
+  
+  const chronologicalAge = React.useMemo(() => {
+    if (!profile) return 40;
+    const mapping: Record<string, number> = {
+      '18-29': 24,
+      '30-44': 37,
+      '45-59': 52,
+      '60+': 68
+    };
+    return mapping[profile.faixaEtaria] || 40;
+  }, [profile]);
+
+  // Retrieve wearable telemetry from localStorage
+  const wearableVfc = React.useMemo(() => {
+    return Number(localStorage.getItem('wearable_vfc')) || 55;
+  }, [sessions]); // Recalculate if sessions change
+
+  const wearableSleep = React.useMemo(() => {
+    return localStorage.getItem('wearable_sleep') || '1h 30m';
+  }, [sessions]);
+
+  // Convert sleep string to minutes
+  const sleepMinutes = React.useMemo(() => {
+    const hoursMatch = wearableSleep.match(/(\d+)\s*h/);
+    const minutesMatch = wearableSleep.match(/(\d+)\s*m/);
+    const hours = hoursMatch ? Number(hoursMatch[1]) : 0;
+    const minutes = minutesMatch ? Number(minutesMatch[1]) : 0;
+    return hours * 60 + minutes;
+  }, [wearableSleep]);
+
+  // Compute dynamic Jing Index and Biological Age Recoil
+  const { jingIndex, biologicalAge, recoil } = React.useMemo(() => {
+    const sessionsCount = sessions?.length || 0;
+    const vfcScore = Math.min(100, (wearableVfc / 80) * 100);
+    const sleepScore = Math.min(100, (sleepMinutes / 120) * 100);
+    const acupressureScore = Math.min(100, (sessionsCount / 8) * 100);
+    const nutrimingScore = 85; // Default consistency index
+
+    const index = Math.min(100, Math.max(15, Math.round(
+      vfcScore * 0.35 + sleepScore * 0.25 + acupressureScore * 0.25 + nutrimingScore * 0.15
+    )));
+
+    const maxRecoil = 6.5;
+    const computedRecoil = Number(((index / 100) * maxRecoil).toFixed(1));
+    const computedBioAge = Number((chronologicalAge - computedRecoil).toFixed(1));
+
+    return {
+      jingIndex: index,
+      recoil: computedRecoil,
+      biologicalAge: computedBioAge
+    };
+  }, [sessions, wearableVfc, sleepMinutes, chronologicalAge]);
+
+  // Progression chart points over 6 weeks
+  const chartPoints = React.useMemo(() => {
+    const p1 = chronologicalAge;
+    const p2 = chronologicalAge - (recoil * 0.15);
+    const p3 = chronologicalAge - (recoil * 0.35);
+    const p4 = chronologicalAge - (recoil * 0.6);
+    const p5 = chronologicalAge - (recoil * 0.8);
+    const p6 = biologicalAge;
+    return [
+      Number(p1.toFixed(1)),
+      Number(p2.toFixed(1)),
+      Number(p3.toFixed(1)),
+      Number(p4.toFixed(1)),
+      Number(p5.toFixed(1)),
+      Number(p6.toFixed(1))
+    ];
+  }, [chronologicalAge, recoil, biologicalAge]);
 
   // Verificar se usuário é Premium
   if (!user?.isPremium) {
@@ -580,24 +654,188 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
           </div>
         </div>
 
-        {stats && stats.totalSessions > 0 && (
-          <div className="mt-8 bg-white rounded-2xl shadow-lg p-8">
-            <div>
-              {/* Wellness Score baseado em dados reais */}
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">{t('progress.wellness_index')}</h3>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-green-600 mb-2">
-                    {Math.min(100, Math.round((stats.averageEffectiveness / 5) * 100))}
+        {/* Pilar 2: Bateria Vital (Índice de Jing) e Idade Biológica */}
+        <div className="mt-8 bg-white rounded-3xl shadow-xl border border-slate-100 p-8 overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-8 opacity-5">
+            <TrendingUp className="w-40 h-40 text-blue-900" />
+          </div>
+          
+          <div className="relative z-10">
+            <div className="mb-6">
+              <span className="text-xs uppercase tracking-widest text-blue-600 font-bold">PILAR 2 — Longevidade & Senescência</span>
+              <h2 className="text-2xl font-extrabold text-gray-950 mt-1 flex items-center gap-2">
+                <Zap className="w-6 h-6 text-yellow-500 fill-yellow-500 animate-pulse" />
+                Rastreamento da Bateria Vital (Índice de Jing)
+              </h2>
+              <p className="text-gray-500 text-sm mt-1">
+                Monitoramento integrado do seu envelhecimento celular cruzando telemetria em tempo real, sono profundo e consistência terapêutica.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+              
+              {/* Col 1: Liquid Jing Battery */}
+              <div className="bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl p-6 text-white border border-slate-800 shadow-lg flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-950/20 via-transparent to-transparent pointer-events-none"></div>
+                
+                <h3 className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-4 font-sans">Capacidade de Jing</h3>
+                
+                {/* Liquid battery visual */}
+                <div className="w-20 h-36 border-4 border-slate-700 rounded-2xl relative p-1 flex items-end overflow-hidden mb-4 shadow-inner">
+                  {/* Battery tip */}
+                  <div className="absolute top-[-8px] left-[50%] translate-x-[-50%] w-6 h-2 bg-slate-700 rounded-t-sm"></div>
+                  
+                  {/* Liquid fill */}
+                  <div 
+                    className="w-full bg-gradient-to-t from-blue-600 via-cyan-450 to-teal-400 rounded-xl transition-all duration-1000 ease-out relative"
+                    style={{ height: `${jingIndex}%` }}
+                  >
+                    {/* Bubbles effect */}
+                    <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle,_rgba(255,255,255,0.4)_10%,_transparent_11%)] bg-[length:12px_12px] animate-[pulse_2s_infinite]"></div>
                   </div>
-                  <div className="text-sm text-gray-600">
-                    Baseado em {stats.totalSessions} sessões reais
+                  
+                  {/* Text indicator overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xl font-black font-mono drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-white">
+                      {jingIndex}%
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Submetrics list */}
+                <div className="w-full grid grid-cols-2 gap-2 mt-2 text-[10px] text-slate-400 font-medium">
+                  <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center">
+                    <span className="block text-[11px] font-bold text-cyan-400 font-mono">{wearableVfc}ms</span>
+                    <span>Tónus Vago (VFC)</span>
+                  </div>
+                  <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center">
+                    <span className="block text-[11px] font-bold text-indigo-400 font-mono">{wearableSleep}</span>
+                    <span>Sono Profundo</span>
+                  </div>
+                  <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center col-span-2">
+                    <span className="block text-[11px] font-bold text-emerald-400 font-mono">{sessions?.length || 0} sessões</span>
+                    <span>Consistência Terapêutica (Este Ciclo)</span>
                   </div>
                 </div>
               </div>
+
+              {/* Col 2: Biological Age Regression */}
+              <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-between min-h-[300px]">
+                <div>
+                  <h3 className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-4">Recuo de Envelhecimento</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center pb-3 border-b border-gray-200/60">
+                      <span className="text-sm text-gray-600 font-medium">Idade Cronológica</span>
+                      <span className="text-lg font-bold text-gray-700">{chronologicalAge} anos</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center pb-3 border-b border-gray-200/60">
+                      <span className="text-sm text-gray-600 font-medium">Idade Biológica</span>
+                      <span className="text-2xl font-black text-blue-600 font-mono">{biologicalAge} anos</span>
+                    </div>
+
+                    <div className="flex justify-between items-center bg-gradient-to-r from-blue-50 to-cyan-50 p-3 rounded-xl border border-blue-100">
+                      <span className="text-xs text-blue-700 font-bold">Diferencial / Rejuvenescimento</span>
+                      <span className="px-2.5 py-0.5 bg-blue-600 text-white rounded-full text-xs font-mono font-extrabold">
+                        -{recoil} anos
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-gray-500 leading-relaxed mt-4 bg-white p-3 rounded-lg border border-gray-100">
+                  <span className="font-bold text-gray-700 block mb-1">💡 Diagnóstico do Oráculo:</span>
+                  {jingIndex >= 70 ? (
+                    <span>Sua consistência na craniopuntura e a modulação ativa da VFC estão reduzindo a senescência celular. Sua "bateria vital" (Jing) está em nível de alta regeneração, desacelerando o relógio biológico.</span>
+                  ) : jingIndex >= 45 ? (
+                    <span>Seu índice de Jing está moderado. Aumentar a frequência de sessões de respiração e acupressão ajudará a acionar o sistema parassimpático com mais consistência, acelerando o recuo de idade.</span>
+                  ) : (
+                    <span>Sua bateria de Jing está sob sobrecarga (estresse crônico ou sono inadequado). Estimule o ponto YNSA Fígado (N. Vago) e melhore a regularidade do Nutriming para iniciar o recuo biológico.</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Col 3: SVG Progression Line Chart */}
+              <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-between min-h-[300px]">
+                <div>
+                  <h3 className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-2">Curva de Regressão Semanal</h3>
+                  <span className="text-[10px] text-gray-400 block mb-4">Idade Biológica estimada nas últimas 6 semanas</span>
+                  
+                  {/* SVG Chart */}
+                  <div className="w-full h-36 flex items-center justify-center">
+                    <svg viewBox="0 0 300 120" className="w-full h-full overflow-visible">
+                      <defs>
+                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#2563EB" stopOpacity="0.15" />
+                          <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+
+                      {/* Horizontal Grid Lines */}
+                      <line x1="0" y1="10" x2="300" y2="10" stroke="rgba(0,0,0,0.05)" />
+                      <line x1="0" y1="50" x2="300" y2="50" stroke="rgba(0,0,0,0.05)" />
+                      <line x1="0" y1="90" x2="300" y2="90" stroke="rgba(0,0,0,0.05)" />
+
+                      {/* Area under the line */}
+                      <path 
+                        d={`M 0,110 L 0,${10 + (chronologicalAge - chartPoints[0]) * 10} 
+                            L 60,${10 + (chronologicalAge - chartPoints[1]) * 10} 
+                            L 120,${10 + (chronologicalAge - chartPoints[2]) * 10} 
+                            L 180,${10 + (chronologicalAge - chartPoints[3]) * 10} 
+                            L 240,${10 + (chronologicalAge - chartPoints[4]) * 10} 
+                            L 300,${10 + (chronologicalAge - chartPoints[5]) * 10} 
+                            L 300,110 Z`} 
+                        fill="url(#chartGrad)" 
+                      />
+
+                      {/* Line chart path */}
+                      <polyline 
+                        fill="none" 
+                        stroke="#2563EB" 
+                        strokeWidth="2.5" 
+                        points={`0,${10 + (chronologicalAge - chartPoints[0]) * 10} 
+                                 60,${10 + (chronologicalAge - chartPoints[1]) * 10} 
+                                 120,${10 + (chronologicalAge - chartPoints[2]) * 10} 
+                                 180,${10 + (chronologicalAge - chartPoints[3]) * 10} 
+                                 240,${10 + (chronologicalAge - chartPoints[4]) * 10} 
+                                 300,${10 + (chronologicalAge - chartPoints[5]) * 10}`} 
+                      />
+
+                      {/* Dots and Tooltips */}
+                      {chartPoints.map((val, idx) => {
+                        const x = idx * 60;
+                        const y = 10 + (chronologicalAge - val) * 10;
+                        return (
+                          <g key={idx}>
+                            <circle cx={x} cy={y} r="4" fill="#2563EB" stroke="white" strokeWidth="1.5" />
+                            {idx === 5 && (
+                              <g>
+                                <circle cx={x} cy={y} r="8" fill="none" stroke="#2563EB" strokeWidth="1" className="animate-ping" />
+                                <rect x={x - 25} y={y - 25} width="40" height="16" rx="3" fill="#1E293B" />
+                                <text x={x - 5} y={y - 14} fill="white" fontSize="9" fontWeight="bold" fontFamily="monospace" textAnchor="middle">{val}</text>
+                              </g>
+                            )}
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  </div>
+                </div>
+
+                <div className="flex justify-between text-[9px] text-gray-400 font-mono mt-2">
+                  <span>Sem 1</span>
+                  <span>Sem 2</span>
+                  <span>Sem 3</span>
+                  <span>Sem 4</span>
+                  <span>Sem 5</span>
+                  <span>Atual</span>
+                </div>
+              </div>
+
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -143,6 +143,13 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
     }
   }, [activeDeviceId, devices]);
 
+  // Synchronize telemetry values to localStorage for use in the tracking page
+  useEffect(() => {
+    localStorage.setItem('wearable_vfc', vfcValue.toString());
+    localStorage.setItem('wearable_rhr', rhrValue.toString());
+    localStorage.setItem('wearable_sleep', deepSleep);
+  }, [vfcValue, rhrValue, deepSleep]);
+
   // Live heart pulse representation
   useEffect(() => {
     graphInterval.current = setInterval(() => {

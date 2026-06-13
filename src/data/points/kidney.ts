@@ -14,7 +14,7 @@ export const kidneyPoints: AcupressurePoint[] = [
     benefitsEn: ['Restores Deep Vital Energy', 'Treats Infertility/Impotence', 'Combats Chronic Fatigue', 'Strengthens Energy Core'],
     isPremium: true,
     category: 'kidney',
-    additionalCategories: ['sexual'],
+    additionalCategories: ['sexual', 'general'],
     instructions: 'Localizado na linha média, 3 cun (4 dedos) abaixo do umbigo. Massagem circular suave gera calor.',
     duration: 180,
     pressure: 'leve'
@@ -32,7 +32,7 @@ export const kidneyPoints: AcupressurePoint[] = [
     benefitsEn: ['Strengthens Lumbar/Knee', 'Treats Impotence/Menstruation', 'Improves Memory/Sleep', 'Fights Shortness of Breath'],
     isPremium: true,
     category: 'kidney',
-    additionalCategories: ['sexual', 'back_pain', 'lung'],
+    additionalCategories: ['sexual', 'back_pain', 'lung', 'general'],
     instructions: 'Na depressão entre o maléolo interno (osso do tornozelo) e o tendão de Aquiles.',
     duration: 180,
     pressure: 'moderada'

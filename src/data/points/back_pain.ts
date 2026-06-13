@@ -14,7 +14,7 @@ export const back_painPoints: AcupressurePoint[] = [
     benefitsEn: ['Strengthens Lower Back', 'Increases Sexual Vitality', 'Improves Hearing/Tinnitus', 'Treats Adrenal Fatigue'],
     isPremium: true,
     category: 'back_pain',
-    additionalCategories: ['kidney', 'sexual'],
+    additionalCategories: ['kidney', 'sexual', 'general'],
     instructions: 'Na região lombar, 1.5 cun (2 dedos) lateral à linha média, na altura da L2 (segunda vértebra lombar).',
     duration: 180,
     pressure: 'moderada'

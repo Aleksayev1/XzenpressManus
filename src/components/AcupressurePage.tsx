@@ -511,11 +511,46 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
 
   const zusanliPoint = points.find(p => p.id === 'st36' || p.name.toLowerCase().includes('zusanli') || p.id === 'zs');
 
-  const filteredPoints = getFilteredPoints().filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (p.benefits && p.benefits.some(b => b.toLowerCase().includes(searchQuery.toLowerCase())))
-  );
+  const normalizeForSearch = (str: string) => {
+    if (!str) return '';
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Remove accents
+      .replace(/[^a-z0-9]/g, ''); // Remove spaces, punctuation, etc.
+  };
+
+  const filteredPoints = getFilteredPoints().filter(p => {
+    const queryNorm = normalizeForSearch(searchQuery);
+    if (!queryNorm) return true;
+
+    // Search in current translation and standard name
+    const nameNorm = normalizeForSearch(getTranslatedField(p, 'name'));
+    const nameEnNorm = p.nameEn ? normalizeForSearch(p.nameEn) : '';
+    const nameEsNorm = p.nameEs ? normalizeForSearch(p.nameEs) : '';
+
+    // Search in ID
+    const idNorm = normalizeForSearch(p.id);
+
+    // Search in current translation and standard description
+    const descNorm = normalizeForSearch(getTranslatedField(p, 'description'));
+    const descEnNorm = p.descriptionEn ? normalizeForSearch(p.descriptionEn) : '';
+
+    // Search in benefits
+    const benefitsNorm = p.benefits ? p.benefits.map((b: string) => normalizeForSearch(b)) : [];
+    const benefitsEnNorm = p.benefitsEn ? p.benefitsEn.map((b: string) => normalizeForSearch(b)) : [];
+
+    return (
+      nameNorm.includes(queryNorm) ||
+      nameEnNorm.includes(queryNorm) ||
+      nameEsNorm.includes(queryNorm) ||
+      idNorm.includes(queryNorm) ||
+      descNorm.includes(queryNorm) ||
+      descEnNorm.includes(queryNorm) ||
+      benefitsNorm.some((b: string) => b.includes(queryNorm)) ||
+      benefitsEnNorm.some((b: string) => b.includes(queryNorm))
+    );
+  });
 
   return (
     <div

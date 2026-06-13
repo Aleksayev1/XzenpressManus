@@ -16,6 +16,7 @@ export const immunityPoints: AcupressurePoint[] = [
     benefitsEn: ['Reduces inflammation', 'Relieves elbow pain', 'Lowers fever', 'Improves skin'],
     isPremium: true,
     category: 'immunity',
+    additionalCategories: ['general'],
     instructions: 'APLICAÇÃO BILATERAL: Localizado na dobra do cotovelo. Pressionar por 2 minutos.',
     duration: 120,
     pressure: 'firme'

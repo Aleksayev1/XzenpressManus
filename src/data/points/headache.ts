@@ -14,7 +14,7 @@ export const headachePoints: AcupressurePoint[] = [
     benefitsEn: ['Relieves Headache/Migraine', 'Relaxes Neck/Shoulders', 'Treats Dizziness/Vertigo', 'Clears Vision'],
     isPremium: true,
     category: 'headache',
-    additionalCategories: ['neck'],
+    additionalCategories: ['neck', 'general'],
     instructions: 'Na base do crânio, nas depressões entre os músculos trapézio e esternocleidomastóideo.',
     duration: 180,
     pressure: 'moderada'

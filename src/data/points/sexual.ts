@@ -14,7 +14,7 @@ export const sexualPoints: AcupressurePoint[] = [
     benefitsEn: ['Increases Sexual Potency', 'Treats Prostate/Bladder', 'Relieves Menstrual Cramps', 'Regulates Urination'],
     isPremium: true,
     category: 'sexual',
-    additionalCategories: ['kidney', 'menstrual'],
+    additionalCategories: ['kidney', 'menstrual', 'general'],
     instructions: 'Localizado na linha média, 1 cun (1 dedão) acima da borda superior do osso púbico. Pressionar moderadamente.',
     duration: 180,
     pressure: 'moderada'
@@ -32,7 +32,7 @@ export const sexualPoints: AcupressurePoint[] = [
     benefitsEn: ['Strengthens Spleen/Liver/Kidney', 'Treats Insomnia/Shyness', 'Relieves Irritability/Heat', 'Prostate and Genital Health'],
     isPremium: true,
     category: 'sexual',
-    additionalCategories: ['menstrual', 'digestive', 'emotional', 'kidney'],
+    additionalCategories: ['menstrual', 'digestive', 'emotional', 'kidney', 'general'],
     instructions: 'Face interna da perna, 4 dedos (3 cun) acima do maléolo interno (osso do tornozelo), atrás da tíbia.',
     duration: 180,
     pressure: 'moderada'

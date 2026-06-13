@@ -124,6 +124,53 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
         return encodeURI(path);
     };
 
+    // Estado unificado de todas as ervas (estáticas + customizadas do Supabase)
+    const [herbs, setHerbs] = useState<Herb[]>(HERB_DATABASE);
+
+    // Carregar ervas customizadas do Supabase ao montar o componente
+    useEffect(() => {
+        const loadCustomHerbs = async () => {
+            if (!supabase) return;
+            try {
+                const { data, error } = await supabase
+                    .from('xzen_custom_herbs')
+                    .select('*');
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    const mappedCustom: Herb[] = data.map(row => ({
+                        id: row.id,
+                        name: row.name,
+                        scientificName: row.scientific_name || '',
+                        origin: row.origin as any,
+                        partUsed: row.part_used || '',
+                        mainAction: row.main_action || '',
+                        description: row.description || '',
+                        flavor: row.flavor || undefined,
+                        nature: row.nature as any || undefined,
+                        tropism: row.tropism || undefined,
+                        indications: row.indications || [],
+                        contraindications: row.contraindications || []
+                    }));
+                    setHerbs(prev => {
+                        const merged = [...prev];
+                        mappedCustom.forEach(c => {
+                            const index = merged.findIndex(h => h.id === c.id);
+                            if (index !== -1) {
+                                merged[index] = c;
+                            } else {
+                                merged.push(c);
+                            }
+                        });
+                        return merged;
+                    });
+                }
+            } catch (err) {
+                console.error('Erro ao carregar ervas customizadas:', err);
+            }
+        };
+        loadCustomHerbs();
+    }, []);
+
     // Helper para cruzar texto do Oráculo com dados reais dos pontos estáticos
     const getMatchingPoint = (pointStr: string) => {
         if (!pointStr) return undefined;
@@ -255,7 +302,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
         const searchStr = cleanName.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
         
         // Tenta achar correspondência direta no banco de plantas/peptídeos
-        const matched = HERB_DATABASE.find(h => {
+        const matched = herbs.find(h => {
             const hName = h.name.toLowerCase().replace(/[^a-z0-9\s]/g, '');
             const hSci = h.scientificName.toLowerCase().replace(/[^a-z0-9\s]/g, '');
             
@@ -285,7 +332,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
         herb.scientificName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         herb.indications.some(i => i.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const filteredHerbs = HERB_DATABASE.filter(herb => {
+    const filteredHerbs = herbs.filter(herb => {
         let matchesTab = true;
         if (activeTab === 'Brasil') matchesTab = herb.origin === 'Brasil';
         if (activeTab === 'China (MTC)') matchesTab = herb.origin === 'China (MTC)';
@@ -294,9 +341,9 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
     });
 
     // Grupos ordenados para a aba "Todos"
-    const brasilHerbs = HERB_DATABASE.filter(h => h.origin === 'Brasil' && matchesSearch(h));
-    const mtcHerbs = HERB_DATABASE.filter(h => h.origin === 'China (MTC)' && matchesSearch(h));
-    const peptideHerbs = HERB_DATABASE.filter(h => h.origin === 'Peptídeo (Sintético/Bio-idêntico)' && matchesSearch(h));
+    const brasilHerbs = herbs.filter(h => h.origin === 'Brasil' && matchesSearch(h));
+    const mtcHerbs = herbs.filter(h => h.origin === 'China (MTC)' && matchesSearch(h));
+    const peptideHerbs = herbs.filter(h => h.origin === 'Peptídeo (Sintético/Bio-idêntico)' && matchesSearch(h));
     const isGroupedView = activeTab === 'Todos';
 
     // Chamada à Netlify Function deficiency-oracle

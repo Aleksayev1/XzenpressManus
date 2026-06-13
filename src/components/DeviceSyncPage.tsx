@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Activity, Heart, Moon, RefreshCw, Sliders, Check, AlertTriangle, Smartphone, Battery, Info, ShieldAlert, Cpu } from 'lucide-react';
+import { loadAnamneseProfile } from '../data/anamneseProfile';
 
 interface DeviceSyncPageProps {
   onPageChange: (page: string) => void;
@@ -79,6 +80,59 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
 
   // Active device helper
   const activeDevice = devices.find(d => d.id === activeDeviceId && d.status === 'connected');
+
+  // Dynamic recommendation based on Anamnese Profile elements
+  const getRecommendedPoint = () => {
+    const profile = loadAnamneseProfile();
+    
+    // Default fallback: user's highly successful cranial nerve X (Vago) linked to Liver point!
+    let pointId = 'ynsa-liver';
+    let pointName = 'YNSA Fígado (N. Vago — NC X)';
+    let reason = 'Seu tônus vagal e VFC estão extremamente baixos. A estimulação do 10º par craniano (Nervo Vago) na região occipital/dorsal regula o sistema parassimpático, seda a irritação celular e drena a sobrecarga energética (Fogo do Fígado).';
+    let labelSuffix = 'NC X / Fígado';
+
+    if (profile?.guardianScores) {
+      // Find the weakest guardian element (lowest score)
+      const scores = profile.guardianScores;
+      const weakest = Object.entries(scores).reduce(
+        (min, [key, val]) => (val < min[1] ? [key, val] : min),
+        ['madeira', 100]
+      );
+      
+      const element = weakest[0];
+      
+      if (element === 'madeira') {
+        pointId = 'ynsa-liver';
+        pointName = 'YNSA Fígado (N. Vago — NC X)';
+        reason = 'Seu perfil indica fragilidade no elemento Madeira (Fígado) e sintomas associados a estresse ou tensão. O ponto do Nervo Vago (NC X) correspondente ao Fígado drena o calor hepático acumulado e aciona a resposta parassimpática e anti-inflamatória sistêmica.';
+        labelSuffix = 'NC X / Fígado';
+      } else if (element === 'terra') {
+        pointId = 'septicemia-zusanli-st36';
+        pointName = 'Zusanli (ST36) - Fortaleza Imune';
+        reason = 'Seu perfil indica fragilidade no elemento Terra (Baço/Estômago) com cansaço e digestão lenta. Zusanli nutre a base energética e restaura a vitalidade física, aumentando o tônus parassimpático.';
+        labelSuffix = 'E36 / ZS';
+      } else if (element === 'fogo') {
+        pointId = 'zs-point';
+        pointName = 'YNSA Ponto ZS (Zeise-Suess)';
+        reason = 'Seu perfil indica sensibilidade no elemento Fogo (Coração/Ansiedade). O ponto mestre ZS de imunidade neuro-hormonal estabiliza o estresse traumático e combate a hiperexcitabilidade simpática.';
+        labelSuffix = 'ZS / YNSA';
+      } else if (element === 'metal') {
+        pointId = 'ynsa-zf-pulmao';
+        pointName = 'YNSA Pulmão (Imunidade)';
+        reason = 'Seu perfil aponta fragilidade no elemento Metal (Pulmão/Pele). O ponto do Pulmão restabelece o fluxo do Qi respiratório e a imunidade profunda de barreira.';
+        labelSuffix = 'Pulmão';
+      } else if (element === 'agua') {
+        pointId = 'r1-yongquan';
+        pointName = 'R1 (Yongquan) - Fonte Borbulhante';
+        reason = 'Seu perfil indica fragilidade no elemento Água (Rim/Medo/Lombar). Yongquan drena o excesso de fogo mental e cerebral para a sola do pé, induzindo o relaxamento e o sono reparador.';
+        labelSuffix = 'R1 / Rim';
+      }
+    }
+    
+    return { pointId, pointName, reason, labelSuffix };
+  };
+
+  const recommended = getRecommendedPoint();
 
   // Generate real-time telemetry fluctuations
   useEffect(() => {
@@ -195,8 +249,8 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
     }
   };
 
-  const navigateToAcupoint = () => {
-    localStorage.setItem('preselected_acupressure_point', 'zusanli-st36');
+  const navigateToAcupoint = (pointId: string) => {
+    localStorage.setItem('preselected_acupressure_point', pointId);
     onPageChange('acupressure');
   };
 
@@ -605,7 +659,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                 A VFC reflete a variação milimétrica no tempo entre cada batimento cardíaco sucessivo. Quando estamos calmos e regenerando (sistema parassimpático), os batimentos variam bastante (VFC alta). Quando estamos sob ameaça ou sobrecarga (sistema simpático), o coração bate de forma rígida e metronômica (VFC baixa).
               </p>
               <p className="leading-relaxed">
-                Estimular o ponto <strong>Zusanli (ZS / E36)</strong> do meridiano do estômago ativa ramificações do nervo vago, sinalizando relaxamento e induzindo uma VFC maior, acalmando a resposta sistêmica de luta-ou-fuga.
+                A estimulação do ponto correspondente ao <strong>Nervo Vago (NC X / Fígado)</strong> no couro cabeludo sinaliza relaxamento e modula diretamente a VFC, neutralizando a resposta inflamatória e o estresse sistêmico.
               </p>
             </div>
           </div>
@@ -650,18 +704,18 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
               <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-900 text-xs space-y-2">
                 <p className="font-semibold text-slate-200">💡 Resposta de Biofeedback Sugerida:</p>
                 <p>
-                  Recomendamos a estimulação preventiva do acuponto **YNSA ZS (Zusanli)** por 2 minutos. Esse ponto estimula ramificações do nervo vago e induz a liberação de acetilcolina, freando a resposta simpática de sobrecarga cardíaca.
+                  Recomendamos a estimulação preventiva do acuponto **{recommended.pointName}**. {recommended.reason}
                 </p>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={navigateToAcupoint}
-                className="flex-1 py-3.5 px-6 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-600 text-slate-55 font-bold rounded-xl text-sm transition-all duration-200 transform hover:scale-[1.02] shadow-lg shadow-red-950/30 flex items-center justify-center gap-2"
+                onClick={() => navigateToAcupoint(recommended.pointId)}
+                className="flex-1 py-3.5 px-6 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-slate-55 font-bold rounded-xl text-sm transition-all duration-200 transform hover:scale-[1.02] shadow-lg shadow-red-950/30 flex items-center justify-center gap-2"
               >
-                <span>Estimular Ponto ZS Agora</span>
-                <span className="text-xs font-mono font-normal opacity-80">(E36)</span>
+                <span>Estimular Ponto Agora</span>
+                <span className="text-xs font-mono font-normal opacity-85">({recommended.labelSuffix})</span>
               </button>
               <button
                 onClick={() => {

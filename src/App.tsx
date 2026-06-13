@@ -49,6 +49,7 @@ import { AnamnesePage } from './components/AnamnesePage';
 import { hasCompletedAnamnese, loadAnamneseProfile, type AnamneseProfile } from './data/anamneseProfile';
 
 import { PremiumPartnerPitch } from './pages/PremiumPartnerPitch';
+import { DeviceSyncPage } from './components/DeviceSyncPage';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('landing');
@@ -284,6 +285,8 @@ function AppContent() {
         );
       case 'premium-partner':
         return <PremiumPartnerPitch onPageChange={setCurrentPage} />;
+      case 'device-sync':
+        return <DeviceSyncPage onPageChange={setCurrentPage} />;
       default:
         return <LandingPage onStart={() => setCurrentPage('login')} />;
     }

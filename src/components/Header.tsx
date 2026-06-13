@@ -75,6 +75,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
     { id: 'hormonal-research', label: 'Estudo ZS', icon: <Brain className="w-4 h-4 text-purple-500" /> },
     { id: 'fusion', label: 'Fusão de Sons', icon: <Music className="w-4 h-4 text-pink-400" /> },
     { id: 'progress', label: 'Monitoramento', icon: <TrendingUp className="w-4 h-4 text-orange-500" /> },
+    { id: 'device-sync', label: 'Dispositivos (VFC)', icon: <Activity className="w-4 h-4 text-cyan-500" /> },
   ];
 
   const communityItems: NavItem[] = [

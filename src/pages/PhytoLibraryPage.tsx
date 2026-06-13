@@ -242,6 +242,10 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
             const matched = acupressurePoints.find(p => p.id === 'sp6-sanyinjiao');
             if (matched) return matched;
         }
+        if (cleanStr.includes('bp9') || cleanStr.includes('sp9') || cleanStr.includes('bp-9') || cleanStr.includes('sp-9') || cleanStr.includes('yinlingquan') || cleanStr.includes('yin ling quan')) {
+            const matched = acupressurePoints.find(p => p.id === 'sp9-yinlingquan');
+            if (matched) return matched;
+        }
         if (cleanStr.includes('e36') || cleanStr.includes('st36') || cleanStr.includes('e-36') || cleanStr.includes('st-36') || cleanStr.includes('zusanli')) {
             const matched = acupressurePoints.find(p => p.id === 'septicemia-zusanli-st36');
             if (matched) return matched;

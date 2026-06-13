@@ -18,5 +18,22 @@ export const digestivePoints: AcupressurePoint[] = [
     instructions: 'Na face interna do pé, na depressão distal à base do primeiro osso metatarsal.',
     duration: 120,
     pressure: 'moderada'
+  },
+  {
+    id: 'sp9-yinlingquan',
+    name: 'BP9 (SP9) - Yinlingquan - Fonte da Colina Yin',
+    nameEn: 'SP9 - Yinlingquan - Yin Mound Spring',
+    description: 'Ponto He-Mar e ponto de Água do meridiano do Baço. Principal ponto para eliminar umidade do aquecedor inferior, tratar edema, distúrbios urinários, dor ou inchaço no joelho e problemas digestivos associados ao excesso de umidade.',
+    descriptionEn: 'He-Sea and Water point of Spleen meridian. Primary point to resolve dampness in the lower burner, treat edema, urinary disorders, knee pain or swelling, and digestive issues related to excess dampness.',
+    position: { x: 32, y: 55 },
+    image: '/BP9_Yinlingquan_New.png',
+    imageAlt: 'Localização do ponto BP9 (Yinlingquan) - Perna',
+    benefits: ['Elimina Umidade', 'Trata Edemas', 'Alivia Dor no Joelho', 'Harmoniza Vias Urinárias'],
+    benefitsEn: ['Resolves Dampness', 'Treats Edema', 'Relieves Knee Pain', 'Harmonizes Urinary Tract'],
+    isPremium: false,
+    category: 'digestive',
+    instructions: 'Na face interna da perna, na depressão localizada no ângulo formado pelo côndilo medial da tíbia e a borda posterior da tíbia.',
+    duration: 120,
+    pressure: 'moderada'
   }
 ];

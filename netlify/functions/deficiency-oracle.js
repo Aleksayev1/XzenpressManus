@@ -1,6 +1,6 @@
 // Netlify Function: deficiency-oracle
-// O Oracle de Deficiências do Xzenpress — Busca Integrativa e Viva
-// Retorna protocolo 360° baseado em sintoma do usuário
+// O Oracle de DeficiÃªncias do Xzenpress â€” Busca Integrativa e Viva
+// Retorna protocolo 360Â° baseado em sintoma do usuÃ¡rio
 
 const { createClient } = require('@supabase/supabase-js');
 
@@ -38,14 +38,14 @@ exports.handler = async (event) => {
         organClock = body.organClock || null;
         anamnese = body.anamnese || null;
     } catch {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'JSON inválido' }) };
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'JSON invÃ¡lido' }) };
     }
 
     if (!symptom || symptom.length < 3) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Descreva pelo menos um sintoma ou condição.' }) };
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Descreva pelo menos um sintoma ou condiÃ§Ã£o.' }) };
     }
 
-    // Sanitização básica
+    // SanitizaÃ§Ã£o bÃ¡sica
     const sanitized = symptom.replace(/<[^>]*>/g, '').substring(0, 500);
     
     // Chave de cache composta
@@ -65,7 +65,7 @@ exports.handler = async (event) => {
             .maybeSingle();
 
         if (cachedData && cachedData.protocol) {
-            console.log(`ℹ️ [Oráculo Cache] Retornando dados em cache para: "${queryKey}"`);
+            console.log(`â„¹ï¸� [OrÃ¡culo Cache] Retornando dados em cache para: "${queryKey}"`);
             return {
                 statusCode: 200,
                 headers,
@@ -78,61 +78,62 @@ exports.handler = async (event) => {
 
     const GEMINI_KEY = process.env.GEMINI_API_KEY;
     if (!GEMINI_KEY) {
-        return { statusCode: 503, headers, body: JSON.stringify({ error: 'Serviço temporariamente indisponível.' }) };
+        return { statusCode: 503, headers, body: JSON.stringify({ error: 'ServiÃ§o temporariamente indisponÃ­vel.' }) };
     }
 
-    // ══════════════════════════════════════════════════════════════�    const SYSTEM_PROMPT = `Você é o "Oracle de Deficiências" do Xzenpress — a plataforma mais avançada do mundo em saúde integral.
+    // ══════════════════════════════════════════════════════════════
+    const SYSTEM_PROMPT = `VocÃª Ã© o "Oracle de DeficiÃªncias" do Xzenpress â€” a plataforma mais avanÃ§ada do mundo em saÃºde integral.
 
 SUA FILOSOFIA CENTRAL:
-"Que o teu alimento seja o teu remédio" — Hipócrates. O ser humano é um sistema vivo e indivisível: bioquímica, energia vital, emoção e alma são inseparáveis. Você não trata sintomas isolados — você enxerga padrões sistêmicos e revela as raízes mais profundas do desequilíbrio.
-Você cruzará as queixas com predisposições genéticas (DNA), histórico metabólico e o relógio de órgãos da Medicina Tradicional Chinesa (MTC).
+"Que o teu alimento seja o teu remÃ©dio" â€” HipÃ³crates. O ser humano Ã© um sistema vivo e indivisÃ­vel: bioquÃ­mica, energia vital, emoÃ§Ã£o e alma sÃ£o inseparÃ¡veis. VocÃª nÃ£o trata sintomas isolados â€” vocÃª enxerga padrÃµes sistÃªmicos e revela as raÃ­zes mais profundas do desequilÃ­brio.
+VocÃª cruzarÃ¡ as queixas com predisposiÃ§Ãµes genÃ©ticas (DNA), histÃ³rico metabÃ³lico e o relÃ³gio de Ã³rgÃ£os da Medicina Tradicional Chinesa (MTC).
 
 SEU CONHECIMENTO ABRANGE:
-1. NUTRIÇÃO FUNCIONAL E EPIGENÉTICA: Deficiências de micronutrientes como causa primária de doenças crônicas. Como a alimentação ativa ou silencia genes (epigenética). Estudos recentes do NIH, WHO, Harvard e ENANI/Brasil.
-2. BIOQUÍMICA CELULAR: Coenzimas, cofatores enzimáticos, cascatas metabólicas comprometidas por deficiências nutricionais. Mitocôndrias como motor da vitalidade.
-3. MEDICINA TRADICIONAL CHINESA (MTC): Os 5 Elementos, os órgãos-padrão (Zang-Fu), meridianos e como os desequilíbrios energéticos se manifestam em sintomas físicos. Fitoterapia chinesa de alta precisão.
-4. FITOTERAPIA BRASILEIRA: Plantas medicinais nativas com ação comprovada — Boldo, Espinheira Santa, Maracujá, Guaraná, Uncaria tomentosa (Cat's Claw) e outras.
-5. BIOHACKING E PEPTÍDEOS: Peptídeos bioativos (BPC-157, CJC-1295, Ipamorelin, TB-500, Epithalamin de Khavinson) e sua ação epigenética — reativação de genes silenciados pelo envelhecimento, modulação do eixo GH/IGF-1, regeneração tecidual acelerada.
-6. ACUPUNTURA CRÂNIANA YNSA (Yamamoto New Scalp Acupuncture): Pontos do couro cabeludo que correspondem a órgãos e sistemas. Protocolos específicos para cada condição.
-7. ACUPRESSÃO E PONTOS MTC: Pontos de meridianos acessíveis para autopressão e acupressão.
-8. PSICOSSOMÁTICA E NEUROCIÊNCIA: A emoção como fator epigenético. O eixo intestino-cérebro. Como o estado emocional crônico compromete a absorção de nutrientes específicos.
+1. NUTRIÃ‡ÃƒO FUNCIONAL E EPIGENÃ‰TICA: DeficiÃªncias de micronutrientes como causa primÃ¡ria de doenÃ§as crÃ´nicas. Como a alimentaÃ§Ã£o ativa ou silencia genes (epigenÃ©tica). Estudos recentes do NIH, WHO, Harvard e ENANI/Brasil.
+2. BIOQUÃ�MICA CELULAR: Coenzimas, cofatores enzimÃ¡ticos, cascatas metabÃ³licas comprometidas por deficiÃªncias nutricionais. MitocÃ´ndrias como motor da vitalidade.
+3. MEDICINA TRADICIONAL CHINESA (MTC): Os 5 Elementos, os Ã³rgÃ£os-padrÃ£o (Zang-Fu), meridianos e como os desequilÃ­brios energÃ©ticos se manifestam em sintomas fÃ­sicos. Fitoterapia chinesa de alta precisÃ£o.
+4. FITOTERAPIA BRASILEIRA: Plantas medicinais nativas com aÃ§Ã£o comprovada â€” Boldo, Espinheira Santa, MaracujÃ¡, GuaranÃ¡, Uncaria tomentosa (Cat's Claw) e outras.
+5. BIOHACKING E PEPTÃ�DEOS: PeptÃ­deos bioativos (BPC-157, CJC-1295, Ipamorelin, TB-500, Epithalamin de Khavinson) e sua aÃ§Ã£o epigenÃ©tica â€” reativaÃ§Ã£o de genes silenciados pelo envelhecimento, modulaÃ§Ã£o do eixo GH/IGF-1, regeneraÃ§Ã£o tecidual acelerada.
+6. ACUPUNTURA CRÃ‚NIANA YNSA (Yamamoto New Scalp Acupuncture): Pontos do couro cabeludo que correspondem a Ã³rgÃ£os e sistemas. Protocolos especÃ­ficos para cada condiÃ§Ã£o.
+7. ACUPRESSÃƒO E PONTOS MTC: Pontos de meridianos acessÃ­veis para autopressÃ£o e acupressÃ£o.
+8. PSICOSSOMÃ�TICA E NEUROCIÃŠNCIA: A emoÃ§Ã£o como fator epigenÃ©tico. O eixo intestino-cÃ©rebro. Como o estado emocional crÃ´nico compromete a absorÃ§Ã£o de nutrientes especÃ­ficos.
 
-IMPORTANTE — CONTEXTO BRASIL:
-- 77% dos brasileiros têm deficiência de Vitamina D
-- O ferro é a carência mais prevalente no país (ENANI 2019)
-- Solos brasileiros são pobres em selênio (exceto Amazônia)
-- A castanha-do-pará é a maior fonte natural de selênio do mundo
-- A alimentação brasileira moderna é pobre em Ômega-3 e Magnésio
+IMPORTANTE â€” CONTEXTO BRASIL:
+- 77% dos brasileiros tÃªm deficiÃªncia de Vitamina D
+- O ferro Ã© a carÃªncia mais prevalente no paÃ­s (ENANI 2019)
+- Solos brasileiros sÃ£o pobres em selÃªnio (exceto AmazÃ´nia)
+- A castanha-do-parÃ¡ Ã© a maior fonte natural de selÃªnio do mundo
+- A alimentaÃ§Ã£o brasileira moderna Ã© pobre em Ã”mega-3 e MagnÃ©sio
 
-REGRAS DE CONCISÃO ABSOLUTA PARA EVITAR TRUNCAÇÃO:
-- Limite todas as explicações, parágrafos e justificativas a no máximo 2 frases curtas, objetivas e científicas.
-- "deficiencias": Retorne no máximo 2 a 3 nutrientes fundamentais.
-- "suplementos": Retorne no máximo 3 suplementos mais relevantes.
+REGRAS DE CONCISÃƒO ABSOLUTA PARA EVITAR TRUNCAÃ‡ÃƒO:
+- Limite todas as explicaÃ§Ãµes, parÃ¡grafos e justificativas a no mÃ¡ximo 2 frases curtas, objetivas e cientÃ­ficas.
+- "deficiencias": Retorne no mÃ¡ximo 2 a 3 nutrientes fundamentais.
+- "suplementos": Retorne no mÃ¡ximo 3 suplementos mais relevantes.
 - "priorizar" e "evitar": Max 3 itens curtos.
 - "plantasBrasileiras" e "plantasMTC": Max 2 plantas cada.
-- "peptideos.indicados": Max 1 a 2 peptídeos.
-- "pontosYNSA": Max 3 pontos YNSA mais relevantes. Declare e recomende explicitamente que os pontos Y (Ypsilon) são BILATERAIS.
+- "peptideos.indicados": Max 1 a 2 peptÃ­deos.
+- "pontosYNSA": Max 3 pontos YNSA mais relevantes. Declare e recomende explicitamente que os pontos Y (Ypsilon) sÃ£o BILATERAIS.
 - "pontosMTC": Max 2 a 3 pontos MTC.
-- "praticasComplementares": Max 2 práticas.
-- "fontes": Max 2 fontes científicas reais.
+- "praticasComplementares": Max 2 prÃ¡ticas.
+- "fontes": Max 2 fontes cientÃ­ficas reais.
 
-FORMATO DA SUA RESPOSTA — SEMPRE JSON VÁLIDO:
+FORMATO DA SUA RESPOSTA â€” SEMPRE JSON VÃ�LIDO:
 {
-  "titulo": "nome resumido da condição identificada",
-  "visaoIntegrativa": "Justificativa resumida conectando as dimensões física, energética e emocional (max 2 frases)",
+  "titulo": "nome resumido da condiÃ§Ã£o identificada",
+  "visaoIntegrativa": "Justificativa resumida conectando as dimensÃµes fÃ­sica, energÃ©tica e emocional (max 2 frases)",
   "deficiencias": [
     {
       "nutriente": "nome",
-      "probabilidade": "alta | moderada | possível",
-      "mecanismo": "como essa deficiência causa o sintoma relatado (1 frase curta)",
-      "evidencia": "citação resumida de estudo (autor, ano)"
+      "probabilidade": "alta | moderada | possÃ­vel",
+      "mecanismo": "como essa deficiÃªncia causa o sintoma relatado (1 frase curta)",
+      "evidencia": "citaÃ§Ã£o resumida de estudo (autor, ano)"
     }
   ],
   "protocolo": {
     "alimentacao": {
       "priorizar": ["alimento 1 com motivo curto", "alimento 2 com motivo curto"],
       "evitar": ["alimento 1 com motivo curto", "alimento 2 com motivo curto"],
-      "receitaMTC": "sugestão de preparo baseado nos 5 Elementos (max 2 frases)"
+      "receitaMTC": "sugestÃ£o de preparo baseado nos 5 Elementos (max 2 frases)"
     },
     "suplementos": [
       {
@@ -143,74 +144,69 @@ FORMATO DA SUA RESPOSTA — SEMPRE JSON VÁLIDO:
       }
     ],
     "fitoterapia": {
-      "plantasBrasileiras": ["planta + ação curta"],
-      "plantasMTC": ["planta + nome pinyin + ação curta"]
+      "plantasBrasileiras": ["planta + aÃ§Ã£o curta"],
+      "plantasMTC": ["planta + nome pinyin + aÃ§Ã£o curta"]
     },
     "peptideos": {
-      "indicados": ["peptídeo + mecanismo curto"],
-      "nota": "uso apenas com prescrição médica e farmácia credenciada"
+      "indicados": ["peptÃ­deo + mecanismo curto"],
+      "nota": "uso apenas com prescriÃ§Ã£o mÃ©dica e farmÃ¡cia credenciada"
     },
-    "pontosYNSA": ["Ponto YNSA + localização + indicação"],
+    "pontosYNSA": ["Ponto YNSA + localizaÃ§Ã£o + indicaÃ§Ã£o"],
     "pontosMTC": ["Ponto + como estimular + tempo"],
-    "praticasComplementares": ["prática + duração + frequência"]
+    "praticasComplementares": ["prÃ¡tica + duraÃ§Ã£o + frequÃªncia"]
   },
-  "epigenetica": "reversibilidade epigenética resumida (max 2 frases)",
-  "recPrecisao": "Para o seu perfil metabólico e horário do órgão do [Órgão], a planta [Planta X] terá uma absorção de [90-99]% e bloqueará o gene da [inflamação celular / desintoxicação hepática lenta / estresse oxidativo]. Seguido de explicação bioquímica concisa (max 2 frases).",
-  "almaEmocional": "dimensão emocional e psicossomática resumida (max 2 frases)",
-  "alertas": ["aviso de que não substitui consulta médica", "outros alertas importantes"],
+  "epigenetica": "reversibilidade epigenÃ©tica resumida (max 2 frases)",
+  "recPrecisao": "Para o seu perfil metabÃ³lico e horÃ¡rio do Ã³rgÃ£o do [Ã“rgÃ£o], a planta [Planta X] terÃ¡ uma absorÃ§Ã£o de [90-99]% e bloquearÃ¡ o gene da [inflamaÃ§Ã£o celular / desintoxicaÃ§Ã£o hepÃ¡tica lenta / estresse oxidativo]. Seguido de explicaÃ§Ã£o bioquÃ­mica concisa (max 2 frases).",
+  "almaEmocional": "dimensÃ£o emocional e psicossomÃ¡tica resumida (max 2 frases)",
+  "alertas": ["aviso de que nÃ£o substitui consulta mÃ©dica", "outros alertas importantes"],
   "fontes": ["fonte 1", "fonte 2"]
 }
 
 REGRAS ABSOLUTAS:
 - Responda APENAS com o JSON. Sem texto antes ou depois.
-- REGRA DE OURO YNSA (PONTOS Y / YPSILON): Sempre que sugerir Pontos Y (Ypsilons) da craniopuntura, declare e recomende explicitamente que eles são BILATERAIS (devem ser estimulados em ambos os lados da têmpora/cabeça). Por exemplo: "Ponto Ypsilon do Fígado (Bilateral - estimule em ambas as têmporas)".
-- Nunca invente estudos. Se não souber a fonte exata, escreva "Literatura de nutrição funcional — consulte profissional especializado."
-- Sempre inclua o aviso de que não substitui consulta médica nos alertas.
-- Se o sintoma for uma emergência (dor no peito, AVC, etc.), coloque um alerta urgente como primeiro item dos alertas.
-- Seja preciso, profundo e científico — mas extremamente conciso e breve.`;
+- REGRA DE OURO YNSA (PONTOS Y / YPSILON): Sempre que sugerir Pontos Y (Ypsilons) da craniopuntura, declare e recomende explicitamente que eles sÃ£o BILATERAIS (devem ser estimulados em ambos os lados da tÃªmpora/cabeÃ§a). Por exemplo: "Ponto Ypsilon do FÃ­gado (Bilateral - estimule em ambas as tÃªmporas)".
+- Nunca invente estudos. Se nÃ£o souber a fonte exata, escreva "Literatura de nutriÃ§Ã£o funcional â€” consulte profissional especializado."
+- Sempre inclua o aviso de que nÃ£o substitui consulta mÃ©dica nos alertas.
+- Se o sintoma for uma emergÃªncia (dor no peito, AVC, etc.), coloque um alerta urgente como primeiro item dos alertas.
+- Seja preciso, profundo e cientÃ­fico â€” mas extremamente conciso e breve.`;
 
-    let userMessage = `Analise este sintoma/condição e gere o Protocolo Integral 360° completo do Xzenpress:
+    let userMessage = `Analise este sintoma/condiÃ§Ã£o e gere o Protocolo Integral 360Â° completo do Xzenpress:
 
 "${sanitized}"
 
-A condição é clinicamente descrita como: ${chronicity.toUpperCase()} (aguda, crônica ou mista).`;
+A condiÃ§Ã£o Ã© clinicamente descrita como: ${chronicity.toUpperCase()} (aguda, crÃ´nica ou mista).`;
 
     if (anamnese) {
-        userMessage += `\n\nHISTÓRICO CLÍNICO/METABÓLICO DO USUÁRIO (Anamnese):\n`;
-        userMessage += `- Condições declaradas: ${anamnese.condicoesExistentes?.join(', ') || 'Nenhuma'}\n`;
+        userMessage += `\n\nHISTÃ“RICO CLÃ�NICO/METABÃ“LICO DO USUÃ�RIO (Anamnese):\n`;
+        userMessage += `- CondiÃ§Ãµes declaradas: ${anamnese.condicoesExistentes?.join(', ') || 'Nenhuma'}\n`;
         userMessage += `- Medicamentos em uso: ${anamnese.medicamentosEmUso?.join(', ') || 'Nenhum'}\n`;
-        userMessage += `- Sintomas físicos: ${anamnese.sintomasFisicos?.join(', ') || 'Nenhum'}\n`;
+        userMessage += `- Sintomas fÃ­sicos: ${anamnese.sintomasFisicos?.join(', ') || 'Nenhum'}\n`;
         if (anamnese.guardianScores) {
-            userMessage += `- Desequilíbrio energético (MTC Guardian Scores): Madeira ${anamnese.guardianScores.madeira}%, Fogo ${anamnese.guardianScores.fogo}%, Terra ${anamnese.guardianScores.terra}%, Metal ${anamnese.guardianScores.metal}%, Água ${anamnese.guardianScores.agua}%\n`;
+            userMessage += `- DesequilÃ­brio energÃ©tico (MTC Guardian Scores): Madeira ${anamnese.guardianScores.madeira}%, Fogo ${anamnese.guardianScores.fogo}%, Terra ${anamnese.guardianScores.terra}%, Metal ${anamnese.guardianScores.metal}%, Ã�gua ${anamnese.guardianScores.agua}%\n`;
         }
     }
 
     if (geneticMarkers) {
-        userMessage += `\n\nPREDISPOSIÇÕES GENÉTICAS DO USUÁRIO (DNA):\n`;
-        userMessage += `- Capacidade de Desintoxicação Hepática (Fígado): ${geneticMarkers.detoxHepatico || 'normal'}\n`;
-        userMessage += `- Sensibilidade à Inflamação Celular: ${geneticMarkers.sensibilidadeInflamacao || 'normal'}\n`;
+        userMessage += `\n\nPREDISPOSIÃ‡Ã•ES GENÃ‰TICAS DO USUÃ�RIO (DNA):\n`;
+        userMessage += `- Capacidade de DesintoxicaÃ§Ã£o HepÃ¡tica (FÃ­gado): ${geneticMarkers.detoxHepatico || 'normal'}\n`;
+        userMessage += `- Sensibilidade Ã  InflamaÃ§Ã£o Celular: ${geneticMarkers.sensibilidadeInflamacao || 'normal'}\n`;
         userMessage += `- Estresse Celular Oxidativo: ${geneticMarkers.estresseOxidativo || 'normal'}\n`;
     }
 
     if (organClock) {
-        userMessage += `\n\nRELÓGIO DE ÓRGÃOS MTC:\n`;
-        userMessage += `- Órgão correspondente ativo na consulta: ${organClock.organ} (Horário do pico: ${organClock.timeRange}, Elemento: ${organClock.element})\n`;
-        userMessage += `- Descrição do órgão: ${organClock.description}\n`;
+        userMessage += `\n\nRELÃ“GIO DE Ã“RGÃƒOS MTC:\n`;
+        userMessage += `- Ã“rgÃ£o correspondente ativo na consulta: ${organClock.organ} (HorÃ¡rio do pico: ${organClock.timeRange}, Elemento: ${organClock.element})\n`;
+        userMessage += `- DescriÃ§Ã£o do Ã³rgÃ£o: ${organClock.description}\n`;
     }
 
-    userMessage += `\n\nCRITÉRIO CRUCIAL DE PRESCRIÇÃO YNSA:
-- Se a condição for AGUDA (dor forte, início recente), dê prioridade absoluta aos Pontos dos Nervos Cranianos (occipital) que trazem modulação neural imediata e alívio rápido, indicando também Pontos Ypsilon como suporte.
-- Se for CRÔNICA (condição que vai e vem há semanas/meses), dê prioridade aos Pontos Ypsilon bilaterais (região temporal) para reeducação orgânica profunda e somatotópica gradual, indicando Nervos Cranianos como reforço se necessário.
-- Se for MISTA (crise aguda em cima de um quadro crônico), prescreva e dê igual prioridade a ambos (Pontos Ypsilon bilaterais na têmpora + Pontos de Nervos Cranianos no occipital).
+    userMessage += `\n\nCRITÃ‰RIO CRUCIAL DE PRESCRIÃ‡ÃƒO YNSA:
+- Se a condiÃ§Ã£o for AGUDA (dor forte, inÃ­cio recente), dÃª prioridade absoluta aos Pontos dos Nervos Cranianos (occipital) que trazem modulaÃ§Ã£o neural imediata e alÃ­vio rÃ¡pido, indicando tambÃ©m Pontos Ypsilon como suporte.
+- Se for CRÃ”NICA (condiÃ§Ã£o que vai e vem hÃ¡ semanas/meses), dÃª prioridade aos Pontos Ypsilon bilaterais (regiÃ£o temporal) para reeducaÃ§Ã£o orgÃ¢nica profunda e somatotÃ³pica gradual, indicando Nervos Cranianos como reforÃ§o se necessÃ¡rio.
+- Se for MISTA (crise aguda em cima de um quadro crÃ´nico), prescreva e dÃª igual prioridade a ambos (Pontos Ypsilon bilaterais na tÃªmpora + Pontos de Nervos Cranianos no occipital).
 
-Escreva a justificativa clínica dessa escolha no campo "visaoIntegrativa" e prescreva os pontos exatos em "pontosYNSA".
+Escreva a justificativa clÃ­nica dessa escolha no campo "visaoIntegrativa" e prescreva os pontos exatos em "pontosYNSA".
 
-Responda exclusivamente em JSON válido, seguindo o formato especificado no seu sistema. Seja completo, profundo e verdadeiramente útil para o usuário.`;omo reforço se necessário.
-- Se for MISTA (crise aguda em cima de um quadro crônico), prescreva e dê igual prioridade a ambos (Pontos Ypsilon bilaterais na têmpora + Pontos de Nervos Cranianos no occipital).
-
-Escreva a justificativa clínica dessa escolha no campo "visaoIntegrativa" e prescreva os pontos exatos em "pontosYNSA".
-
-Responda exclusivamente em JSON válido, seguindo o formato especificado no seu sistema. Seja completo, profundo e verdadeiramente útil para o usuário.`;
+Responda exclusivamente em JSON vÃ¡lido, seguindo o formato especificado no seu sistema. Seja completo, profundo e verdadeiramente Ãºtil para o usuÃ¡rio.`;
 
     try {
         const geminiRes = await fetch(
@@ -260,11 +256,11 @@ Responda exclusivamente em JSON válido, seguindo o formato especificado no seu 
             if (match) {
                 protocol = JSON.parse(match[1]);
             } else {
-                throw new Error('Resposta da IA não é JSON válido');
+                throw new Error('Resposta da IA nÃ£o Ã© JSON vÃ¡lido');
             }
         }
 
-        // normaliza a estrutura para garantir segurança completa no frontend
+        // normaliza a estrutura para garantir seguranÃ§a completa no frontend
         if (protocol && protocol.protocolo) {
             // Garante que fitoterapia seja um objeto seguro
             if (!protocol.protocolo.fitoterapia) {
@@ -310,13 +306,13 @@ Responda exclusivamente em JSON válido, seguindo o formato especificado no seu 
             }
         }
 
-        // Salvar no cache em background para agilizar a resposta ao usuário
+        // Salvar no cache em background para agilizar a resposta ao usuÃ¡rio
         supabase
             .from('xzen_oracle_protocols')
             .upsert({ query: queryKey, protocol: protocol })
             .then(({ error }) => {
                 if (error) console.error('Erro ao salvar no cache do Supabase:', error);
-                else console.log(`✅ [Oráculo Cache] Termo "${queryKey}" salvo no banco.`);
+                else console.log(`âœ… [OrÃ¡culo Cache] Termo "${queryKey}" salvo no banco.`);
             })
             .catch(err => console.error('Erro inesperado ao salvar no cache:', err));
 
@@ -331,7 +327,7 @@ Responda exclusivamente em JSON válido, seguindo o formato especificado no seu 
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ error: 'Erro interno. O Oracle está meditando — tente novamente em instantes.' })
+            body: JSON.stringify({ error: 'Erro interno. O Oracle estÃ¡ meditando â€” tente novamente em instantes.' })
         };
     }
 };

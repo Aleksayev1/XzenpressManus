@@ -90,6 +90,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [notificationDismissed, setNotificationDismissed] = useState<boolean>(false);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced'>('idle');
 
   const { user } = useAuth();
   const [apiSyncStatus, setApiSyncStatus] = useState<'active' | 'disconnected' | 'error' | 'none'>('none');
@@ -229,6 +230,65 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
     };
     fetchApiSyncStatus();
   }, [user?.id]);
+
+  const handleSync = async () => {
+    if (syncStatus === 'syncing') return;
+    setSyncStatus('syncing');
+    
+    setTimeout(async () => {
+      // Save locally to localStorage
+      localStorage.setItem('wearable_vfc', vfcValue.toString());
+      localStorage.setItem('wearable_rhr', rhrValue.toString());
+      localStorage.setItem('wearable_deep_sleep_mins', deepSleepMinutes.toString());
+      localStorage.setItem('wearable_rem_sleep_mins', remSleepMinutes.toString());
+      
+      const h = Math.floor(deepSleepMinutes / 60);
+      const m = deepSleepMinutes % 60;
+      localStorage.setItem('wearable_sleep', `${h}h ${m}m`);
+      
+      // Save to Supabase if logged in
+      if (user?.id && supabase) {
+        try {
+          const deviceName = activeDevice ? activeDevice.name : 'Simulador Virtual';
+          
+          await supabase
+            .from('xzen_user_telemetry')
+            .insert({
+              user_id: user.id,
+              wearable_vfc: vfcValue,
+              wearable_rhr: rhrValue,
+              wearable_sleep: `${h}h ${m}m`,
+              wearable_deep_sleep_minutes: deepSleepMinutes,
+              wearable_rem_sleep_minutes: remSleepMinutes,
+              active_device_id: deviceName,
+              provider: 'simulador'
+            });
+
+          await supabase
+            .from('xzen_user_telemetry_status')
+            .upsert({
+              user_id: user.id,
+              sync_status: 'active',
+              last_sync_at: new Date().toISOString(),
+              active_device_id: deviceName,
+              provider: 'simulador'
+            });
+
+          setApiSyncStatus('active');
+          setApiProvider('simulador');
+          setApiDeviceName(deviceName);
+        } catch (err) {
+          console.error('Erro ao sincronizar com banco de dados:', err);
+        }
+      }
+      
+      setSyncStatus('synced');
+      
+      setTimeout(() => {
+        setSyncStatus('idle');
+      }, 2500);
+    }, 1500);
+  };
 
   const handleConnectWidgetDevice = async (deviceType: string) => {
     setIsConnectingWidget(true);
@@ -444,6 +504,84 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
     })
     .join(' ');
 
+  const renderSimulatorControl = (
+    key: 'vfc' | 'rhr' | 'deep' | 'rem',
+    label: string,
+    value: number,
+    setValue: React.Dispatch<React.SetStateAction<number>>,
+    min: number,
+    max: number,
+    step: number,
+    accentColor: string,
+    isTime: boolean = false
+  ) => {
+    const isCritical = key === 'vfc' ? value < 35 : key === 'rhr' ? value > 70 : value < 60;
+    const criticalLabel = key === 'vfc' ? '(SOBRECARGA)' : key === 'rhr' ? '(SOBRECARGA)' : '(INSUFICIENTE)';
+    const normalLabel = key === 'vfc' ? '(SAUDÁVEL)' : key === 'rhr' ? '(EXCELENTE)' : (key === 'rem' ? '(COGNITIVO OK)' : '(RESTREATIVO)');
+    
+    const formatValue = (val: number) => {
+      if (isTime) {
+        const h = Math.floor(val / 60);
+        const m = val % 60;
+        return `${h}h ${m}m (${val} min)`;
+      }
+      return `${val} ${key === 'vfc' ? 'ms' : 'bpm'}`;
+    };
+
+    return (
+      <div className="space-y-3 pt-2 first:pt-0 border-t border-slate-900 first:border-t-0">
+        <div className="flex justify-between text-xs font-semibold">
+          <span className="text-slate-400">{label} simulada</span>
+          <span className={`font-mono text-sm ${isCritical ? 'text-red-400 font-bold' : accentColor}`}>
+            {formatValue(value)} {isCritical ? criticalLabel : normalLabel}
+          </span>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <input
+            type="range"
+            min={min}
+            max={max}
+            step={step}
+            value={value}
+            onChange={(e) => {
+              setIsSimulating(true);
+              setValue(Number(e.target.value));
+            }}
+            className={`flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer ${
+              key === 'vfc' ? 'accent-cyan-400' : key === 'rhr' ? 'accent-pink-400' : key === 'deep' ? 'accent-indigo-400' : 'accent-purple-400'
+            }`}
+          />
+          
+          <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSimulating(true);
+                setValue(prev => Math.max(min, prev - step));
+              }}
+              className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-cyan-950 active:text-cyan-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+              title={`Diminuir ${isTime ? `${step} min` : (key === 'vfc' ? '1ms' : '1bpm')}`}
+            >
+              -
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSimulating(true);
+                setValue(prev => Math.min(max, prev + step));
+              }}
+              className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-cyan-950 active:text-cyan-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+              title={`Aumentar ${isTime ? `${step} min` : (key === 'vfc' ? '1ms' : '1bpm')}`}
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans pb-20 pt-20 px-4 relative overflow-hidden">
       {/* Premium background ambient light effects */}
@@ -452,19 +590,32 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Back navigation */}
-        <div className="flex items-center mb-8">
-          <button
-            onClick={() => onPageChange('home')}
-            className="p-3 bg-slate-900/80 hover:bg-slate-800 rounded-full border border-slate-800/80 transition-all group shadow-lg mr-4 flex items-center justify-center"
-            title="Voltar"
-          >
-            <ArrowLeft className="w-5 h-5 text-slate-400 group-hover:text-cyan-400 transition-colors" />
-          </button>
-          <div>
-            <span className="text-xs uppercase tracking-widest text-cyan-400 font-semibold">Telemetria & Pulsologia Digital</span>
-            <h1 className="text-3xl sm:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 tracking-tight">
-              Sincronização de Wearables
-            </h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center">
+            <button
+              onClick={() => onPageChange('home')}
+              className="p-3 bg-slate-900/80 hover:bg-slate-800 rounded-full border border-slate-800/80 transition-all group shadow-lg mr-4 flex items-center justify-center"
+              title="Voltar"
+            >
+              <ArrowLeft className="w-5 h-5 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+            </button>
+            <div>
+              <span className="text-xs uppercase tracking-widest text-cyan-400 font-semibold">Telemetria & Pulsologia Digital</span>
+              <h1 className="text-2xl sm:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 tracking-tight">
+                Sincronização de Wearables
+              </h1>
+            </div>
+          </div>
+
+          {/* Sync Status Badge from User Suggestion */}
+          <div className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-all duration-300 shrink-0 self-start sm:self-center ${
+            syncStatus === 'synced'
+              ? 'bg-emerald-950/85 text-emerald-400 border-emerald-500/30'
+              : syncStatus === 'syncing'
+              ? 'bg-cyan-950/85 text-cyan-400 border-cyan-500/30 animate-pulse'
+              : 'bg-slate-900/80 text-slate-400 border-slate-850'
+          }`}>
+            Status do Sincronizador: {syncStatus === 'synced' ? 'SINCRONIZADO' : syncStatus === 'syncing' ? 'SINCRONIZANDO...' : 'AGUARDANDO'}
           </div>
         </div>
 
@@ -677,227 +828,10 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
 
               {activeDevice ? (
                 <div className="space-y-6 bg-slate-950/50 p-6 rounded-2xl border border-slate-900">
-                  {/* VFC Slider */}
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-xs font-semibold">
-                      <span className="text-slate-400">Variabilidade da Frequência Cardíaca (VFC) simulada</span>
-                      <span className={`font-mono text-sm ${vfcValue < 35 ? 'text-red-400 font-bold' : 'text-cyan-400'}`}>
-                        {vfcValue} ms {vfcValue < 35 ? '(SOBRECARGA)' : '(SAUDÁVEL)'}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="range"
-                        min="15"
-                        max="100"
-                        value={vfcValue}
-                        onChange={(e) => {
-                          setIsSimulating(true);
-                          setVfcValue(Number(e.target.value));
-                        }}
-                        className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
-                      />
-                      
-                      <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsSimulating(true);
-                            setVfcValue(prev => Math.max(15, prev - 1));
-                          }}
-                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-cyan-950 active:text-cyan-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
-                          title="Diminuir 1ms"
-                        >
-                          -
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsSimulating(true);
-                            setVfcValue(prev => Math.min(100, prev + 1));
-                          }}
-                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-cyan-950 active:text-cyan-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
-                          title="Aumentar 1ms"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-                      <span>15ms (Estresse Crítico)</span>
-                      <span>50ms (Equilíbrio)</span>
-                      <span>100ms (Excelente)</span>
-                    </div>
-                  </div>
-
-                  {/* RHR Slider */}
-                  <div className="space-y-3 pt-2 border-t border-slate-900">
-                    <div className="flex justify-between text-xs font-semibold">
-                      <span className="text-slate-400">Frequência Cardíaca de Repouso (RHR) simulada</span>
-                      <span className={`font-mono text-sm ${rhrValue > 70 ? 'text-red-400 font-bold' : 'text-pink-400'}`}>
-                        {rhrValue} bpm {rhrValue > 70 ? '(SOBRECARGA)' : '(EXCELENTE)'}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="range"
-                        min="40"
-                        max="100"
-                        value={rhrValue}
-                        onChange={(e) => {
-                          setIsSimulating(true);
-                          setRhrValue(Number(e.target.value));
-                        }}
-                        className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-pink-400"
-                      />
-                      
-                      <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsSimulating(true);
-                            setRhrValue(prev => Math.max(40, prev - 1));
-                          }}
-                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-pink-950 active:text-pink-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
-                          title="Diminuir 1bpm"
-                        >
-                          -
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsSimulating(true);
-                            setRhrValue(prev => Math.min(100, prev + 1));
-                          }}
-                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-pink-950 active:text-pink-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
-                          title="Aumentar 1bpm"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-                      <span>40 bpm (Atleta)</span>
-                      <span>60 bpm (Moderado)</span>
-                      <span>100 bpm (Taquicardia)</span>
-                    </div>
-                  </div>
-
-                  {/* Deep Sleep Slider */}
-                  <div className="space-y-3 pt-2 border-t border-slate-900">
-                    <div className="flex justify-between text-xs font-semibold">
-                      <span className="text-slate-400">Tempo de Sono Profundo simulado</span>
-                      <span className={`font-mono text-sm ${deepSleepMinutes < 60 ? 'text-red-400 font-bold' : 'text-indigo-400'}`}>
-                        {Math.floor(deepSleepMinutes / 60)}h {deepSleepMinutes % 60}m ({deepSleepMinutes} min) {deepSleepMinutes < 60 ? '(INSUFICIENTE)' : '(RESTREATIVO)'}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="range"
-                        min="0"
-                        max="240"
-                        step="15"
-                        value={deepSleepMinutes}
-                        onChange={(e) => {
-                          setIsSimulating(true);
-                          setDeepSleepMinutes(Number(e.target.value));
-                        }}
-                        className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-400"
-                      />
-                      
-                      <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsSimulating(true);
-                            setDeepSleepMinutes(prev => Math.max(0, prev - 15));
-                          }}
-                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-indigo-950 active:text-indigo-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
-                          title="Diminuir 15 min"
-                        >
-                          -
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsSimulating(true);
-                            setDeepSleepMinutes(prev => Math.min(240, prev + 15));
-                          }}
-                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-indigo-950 active:text-indigo-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
-                          title="Aumentar 15 min"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-                      <span>0h (Nulo)</span>
-                      <span>1.5h (Médio)</span>
-                      <span>4h (Excelente)</span>
-                    </div>
-                  </div>
-
-                  {/* REM Sleep Slider */}
-                  <div className="space-y-3 pt-2 border-t border-slate-900">
-                    <div className="flex justify-between text-xs font-semibold">
-                      <span className="text-slate-400">Tempo de Sono REM simulado</span>
-                      <span className={`font-mono text-sm ${remSleepMinutes < 60 ? 'text-red-400 font-bold' : 'text-purple-400'}`}>
-                        {Math.floor(remSleepMinutes / 60)}h {remSleepMinutes % 60}m ({remSleepMinutes} min) {remSleepMinutes < 60 ? '(INSUFICIENTE)' : '(COGNITIVO OK)'}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="range"
-                        min="0"
-                        max="240"
-                        step="15"
-                        value={remSleepMinutes}
-                        onChange={(e) => {
-                          setIsSimulating(true);
-                          setRemSleepMinutes(Number(e.target.value));
-                        }}
-                        className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-400"
-                      />
-                      
-                      <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsSimulating(true);
-                            setRemSleepMinutes(prev => Math.max(0, prev - 15));
-                          }}
-                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-purple-950 active:text-purple-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
-                          title="Diminuir 15 min"
-                        >
-                          -
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsSimulating(true);
-                            setRemSleepMinutes(prev => Math.min(240, prev + 15));
-                          }}
-                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-purple-950 active:text-purple-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
-                          title="Aumentar 15 min"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-                      <span>0h (Nulo)</span>
-                      <span>1.5h (Médio)</span>
-                      <span>4h (Excelente)</span>
-                    </div>
-                  </div>
+                  {renderSimulatorControl('vfc', 'Variabilidade da Frequência Cardíaca (VFC)', vfcValue, setVfcValue, 15, 100, 1, 'text-cyan-400')}
+                  {renderSimulatorControl('rhr', 'Frequência Cardíaca de Repouso (RHR)', rhrValue, setRhrValue, 40, 100, 1, 'text-pink-400')}
+                  {renderSimulatorControl('deep', 'Tempo de Sono Profundo', deepSleepMinutes, setDeepSleepMinutes, 0, 240, 15, 'text-indigo-400', true)}
+                  {renderSimulatorControl('rem', 'Tempo de Sono REM', remSleepMinutes, setRemSleepMinutes, 0, 240, 15, 'text-purple-400', true)}
 
                   <div className="flex flex-col sm:flex-row gap-4 pt-2">
                     <button
@@ -911,6 +845,36 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                       className="flex-1 py-3 px-5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold transition-all duration-200"
                     >
                       🔄 Restaurar Valores Normais (Vagus OK)
+                    </button>
+                  </div>
+
+                  {/* Sync Data to Device / Longevity OS button from User Suggestion */}
+                  <div className="pt-4 border-t border-slate-900">
+                    <button
+                      onClick={handleSync}
+                      disabled={syncStatus === 'syncing'}
+                      className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 shadow-lg flex items-center justify-center gap-2 ${
+                        syncStatus === 'synced'
+                          ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/20'
+                          : syncStatus === 'syncing'
+                          ? 'bg-cyan-700 text-white shadow-cyan-950/20 cursor-wait'
+                          : 'bg-cyan-600 hover:bg-cyan-500 text-slate-950 hover:shadow-cyan-900/20'
+                      }`}
+                    >
+                      {syncStatus === 'syncing' ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          <span>Sincronizando Dados com Longevity OS...</span>
+                        </>
+                      ) : syncStatus === 'synced' ? (
+                        <>
+                          <span>✓ Dados Sincronizados com Sucesso!</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Sincronizar Dados no Longevity OS</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>

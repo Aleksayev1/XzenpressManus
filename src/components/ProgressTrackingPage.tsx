@@ -10,6 +10,7 @@ import { fiveElements } from '../data/fiveElements';
 import { type WeeklyCheckinData } from './WeeklyCheckin';
 import { supabase } from '../lib/supabase';
 import { calculateJingIndex, calculateBiologicalWear } from '../services/clinicalAlgorithms';
+import SomatoEmotionalCard from './SomatoEmotionalCard';
 
 interface ProgressTrackingPageProps {
   onPageChange: (page: string) => void;
@@ -273,6 +274,23 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
       Number(p6.toFixed(1))
     ];
   }, [chronologicalAge, recoil, biologicalAge]);
+
+  // Dynamic prescription based on dominant emotional element and biological wear
+  const dynamicPrescription = React.useMemo(() => {
+    const defaultData = emotionalEngineMetadata[dominantElementId] || emotionalEngineMetadata.madeira;
+    if (biologicalWear > 1.5) {
+      return {
+        reformaIntima: 'Foco em acolhimento e repouso absoluto. Seu corpo físico está sob alto estresse simpático. Suspenda temporariamente cobranças mentais, autoexigências e metas rígidas.',
+        meditacao: 'Pratique a Respiração de Aterramento (coerência cardíaca focando no ponto Yongquan R1 localizado na sola do pé para descender o calor mental acumulado).',
+        acupressao: 'Estímulo bilateral do ponto KD3 (Taixi) + R1 (Yongquan) por 3 minutos para restaurar a essência Jing do Rim e acalmar o Shen (mente) agitado.',
+        isEmergency: true
+      };
+    }
+    return {
+      ...defaultData,
+      isEmergency: false
+    };
+  }, [dominantElementId, biologicalWear]);
 
   // Verificar se usuário é Premium
   if (!user?.isPremium) {
@@ -1120,7 +1138,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                 </div>
 
                 {/* Col 2: Insights e Padrão Detectado */}
-                <div className="bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl p-6 text-white border border-slate-800 shadow-lg flex flex-col justify-between relative overflow-hidden">
+                <div className="bg-gradient-to-br from-slate-900 to-slate-955 rounded-2xl p-6 text-white border border-slate-800 shadow-lg flex flex-col justify-between relative overflow-hidden">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-950/20 via-transparent to-transparent pointer-events-none"></div>
                   
                   <div className="relative z-10">
@@ -1138,18 +1156,32 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                           "Nos últimos 60 dias, identificamos {dominantCount} episódios associados ao elemento {dominantElement.element}. Isso sugere uma sobrecarga energética no meridiano do {dominantElement.organ}, refletindo comportamentos de {dominantElement.emotions.imbalanced.slice(0, 3).join(', ')}."
                         </p>
                       </div>
+
+                      {/* MTC Somato-Emotional Link */}
+                      <SomatoEmotionalCard biologicalWear={biologicalWear} />
                     </div>
                   </div>
 
                   <div className="relative z-10 text-[10px] text-slate-400 font-sans border-t border-slate-800/80 pt-3 mt-4">
-                    💡 <strong>Frequência de Ressonância:</strong> {dominantElement.frequency} Hz • {dominantElement.sound}
+                    💡 <strong>Frequência de Ressonância:</strong> {dynamicPrescription.isEmergency ? 396 : dominantElement.frequency} Hz • {dynamicPrescription.isEmergency ? 'UT' : dominantElement.sound}
                   </div>
                 </div>
 
                 {/* Col 3: Recomendações e Prescrição */}
-                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-between">
+                <div className={`rounded-2xl p-6 border flex flex-col justify-between transition-colors duration-300 ${
+                  dynamicPrescription.isEmergency 
+                    ? 'bg-rose-50/70 border-rose-200' 
+                    : 'bg-slate-55 bg-slate-50 border-slate-200'
+                }`}>
                   <div>
-                    <h3 className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-4">Prescrição Recomendada</h3>
+                    <h3 className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-4 flex items-center justify-between">
+                      <span>Prescrição Recomendada</span>
+                      {dynamicPrescription.isEmergency && (
+                        <span className="px-2 py-0.5 bg-rose-600 text-white rounded text-[8px] font-extrabold tracking-widest uppercase animate-pulse">
+                          Urgência Jing
+                        </span>
+                      )}
+                    </h3>
                     
                     <div className="space-y-3">
                       <div className="bg-white p-2.5 rounded-xl border border-gray-100 flex items-start gap-2.5 shadow-sm">
@@ -1157,7 +1189,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                         <div>
                           <div className="text-[10px] uppercase font-bold text-gray-400">Reforma Íntima e Conduta</div>
                           <div className="text-xs text-gray-700 leading-relaxed font-medium">
-                            {emotionalEngineMetadata[dominantElementId].reformaIntima}
+                            {dynamicPrescription.reformaIntima}
                           </div>
                         </div>
                       </div>
@@ -1167,7 +1199,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                         <div>
                           <div className="text-[10px] uppercase font-bold text-gray-400">Prática Respiratória / Meditação</div>
                           <div className="text-xs text-gray-700 leading-relaxed font-medium">
-                            {emotionalEngineMetadata[dominantElementId].meditacao}
+                            {dynamicPrescription.meditacao}
                           </div>
                         </div>
                       </div>
@@ -1177,7 +1209,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                         <div>
                           <div className="text-[10px] uppercase font-bold text-gray-400">Acupressão Corretiva</div>
                           <div className="text-xs text-gray-700 leading-relaxed font-medium">
-                            {emotionalEngineMetadata[dominantElementId].acupressao}
+                            {dynamicPrescription.acupressao}
                           </div>
                         </div>
                       </div>
@@ -1186,16 +1218,25 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
 
                   <div className="mt-4 flex gap-2">
                     <button
-                      onClick={() => onPageChange('acupressure')}
-                      className="flex-1 py-2 px-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold text-center transition-colors shadow-sm"
+                      onClick={() => {
+                        if (dynamicPrescription.isEmergency) {
+                          localStorage.setItem('preselected_acupressure_point', 'r1-yongquan');
+                        }
+                        onPageChange('acupressure');
+                      }}
+                      className={`flex-1 py-2 px-3 text-white rounded-xl text-xs font-bold text-center transition-colors shadow-sm ${
+                        dynamicPrescription.isEmergency 
+                          ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-200' 
+                          : 'bg-purple-600 hover:bg-purple-700'
+                      }`}
                     >
-                      Acessar Pontos
+                      {dynamicPrescription.isEmergency ? 'Pontos de Urgência (Rim)' : 'Acessar Pontos'}
                     </button>
                     <button
                       onClick={() => onPageChange('sounds')}
                       className="flex-1 py-2 px-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl text-xs font-bold text-center transition-colors"
                     >
-                      Tocar {dominantElement.frequency}Hz
+                      Tocar {dynamicPrescription.isEmergency ? 396 : dominantElement.frequency}Hz
                     </button>
                   </div>
                 </div>

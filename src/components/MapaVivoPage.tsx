@@ -6,12 +6,11 @@ import { WeeklyCheckin, type WeeklyCheckinData } from './WeeklyCheckin';
 import {
   fiveElements,
   calculateXLI,
-  getDominantGuardian,
   type GuardianElement,
   type GuardianScores
 } from '../data/fiveElements';
 import { type AnamneseProfile } from '../data/anamneseProfile';
-import { ArrowLeft, X, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowLeft, Sparkles, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { MapaVivoStorageService } from '../services/mapaVivoStorageService';
 

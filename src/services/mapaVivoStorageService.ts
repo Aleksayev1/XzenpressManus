@@ -261,6 +261,23 @@ export const MapaVivoStorageService = {
           localStorage.removeItem(LOCAL_MAPA_STATE_PREFIX);
         }
       }
+
+      // 3. Sincronizar Check-ins locais
+      const localCheckinsRaw = localStorage.getItem('xzen_local_checkins');
+      if (localCheckinsRaw) {
+        try {
+          const localCheckins = JSON.parse(localCheckinsRaw);
+          if (Array.isArray(localCheckins) && localCheckins.length > 0) {
+            console.log(`Sincronizando ${localCheckins.length} check-ins locais para a nuvem...`);
+            for (const checkin of localCheckins) {
+              await this.saveCheckin(userId, checkin);
+            }
+          }
+          localStorage.removeItem('xzen_local_checkins');
+        } catch (err) {
+          console.error('Erro ao sincronizar check-ins locais:', err);
+        }
+      }
     } catch (e) {
       console.error('Erro durante sincronização automática de dados locais:', e);
     }

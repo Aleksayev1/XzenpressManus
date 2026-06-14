@@ -234,7 +234,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
 
           {/* Mobile Navigation */}
           {isMenuOpen && (
-            <div className="lg:hidden pb-6 animate-in fade-in slide-in-from-top-4">
+            <div className="lg:hidden pb-6 animate-in fade-in slide-in-from-top-4 max-h-[calc(100vh-140px)] overflow-y-auto">
               <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-50 rounded-2xl mt-2 border border-gray-100 shadow-inner">
                 {([...headerNavItems, ...libraryItems, ...communityItems] as NavItem[]).map((item) => (
                   <button

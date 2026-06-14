@@ -833,10 +833,14 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                 
                 {/* Submetrics list */}
                 <div className="w-full grid grid-cols-2 gap-2 mt-2 text-[10px] text-slate-400 font-medium">
-                  <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center">
-                    <span className="block text-[11px] font-bold text-cyan-400 font-mono">{wearableVfc}ms</span>
-                    <span>Tónus Vago (VFC)</span>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onPageChange('device-sync')}
+                    className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center hover:border-cyan-500/50 hover:bg-slate-900/50 transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-cyan-500/50 group"
+                  >
+                    <span className="block text-[11px] font-bold text-cyan-400 font-mono group-hover:scale-105 transition-transform">{wearableVfc}ms</span>
+                    <span className="group-hover:text-cyan-300 transition-colors">Tónus Vago (VFC) ⚙️</span>
+                  </button>
                   <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center">
                     <span className="block text-[11px] font-bold text-indigo-400 font-mono">{wearableSleep}</span>
                     <span>Sono Profundo</span>

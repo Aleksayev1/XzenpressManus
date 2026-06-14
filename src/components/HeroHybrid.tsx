@@ -115,6 +115,15 @@ export const HeroHybrid: React.FC<HeroHybridProps> = ({ onShowTherapySelection, 
                                     <span>Novo: Mapa Zoster (T4)</span>
                                 </button>
 
+                                {/* Botão Dispositivos VFC */}
+                                <button
+                                    onClick={() => onPageChange('device-sync')}
+                                    className="w-full mt-3 bg-white border-2 border-cyan-500 text-cyan-600 px-8 py-3 rounded-full text-base font-bold hover:bg-cyan-50 transform hover:scale-105 transition-all duration-200 shadow-sm flex items-center justify-center space-x-2"
+                                >
+                                    <span>⌚</span>
+                                    <span>Dispositivos VFC (Wearables)</span>
+                                </button>
+
                                 <p className="text-gray-500 text-sm mt-3">Mente • Energia • Corpo</p>
                             </div>
                         </div>

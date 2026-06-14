@@ -8,6 +8,7 @@ import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { MapaVivoStorageService } from '../services/mapaVivoStorageService';
 import { fiveElements } from '../data/fiveElements';
 import { type WeeklyCheckinData } from './WeeklyCheckin';
+import { supabase } from '../lib/supabase';
 
 interface ProgressTrackingPageProps {
   onPageChange: (page: string) => void;
@@ -59,12 +60,12 @@ const emotionalEngineMetadata: Record<string, {
     frequenciaDesc: 'Aterramento & Alívio de Tensão Mental e Preocupação Crônica'
   },
   metal: {
-    patternLabel: 'Tristeza, Luto e Culpa (Eixo Pulmão-Metal)',
-    reformaIntima: 'Praticar o desapego de situações passadas e o auto-acolhimento. Perdoar-se pelos erros antigos e compreender que cada ciclo tem seu fim.',
-    meditacao: 'Respiração de Expansão Torácica focando na inspiração de prana (luz dourada) e na expiração de dores acumuladas.',
-    acupressao: 'Estímulo do ponto LU9 (Tai Yuan) + LI4 (He Gu) para aliviar a opressão no peito e fortalecer a imunidade emocional.',
+    patternLabel: 'Tristeza, Apego e Culpa (Eixo Pulmão-Metal)',
+    reformaIntima: 'Praticar o desapego e aceitar as perdas como parte do ciclo evolutivo. Libertar-se de culpas antigas e autopunições inúteis.',
+    meditacao: 'Meditação do Desapego (Visualização de folhas secas sendo levadas pelo vento, simbolizando o fluxo natural da vida).',
+    acupressao: 'Estímulo do ponto LU7 (Lie Que) + LI4 (He Gu) para promover a liberação emocional e fortalecer a barreira defensiva (Wei Qi).',
     frequenciaHz: 741,
-    frequenciaDesc: 'Despertar da Intuição & Purificação de Culpas e Bloqueios Emocionais'
+    frequenciaDesc: 'Desintoxicação Celular & Cura de Culpa e Tristeza Profunda'
   },
   agua: {
     patternLabel: 'Medo, Insegurança e Falta de Propósito (Eixo Rim-Água)',
@@ -83,6 +84,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
   const { sessions, stats, loading, error } = useSessionHistory(selectedPeriod);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [checkins, setCheckins] = useState<WeeklyCheckinData[]>([]);
+  const [dbTelemetryLoaded, setDbTelemetryLoaded] = useState(false);
 
   useEffect(() => {
     const fetchCheckins = async () => {
@@ -97,6 +99,49 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
       }
     };
     fetchCheckins();
+  }, [user?.id]);
+
+  useEffect(() => {
+    const fetchCloudTelemetry = async () => {
+      if (!user?.id) return;
+      try {
+        const { data: telemetryData, error: telemetryError } = await supabase
+          .from('xzen_user_telemetry')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (telemetryData && telemetryData.length > 0 && !telemetryError) {
+          const latest = telemetryData[0];
+          localStorage.setItem('wearable_vfc', latest.wearable_vfc.toString());
+          if (latest.wearable_rhr) {
+            localStorage.setItem('wearable_rhr', latest.wearable_rhr.toString());
+          }
+          if (latest.wearable_sleep) {
+            localStorage.setItem('wearable_sleep', latest.wearable_sleep);
+          }
+          if (latest.active_device_id) {
+            localStorage.setItem('active_device_id', latest.active_device_id);
+          }
+        }
+
+        const { data: statusData, error: statusError } = await supabase
+          .from('xzen_user_telemetry_status')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (statusData && !statusError) {
+          localStorage.setItem('active_device_id', statusData.active_device_id || '');
+        }
+
+        setDbTelemetryLoaded(true);
+      } catch (err) {
+        console.error('Erro ao sincronizar telemetria da nuvem:', err);
+      }
+    };
+    fetchCloudTelemetry();
   }, [user?.id]);
 
   // Load Anamnese profile for chronological age calculation

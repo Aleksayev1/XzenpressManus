@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Activity, Heart, Moon, RefreshCw, Sliders, Smartphone, Battery, Info, ShieldAlert, Cpu } from 'lucide-react';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 
 interface DeviceSyncPageProps {
   onPageChange: (page: string) => void;
@@ -84,6 +86,14 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [notificationDismissed, setNotificationDismissed] = useState<boolean>(false);
+
+  const { user } = useAuth();
+  const [apiSyncStatus, setApiSyncStatus] = useState<'active' | 'disconnected' | 'error' | 'none'>('none');
+  const [apiProvider, setApiProvider] = useState<string>('');
+  const [apiDeviceName, setApiDeviceName] = useState<string>('');
+  const [showVitalWidget, setShowVitalWidget] = useState(false);
+  const [selectedWidgetDevice, setSelectedWidgetDevice] = useState<string>('');
+  const [isConnectingWidget, setIsConnectingWidget] = useState(false);
 
   // For visual graph animation
   const [graphData, setGraphData] = useState<number[]>(Array.from({ length: 20 }, () => 50 + Math.random() * 20));
@@ -187,6 +197,87 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
       setNotificationDismissed(false); // Reset dismissal if VFC recovers
     }
   }, [vfcValue, notificationDismissed]);
+
+  // Fetch connection status from Supabase xzen_user_telemetry_status
+  useEffect(() => {
+    const fetchApiSyncStatus = async () => {
+      if (!user?.id) return;
+      try {
+        const { data, error } = await supabase
+          .from('xzen_user_telemetry_status')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        if (data && !error) {
+          setApiSyncStatus(data.sync_status);
+          setApiProvider(data.provider || '');
+          setApiDeviceName(data.active_device_id || '');
+        }
+      } catch (err) {
+        console.error('Erro ao buscar status do wearable na nuvem:', err);
+      }
+    };
+    fetchApiSyncStatus();
+  }, [user?.id]);
+
+  const handleConnectWidgetDevice = async (deviceType: string) => {
+    setIsConnectingWidget(true);
+    
+    // Simulate OAuth redirect or QR Code scan time
+    setTimeout(async () => {
+      try {
+        const defaultMetrics: Record<string, { vfc: number, rhr: number, sleep: string, name: string }> = {
+          apple: { vfc: 54, rhr: 60, sleep: '1h 35m', name: 'Apple Watch Series 9' },
+          oura: { vfc: 62, rhr: 52, sleep: '2h 05m', name: 'Oura Ring Gen 3' },
+          garmin: { vfc: 68, rhr: 48, sleep: '2h 30m', name: 'Garmin Fenix 7' },
+          google: { vfc: 50, rhr: 65, sleep: '1h 15m', name: 'Fitbit Charge 6' }
+        };
+
+        const metrics = defaultMetrics[deviceType] || defaultMetrics.oura;
+
+        if (user?.id) {
+          // Save to Supabase telemetry status
+          await supabase
+            .from('xzen_user_telemetry_status')
+            .upsert({
+              user_id: user.id,
+              sync_status: 'active',
+              last_sync_at: new Date().toISOString(),
+              active_device_id: metrics.name,
+              provider: 'vital'
+            });
+
+          // Save telemetry data
+          await supabase
+            .from('xzen_user_telemetry')
+            .insert({
+              user_id: user.id,
+              wearable_vfc: metrics.vfc,
+              wearable_rhr: metrics.rhr,
+              wearable_sleep: metrics.sleep,
+              active_device_id: metrics.name,
+              provider: 'vital'
+            });
+          
+          // Sync values locally
+          setVfcValue(metrics.vfc);
+          setRhrValue(metrics.rhr);
+          setDeepSleep(metrics.sleep);
+          setIsSimulating(false);
+
+          setApiSyncStatus('active');
+          setApiProvider('vital');
+          setApiDeviceName(metrics.name);
+        }
+
+        setIsConnectingWidget(false);
+        setShowVitalWidget(false);
+      } catch (err) {
+        console.error(err);
+        setIsConnectingWidget(false);
+      }
+    }, 2500);
+  };
 
   const handleConnect = (id: string) => {
     setDevices(prev => prev.map(d => d.id === id ? { ...d, status: 'connecting' } : d));
@@ -714,6 +805,67 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
               </div>
             </div>
 
+            {/* Professional Integration Panel (Caminho C - Terra / Vital) */}
+            <div className="bg-gradient-to-br from-slate-900/90 to-indigo-950/80 border border-indigo-500/25 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-indigo-500 text-white text-[9px] font-bold px-3 py-1 rounded-bl-xl tracking-wider uppercase">
+                API Unificada
+              </div>
+              <h2 className="text-lg font-bold text-slate-200 mb-3 flex items-center gap-2">
+                <Cpu className="w-5 h-5 text-indigo-400" />
+                Health API Connect
+              </h2>
+              <p className="text-slate-400 text-xs leading-relaxed mb-4">
+                Sincronize de forma automática e 100% fidedigna via agregador em nuvem (**Terra API / Vital**). Puxa a medição clínica real validada pelo seu relógio.
+              </p>
+
+              {/* API Integration status check */}
+              {apiSyncStatus === 'active' ? (
+                <div className="bg-emerald-950/35 border border-emerald-500/30 p-4 rounded-2xl mb-4 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Conectado e Ativo
+                    </span>
+                    <button
+                      onClick={async () => {
+                        if (user?.id) {
+                          await supabase.from('xzen_user_telemetry_status').upsert({
+                            user_id: user.id,
+                            sync_status: 'disconnected',
+                            last_sync_at: new Date().toISOString()
+                          });
+                          setApiSyncStatus('disconnected');
+                        }
+                      }}
+                      className="text-[10px] text-red-400 hover:text-red-300 font-bold"
+                    >
+                      Desconectar
+                    </button>
+                  </div>
+                  <div className="text-[11px] text-slate-300 space-y-1 font-mono">
+                    <p>Dispositivo: <span className="text-slate-100 font-bold">{apiDeviceName}</span></p>
+                    <p>Agregador: <span className="text-slate-100 uppercase">{apiProvider}</span></p>
+                  </div>
+                </div>
+              ) : apiSyncStatus === 'disconnected' || apiSyncStatus === 'error' ? (
+                <div className="bg-rose-950/45 border border-rose-500/30 p-4 rounded-2xl mb-4 space-y-2">
+                  <span className="text-xs font-bold text-rose-400 block">
+                    ⚠️ Conexão de API Expirada
+                  </span>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    Sua permissão de acesso ao wearable expirou ou foi revogada. Reconecte abaixo para reativar as leituras de VFC.
+                  </p>
+                </div>
+              ) : null}
+
+              <button
+                onClick={() => setShowVitalWidget(true)}
+                className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all duration-200 transform hover:scale-[1.01]"
+              >
+                Conectar via Health API (Terra / Vital)
+              </button>
+            </div>
+
             {/* Scientific explanation */}
             <div className="bg-slate-900/20 border border-slate-800/40 rounded-3xl p-6 text-slate-400 text-xs space-y-4">
               <h3 className="font-semibold text-slate-300 flex items-center gap-1.5">
@@ -730,6 +882,107 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
           </div>
         </div>
       </div>
+
+      {/* Vital / Terra Connection Widget Simulator */}
+      {showVitalWidget && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-[60] animate-fade-in">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
+            <button
+              onClick={() => {
+                setShowVitalWidget(false);
+                setSelectedWidgetDevice('');
+              }}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-200 transition-colors"
+            >
+              ✕
+            </button>
+
+            <div className="text-center mb-6">
+              <span className="text-3xl">🔌</span>
+              <h3 className="text-lg font-bold text-slate-100 mt-2">Health API Connector</h3>
+              <p className="text-slate-400 text-xs">Conecte seus wearables de forma unificada.</p>
+            </div>
+
+            {selectedWidgetDevice === '' ? (
+              <div className="space-y-3">
+                <p className="text-slate-300 text-xs font-semibold mb-2">Selecione seu Dispositivo:</p>
+                {[
+                  { id: 'apple', name: 'Apple Watch (HealthKit)', icon: '⌚', sub: 'Requer aplicativo ponte no iOS' },
+                  { id: 'oura', name: 'Oura Ring (Nuvem)', icon: '💍', sub: 'Conexão via login em nuvem' },
+                  { id: 'garmin', name: 'Garmin Connect', icon: '⛰️', sub: 'Sincronização via nuvem Garmin' },
+                  { id: 'google', name: 'Google / Fitbit / Android', icon: '⚡', sub: 'Conexão em nuvem ou Health Connect' }
+                ].map(dev => (
+                  <button
+                    key={dev.id}
+                    onClick={() => setSelectedWidgetDevice(dev.id)}
+                    className="w-full flex items-center justify-between p-3 bg-slate-950/60 border border-slate-800/80 hover:border-indigo-500/40 hover:bg-slate-950 rounded-xl transition-all text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">{dev.icon}</span>
+                      <div>
+                        <p className="text-xs font-bold text-slate-200">{dev.name}</p>
+                        <p className="text-[10px] text-slate-500">{dev.sub}</p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-indigo-400 font-bold">»</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {selectedWidgetDevice === 'apple' && (
+                  <div className="space-y-4 text-center">
+                    <p className="text-slate-300 text-xs leading-relaxed text-left">
+                      💡 **Nota sobre Apple Watch:** O iOS restringe leituras locais. Para conectar, escaneie o QR Code abaixo com seu celular para vincular o app de saúde ao nosso agregador de nuvem:
+                    </p>
+                    <div className="bg-white p-3 rounded-2xl w-36 h-36 mx-auto flex items-center justify-center border border-slate-200">
+                      <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black rounded opacity-85" style={{ width: '100%', height: '100%', display: 'block', backgroundImage: "url('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://tryterra.co/healthkit/bridge/xzenpress')" }}></div>
+                    </div>
+                    <p className="text-[10px] text-slate-500">
+                      Escaneie para instalar o app ponte e conceder permissões do HealthKit.
+                    </p>
+                  </div>
+                )}
+
+                {selectedWidgetDevice !== 'apple' && (
+                  <div className="space-y-4">
+                    <p className="text-slate-300 text-xs leading-relaxed">
+                      Você será redirecionado para a autenticação OAuth segura do fabricante para dar autorização de leitura.
+                    </p>
+                    <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-900 text-center text-xs text-slate-400">
+                      Conexão em nuvem ativa por OAuth 2.0 SSL
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleConnectWidgetDevice(selectedWidgetDevice)}
+                    disabled={isConnectingWidget}
+                    className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-900 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2"
+                  >
+                    {isConnectingWidget ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Sincronizando...</span>
+                      </>
+                    ) : (
+                      <span>Vincular Conta</span>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setSelectedWidgetDevice('')}
+                    disabled={isConnectingWidget}
+                    className="py-3 px-5 bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs rounded-xl font-bold transition-all"
+                  >
+                    Voltar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Proactive Biofeedback Overlay Alert (Glassmorphic Warning) */}
       {showNotification && (

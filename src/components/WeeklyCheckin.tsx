@@ -174,7 +174,7 @@ export const WeeklyCheckin: React.FC<WeeklyCheckinProps> = ({ onComplete, onSkip
                     <span className="text-2xl">{el.emoji}</span>
                     <div>
                       <div className="text-white text-sm font-medium">
-                        {el.emotions.imbalanced.slice(0, 2).join(' / ')}
+                        {el.emotions.imbalanced.slice(0, 3).join(' / ')}
                       </div>
                       <div className="text-xs text-gray-500">{el.organ}</div>
                     </div>

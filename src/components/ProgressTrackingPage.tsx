@@ -5,6 +5,9 @@ import { useSessionHistory } from '../hooks/useSessionHistory';
 import { acupressurePoints } from '../data/acupressurePoints';
 import { useLanguage } from '../contexts/LanguageContext';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
+import { MapaVivoStorageService } from '../services/mapaVivoStorageService';
+import { fiveElements } from '../data/fiveElements';
+import { type WeeklyCheckinData } from './WeeklyCheckin';
 
 interface ProgressTrackingPageProps {
   onPageChange: (page: string) => void;
@@ -23,15 +26,141 @@ interface Goal {
   color: string;
 }
 
+const emotionalEngineMetadata: Record<string, {
+  patternLabel: string;
+  reformaIntima: string;
+  meditacao: string;
+  acupressao: string;
+  frequenciaHz: number;
+  frequenciaDesc: string;
+}> = {
+  madeira: {
+    patternLabel: 'Ressentimento e Frustração (Eixo Fígado-Madeira)',
+    reformaIntima: 'Praticar o autoperdão e a flexibilidade perante as imperfeições alheias. Soltar mágoas antigas para liberar o fluxo de criatividade.',
+    meditacao: 'Meditação do Grito Silencioso com expirações profundas para expulsar a energia estagnada do peito e do abdômen.',
+    acupressao: 'Estímulo bilateral do ponto LV3 (Tai Chong) + GB34 (Yang Ling Quan) para dispersar a raiva e mover o Qi estagnado.',
+    frequenciaHz: 528,
+    frequenciaDesc: 'Reparação Celular & Transformação de Ressentimento em Mansidão'
+  },
+  fogo: {
+    patternLabel: 'Ansiedade, Agitação e Orgulho (Eixo Coração-Fogo)',
+    reformaIntima: 'Praticar o silêncio interno e a humildade. Combater o orgulho espiritual e a pressa mental através da caridade silenciosa e desinteressada.',
+    meditacao: 'Coerência Cardíaca (respiração guiada 5s inspiração / 5s expiração) para sincronizar o ritmo do coração.',
+    acupressao: 'Estímulo do ponto HT7 (Shen Men) + PC6 (Nei Guan) para acalmar a mente (Shen) e aliviar palpitações e angústia.',
+    frequenciaHz: 639,
+    frequenciaDesc: 'Harmonização de Conexões Sociais & Cura do Orgulho/Ego'
+  },
+  terra: {
+    patternLabel: 'Preocupação e Ruminação Mental (Eixo Baço-Terra)',
+    reformaIntima: 'Praticar a entrega e a aceitação. Compreender que você não tem o controle de tudo. Confiar no fluxo natural da vida e do tempo.',
+    meditacao: 'Meditação Mindfulness na respiração abdominal consciente e atenção plena aos sentidos físicos no momento presente.',
+    acupressao: 'Estímulo do ponto SP6 (San Yin Jiao) + ST36 (Zu San Li) para tonificar o centro e estabilizar os pensamentos.',
+    frequenciaHz: 174,
+    frequenciaDesc: 'Aterramento & Alívio de Tensão Mental e Preocupação Crônica'
+  },
+  metal: {
+    patternLabel: 'Tristeza, Luto e Culpa (Eixo Pulmão-Metal)',
+    reformaIntima: 'Praticar o desapego de situações passadas e o auto-acolhimento. Perdoar-se pelos erros antigos e compreender que cada ciclo tem seu fim.',
+    meditacao: 'Respiração de Expansão Torácica focando na inspiração de prana (luz dourada) e na expiração de dores acumuladas.',
+    acupressao: 'Estímulo do ponto LU9 (Tai Yuan) + LI4 (He Gu) para aliviar a opressão no peito e fortalecer a imunidade emocional.',
+    frequenciaHz: 741,
+    frequenciaDesc: 'Despertar da Intuição & Purificação de Culpas e Bloqueios Emocionais'
+  },
+  agua: {
+    patternLabel: 'Medo, Insegurança e Falta de Propósito (Eixo Rim-Água)',
+    reformaIntima: 'Fortalecer a coragem moral e a fé na sua jornada. Conectar-se com sua ancestralidade para resgatar a força vital e o senso de direção.',
+    meditacao: 'Meditação de Aterramento (Visualização de Raízes profundas descendo dos pés até o centro da Terra).',
+    acupressao: 'Estímulo do ponto KD3 (Tai Xi) + KD1 (Yong Quan) para nutrir a essência (Jing) e ancorar a mente.',
+    frequenciaHz: 396,
+    frequenciaDesc: 'Liberação de Medos Subconscientes & Ativação da Coragem e Propósito'
+  }
+};
+
 export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPageChange }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter'>('week');
   const { sessions, stats, loading, error } = useSessionHistory(selectedPeriod);
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [checkins, setCheckins] = useState<WeeklyCheckinData[]>([]);
+  const [loadingCheckins, setLoadingCheckins] = useState(true);
+
+  useEffect(() => {
+    const fetchCheckins = async () => {
+      if (!user?.id) {
+        setLoadingCheckins(false);
+        return;
+      }
+      try {
+        const data = await MapaVivoStorageService.loadCheckins(user.id);
+        setCheckins(data || []);
+      } catch (err) {
+        console.error("Erro ao carregar check-ins no Dashboard:", err);
+      } finally {
+        setLoadingCheckins(false);
+      }
+    };
+    fetchCheckins();
+  }, [user?.id]);
 
   // Load Anamnese profile for chronological age calculation
   const profile = React.useMemo(() => loadAnamneseProfile(), []);
+
+  // Emotional AI Engine calculations
+  const { activeCounts, totalRecentCount, isSimulated, dominantElementId, dominantCount, dominantElement } = React.useMemo(() => {
+    const sixtyDaysAgo = new Date();
+    sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+
+    const recentEmotionalCheckins = checkins.filter(c => new Date(c.date) >= sixtyDaysAgo);
+
+    const emotionalCounts: Record<string, number> = {
+      madeira: 0,
+      fogo: 0,
+      terra: 0,
+      metal: 0,
+      agua: 0
+    };
+
+    recentEmotionalCheckins.forEach(c => {
+      if (c.emotionGuardianId && emotionalCounts[c.emotionGuardianId] !== undefined) {
+        emotionalCounts[c.emotionGuardianId]++;
+      }
+    });
+
+    const isSim = checkins.length < 3;
+    const activeCountsMap = { ...emotionalCounts };
+    let totalCount = recentEmotionalCheckins.length;
+
+    if (isSim) {
+      // Seed mock counts based on weakest guardian score or default emotions
+      const weakestElement = profile?.guardianScores
+        ? (Object.entries(profile.guardianScores) as [string, number][]).sort((a, b) => a[1] - b[1])[0][0]
+        : 'fogo'; // Fallback to fogo
+      
+      activeCountsMap[weakestElement] = 18;
+      const otherElements = Object.keys(activeCountsMap).filter(k => k !== weakestElement);
+      activeCountsMap[otherElements[0]] = 8;
+      activeCountsMap[otherElements[1]] = 5;
+      activeCountsMap[otherElements[2]] = 3;
+      activeCountsMap[otherElements[3]] = 1;
+      totalCount = 35; // Total simulated episodes
+    }
+
+    const sortedElements = (Object.keys(activeCountsMap) as Array<keyof typeof activeCountsMap>)
+      .sort((a, b) => activeCountsMap[b] - activeCountsMap[a]);
+    const dominantId = sortedElements[0];
+    const domCount = activeCountsMap[dominantId];
+    const domElement = fiveElements.find(e => e.id === dominantId)!;
+
+    return {
+      activeCounts: activeCountsMap,
+      totalRecentCount: totalCount,
+      isSimulated: isSim,
+      dominantElementId: dominantId,
+      dominantCount: domCount,
+      dominantElement: domElement
+    };
+  }, [checkins, profile]);
   
   const chronologicalAge = React.useMemo(() => {
     if (!profile) return 40;
@@ -833,6 +962,146 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                 </div>
               </div>
 
+            </div>
+          </div>
+
+          {/* Pilar 3: Corpo Emocional (Emotional AI Engine) */}
+          <div className="mt-8 bg-white rounded-3xl shadow-xl border border-slate-100 p-8 overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-8 opacity-5">
+              <Brain className="w-40 h-40 text-purple-900" />
+            </div>
+            
+            <div className="relative z-10">
+              <div className="mb-6">
+                <span className="text-xs uppercase tracking-widest text-purple-600 font-bold">PILAR 3 — Inteligência Emocional & IA</span>
+                <h2 className="text-2xl font-extrabold text-gray-950 mt-1 flex items-center gap-2">
+                  <Brain className="w-6 h-6 text-purple-500 fill-purple-200 animate-pulse" />
+                  Emotional AI Engine — Análise de Padrões Subconscientes
+                </h2>
+                <p className="text-gray-500 text-sm mt-1">
+                  Mapeamento de comportamentos recorrentes nos últimos 60 dias com base no histórico de check-ins e direcionamento terapêutico integrado.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+                {/* Col 1: Gráfico de Distorção Emocional */}
+                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-4">Frequência por Elemento (60d)</h3>
+                    
+                    <div className="space-y-4">
+                      {fiveElements.map(el => {
+                        const count = activeCounts[el.id] || 0;
+                        const pct = totalRecentCount > 0 ? (count / totalRecentCount) * 100 : 0;
+                        return (
+                          <div key={el.id} className="space-y-1">
+                            <div className="flex justify-between text-xs font-semibold">
+                              <span className="flex items-center gap-1.5 text-gray-750">
+                                <span>{el.emoji}</span>
+                                <span className="capitalize">{el.element}</span>
+                              </span>
+                              <span className="text-gray-500">{count} registro{count !== 1 ? 's' : ''} ({Math.round(pct)}%)</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="h-2 rounded-full transition-all duration-1000"
+                                style={{ width: `${pct}%`, backgroundColor: el.color }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {isSimulated && (
+                    <div className="mt-4 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-xl text-[10px] text-yellow-750 font-medium">
+                      ⚠️ <strong>Telemetria Simulada:</strong> Exibindo estimativa baseada no seu perfil de onboarding. Realize mais check-ins no Mapa Vivo para obter dados 100% reais.
+                    </div>
+                  )}
+                </div>
+
+                {/* Col 2: Insights e Padrão Detectado */}
+                <div className="bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl p-6 text-white border border-slate-800 shadow-lg flex flex-col justify-between relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-950/20 via-transparent to-transparent pointer-events-none"></div>
+                  
+                  <div className="relative z-10">
+                    <h3 className="text-xs uppercase tracking-wider text-purple-300 font-bold mb-4 font-sans">Insights da Inteligência Emocional</h3>
+                    
+                    <div className="space-y-3">
+                      <div className="text-xs text-slate-400">Padrão Primário Detectado:</div>
+                      <div className="text-lg font-extrabold text-white flex items-center gap-2">
+                        <span className="text-2xl">{dominantElement.emoji}</span>
+                        <span>{emotionalEngineMetadata[dominantElementId].patternLabel}</span>
+                      </div>
+                      
+                      <div className="bg-white/5 border border-white/10 rounded-xl p-3.5 mt-2">
+                        <p className="text-xs text-purple-200 italic leading-relaxed">
+                          "Nos últimos 60 dias, identificamos {dominantCount} episódios associados ao elemento {dominantElement.element}. Isso sugere uma sobrecarga energética no meridiano do {dominantElement.organ}, refletindo comportamentos de {dominantElement.emotions.imbalanced.slice(0, 3).join(', ')}."
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="relative z-10 text-[10px] text-slate-400 font-sans border-t border-slate-800/80 pt-3 mt-4">
+                    💡 <strong>Frequência de Ressonância:</strong> {dominantElement.frequency} Hz • {dominantElement.sound}
+                  </div>
+                </div>
+
+                {/* Col 3: Recomendações e Prescrição */}
+                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-4">Prescrição Recomendada</h3>
+                    
+                    <div className="space-y-3">
+                      <div className="bg-white p-2.5 rounded-xl border border-gray-100 flex items-start gap-2.5 shadow-sm">
+                        <span className="text-base mt-0.5">🧘</span>
+                        <div>
+                          <div className="text-[10px] uppercase font-bold text-gray-400">Reforma Íntima e Conduta</div>
+                          <div className="text-xs text-gray-700 leading-relaxed font-medium">
+                            {emotionalEngineMetadata[dominantElementId].reformaIntima}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-2.5 rounded-xl border border-gray-100 flex items-start gap-2.5 shadow-sm">
+                        <span className="text-base mt-0.5">🌬️</span>
+                        <div>
+                          <div className="text-[10px] uppercase font-bold text-gray-400">Prática Respiratória / Meditação</div>
+                          <div className="text-xs text-gray-700 leading-relaxed font-medium">
+                            {emotionalEngineMetadata[dominantElementId].meditacao}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-2.5 rounded-xl border border-gray-100 flex items-start gap-2.5 shadow-sm">
+                        <span className="text-base mt-0.5">📍</span>
+                        <div>
+                          <div className="text-[10px] uppercase font-bold text-gray-400">Acupressão Corretiva</div>
+                          <div className="text-xs text-gray-700 leading-relaxed font-medium">
+                            {emotionalEngineMetadata[dominantElementId].acupressao}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex gap-2">
+                    <button
+                      onClick={() => onPageChange('acupressure')}
+                      className="flex-1 py-2 px-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold text-center transition-colors shadow-sm"
+                    >
+                      Acessar Pontos
+                    </button>
+                    <button
+                      onClick={() => onPageChange('sounds')}
+                      className="flex-1 py-2 px-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl text-xs font-bold text-center transition-colors"
+                    >
+                      Tocar {dominantElement.frequency}Hz
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

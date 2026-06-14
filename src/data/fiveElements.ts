@@ -112,7 +112,7 @@ export const fiveElements: GuardianElement[] = [
     sound: 'Riso',
     lifePhase: 'Crescimento',
     emotions: {
-      imbalanced: ['ansiedade', 'agitação', 'euforia excessiva', 'dificuldade de conexão', 'pânico'],
+      imbalanced: ['ansiedade', 'agitação', 'orgulho', 'euforia excessiva', 'dificuldade de conexão', 'pânico'],
       balanced: ['alegria', 'amor', 'clareza', 'conexão', 'presença', 'entusiasmo saudável']
     },
     physicalSigns: {
@@ -212,7 +212,7 @@ export const fiveElements: GuardianElement[] = [
     sound: 'Choro',
     lifePhase: 'Velhice (recepção e sabedoria)',
     emotions: {
-      imbalanced: ['tristeza', 'luto', 'apego', 'dificuldade em soltar', 'rigidez'],
+      imbalanced: ['tristeza', 'luto', 'culpa', 'apego', 'dificuldade em soltar', 'rigidez'],
       balanced: ['desapego', 'renovação', 'leveza', 'pureza', 'inspiração']
     },
     physicalSigns: {
@@ -306,6 +306,7 @@ export const emotionToGuardian: Record<string, GuardianElement['id']> = {
   'panic': 'fogo',
   'agitation': 'fogo',
   'joy': 'fogo',
+  'pride': 'fogo',
   // Terra / Baço
   'worry': 'terra',
   'overthinking': 'terra',
@@ -314,10 +315,12 @@ export const emotionToGuardian: Record<string, GuardianElement['id']> = {
   'sadness': 'metal',
   'grief': 'metal',
   'melancholy': 'metal',
+  'guilt': 'metal',
   // Água / Rim
   'fear': 'agua',
   'insecurity': 'agua',
-  'fright': 'agua'
+  'fright': 'agua',
+  'lack_of_purpose': 'agua'
 };
 
 // Utilitário: calcular XLI básico a partir dos scores dos guardiões e check-ins

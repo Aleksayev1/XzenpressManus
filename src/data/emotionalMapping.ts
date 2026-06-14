@@ -215,6 +215,93 @@ export const emotionalStates: EmotionalState[] = [
         ],
         recommendedProtocol: 'sono-reparador',
         zenFlowExerciseId: 'reg-calm', // Acalmar o Mar Interno
+    },
+    {
+        id: 'pride',
+        namePortuguese: 'Orgulho / Ego Elevado',
+        nameEnglish: 'Pride / High Ego',
+        emoji: '👑',
+        globalPrevalence: 12,
+        mtcElement: 'fire',
+        mtcOrgan: 'Coração (Heart)',
+        description: 'Dificuldade em admitir erros, rigidez em opiniões, arrogância ou autoafirmação excessiva',
+        primaryPoints: [
+            'shenmen-c7',
+            'yintang-ex-hn3',
+            'ynsa-ponto-d',
+            'neiguan-pc6'
+        ],
+        recommendedProtocol: 'harmonia-mental',
+        zenFlowExerciseId: 'reg-calm',
+        cycle: {
+            mother: 'wood',
+            son: 'earth',
+            controller: 'water'
+        }
+    },
+    {
+        id: 'guilt',
+        namePortuguese: 'Culpa / Auto-cobrança',
+        nameEnglish: 'Guilt / Self-blame',
+        emoji: '😔',
+        globalPrevalence: 22,
+        mtcElement: 'metal',
+        mtcOrgan: 'Pulmão (Lung)',
+        description: 'Sentimento de culpa, remorso, auto-cobrança severa ou apego a falhas do passado',
+        primaryPoints: [
+            'ht5-tongli',
+            'ren17-danzhong',
+            'lu9-taiyuan',
+            'ynsa-basal-ganglia'
+        ],
+        recommendedProtocol: 'harmonia-mental',
+        zenFlowExerciseId: 'rel-chest',
+        cycle: {
+            mother: 'earth',
+            son: 'water',
+            controller: 'fire'
+        }
+    },
+    {
+        id: 'resentment',
+        namePortuguese: 'Ressentimento / Mágoa',
+        nameEnglish: 'Resentment / Hurt',
+        emoji: '😒',
+        globalPrevalence: 18,
+        mtcElement: 'wood',
+        mtcOrgan: 'Fígado (Liver)',
+        description: 'Ressentimento, mágoa guardada, raiva contida ou dificuldade em perdoar e seguir em frente',
+        primaryPoints: [
+            'lv3-taichong',
+            'xingjian-lv2',
+            'ynsa-zf-figado',
+            'septicemia-hegu-li4'
+        ],
+        recommendedProtocol: 'equilibrio-raiva',
+        zenFlowExerciseId: 'rel-liver',
+        cycle: {
+            mother: 'water',
+            son: 'fire',
+            controller: 'metal'
+        }
+    },
+    {
+        id: 'lack_of_purpose',
+        namePortuguese: 'Sem Propósito / Vazio',
+        nameEnglish: 'Lack of Purpose / Lost',
+        emoji: '🧭',
+        globalPrevalence: 20,
+        mtcElement: 'water',
+        mtcOrgan: 'Rim (Kidney)',
+        description: 'Vazio existencial, falta de motivação profunda, desorientação ou insegurança sobre o futuro',
+        primaryPoints: [
+            'kd3-taixi',
+            'yongquan-r1-kd1',
+            'ynsa-zf-rim',
+            'cv4-guanyuan'
+        ],
+        recommendedProtocol: 'decisao-coragem',
+        zenFlowExerciseId: 'reg-ground',
         cycle: {
             mother: 'metal',
             son: 'wood',

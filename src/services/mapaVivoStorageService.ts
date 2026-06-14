@@ -113,6 +113,7 @@ export const MapaVivoStorageService = {
         user_id: userId,
         has_completed_onboarding: state.hasCompletedOnboarding,
         scores: state.scores,
+        baseline_scores: state.baselineScores || null,
         dominant_guardian_id: state.dominantGuardianId,
         last_checkin_date: state.lastCheckinDate,
         updated_at: new Date().toISOString()
@@ -150,6 +151,7 @@ export const MapaVivoStorageService = {
         const state = {
           hasCompletedOnboarding: data.has_completed_onboarding,
           scores: data.scores,
+          baselineScores: data.baseline_scores || undefined,
           dominantGuardianId: data.dominant_guardian_id,
           checkins: [], // Será carregado separadamente por loadCheckins
           lastCheckinDate: data.last_checkin_date,

@@ -23,6 +23,7 @@ interface MapaVivoPageProps {
 interface MapaVivoState {
   hasCompletedOnboarding: boolean;
   scores: GuardianScores;
+  baselineScores?: GuardianScores;
   dominantGuardianId: GuardianElement['id'] | null;
   checkins: WeeklyCheckinData[];
   lastCheckinDate: string | null;
@@ -127,6 +128,7 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
           if (cloudState) {
             setState({
               ...cloudState,
+              baselineScores: cloudState.baselineScores || (anamneseProfile?.guardianScores ? buildInitialScores(anamneseProfile) : undefined),
               checkins
             });
           } else if (anamneseProfile?.guardianScores) {
@@ -134,6 +136,7 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
             const newState = {
               hasCompletedOnboarding: true,
               scores: seedScores,
+              baselineScores: seedScores,
               dominantGuardianId: null,
               checkins: checkins,
               lastCheckinDate: null,
@@ -150,6 +153,7 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
             setState({
               hasCompletedOnboarding: true,
               scores: seedScores,
+              baselineScores: seedScores,
               dominantGuardianId: null,
               checkins: [],
               lastCheckinDate: null,
@@ -160,6 +164,7 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
             const localCheckins = JSON.parse(localStorage.getItem('xzen_local_checkins') || '[]');
             setState({
               ...localState,
+              baselineScores: localState.baselineScores || (anamneseProfile?.guardianScores ? buildInitialScores(anamneseProfile) : undefined),
               checkins: localCheckins
             });
           }
@@ -188,6 +193,7 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
       ...state,
       hasCompletedOnboarding: true,
       scores,
+      baselineScores: scores,
       dominantGuardianId: dominantId,
     };
     setState(newState);
@@ -498,6 +504,7 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
       <div className="overflow-y-auto pb-24">
         <GuardianDisplay
           scores={state.scores}
+          baselineScores={state.baselineScores || (anamneseProfile?.guardianScores ? buildInitialScores(anamneseProfile) : undefined) || state.scores}
           xli={xli}
           onGuardianClick={handleGuardianClick}
           weeklyCheckinDue={checkinDue}

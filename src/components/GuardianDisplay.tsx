@@ -4,6 +4,7 @@ import { ChevronDown, Zap, Info } from 'lucide-react';
 
 interface GuardianDisplayProps {
   scores: GuardianScores;
+  baselineScores?: GuardianScores;
   xli: number;
   onGuardianClick: (guardian: GuardianElement) => void;
   weeklyCheckinDue?: boolean;
@@ -47,6 +48,7 @@ function getEmotionCloud(scores: GuardianScores): { label: string; color: string
 
 export const GuardianDisplay: React.FC<GuardianDisplayProps> = ({
   scores,
+  baselineScores,
   xli,
   onGuardianClick,
   weeklyCheckinDue,
@@ -126,6 +128,7 @@ export const GuardianDisplay: React.FC<GuardianDisplayProps> = ({
         {guardianLayout.map(({ id, pos }) => {
           const el = fiveElements.find(e => e.id === id)!;
           const score = scores[el.id];
+          const baselineScore = baselineScores ? baselineScores[el.id] : undefined;
           const isHovered = hoveredGuardian === id;
           const isDominant = dominant.id === id;
 
@@ -159,19 +162,34 @@ export const GuardianDisplay: React.FC<GuardianDisplayProps> = ({
                 {el.emoji}
               </div>
               {/* Score bar */}
-              <div className="w-10 h-1 bg-gray-800 rounded-full mt-1 overflow-hidden">
+              <div className="w-10 h-1.5 bg-gray-800 rounded-full mt-1 relative overflow-hidden">
+                {/* Current score fill */}
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{ width: `${score}%`, backgroundColor: el.color }}
                 />
+                {/* Baseline score tick */}
+                {baselineScore !== undefined && (
+                  <div
+                    className="absolute top-0 bottom-0 w-[2px] bg-slate-300 shadow-sm animate-pulse"
+                    style={{ left: `${baselineScore}%` }}
+                    title={`Linha de base inicial: ${baselineScore}%`}
+                  />
+                )}
               </div>
               {/* Label on hover */}
               {isHovered && (
                 <div
-                  className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-medium px-2 py-0.5 rounded-full z-10"
-                  style={{ backgroundColor: el.color + '33', color: el.color, border: `1px solid ${el.color}55` }}
+                  className="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-medium px-2.5 py-1 rounded-full z-10 flex flex-col items-center leading-none"
+                  style={{ backgroundColor: '#111827', color: el.color, border: `1px solid ${el.color}55`, boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
                 >
-                  {el.organ} · {score}%
+                  <span className="font-bold text-white mb-0.5">{el.organ}</span>
+                  <span className="text-gray-400">
+                    Atual: <span className="font-bold text-white">{score}%</span>
+                    {baselineScore !== undefined && (
+                      <> | Inicial: <span className="font-bold text-slate-400">{baselineScore}%</span></>
+                    )}
+                  </span>
                 </div>
               )}
             </button>

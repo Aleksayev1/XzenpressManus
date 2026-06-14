@@ -22,53 +22,65 @@ interface Device {
 }
 
 export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) => {
-  const [devices, setDevices] = useState<Device[]>([
-    {
-      id: 'oura',
-      name: 'Oura Ring Gen 3',
-      brand: 'Oura',
-      icon: '💍',
-      status: 'connected',
-      battery: 88,
-      syncTime: 'Há 5 minutos',
-      defaultMetrics: { vfc: 58, rhr: 54, deepSleep: '1h 45m' }
-    },
-    {
-      id: 'apple',
-      name: 'Apple Watch Series 9',
-      brand: 'Apple',
-      icon: '⌚',
-      status: 'disconnected',
-      battery: 0,
-      syncTime: '-',
-      defaultMetrics: { vfc: 52, rhr: 62, deepSleep: '1h 20m' }
-    },
-    {
-      id: 'garmin',
-      name: 'Garmin Fenix 7',
-      brand: 'Garmin',
-      icon: '⛰️',
-      status: 'disconnected',
-      battery: 0,
-      syncTime: '-',
-      defaultMetrics: { vfc: 66, rhr: 50, deepSleep: '2h 15m' }
-    },
-    {
-      id: 'samsung',
-      name: 'Galaxy Watch 6',
-      brand: 'Samsung',
-      icon: '⚡',
-      status: 'disconnected',
-      battery: 0,
-      syncTime: '-',
-      defaultMetrics: { vfc: 48, rhr: 66, deepSleep: '1h 10m' }
-    }
-  ]);
+  const [activeDeviceId, setActiveDeviceId] = useState<string>(() => {
+    return localStorage.getItem('active_device_id') || 'oura';
+  });
 
-  const [activeDeviceId, setActiveDeviceId] = useState<string>('oura');
-  const [vfcValue, setVfcValue] = useState<number>(58);
-  const [rhrValue, setRhrValue] = useState<number>(54);
-  const [deepSleep, setDeepSleep] = useState<string>('1h 45m');
+  const [devices, setDevices] = useState<Device[]>(() => {
+    const savedActiveId = localStorage.getItem('active_device_id') || 'oura';
+    return [
+      {
+        id: 'oura',
+        name: 'Oura Ring Gen 3',
+        brand: 'Oura',
+        icon: '💍',
+        status: savedActiveId === 'oura' ? 'connected' : 'disconnected',
+        battery: savedActiveId === 'oura' ? 88 : 0,
+        syncTime: savedActiveId === 'oura' ? 'Há 5 minutos' : '-',
+        defaultMetrics: { vfc: 58, rhr: 54, deepSleep: '1h 45m' }
+      },
+      {
+        id: 'apple',
+        name: 'Apple Watch Series 9',
+        brand: 'Apple',
+        icon: '⌚',
+        status: savedActiveId === 'apple' ? 'connected' : 'disconnected',
+        battery: savedActiveId === 'apple' ? 95 : 0,
+        syncTime: savedActiveId === 'apple' ? 'Sincronizado agora' : '-',
+        defaultMetrics: { vfc: 52, rhr: 62, deepSleep: '1h 20m' }
+      },
+      {
+        id: 'garmin',
+        name: 'Garmin Fenix 7',
+        brand: 'Garmin',
+        icon: '⛰️',
+        status: savedActiveId === 'garmin' ? 'connected' : 'disconnected',
+        battery: savedActiveId === 'garmin' ? 92 : 0,
+        syncTime: savedActiveId === 'garmin' ? 'Sincronizado agora' : '-',
+        defaultMetrics: { vfc: 66, rhr: 50, deepSleep: '2h 15m' }
+      },
+      {
+        id: 'samsung',
+        name: 'Galaxy Watch 6',
+        brand: 'Samsung',
+        icon: '⚡',
+        status: savedActiveId === 'samsung' ? 'connected' : 'disconnected',
+        battery: savedActiveId === 'samsung' ? 90 : 0,
+        syncTime: savedActiveId === 'samsung' ? 'Sincronizado agora' : '-',
+        defaultMetrics: { vfc: 48, rhr: 66, deepSleep: '1h 10m' }
+      }
+    ];
+  });
+
+  const [vfcValue, setVfcValue] = useState<number>(() => {
+    return Number(localStorage.getItem('wearable_vfc')) || 58;
+  });
+  const [rhrValue, setRhrValue] = useState<number>(() => {
+    return Number(localStorage.getItem('wearable_rhr')) || 54;
+  });
+  const [deepSleep, setDeepSleep] = useState<string>(() => {
+    return localStorage.getItem('wearable_sleep') || '1h 45m';
+  });
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [notificationDismissed, setNotificationDismissed] = useState<boolean>(false);
@@ -134,14 +146,10 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
 
   const recommended = getRecommendedPoint();
 
-  // Generate real-time telemetry fluctuations
+  // Save active device ID to localStorage
   useEffect(() => {
-    if (activeDevice && !isSimulating) {
-      setVfcValue(activeDevice.defaultMetrics.vfc);
-      setRhrValue(activeDevice.defaultMetrics.rhr);
-      setDeepSleep(activeDevice.defaultMetrics.deepSleep);
-    }
-  }, [activeDeviceId, devices]);
+    localStorage.setItem('active_device_id', activeDeviceId);
+  }, [activeDeviceId]);
 
   // Synchronize telemetry values to localStorage for use in the tracking page
   useEffect(() => {
@@ -202,19 +210,45 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
         return d;
       }));
       setActiveDeviceId(id);
+      
+      // Update values to new device defaults directly on connection using static map to avoid stale closures
+      const defaultMetricsMap: Record<string, { vfc: number, rhr: number, deepSleep: string }> = {
+        oura: { vfc: 58, rhr: 54, deepSleep: '1h 45m' },
+        apple: { vfc: 52, rhr: 62, deepSleep: '1h 20m' },
+        garmin: { vfc: 66, rhr: 50, deepSleep: '2h 15m' },
+        samsung: { vfc: 48, rhr: 66, deepSleep: '1h 10m' }
+      };
+      const metrics = defaultMetricsMap[id];
+      if (metrics) {
+        setVfcValue(metrics.vfc);
+        setRhrValue(metrics.rhr);
+        setDeepSleep(metrics.deepSleep);
+        setIsSimulating(false);
+      }
+      
       setConnectingId(null);
     }, 1800);
   };
 
   const handleDisconnect = (id: string) => {
-    setDevices(prev => prev.map(d => d.id === id ? { ...d, status: 'disconnected', battery: 0, syncTime: '-' } : d));
-    // Find next connected device if any
-    const remaining = devices.filter(d => d.id !== id && d.status === 'connected');
-    if (remaining.length > 0) {
-      setActiveDeviceId(remaining[0].id);
-    } else {
-      setActiveDeviceId('');
-    }
+    setDevices(prev => {
+      const updated = prev.map(d => d.id === id ? { ...d, status: 'disconnected' as const, battery: 0, syncTime: '-' } : d);
+      const remaining = updated.filter(d => d.status === 'connected');
+      if (remaining.length > 0) {
+        setActiveDeviceId(remaining[0].id);
+        setVfcValue(remaining[0].defaultMetrics.vfc);
+        setRhrValue(remaining[0].defaultMetrics.rhr);
+        setDeepSleep(remaining[0].defaultMetrics.deepSleep);
+        setIsSimulating(false);
+      } else {
+        setActiveDeviceId('');
+        setVfcValue(55);
+        setRhrValue(60);
+        setDeepSleep('1h 30m');
+        setIsSimulating(false);
+      }
+      return updated;
+    });
   };
 
   const startCriticalSimulation = () => {
@@ -526,17 +560,45 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                       </span>
                     </div>
                     
-                    <input
-                      type="range"
-                      min="15"
-                      max="100"
-                      value={vfcValue}
-                      onChange={(e) => {
-                        setIsSimulating(true);
-                        setVfcValue(Number(e.target.value));
-                      }}
-                      className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
-                    />
+                    <div className="flex items-center gap-4">
+                       <input
+                         type="range"
+                         min="15"
+                         max="100"
+                         value={vfcValue}
+                         onChange={(e) => {
+                           setIsSimulating(true);
+                           setVfcValue(Number(e.target.value));
+                         }}
+                         className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                       />
+                       
+                       {/* Precise Control Buttons for Mobile */}
+                       <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 shrink-0">
+                         <button
+                           type="button"
+                           onClick={() => {
+                             setIsSimulating(true);
+                             setVfcValue(prev => Math.max(15, prev - 1));
+                           }}
+                           className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-cyan-950 active:text-cyan-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+                           title="Diminuir 1ms"
+                         >
+                           -
+                         </button>
+                         <button
+                           type="button"
+                           onClick={() => {
+                             setIsSimulating(true);
+                             setVfcValue(prev => Math.min(100, prev + 1));
+                           }}
+                           className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-cyan-950 active:text-cyan-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+                           title="Aumentar 1ms"
+                         >
+                           +
+                         </button>
+                       </div>
+                     </div>
                     
                     <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                       <span>15ms (Estresse Crítico)</span>

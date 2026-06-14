@@ -174,13 +174,9 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
   }, [profile]);
 
   // Retrieve wearable telemetry from localStorage
-  const wearableVfc = React.useMemo(() => {
-    return Number(localStorage.getItem('wearable_vfc')) || 55;
-  }, [sessions]); // Recalculate if sessions change
+  const wearableVfc = Number(localStorage.getItem('wearable_vfc')) || 55;
 
-  const wearableSleep = React.useMemo(() => {
-    return localStorage.getItem('wearable_sleep') || '1h 30m';
-  }, [sessions]);
+  const wearableSleep = localStorage.getItem('wearable_sleep') || '1h 30m';
 
   // Convert sleep string to minutes
   const sleepMinutes = React.useMemo(() => {

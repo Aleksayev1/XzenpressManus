@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Activity, Heart, Moon, RefreshCw, Sliders, Check, AlertTriangle, Smartphone, Battery, Info, ShieldAlert, Cpu } from 'lucide-react';
+import { ArrowLeft, Activity, Heart, Moon, RefreshCw, Sliders, Smartphone, Battery, Info, ShieldAlert, Cpu } from 'lucide-react';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 
 interface DeviceSyncPageProps {
@@ -84,7 +84,6 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [notificationDismissed, setNotificationDismissed] = useState<boolean>(false);
-  const [connectingId, setConnectingId] = useState<string | null>(null);
 
   // For visual graph animation
   const [graphData, setGraphData] = useState<number[]>(Array.from({ length: 20 }, () => 50 + Math.random() * 20));
@@ -190,7 +189,6 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   }, [vfcValue, notificationDismissed]);
 
   const handleConnect = (id: string) => {
-    setConnectingId(id);
     setDevices(prev => prev.map(d => d.id === id ? { ...d, status: 'connecting' } : d));
 
     setTimeout(() => {
@@ -225,8 +223,6 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
         setDeepSleep(metrics.deepSleep);
         setIsSimulating(false);
       }
-      
-      setConnectingId(null);
     }, 1800);
   };
 

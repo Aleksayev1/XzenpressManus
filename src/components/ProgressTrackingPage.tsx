@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Calendar, Target, Award, BarChart3, PieChart, Activity, Zap, Brain, Heart, Star } from 'lucide-react';
+import { TrendingUp, Target, Award, BarChart3, Activity, Zap, Brain, Heart, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSessionHistory } from '../hooks/useSessionHistory';
 import { acupressurePoints } from '../data/acupressurePoints';
@@ -79,16 +79,14 @@ const emotionalEngineMetadata: Record<string, {
 export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPageChange }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter'>('week');
+  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('week');
   const { sessions, stats, loading, error } = useSessionHistory(selectedPeriod);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [checkins, setCheckins] = useState<WeeklyCheckinData[]>([]);
-  const [loadingCheckins, setLoadingCheckins] = useState(true);
 
   useEffect(() => {
     const fetchCheckins = async () => {
       if (!user?.id) {
-        setLoadingCheckins(false);
         return;
       }
       try {
@@ -96,8 +94,6 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
         setCheckins(data || []);
       } catch (err) {
         console.error("Erro ao carregar check-ins no Dashboard:", err);
-      } finally {
-        setLoadingCheckins(false);
       }
     };
     fetchCheckins();
@@ -480,12 +476,12 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
             <div className="flex items-center space-x-4">
               <select
                 value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value as 'week' | 'month' | 'quarter')}
+                onChange={(e) => setSelectedPeriod(e.target.value as 'week' | 'month' | 'year')}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="week">{t('progress.period.week')}</option>
                 <option value="month">{t('progress.period.month')}</option>
-                <option value="quarter">{t('progress.period.quarter')}</option>
+                <option value="year">{t('progress.period.year') || 'Anual'}</option>
               </select>
             </div>
           </div>
@@ -620,7 +616,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
             {/* Current Period Summary */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-4">
-                Resumo {selectedPeriod === 'week' ? 'Semanal' : selectedPeriod === 'month' ? 'Mensal' : 'Trimestral'}
+                Resumo {selectedPeriod === 'week' ? 'Semanal' : selectedPeriod === 'month' ? 'Mensal' : 'Anual'}
               </h3>
               {stats ? (
                 <div className="space-y-4">

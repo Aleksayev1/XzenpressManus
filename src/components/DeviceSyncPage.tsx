@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Activity, Heart, Moon, RefreshCw, Sliders, Smartphone, Battery, Info, ShieldAlert, Cpu } from 'lucide-react';
+import { ArrowLeft, Activity, Heart, Moon, RefreshCw, Sliders, Smartphone, Battery, Info, ShieldAlert, Cpu, Brain } from 'lucide-react';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -19,7 +19,8 @@ interface Device {
   defaultMetrics: {
     vfc: number;
     rhr: number;
-    deepSleep: string;
+    deepSleepMinutes: number;
+    remSleepMinutes: number;
   };
 }
 
@@ -39,7 +40,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
         status: savedActiveId === 'oura' ? 'connected' : 'disconnected',
         battery: savedActiveId === 'oura' ? 88 : 0,
         syncTime: savedActiveId === 'oura' ? 'Há 5 minutos' : '-',
-        defaultMetrics: { vfc: 58, rhr: 54, deepSleep: '1h 45m' }
+        defaultMetrics: { vfc: 58, rhr: 54, deepSleepMinutes: 105, remSleepMinutes: 110 }
       },
       {
         id: 'apple',
@@ -49,7 +50,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
         status: savedActiveId === 'apple' ? 'connected' : 'disconnected',
         battery: savedActiveId === 'apple' ? 95 : 0,
         syncTime: savedActiveId === 'apple' ? 'Sincronizado agora' : '-',
-        defaultMetrics: { vfc: 52, rhr: 62, deepSleep: '1h 20m' }
+        defaultMetrics: { vfc: 52, rhr: 62, deepSleepMinutes: 80, remSleepMinutes: 95 }
       },
       {
         id: 'garmin',
@@ -59,7 +60,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
         status: savedActiveId === 'garmin' ? 'connected' : 'disconnected',
         battery: savedActiveId === 'garmin' ? 92 : 0,
         syncTime: savedActiveId === 'garmin' ? 'Sincronizado agora' : '-',
-        defaultMetrics: { vfc: 66, rhr: 50, deepSleep: '2h 15m' }
+        defaultMetrics: { vfc: 66, rhr: 50, deepSleepMinutes: 135, remSleepMinutes: 120 }
       },
       {
         id: 'samsung',
@@ -69,7 +70,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
         status: savedActiveId === 'samsung' ? 'connected' : 'disconnected',
         battery: savedActiveId === 'samsung' ? 90 : 0,
         syncTime: savedActiveId === 'samsung' ? 'Sincronizado agora' : '-',
-        defaultMetrics: { vfc: 48, rhr: 66, deepSleep: '1h 10m' }
+        defaultMetrics: { vfc: 48, rhr: 66, deepSleepMinutes: 70, remSleepMinutes: 85 }
       }
     ];
   });
@@ -80,8 +81,11 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   const [rhrValue, setRhrValue] = useState<number>(() => {
     return Number(localStorage.getItem('wearable_rhr')) || 54;
   });
-  const [deepSleep, setDeepSleep] = useState<string>(() => {
-    return localStorage.getItem('wearable_sleep') || '1h 45m';
+  const [deepSleepMinutes, setDeepSleepMinutes] = useState<number>(() => {
+    return Number(localStorage.getItem('wearable_deep_sleep_mins')) || 105;
+  });
+  const [remSleepMinutes, setRemSleepMinutes] = useState<number>(() => {
+    return Number(localStorage.getItem('wearable_rem_sleep_mins')) || 95;
   });
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
@@ -164,8 +168,14 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   useEffect(() => {
     localStorage.setItem('wearable_vfc', vfcValue.toString());
     localStorage.setItem('wearable_rhr', rhrValue.toString());
-    localStorage.setItem('wearable_sleep', deepSleep);
-  }, [vfcValue, rhrValue, deepSleep]);
+    localStorage.setItem('wearable_deep_sleep_mins', deepSleepMinutes.toString());
+    localStorage.setItem('wearable_rem_sleep_mins', remSleepMinutes.toString());
+    
+    // Also save legacy text 'wearable_sleep' for backward compatibility (using deep sleep duration)
+    const h = Math.floor(deepSleepMinutes / 60);
+    const m = deepSleepMinutes % 60;
+    localStorage.setItem('wearable_sleep', `${h}h ${m}m`);
+  }, [vfcValue, rhrValue, deepSleepMinutes, remSleepMinutes]);
 
   // Live heart pulse representation
   useEffect(() => {
@@ -201,7 +211,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   // Fetch connection status from Supabase xzen_user_telemetry_status
   useEffect(() => {
     const fetchApiSyncStatus = async () => {
-      if (!user?.id) return;
+      if (!user?.id || !supabase) return;
       try {
         const { data, error } = await supabase
           .from('xzen_user_telemetry_status')
@@ -226,16 +236,16 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
     // Simulate OAuth redirect or QR Code scan time
     setTimeout(async () => {
       try {
-        const defaultMetrics: Record<string, { vfc: number, rhr: number, sleep: string, name: string }> = {
-          apple: { vfc: 54, rhr: 60, sleep: '1h 35m', name: 'Apple Watch Series 9' },
-          oura: { vfc: 62, rhr: 52, sleep: '2h 05m', name: 'Oura Ring Gen 3' },
-          garmin: { vfc: 68, rhr: 48, sleep: '2h 30m', name: 'Garmin Fenix 7' },
-          google: { vfc: 50, rhr: 65, sleep: '1h 15m', name: 'Fitbit Charge 6' }
+        const defaultMetrics: Record<string, { vfc: number, rhr: number, deepSleepMinutes: number, remSleepMinutes: number, name: string }> = {
+          apple: { vfc: 54, rhr: 60, deepSleepMinutes: 95, remSleepMinutes: 90, name: 'Apple Watch Series 9' },
+          oura: { vfc: 62, rhr: 52, deepSleepMinutes: 125, remSleepMinutes: 115, name: 'Oura Ring Gen 3' },
+          garmin: { vfc: 68, rhr: 48, deepSleepMinutes: 150, remSleepMinutes: 130, name: 'Garmin Fenix 7' },
+          google: { vfc: 50, rhr: 65, deepSleepMinutes: 75, remSleepMinutes: 80, name: 'Fitbit Charge 6' }
         };
 
         const metrics = defaultMetrics[deviceType] || defaultMetrics.oura;
 
-        if (user?.id) {
+        if (user?.id && supabase) {
           // Save to Supabase telemetry status
           await supabase
             .from('xzen_user_telemetry_status')
@@ -247,6 +257,10 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
               provider: 'vital'
             });
 
+          const h = Math.floor(metrics.deepSleepMinutes / 60);
+          const m = metrics.deepSleepMinutes % 60;
+          const formattedSleep = `${h}h ${m}m`;
+
           // Save telemetry data
           await supabase
             .from('xzen_user_telemetry')
@@ -254,7 +268,9 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
               user_id: user.id,
               wearable_vfc: metrics.vfc,
               wearable_rhr: metrics.rhr,
-              wearable_sleep: metrics.sleep,
+              wearable_sleep: formattedSleep,
+              wearable_deep_sleep_minutes: metrics.deepSleepMinutes,
+              wearable_rem_sleep_minutes: metrics.remSleepMinutes,
               active_device_id: metrics.name,
               provider: 'vital'
             });
@@ -262,7 +278,8 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
           // Sync values locally
           setVfcValue(metrics.vfc);
           setRhrValue(metrics.rhr);
-          setDeepSleep(metrics.sleep);
+          setDeepSleepMinutes(metrics.deepSleepMinutes);
+          setRemSleepMinutes(metrics.remSleepMinutes);
           setIsSimulating(false);
 
           setApiSyncStatus('active');
@@ -301,17 +318,18 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
       setActiveDeviceId(id);
       
       // Update values to new device defaults directly on connection using static map to avoid stale closures
-      const defaultMetricsMap: Record<string, { vfc: number, rhr: number, deepSleep: string }> = {
-        oura: { vfc: 58, rhr: 54, deepSleep: '1h 45m' },
-        apple: { vfc: 52, rhr: 62, deepSleep: '1h 20m' },
-        garmin: { vfc: 66, rhr: 50, deepSleep: '2h 15m' },
-        samsung: { vfc: 48, rhr: 66, deepSleep: '1h 10m' }
+      const defaultMetricsMap: Record<string, { vfc: number, rhr: number, deepSleepMinutes: number, remSleepMinutes: number }> = {
+        oura: { vfc: 58, rhr: 54, deepSleepMinutes: 105, remSleepMinutes: 110 },
+        apple: { vfc: 52, rhr: 62, deepSleepMinutes: 80, remSleepMinutes: 95 },
+        garmin: { vfc: 66, rhr: 50, deepSleepMinutes: 135, remSleepMinutes: 120 },
+        samsung: { vfc: 48, rhr: 66, deepSleepMinutes: 70, remSleepMinutes: 85 }
       };
       const metrics = defaultMetricsMap[id];
       if (metrics) {
         setVfcValue(metrics.vfc);
         setRhrValue(metrics.rhr);
-        setDeepSleep(metrics.deepSleep);
+        setDeepSleepMinutes(metrics.deepSleepMinutes);
+        setRemSleepMinutes(metrics.remSleepMinutes);
         setIsSimulating(false);
       }
     }, 1800);
@@ -325,13 +343,15 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
         setActiveDeviceId(remaining[0].id);
         setVfcValue(remaining[0].defaultMetrics.vfc);
         setRhrValue(remaining[0].defaultMetrics.rhr);
-        setDeepSleep(remaining[0].defaultMetrics.deepSleep);
+        setDeepSleepMinutes(remaining[0].defaultMetrics.deepSleepMinutes);
+        setRemSleepMinutes(remaining[0].defaultMetrics.remSleepMinutes);
         setIsSimulating(false);
       } else {
         setActiveDeviceId('');
         setVfcValue(55);
         setRhrValue(60);
-        setDeepSleep('1h 30m');
+        setDeepSleepMinutes(90);
+        setRemSleepMinutes(90);
         setIsSimulating(false);
       }
       return updated;
@@ -369,11 +389,13 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
     if (activeDevice) {
       setVfcValue(activeDevice.defaultMetrics.vfc);
       setRhrValue(activeDevice.defaultMetrics.rhr);
-      setDeepSleep(activeDevice.defaultMetrics.deepSleep);
+      setDeepSleepMinutes(activeDevice.defaultMetrics.deepSleepMinutes);
+      setRemSleepMinutes(activeDevice.defaultMetrics.remSleepMinutes);
     } else {
       setVfcValue(55);
       setRhrValue(60);
-      setDeepSleep('1h 30m');
+      setDeepSleepMinutes(90);
+      setRemSleepMinutes(90);
     }
   };
 
@@ -489,8 +511,8 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
 
               {activeDevice && (
                 <div className="space-y-8">
-                  {/* Three Metric Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Four Metric Cards */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* VFC Card */}
                     <div className="bg-slate-950/60 rounded-2xl p-5 border border-slate-800/80 relative overflow-hidden group hover:border-cyan-500/30 transition-all duration-300">
                       <div className="flex justify-between items-start mb-4">
@@ -505,13 +527,13 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                         </span>
                         <span className="text-xs text-slate-500 font-semibold">ms</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-2 font-medium">Variabilidade do batimento cardíaco</p>
+                      <p className="text-[11px] text-slate-500 mt-2 font-medium">Variabilidade do batimento</p>
                     </div>
 
                     {/* Resting HR Card */}
                     <div className="bg-slate-950/60 rounded-2xl p-5 border border-slate-800/80 relative overflow-hidden group hover:border-pink-500/30 transition-all duration-300">
                       <div className="flex justify-between items-start mb-4">
-                        <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Batimentos / Repouso</span>
+                        <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Batimentos / RHR</span>
                         <div className="p-2 bg-pink-950/60 border border-pink-800/40 rounded-lg text-pink-400">
                           <Heart className="w-4 h-4" />
                         </div>
@@ -522,7 +544,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                         </span>
                         <span className="text-xs text-slate-500 font-semibold">bpm</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-2 font-medium">Média cardíaca em relaxamento</p>
+                      <p className="text-[11px] text-slate-500 mt-2 font-medium">Frequência em repouso</p>
                     </div>
 
                     {/* Deep Sleep Card */}
@@ -535,10 +557,26 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                       </div>
                       <div className="flex items-baseline gap-1">
                         <span className="text-4xl font-extrabold font-mono tracking-tight text-slate-100">
-                          {deepSleep}
+                          {Math.floor(deepSleepMinutes / 60)}h {deepSleepMinutes % 60}m
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-2 font-medium">Ciclo restaurativo hormonal</p>
+                      <p className="text-[11px] text-slate-500 mt-2 font-medium">Ciclo celular restaurativo</p>
+                    </div>
+
+                    {/* REM Sleep Card */}
+                    <div className="bg-slate-950/60 rounded-2xl p-5 border border-slate-800/80 relative overflow-hidden group hover:border-purple-500/30 transition-all duration-300">
+                      <div className="flex justify-between items-start mb-4">
+                        <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Sono REM</span>
+                        <div className="p-2 bg-purple-950/60 border border-purple-800/40 rounded-lg text-purple-400">
+                          <Brain className="w-4 h-4" />
+                        </div>
+                      </div>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl font-extrabold font-mono tracking-tight text-slate-100">
+                          {Math.floor(remSleepMinutes / 60)}h {remSleepMinutes % 60}m
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-2 font-medium">Restauração cognitiva & Jing</p>
                     </div>
                   </div>
 
@@ -639,6 +677,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
 
               {activeDevice ? (
                 <div className="space-y-6 bg-slate-950/50 p-6 rounded-2xl border border-slate-900">
+                  {/* VFC Slider */}
                   <div className="space-y-3">
                     <div className="flex justify-between text-xs font-semibold">
                       <span className="text-slate-400">Variabilidade da Frequência Cardíaca (VFC) simulada</span>
@@ -648,49 +687,215 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                     </div>
                     
                     <div className="flex items-center gap-4">
-                       <input
-                         type="range"
-                         min="15"
-                         max="100"
-                         value={vfcValue}
-                         onChange={(e) => {
-                           setIsSimulating(true);
-                           setVfcValue(Number(e.target.value));
-                         }}
-                         className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
-                       />
-                       
-                       {/* Precise Control Buttons for Mobile */}
-                       <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 shrink-0">
-                         <button
-                           type="button"
-                           onClick={() => {
-                             setIsSimulating(true);
-                             setVfcValue(prev => Math.max(15, prev - 1));
-                           }}
-                           className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-cyan-950 active:text-cyan-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
-                           title="Diminuir 1ms"
-                         >
-                           -
-                         </button>
-                         <button
-                           type="button"
-                           onClick={() => {
-                             setIsSimulating(true);
-                             setVfcValue(prev => Math.min(100, prev + 1));
-                           }}
-                           className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-cyan-950 active:text-cyan-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
-                           title="Aumentar 1ms"
-                         >
-                           +
-                         </button>
-                       </div>
-                     </div>
+                      <input
+                        type="range"
+                        min="15"
+                        max="100"
+                        value={vfcValue}
+                        onChange={(e) => {
+                          setIsSimulating(true);
+                          setVfcValue(Number(e.target.value));
+                        }}
+                        className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                      />
+                      
+                      <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsSimulating(true);
+                            setVfcValue(prev => Math.max(15, prev - 1));
+                          }}
+                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-cyan-950 active:text-cyan-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+                          title="Diminuir 1ms"
+                        >
+                          -
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsSimulating(true);
+                            setVfcValue(prev => Math.min(100, prev + 1));
+                          }}
+                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-cyan-950 active:text-cyan-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+                          title="Aumentar 1ms"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
                     
                     <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                       <span>15ms (Estresse Crítico)</span>
                       <span>50ms (Equilíbrio)</span>
                       <span>100ms (Excelente)</span>
+                    </div>
+                  </div>
+
+                  {/* RHR Slider */}
+                  <div className="space-y-3 pt-2 border-t border-slate-900">
+                    <div className="flex justify-between text-xs font-semibold">
+                      <span className="text-slate-400">Frequência Cardíaca de Repouso (RHR) simulada</span>
+                      <span className={`font-mono text-sm ${rhrValue > 70 ? 'text-red-400 font-bold' : 'text-pink-400'}`}>
+                        {rhrValue} bpm {rhrValue > 70 ? '(SOBRECARGA)' : '(EXCELENTE)'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="40"
+                        max="100"
+                        value={rhrValue}
+                        onChange={(e) => {
+                          setIsSimulating(true);
+                          setRhrValue(Number(e.target.value));
+                        }}
+                        className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-pink-400"
+                      />
+                      
+                      <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsSimulating(true);
+                            setRhrValue(prev => Math.max(40, prev - 1));
+                          }}
+                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-pink-950 active:text-pink-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+                          title="Diminuir 1bpm"
+                        >
+                          -
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsSimulating(true);
+                            setRhrValue(prev => Math.min(100, prev + 1));
+                          }}
+                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-pink-950 active:text-pink-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+                          title="Aumentar 1bpm"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                      <span>40 bpm (Atleta)</span>
+                      <span>60 bpm (Moderado)</span>
+                      <span>100 bpm (Taquicardia)</span>
+                    </div>
+                  </div>
+
+                  {/* Deep Sleep Slider */}
+                  <div className="space-y-3 pt-2 border-t border-slate-900">
+                    <div className="flex justify-between text-xs font-semibold">
+                      <span className="text-slate-400">Tempo de Sono Profundo simulado</span>
+                      <span className={`font-mono text-sm ${deepSleepMinutes < 60 ? 'text-red-400 font-bold' : 'text-indigo-400'}`}>
+                        {Math.floor(deepSleepMinutes / 60)}h {deepSleepMinutes % 60}m ({deepSleepMinutes} min) {deepSleepMinutes < 60 ? '(INSUFICIENTE)' : '(RESTREATIVO)'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="0"
+                        max="240"
+                        step="15"
+                        value={deepSleepMinutes}
+                        onChange={(e) => {
+                          setIsSimulating(true);
+                          setDeepSleepMinutes(Number(e.target.value));
+                        }}
+                        className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-400"
+                      />
+                      
+                      <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsSimulating(true);
+                            setDeepSleepMinutes(prev => Math.max(0, prev - 15));
+                          }}
+                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-indigo-950 active:text-indigo-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+                          title="Diminuir 15 min"
+                        >
+                          -
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsSimulating(true);
+                            setDeepSleepMinutes(prev => Math.min(240, prev + 15));
+                          }}
+                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-indigo-950 active:text-indigo-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+                          title="Aumentar 15 min"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                      <span>0h (Nulo)</span>
+                      <span>1.5h (Médio)</span>
+                      <span>4h (Excelente)</span>
+                    </div>
+                  </div>
+
+                  {/* REM Sleep Slider */}
+                  <div className="space-y-3 pt-2 border-t border-slate-900">
+                    <div className="flex justify-between text-xs font-semibold">
+                      <span className="text-slate-400">Tempo de Sono REM simulado</span>
+                      <span className={`font-mono text-sm ${remSleepMinutes < 60 ? 'text-red-400 font-bold' : 'text-purple-400'}`}>
+                        {Math.floor(remSleepMinutes / 60)}h {remSleepMinutes % 60}m ({remSleepMinutes} min) {remSleepMinutes < 60 ? '(INSUFICIENTE)' : '(COGNITIVO OK)'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="0"
+                        max="240"
+                        step="15"
+                        value={remSleepMinutes}
+                        onChange={(e) => {
+                          setIsSimulating(true);
+                          setRemSleepMinutes(Number(e.target.value));
+                        }}
+                        className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-400"
+                      />
+                      
+                      <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsSimulating(true);
+                            setRemSleepMinutes(prev => Math.max(0, prev - 15));
+                          }}
+                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-purple-950 active:text-purple-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+                          title="Diminuir 15 min"
+                        >
+                          -
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsSimulating(true);
+                            setRemSleepMinutes(prev => Math.min(240, prev + 15));
+                          }}
+                          className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 active:bg-purple-950 active:text-purple-400 text-slate-300 font-bold transition-all text-base focus:outline-none"
+                          title="Aumentar 15 min"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                      <span>0h (Nulo)</span>
+                      <span>1.5h (Médio)</span>
+                      <span>4h (Excelente)</span>
                     </div>
                   </div>
 
@@ -828,7 +1033,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                     </span>
                     <button
                       onClick={async () => {
-                        if (user?.id) {
+                        if (user?.id && supabase) {
                           await supabase.from('xzen_user_telemetry_status').upsert({
                             user_id: user.id,
                             sync_status: 'disconnected',

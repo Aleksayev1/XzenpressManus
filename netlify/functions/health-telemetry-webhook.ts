@@ -79,6 +79,8 @@ export const handler: Handler = async (event: HandlerEvent) => {
         let vfcValue: number | null = null;
         let rhrValue: number | null = null;
         let sleepValue: string | null = null;
+        let deepSleepMinutes: number | null = null;
+        let remSleepMinutes: number | null = null;
         let deviceId: string | null = null;
         let isDisconnectionEvent = false;
 
@@ -95,11 +97,21 @@ export const handler: Handler = async (event: HandlerEvent) => {
                 const sleepData = payload.sleep_data || {};
                 vfcValue = sleepData.hrv_data?.summary?.rmssd_ms || sleepData.hrv_data?.summary?.sdnn_ms || null;
                 rhrValue = sleepData.heart_rate_data?.summary?.resting_hr_bpm || null;
+                
                 const durationSeconds = sleepData.sleep_durations_data?.asleep_seconds || 0;
                 if (durationSeconds > 0) {
                     const h = Math.floor(durationSeconds / 3600);
                     const m = Math.floor((durationSeconds % 3600) / 60);
                     sleepValue = `${h}h ${m}m`;
+                }
+
+                const deepSeconds = sleepData.sleep_durations_data?.deep_seconds || 0;
+                const remSeconds = sleepData.sleep_durations_data?.rem_seconds || 0;
+                if (deepSeconds > 0) {
+                    deepSleepMinutes = Math.floor(deepSeconds / 60);
+                }
+                if (remSeconds > 0) {
+                    remSleepMinutes = Math.floor(remSeconds / 60);
                 }
             } else if (eventType === 'body') {
                 const bodyData = payload.body_data || {};
@@ -117,6 +129,15 @@ export const handler: Handler = async (event: HandlerEvent) => {
                 vfcValue = payload.vfc || payload.hrv || payload.data?.hrv || null;
                 rhrValue = payload.rhr || payload.resting_hr || payload.data?.resting_heart_rate || null;
                 sleepValue = payload.sleep || payload.data?.sleep_duration || null;
+                
+                const stages = payload.sleep_stages || payload.data?.sleep_stages || {};
+                if (stages.deep !== undefined) {
+                    // Vital returns durations in seconds or minutes; standardise to minutes
+                    deepSleepMinutes = stages.deep > 300 ? Math.floor(stages.deep / 60) : stages.deep;
+                }
+                if (stages.rem !== undefined) {
+                    remSleepMinutes = stages.rem > 300 ? Math.floor(stages.rem / 60) : stages.rem;
+                }
             }
         }
 
@@ -145,7 +166,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
             console.log(`🔌 Device disconnected for user: ${userId}`);
         } else {
             // Write biometric data if available
-            if (vfcValue !== null || rhrValue !== null || sleepValue !== null) {
+            if (vfcValue !== null || rhrValue !== null || sleepValue !== null || deepSleepMinutes !== null || remSleepMinutes !== null) {
                 // 1. Insert time-series entry
                 await supabase
                     .from('xzen_user_telemetry')
@@ -154,6 +175,8 @@ export const handler: Handler = async (event: HandlerEvent) => {
                         wearable_vfc: vfcValue || 55, // Fallback default
                         wearable_rhr: rhrValue,
                         wearable_sleep: sleepValue,
+                        wearable_deep_sleep_minutes: deepSleepMinutes,
+                        wearable_rem_sleep_minutes: remSleepMinutes,
                         active_device_id: deviceId,
                         provider
                     });

@@ -9,6 +9,7 @@ import { MapaVivoStorageService } from '../services/mapaVivoStorageService';
 import { fiveElements } from '../data/fiveElements';
 import { type WeeklyCheckinData } from './WeeklyCheckin';
 import { supabase } from '../lib/supabase';
+import { calculateJingIndex, calculateBiologicalWear } from '../services/clinicalAlgorithms';
 
 interface ProgressTrackingPageProps {
   onPageChange: (page: string) => void;
@@ -103,7 +104,7 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
 
   useEffect(() => {
     const fetchCloudTelemetry = async () => {
-      if (!user?.id) return;
+      if (!user?.id || !supabase) return;
       try {
         const { data: telemetryData, error: telemetryError } = await supabase
           .from('xzen_user_telemetry')
@@ -120,6 +121,12 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
           }
           if (latest.wearable_sleep) {
             localStorage.setItem('wearable_sleep', latest.wearable_sleep);
+          }
+          if (latest.wearable_deep_sleep_minutes !== undefined && latest.wearable_deep_sleep_minutes !== null) {
+            localStorage.setItem('wearable_deep_sleep_mins', latest.wearable_deep_sleep_minutes.toString());
+          }
+          if (latest.wearable_rem_sleep_minutes !== undefined && latest.wearable_rem_sleep_minutes !== null) {
+            localStorage.setItem('wearable_rem_sleep_mins', latest.wearable_rem_sleep_minutes.toString());
           }
           if (latest.active_device_id) {
             localStorage.setItem('active_device_id', latest.active_device_id);
@@ -215,41 +222,39 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
   }, [profile]);
 
   // Retrieve wearable telemetry from localStorage
-  const wearableVfc = Number(localStorage.getItem('wearable_vfc')) || 55;
+  const { wearableVfc, wearableRhr, deepSleepMinutes, remSleepMinutes } = React.useMemo(() => {
+    return {
+      wearableVfc: Number(localStorage.getItem('wearable_vfc')) || 58,
+      wearableRhr: Number(localStorage.getItem('wearable_rhr')) || 54,
+      deepSleepMinutes: Number(localStorage.getItem('wearable_deep_sleep_mins')) || 105,
+      remSleepMinutes: Number(localStorage.getItem('wearable_rem_sleep_mins')) || 95
+    };
+  }, [dbTelemetryLoaded]);
 
-  const wearableSleep = localStorage.getItem('wearable_sleep') || '1h 30m';
+  // Compute dynamic Jing Index, Biological Wear and Age Recoil
+  const { jingIndex, biologicalWear, biologicalAge, recoil } = React.useMemo(() => {
+    const metrics = {
+      hrv: wearableVfc,
+      rhr: wearableRhr,
+      deepSleepMinutes,
+      remSleepMinutes
+    };
 
-  // Convert sleep string to minutes
-  const sleepMinutes = React.useMemo(() => {
-    const hoursMatch = wearableSleep.match(/(\d+)\s*h/);
-    const minutesMatch = wearableSleep.match(/(\d+)\s*m/);
-    const hours = hoursMatch ? Number(hoursMatch[1]) : 0;
-    const minutes = minutesMatch ? Number(minutesMatch[1]) : 0;
-    return hours * 60 + minutes;
-  }, [wearableSleep]);
+    const index = calculateJingIndex(metrics);
+    const wear = calculateBiologicalWear(metrics);
 
-  // Compute dynamic Jing Index and Biological Age Recoil
-  const { jingIndex, biologicalAge, recoil } = React.useMemo(() => {
-    const sessionsCount = sessions?.length || 0;
-    const vfcScore = Math.min(100, (wearableVfc / 80) * 100);
-    const sleepScore = Math.min(100, (sleepMinutes / 120) * 100);
-    const acupressureScore = Math.min(100, (sessionsCount / 8) * 100);
-    const nutrimingScore = 85; // Default consistency index
-
-    const index = Math.min(100, Math.max(15, Math.round(
-      vfcScore * 0.35 + sleepScore * 0.25 + acupressureScore * 0.25 + nutrimingScore * 0.15
-    )));
-
-    const maxRecoil = 6.5;
+    // Max potential biological age reversal (recoil) is 7.5 years
+    const maxRecoil = 7.5;
     const computedRecoil = Number(((index / 100) * maxRecoil).toFixed(1));
     const computedBioAge = Number((chronologicalAge - computedRecoil).toFixed(1));
 
     return {
       jingIndex: index,
+      biologicalWear: wear,
       recoil: computedRecoil,
       biologicalAge: computedBioAge
     };
-  }, [sessions, wearableVfc, sleepMinutes, chronologicalAge]);
+  }, [wearableVfc, wearableRhr, deepSleepMinutes, remSleepMinutes, chronologicalAge]);
 
   // Progression chart points over 6 weeks
   const chartPoints = React.useMemo(() => {
@@ -873,18 +878,26 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                   <button
                     type="button"
                     onClick={() => onPageChange('device-sync')}
-                    className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center hover:border-cyan-500/50 hover:bg-slate-900/50 transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-cyan-500/50 group"
+                    className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center hover:border-cyan-500/50 hover:bg-slate-900/50 transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-cyan-500/50 group text-left"
                   >
                     <span className="block text-[11px] font-bold text-cyan-400 font-mono group-hover:scale-105 transition-transform">{wearableVfc}ms</span>
-                    <span className="group-hover:text-cyan-300 transition-colors">Tónus Vago (VFC) ⚙️</span>
+                    <span className="group-hover:text-cyan-300 transition-colors">Tônus Vago (VFC) ⚙️</span>
                   </button>
-                  <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center">
-                    <span className="block text-[11px] font-bold text-indigo-400 font-mono">{wearableSleep}</span>
+                  <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center text-left">
+                    <span className="block text-[11px] font-bold text-pink-400 font-mono">{wearableRhr} bpm</span>
+                    <span>Repouso (RHR)</span>
+                  </div>
+                  <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center text-left">
+                    <span className="block text-[11px] font-bold text-indigo-400 font-mono">
+                      {Math.floor(deepSleepMinutes / 60)}h {deepSleepMinutes % 60}m
+                    </span>
                     <span>Sono Profundo</span>
                   </div>
-                  <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center col-span-2">
-                    <span className="block text-[11px] font-bold text-emerald-400 font-mono">{sessions?.length || 0} sessões</span>
-                    <span>Consistência Terapêutica (Este Ciclo)</span>
+                  <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 text-center text-left">
+                    <span className="block text-[11px] font-bold text-purple-400 font-mono">
+                      {Math.floor(remSleepMinutes / 60)}h {remSleepMinutes % 60}m
+                    </span>
+                    <span>Sono REM</span>
                   </div>
                 </div>
               </div>
@@ -912,16 +925,60 @@ export const ProgressTrackingPage: React.FC<ProgressTrackingPageProps> = ({ onPa
                       </span>
                     </div>
                   </div>
+
+                  {/* Desgaste Biológico (Carga Alostática) Card */}
+                  <div className="mt-4 p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Desgaste Fisiológico</span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-extrabold border ${
+                        biologicalWear < 1.0
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-250'
+                          : biologicalWear <= 1.5
+                          ? 'bg-amber-50 text-amber-700 border-amber-255'
+                          : 'bg-rose-50 text-rose-700 border-rose-250'
+                      }`}>
+                        {biologicalWear < 1.0 ? 'Recuperação' : biologicalWear <= 1.5 ? 'Sobrecarga Leve' : 'Desgaste Crítico'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-baseline gap-1">
+                      <span className={`text-3xl font-black font-mono tracking-tight ${
+                        biologicalWear < 1.0 ? 'text-emerald-600' : biologicalWear <= 1.5 ? 'text-amber-500' : 'text-rose-600'
+                      }`}>
+                        {biologicalWear}x
+                      </span>
+                      <span className="text-[9px] text-gray-400 font-semibold">taxa de envelhecimento celular</span>
+                    </div>
+                    
+                    {/* Progress bar representing 0.5x to 3.0x */}
+                    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-2 rounded-full transition-all duration-1000 ${
+                          biologicalWear < 1.0 ? 'bg-emerald-500' : biologicalWear <= 1.5 ? 'bg-amber-500' : 'bg-rose-500'
+                        }`}
+                        style={{ width: `${Math.min(100, Math.max(0, ((biologicalWear - 0.5) / 2.5) * 100))}%` }}
+                      />
+                    </div>
+                    
+                    <p className="text-[10px] text-gray-500 leading-relaxed font-medium">
+                      {biologicalWear < 1.0 
+                        ? 'Seu parassimpático está dominante. O corpo está rejuvenescendo ativamente.'
+                        : biologicalWear <= 1.5
+                        ? 'O corpo está empatando com o estresse. Pratique a respiração 4-7-8 para aliviar a tensão.'
+                        : 'Estresse simpático em overdrive. Alta RHR, baixa VFC. Recomendamos acionar o biofeedback do Nervo Vago (NC X).'
+                      }
+                    </p>
+                  </div>
                 </div>
 
                 <div className="text-[11px] text-gray-500 leading-relaxed mt-4 bg-white p-3 rounded-lg border border-gray-100">
                   <span className="font-bold text-gray-700 block mb-1">💡 Diagnóstico do Oráculo:</span>
-                  {jingIndex >= 70 ? (
-                    <span>Sua consistência na craniopuntura e a modulação ativa da VFC estão reduzindo a senescência celular. Sua "bateria vital" (Jing) está em nível de alta regeneração, desacelerando o relógio biológico.</span>
-                  ) : jingIndex >= 45 ? (
-                    <span>Seu índice de Jing está moderado. Aumentar a frequência de sessões de respiração e acupressão ajudará a acionar o sistema parassimpático com mais consistência, acelerando o recuo de idade.</span>
+                  {biologicalWear < 1.0 ? (
+                    <span>Sua consistência terapêutica, RHR controlada e VFC saudável ({wearableVfc}ms) estão ativando o rejuvenescimento celular. O estresse celular está sob controle.</span>
+                  ) : biologicalWear <= 1.5 ? (
+                    <span>Seu desgaste biológico está em nível moderado ({biologicalWear}x). Aumente a frequência de acupressão ou faça uma respiração 4-7-8 para reequilibrar o sistema autônomo.</span>
                   ) : (
-                    <span>Sua bateria de Jing está sob sobrecarga (estresse crônico ou sono inadequado). Estimule o ponto YNSA Fígado (N. Vago) e melhore a regularidade do Nutriming para iniciar o recuo biológico.</span>
+                    <span>Sua bateria vital está sob sobrecarga severa (desgaste de {biologicalWear}x). Estimule o ponto YNSA Fígado (N. Vago) na aba Dispositivos para reduzir a resposta inflamatória.</span>
                   )}
                 </div>
               </div>

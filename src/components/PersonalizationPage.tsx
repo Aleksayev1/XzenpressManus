@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { User, Target, Clock, Brain, Heart, Zap, Save, RefreshCw, Palette, Volume2, Bell } from 'lucide-react';
+import { User, Target, Clock, Brain, Heart, Zap, Save, RefreshCw, Palette, Volume2, Bell, Dna } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { PreferencesService } from '../services/preferencesService';
+import { MapaVivoStorageService } from '../services/mapaVivoStorageService';
+import { type AnamneseProfile, type GeneticMarkers } from '../data/anamneseProfile';
 
 interface PersonalizationPageProps {
   onPageChange: (page: string) => void;
@@ -138,6 +140,12 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [anamneseProfile, setAnamneseProfile] = useState<AnamneseProfile | null>(null);
+  const [geneticMarkers, setGeneticMarkers] = useState<GeneticMarkers>({
+    detoxHepatico: 'normal',
+    sensibilidadeInflamacao: 'normal',
+    estresseOxidativo: 'normal'
+  });
 
   const concernsOptions = [
     'Estresse e Ansiedade',
@@ -234,7 +242,35 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
     try {
       const success = await PreferencesService.saveUserPreferences(user.id, preferences);
 
-      if (success) {
+      // Save genetic markers to AnamneseProfile
+      let profileSuccess = true;
+      const currentProfile = anamneseProfile || {
+        faixaEtaria: '30-44' as const,
+        sexoBiologico: 'nao_informar' as const,
+        objetivoPrincipal: 'longevidade' as const,
+        qualidadeSono: 'regular' as const,
+        nivelEnergia: 50,
+        nivelEstresse: 'moderado' as const,
+        nivelAtividade: 'moderado' as const,
+        padraoAlimentar: 'misto' as const,
+        sintomasFisicos: [],
+        emocoesDominantes: [],
+        condicoesExistentes: [],
+        medicamentosEmUso: [],
+        guardianScores: { madeira: 50, fogo: 50, terra: 50, metal: 50, agua: 50 },
+        completedAt: new Date().toISOString(),
+        version: 1
+      };
+      
+      const updatedProfile: AnamneseProfile = {
+        ...currentProfile,
+        geneticMarkers
+      };
+      
+      profileSuccess = await MapaVivoStorageService.saveAnamneseProfile(user.id, updatedProfile);
+      setAnamneseProfile(updatedProfile);
+
+      if (success && profileSuccess) {
         setSaveStatus('success');
       } else {
         throw new Error('Failed to save to Supabase');
@@ -271,6 +307,14 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
       const saved = await PreferencesService.getUserPreferences(user.id);
       if (saved) {
         setPreferences(saved);
+      }
+      // Load Anamnese profile including genetic markers
+      const profile = await MapaVivoStorageService.loadAnamneseProfile(user.id);
+      if (profile) {
+        setAnamneseProfile(profile);
+        if (profile.geneticMarkers) {
+          setGeneticMarkers(profile.geneticMarkers);
+        }
       }
     };
     loadPreferences();
@@ -553,6 +597,97 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
                     <span className="text-gray-700">{option.label}</span>
                   </label>
                 ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Marcadores Genéticos (DNA) */}
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
+              <Dna className="w-6 h-6 text-indigo-600 mr-2 animate-pulse" />
+              🧬 Perfil Epigenético & Marcadores de DNA
+            </h2>
+            <p className="text-sm text-gray-500 mb-6">
+              Personalize o cruzamento das plantas medicinais e dosagem do Oráculo com base nas suas predisposições genéticas declaradas.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Detox Hepático */}
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Detoxificação Hepática
+                </label>
+                <div className="space-y-2">
+                  {[
+                    { value: 'lento', label: 'Lenta (Acúmulo)' },
+                    { value: 'normal', label: 'Normal' },
+                    { value: 'rapido', label: 'Rápida (Metabolização)' }
+                  ].map((option) => (
+                    <label key={option.value} className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="detoxHepatico"
+                        value={option.value}
+                        checked={geneticMarkers.detoxHepatico === option.value}
+                        onChange={(e) => setGeneticMarkers(prev => ({ ...prev, detoxHepatico: e.target.value as any }))}
+                        className="text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm text-gray-700">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sensibilidade Inflamação */}
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Inflamação Celular
+                </label>
+                <div className="space-y-2">
+                  {[
+                    { value: 'baixa', label: 'Baixa Resposta' },
+                    { value: 'normal', label: 'Normal' },
+                    { value: 'alta', label: 'Alta (Propensão)' }
+                  ].map((option) => (
+                    <label key={option.value} className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sensibilidadeInflamacao"
+                        value={option.value}
+                        checked={geneticMarkers.sensibilidadeInflamacao === option.value}
+                        onChange={(e) => setGeneticMarkers(prev => ({ ...prev, sensibilidadeInflamacao: e.target.value as any }))}
+                        className="text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm text-gray-700">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Estresse Oxidativo */}
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Estresse Oxidativo
+                </label>
+                <div className="space-y-2">
+                  {[
+                    { value: 'baixo', label: 'Baixo' },
+                    { value: 'normal', label: 'Normal' },
+                    { value: 'alto', label: 'Alto (Radicais Livres)' }
+                  ].map((option) => (
+                    <label key={option.value} className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="estresseOxidativo"
+                        value={option.value}
+                        checked={geneticMarkers.estresseOxidativo === option.value}
+                        onChange={(e) => setGeneticMarkers(prev => ({ ...prev, estresseOxidativo: e.target.value as any }))}
+                        className="text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm text-gray-700">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

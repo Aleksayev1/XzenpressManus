@@ -32,6 +32,7 @@ export const MapaVivoStorageService = {
         condicoes_existentes: profile.condicoesExistentes || [],
         medicamentos_em_uso: profile.medicamentosEmUso || [],
         guardian_scores: profile.guardianScores,
+        genetic_markers: profile.geneticMarkers || null,
         updated_at: new Date().toISOString()
       };
 
@@ -79,6 +80,7 @@ export const MapaVivoStorageService = {
           condicoesExistentes: data.condicoes_existentes || [],
           medicamentos_em_uso: data.medicamentos_em_uso || [],
           guardianScores: data.guardian_scores,
+          geneticMarkers: data.genetic_markers || undefined,
           completedAt: data.completed_at,
           version: 1
         };

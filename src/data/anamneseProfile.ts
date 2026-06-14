@@ -49,6 +49,12 @@ export interface GuardianScoresAnamnese {
   agua: number;
 }
 
+export interface GeneticMarkers {
+  detoxHepatico: 'lento' | 'normal' | 'rapido';
+  sensibilidadeInflamacao: 'alta' | 'normal' | 'baixa';
+  estresseOxidativo: 'alto' | 'normal' | 'baixo';
+}
+
 export interface AnamneseProfile {
   // Identidade
   nome?: string;
@@ -75,6 +81,9 @@ export interface AnamneseProfile {
 
   // Scores calculados dos Guardiões
   guardianScores: GuardianScoresAnamnese;
+
+  // Marcadores Epigenticos (DNA)
+  geneticMarkers?: GeneticMarkers;
 
   // Metadados
   completedAt: string;

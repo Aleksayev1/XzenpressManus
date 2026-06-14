@@ -9,6 +9,9 @@ import {
 import { HERB_DATABASE, Herb } from '../data/herbLibrary';
 import { acupressurePoints } from '../data/points/index';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+import { MapaVivoStorageService } from '../services/mapaVivoStorageService';
+import { type GeneticMarkers } from '../data/anamneseProfile';
 
 interface PhytoLibraryPageProps {
     onPageChange?: (page: string) => void;
@@ -48,6 +51,7 @@ interface OracleProtocol {
         praticasComplementares?: string[];
     };
     epigenetica: string;
+    recPrecisao?: string;
     almaEmocional: string;
     alertas: string[];
     fontes: string[];
@@ -57,11 +61,41 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<'Todos' | 'Brasil' | 'China (MTC)' | 'Peptídeos'>('Todos');
     const [fromMapaVivo, setFromMapaVivo] = useState(false);
+    const { user } = useAuth();
+    const [anamnese, setAnamnese] = useState<any>(null);
+    const [geneticMarkers, setGeneticMarkers] = useState<GeneticMarkers | null>(null);
 
     useEffect(() => {
         setFromMapaVivo(localStorage.getItem('phyto_from_mapa_vivo') === 'true');
-    }, []);
-    
+        
+        const loadUserAnamnese = async () => {
+            if (user) {
+                const profile = await MapaVivoStorageService.loadAnamneseProfile(user.id);
+                if (profile) {
+                    setAnamnese(profile);
+                    if (profile.geneticMarkers) {
+                        setGeneticMarkers(profile.geneticMarkers);
+                    }
+                }
+            } else {
+                // Fallback to local anonymous profile
+                const saved = localStorage.getItem('xzenpress_anamnese_v1');
+                if (saved) {
+                    try {
+                        const profile = JSON.parse(saved);
+                        setAnamnese(profile);
+                        if (profile.geneticMarkers) {
+                            setGeneticMarkers(profile.geneticMarkers);
+                        }
+                    } catch (e) {
+                        console.error('Erro ao ler anamnese local:', e);
+                    }
+                }
+            }
+        };
+        loadUserAnamnese();
+    }, [user]);
+
     // Estados do Oráculo de Deficiências
     const [oracleResult, setOracleResult] = useState<OracleProtocol | null>(null);
     const [isOracleLoading, setIsOracleLoading] = useState(false);
@@ -369,10 +403,47 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                    (window.hasOwnProperty('Capacitor') && (window as any).Capacitor?.isNativePlatform?.());
             const baseApiUrl = isNativeMobile ? 'https://xzenpress.com' : '';
 
+            const getActiveOrganClock = () => {
+                const hour = new Date().getHours();
+                if (hour >= 1 && hour < 3) {
+                    return { organ: 'Fígado', timeRange: '01:00 - 03:00', element: 'Madeira', description: 'Período de desintoxicação profunda do sangue e processamento de emoções como raiva e frustração.' };
+                } else if (hour >= 3 && hour < 5) {
+                    return { organ: 'Pulmão', timeRange: '03:00 - 05:00', element: 'Metal', description: 'Momento de oxigenação celular profunda, eliminação de resíduos gasosos e processamento de sentimentos de tristeza ou melancolia.' };
+                } else if (hour >= 5 && hour < 7) {
+                    return { organ: 'Intestino Grosso', timeRange: '05:00 - 07:00', element: 'Metal', description: 'Fase de eliminação de toxinas físicas e desapego emocional.' };
+                } else if (hour >= 7 && hour < 9) {
+                    return { organ: 'Estômago', timeRange: '07:00 - 09:00', element: 'Terra', description: 'Hora ideal para a primeira refeição, absorção primária de nutrientes e nutrição da clareza mental.' };
+                } else if (hour >= 9 && hour < 11) {
+                    return { organ: 'Baço-Pâncreas', timeRange: '09:00 - 11:00', element: 'Terra', description: 'Conversão de alimentos em energia vital (Qi) e sangue. Evitar ruminação e preocupação excessiva.' };
+                } else if (hour >= 11 && hour < 13) {
+                    return { organ: 'Coração', timeRange: '11:00 - 13:00', element: 'Fogo', description: 'Pico da circulação sanguínea, alegria de viver e conexão espiritual.' };
+                } else if (hour >= 13 && hour < 15) {
+                    return { organ: 'Intestino Delgado', timeRange: '13:00 - 15:00', element: 'Fogo', description: 'Separação do puro e do impuro, tanto dos alimentos quanto dos pensamentos.' };
+                } else if (hour >= 15 && hour < 17) {
+                    return { organ: 'Bexiga', timeRange: '15:00 - 17:00', element: 'Água', description: 'Período de eliminação de resíduos líquidos e regulação dos fluidos corporais.' };
+                } else if (hour >= 17 && hour < 19) {
+                    return { organ: 'Rins', timeRange: '17:00 - 19:00', element: 'Água', description: 'Armazenamento da energia essencial (Jing), filtragem do sangue e fortalecimento da força de vontade.' };
+                } else if (hour >= 19 && hour < 21) {
+                    return { organ: 'Pericárdio (Circulação-Sexo)', timeRange: '19:00 - 21:00', element: 'Fogo', description: 'Proteção do coração físico e emocional, ideal para relaxamento e conexão amorosa.' };
+                } else if (hour >= 21 && hour < 23) {
+                    return { organ: 'Triplo Aquecedor', timeRange: '21:00 - 23:00', element: 'Fogo', description: 'Harmonização dos três aquecedores (tórax, abdômen superior e inferior), regulação da temperatura e relaxamento para o sono.' };
+                } else {
+                    return { organ: 'Vesícula Biliar', timeRange: '23:00 - 01:00', element: 'Madeira', description: 'Período de processamento de gorduras, secreção de bile e tomada de decisões conscientes durante o sono.' };
+                }
+            };
+
+            const organClock = getActiveOrganClock();
+
             const response = await fetch(`${baseApiUrl}/.netlify/functions/deficiency-oracle`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ symptom: query, chronicity })
+                body: JSON.stringify({ 
+                    symptom: query, 
+                    chronicity,
+                    geneticMarkers,
+                    organClock,
+                    anamnese
+                })
             });
 
             if (!response.ok) {
@@ -1050,6 +1121,23 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Recomendação de Precisão (Epigenética/DNA/OrganClock) */}
+                            {oracleResult.recPrecisao && (
+                                <div className="bg-gradient-to-br from-indigo-950/20 via-slate-900/30 to-purple-950/20 border border-indigo-500/30 rounded-2xl p-5 flex flex-col md:flex-row gap-4 items-start relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl group-hover:scale-125 transition-transform duration-700" />
+                                    <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl shrink-0 shadow-lg shadow-indigo-500/10">
+                                        <Dna className="w-6 h-6 animate-pulse" />
+                                    </div>
+                                    <div className="z-10">
+                                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                                            <h4 className="text-xs font-black text-indigo-400 uppercase tracking-widest">Prescrição e Nutrição de Precisão (DNA)</h4>
+                                            <span className="bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">Sincronizado via Relógio MTC</span>
+                                        </div>
+                                        <p className="text-xs text-slate-200 leading-relaxed font-semibold">{oracleResult.recPrecisao}</p>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Epigenética e Visão Científica */}
                             <div className="bg-slate-900/20 border border-slate-850 rounded-2xl p-5 flex flex-col md:flex-row gap-4 items-start">

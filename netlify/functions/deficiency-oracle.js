@@ -27,10 +27,16 @@ exports.handler = async (event) => {
 
     let symptom = '';
     let chronicity = 'misto';
+    let geneticMarkers = null;
+    let organClock = null;
+    let anamnese = null;
     try {
         const body = JSON.parse(event.body || '{}');
         symptom = (body.symptom || '').trim();
         chronicity = (body.chronicity || 'misto').trim();
+        geneticMarkers = body.geneticMarkers || null;
+        organClock = body.organClock || null;
+        anamnese = body.anamnese || null;
     } catch {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'JSON inválido' }) };
     }
@@ -41,7 +47,15 @@ exports.handler = async (event) => {
 
     // Sanitização básica
     const sanitized = symptom.replace(/<[^>]*>/g, '').substring(0, 500);
-    const queryKey = symptom.toLowerCase().trim();
+    
+    // Chave de cache composta
+    let queryKey = symptom.toLowerCase().trim();
+    if (geneticMarkers && organClock) {
+        const detox = geneticMarkers.detoxHepatico || 'normal';
+        const inflam = geneticMarkers.sensibilidadeInflamacao || 'normal';
+        const organName = organClock.organ || 'geral';
+        queryKey = `${queryKey}_${detox}_${inflam}_${organName.toLowerCase().replace(/\s+/g, '')}`;
+    }
 
     try {
         const { data: cachedData } = await supabase
@@ -67,13 +81,11 @@ exports.handler = async (event) => {
         return { statusCode: 503, headers, body: JSON.stringify({ error: 'Serviço temporariamente indisponível.' }) };
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    // O PROMPT-MESTRE DO ORACLE DE DEFICIÊNCIAS XZENPRESS
-    // ═══════════════════════════════════════════════════════════════════
-    const SYSTEM_PROMPT = `Você é o "Oracle de Deficiências" do Xzenpress — a plataforma mais avançada do mundo em saúde integral.
+    // ══════════════════════════════════════════════════════════════�    const SYSTEM_PROMPT = `Você é o "Oracle de Deficiências" do Xzenpress — a plataforma mais avançada do mundo em saúde integral.
 
 SUA FILOSOFIA CENTRAL:
 "Que o teu alimento seja o teu remédio" — Hipócrates. O ser humano é um sistema vivo e indivisível: bioquímica, energia vital, emoção e alma são inseparáveis. Você não trata sintomas isolados — você enxerga padrões sistêmicos e revela as raízes mais profundas do desequilíbrio.
+Você cruzará as queixas com predisposições genéticas (DNA), histórico metabólico e o relógio de órgãos da Medicina Tradicional Chinesa (MTC).
 
 SEU CONHECIMENTO ABRANGE:
 1. NUTRIÇÃO FUNCIONAL E EPIGENÉTICA: Deficiências de micronutrientes como causa primária de doenças crônicas. Como a alimentação ativa ou silencia genes (epigenética). Estudos recentes do NIH, WHO, Harvard e ENANI/Brasil.
@@ -143,6 +155,7 @@ FORMATO DA SUA RESPOSTA — SEMPRE JSON VÁLIDO:
     "praticasComplementares": ["prática + duração + frequência"]
   },
   "epigenetica": "reversibilidade epigenética resumida (max 2 frases)",
+  "recPrecisao": "Para o seu perfil metabólico e horário do órgão do [Órgão], a planta [Planta X] terá uma absorção de [90-99]% e bloqueará o gene da [inflamação celular / desintoxicação hepática lenta / estresse oxidativo]. Seguido de explicação bioquímica concisa (max 2 frases).",
   "almaEmocional": "dimensão emocional e psicossomática resumida (max 2 frases)",
   "alertas": ["aviso de que não substitui consulta médica", "outros alertas importantes"],
   "fontes": ["fonte 1", "fonte 2"]
@@ -156,15 +169,43 @@ REGRAS ABSOLUTAS:
 - Se o sintoma for uma emergência (dor no peito, AVC, etc.), coloque um alerta urgente como primeiro item dos alertas.
 - Seja preciso, profundo e científico — mas extremamente conciso e breve.`;
 
-    const userMessage = `Analise este sintoma/condição e gere o Protocolo Integral 360° completo do Xzenpress:
+    let userMessage = `Analise este sintoma/condição e gere o Protocolo Integral 360° completo do Xzenpress:
 
 "${sanitized}"
 
-A condição é clinicamente descrita como: ${chronicity.toUpperCase()} (aguda, crônica ou mista).
+A condição é clinicamente descrita como: ${chronicity.toUpperCase()} (aguda, crônica ou mista).`;
 
-CRITÉRIO CRUCIAL DE PRESCRIÇÃO YNSA:
+    if (anamnese) {
+        userMessage += `\n\nHISTÓRICO CLÍNICO/METABÓLICO DO USUÁRIO (Anamnese):\n`;
+        userMessage += `- Condições declaradas: ${anamnese.condicoesExistentes?.join(', ') || 'Nenhuma'}\n`;
+        userMessage += `- Medicamentos em uso: ${anamnese.medicamentosEmUso?.join(', ') || 'Nenhum'}\n`;
+        userMessage += `- Sintomas físicos: ${anamnese.sintomasFisicos?.join(', ') || 'Nenhum'}\n`;
+        if (anamnese.guardianScores) {
+            userMessage += `- Desequilíbrio energético (MTC Guardian Scores): Madeira ${anamnese.guardianScores.madeira}%, Fogo ${anamnese.guardianScores.fogo}%, Terra ${anamnese.guardianScores.terra}%, Metal ${anamnese.guardianScores.metal}%, Água ${anamnese.guardianScores.agua}%\n`;
+        }
+    }
+
+    if (geneticMarkers) {
+        userMessage += `\n\nPREDISPOSIÇÕES GENÉTICAS DO USUÁRIO (DNA):\n`;
+        userMessage += `- Capacidade de Desintoxicação Hepática (Fígado): ${geneticMarkers.detoxHepatico || 'normal'}\n`;
+        userMessage += `- Sensibilidade à Inflamação Celular: ${geneticMarkers.sensibilidadeInflamacao || 'normal'}\n`;
+        userMessage += `- Estresse Celular Oxidativo: ${geneticMarkers.estresseOxidativo || 'normal'}\n`;
+    }
+
+    if (organClock) {
+        userMessage += `\n\nRELÓGIO DE ÓRGÃOS MTC:\n`;
+        userMessage += `- Órgão correspondente ativo na consulta: ${organClock.organ} (Horário do pico: ${organClock.timeRange}, Elemento: ${organClock.element})\n`;
+        userMessage += `- Descrição do órgão: ${organClock.description}\n`;
+    }
+
+    userMessage += `\n\nCRITÉRIO CRUCIAL DE PRESCRIÇÃO YNSA:
 - Se a condição for AGUDA (dor forte, início recente), dê prioridade absoluta aos Pontos dos Nervos Cranianos (occipital) que trazem modulação neural imediata e alívio rápido, indicando também Pontos Ypsilon como suporte.
 - Se for CRÔNICA (condição que vai e vem há semanas/meses), dê prioridade aos Pontos Ypsilon bilaterais (região temporal) para reeducação orgânica profunda e somatotópica gradual, indicando Nervos Cranianos como reforço se necessário.
+- Se for MISTA (crise aguda em cima de um quadro crônico), prescreva e dê igual prioridade a ambos (Pontos Ypsilon bilaterais na têmpora + Pontos de Nervos Cranianos no occipital).
+
+Escreva a justificativa clínica dessa escolha no campo "visaoIntegrativa" e prescreva os pontos exatos em "pontosYNSA".
+
+Responda exclusivamente em JSON válido, seguindo o formato especificado no seu sistema. Seja completo, profundo e verdadeiramente útil para o usuário.`;omo reforço se necessário.
 - Se for MISTA (crise aguda em cima de um quadro crônico), prescreva e dê igual prioridade a ambos (Pontos Ypsilon bilaterais na têmpora + Pontos de Nervos Cranianos no occipital).
 
 Escreva a justificativa clínica dessa escolha no campo "visaoIntegrativa" e prescreva os pontos exatos em "pontosYNSA".

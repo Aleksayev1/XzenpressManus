@@ -172,12 +172,20 @@ function AppContent() {
     handleHashChange();
     window.addEventListener('hashchange', handleHashChange);
 
-    // 🛡️ Global Copy Protection
+    // 🛡️ Global Copy Protection & DevTools Blocker
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     const handleDragStart = (e: DragEvent) => e.preventDefault();
     const handleKeyDown = (e: KeyboardEvent) => {
       // Prevent Ctrl+C, Ctrl+U, Ctrl+S, Ctrl+P
       if ((e.ctrlKey || e.metaKey) && ['c', 'u', 's', 'p'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
+      // Prevent F12 (DevTools)
+      if (e.key === 'F12') {
+        e.preventDefault();
+      }
+      // Prevent Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Inspect/Console)
+      if (e.ctrlKey && e.shiftKey && ['i', 'j', 'c'].includes(e.key.toLowerCase())) {
         e.preventDefault();
       }
     };

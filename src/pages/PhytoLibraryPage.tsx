@@ -401,7 +401,8 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
             const isNativeMobile = window.location.protocol === 'capacitor:' || 
                                    window.location.protocol === 'file:' || 
                                    (window.hasOwnProperty('Capacitor') && (window as any).Capacitor?.isNativePlatform?.());
-            const baseApiUrl = isNativeMobile ? 'https://xzenpress.com' : '';
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.51' || window.location.hostname === '127.0.0.1';
+            const baseApiUrl = isLocalhost ? '' : 'https://xzenpress.com';
 
             const getActiveOrganClock = () => {
                 const hour = new Date().getHours();
@@ -958,7 +959,6 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                                                             <div 
                                                                                 className="relative mt-2 rounded-xl overflow-hidden cursor-pointer hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 max-w-[280px] group shadow-md border border-slate-800 hover:border-purple-500/50"
                                                                                 onClick={() => {
-                                                                                    console.log('Oráculo YNSA image click:', matchedPoint.image);
                                                                                     setZoomImageUrl(getSafeImagePath(matchedPoint.image));
                                                                                     setShowZoomModal(true);
                                                                                 }}
@@ -997,7 +997,6 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                                                             <div 
                                                                                 className="relative mt-2 rounded-xl overflow-hidden cursor-pointer hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 max-w-[280px] group shadow-md border border-slate-800 hover:border-orange-500/50"
                                                                                 onClick={() => {
-                                                                                    console.log('Oráculo MTC image click:', matchedPoint.image);
                                                                                     setZoomImageUrl(getSafeImagePath(matchedPoint.image));
                                                                                     setShowZoomModal(true);
                                                                                 }}
@@ -1338,7 +1337,6 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                     isVisible={showZoomModal}
                     imageUrl={zoomImageUrl}
                     onClose={() => {
-                        console.log('🚪 Fechando modal oráculo');
                         setShowZoomModal(false);
                         setZoomImageUrl(null);
                     }}
@@ -1355,11 +1353,8 @@ const ImageZoomModal: React.FC<{
 }> = ({ isVisible, imageUrl, onClose }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
 
-    console.log('🔍 ImageZoomModal oráculo render:', { isVisible, imageUrl, imageLoaded });
-
     useEffect(() => {
         if (isVisible) {
-            console.log('✅ Modal oráculo visível, resetando imageLoaded');
             setImageLoaded(false);
         }
     }, [isVisible, imageUrl]);
@@ -1409,7 +1404,6 @@ const ImageZoomModal: React.FC<{
                         }`}
                     onClick={onClose}
                     onLoad={() => {
-                        console.log('Imagem oráculo carregada com sucesso!');
                         setImageLoaded(true);
                     }}
                     onError={(e) => {

@@ -165,7 +165,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
         try {
             // Call AI Endpoint
-            const response = await fetch('/.netlify/functions/ai-chat', {
+            const { getBaseApiUrl } = await import('../lib/api');
+            const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/ai-chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -208,7 +209,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
         try {
             const history = messages.map(m => ({ role: m.role, content: m.content }));
-            const response = await fetch('/.netlify/functions/ai-chat', {
+            const { getBaseApiUrl } = await import('../lib/api');
+            const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/ai-chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

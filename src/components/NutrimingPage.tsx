@@ -185,7 +185,8 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
         setInteractionReport(null);
         setShowReportDetails(false);
         try {
-            const res = await fetch('/.netlify/functions/interaction-checker', {
+            const { getBaseApiUrl } = await import('../lib/api');
+            const res = await fetch(`${getBaseApiUrl()}/.netlify/functions/interaction-checker`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ medications, supplements: supplements.map(s => s.name) })

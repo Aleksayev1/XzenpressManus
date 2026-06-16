@@ -1,3 +1,5 @@
+import { getBaseApiUrl } from '../lib/api';
+
 export interface CreditCardData {
   number: string;
   name: string;
@@ -144,7 +146,7 @@ export class StripeProvider implements CreditCardProvider {
       console.log('📡 Enviando para backend processar pagamento REAL...');
 
       // Chamar Netlify Function para processar o charge
-      const response = await fetch('/.netlify/functions/process-payment', {
+      const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/process-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { getBaseApiUrl } from '../lib/api';
 
 export interface RefundRequest {
     subscriptionId: string;
@@ -38,7 +39,7 @@ export async function requestRefund(
         }
 
         // Call Netlify Function to process refund
-        const response = await fetch('/.netlify/functions/process-refund', {
+        const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/process-refund`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

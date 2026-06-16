@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { getBaseApiUrl } from '../lib/api';
 
 /**
  * GDPR Data Service
@@ -35,7 +36,7 @@ export async function exportUserData(): Promise<DataExportResult> {
         }
 
         // Call Netlify Function to export data
-        const response = await fetch('/.netlify/functions/export-user-data', {
+        const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/export-user-data`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -108,7 +109,7 @@ export async function deleteUserData(
         }
 
         // Call Netlify Function to delete data
-        const response = await fetch('/.netlify/functions/delete-user-data', {
+        const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/delete-user-data`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -351,7 +351,8 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
         content: msg.content
       }));
 
-      const response = await fetch('/.netlify/functions/ai-chat', {
+      const { getBaseApiUrl } = await import('../lib/api');
+      const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/ai-chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -588,11 +589,8 @@ const ImageZoomModal: React.FC<{
 }> = ({ isVisible, imageUrl, onClose }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  console.log('🔍 ImageZoomModal AI render:', { isVisible, imageUrl, imageLoaded });
-
   useEffect(() => {
     if (isVisible) {
-      console.log('✅ Modal AI está visível, resetando imageLoaded');
       setImageLoaded(false);
     }
   }, [isVisible, imageUrl]);
@@ -642,7 +640,6 @@ const ImageZoomModal: React.FC<{
             }`}
           onClick={onClose}
           onLoad={() => {
-            console.log('Imagem AI carregada com sucesso!');
             setImageLoaded(true);
           }}
           onError={(e) => {

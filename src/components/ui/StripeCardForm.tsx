@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Lock, AlertCircle, CheckCircle } from 'lucide-react';
+import { getBaseApiUrl } from '../../lib/api';
 
 interface StripeCardFormProps {
     amount: number;
@@ -85,7 +86,7 @@ export const StripeCardForm: React.FC<StripeCardFormProps> = ({
 
             // 3. Enviar para backend processar
             console.log('📡 Enviando para backend...', { amount, currency, userId });
-            const response = await fetch('/.netlify/functions/process-payment', {
+            const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/process-payment`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

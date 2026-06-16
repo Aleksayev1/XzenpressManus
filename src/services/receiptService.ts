@@ -3,6 +3,8 @@
  * Handles receipt generation and download
  */
 
+import { getBaseApiUrl } from '../lib/api';
+
 export interface ReceiptData {
     subscriptionId: string;
 }
@@ -13,7 +15,7 @@ export interface ReceiptData {
 export async function downloadReceipt(subscriptionId: string): Promise<void> {
     try {
         // Open receipt in new window for printing/saving as PDF
-        const receiptURL = `/.netlify/functions/generate-receipt?subscriptionId=${subscriptionId}`;
+        const receiptURL = `${getBaseApiUrl()}/.netlify/functions/generate-receipt?subscriptionId=${subscriptionId}`;
 
         const receiptWindow = window.open(receiptURL, '_blank');
 
@@ -39,7 +41,7 @@ export async function downloadReceipt(subscriptionId: string): Promise<void> {
 export async function getReceiptHTML(subscriptionId: string): Promise<string> {
     try {
         const response = await fetch(
-            `/.netlify/functions/generate-receipt?subscriptionId=${subscriptionId}`
+            `${getBaseApiUrl()}/.netlify/functions/generate-receipt?subscriptionId=${subscriptionId}`
         );
 
         if (!response.ok) {

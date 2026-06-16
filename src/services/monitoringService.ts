@@ -3,6 +3,8 @@
  * Centralized error tracking and monitoring
  */
 
+import { getBaseApiUrl } from '../lib/api';
+
 interface ErrorLog {
     timestamp: string;
     level: 'error' | 'warning' | 'info';
@@ -149,7 +151,7 @@ class MonitoringService {
      */
     private async sendToServer(errorLog: ErrorLog) {
         try {
-            await fetch('/.netlify/functions/log-error', {
+            await fetch(`${getBaseApiUrl()}/.netlify/functions/log-error`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

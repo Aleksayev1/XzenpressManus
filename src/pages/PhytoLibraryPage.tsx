@@ -314,6 +314,10 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
             const matched = acupressurePoints.find(p => p.id === 'lv3-taichong');
             if (matched) return matched;
         }
+        if (cleanStr.includes('vb41') || cleanStr.includes('gb41') || cleanStr.includes('vb-41') || cleanStr.includes('gb-41') || cleanStr.includes('zulinqi') || cleanStr.includes('zu lin qi')) {
+            const matched = acupressurePoints.find(p => p.id === 'gb41-zulinqi' || p.id === 'zoster-zulinqi-gb41');
+            if (matched) return matched;
+        }
 
         // 4. CORRESPONDÊNCIA POR ID EXATO OU EQUIVALÊNCIAS
         for (const point of acupressurePoints) {
@@ -328,7 +332,8 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                 .replace('sp', 'bp')
                 .replace('gv', 'vg')
                 .replace('cv', 'vc')
-                .replace('si', 'id');
+                .replace('si', 'id')
+                .replace('gb', 'vb');
             
             if (cleanStr.includes(pidMtc)) return point;
         }

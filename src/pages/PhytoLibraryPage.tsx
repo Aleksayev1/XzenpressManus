@@ -240,8 +240,14 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
             if (matched) return matched;
         }
 
+        // Ponto Ypsilon do Coração (Y-4 / Ypsilon 4 / Heart / Coração)
+        if ((cleanStr.includes('y-4') || cleanStr.includes('y4') || cleanStr.includes('ypsilon')) && (cleanStr.includes('coração') || cleanStr.includes('coracao'))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-cardio-heart');
+            if (matched) return matched;
+        }
+
         // Ponto Ypsilon do Estômago (Y-4 / Ypsilon 4 / Stomach)
-        if (cleanStr.includes('y-4') || cleanStr.includes('y4') || (cleanStr.includes('ypsilon') && (cleanStr.includes('estômago') || cleanStr.includes('estomago')))) {
+        if ((cleanStr.includes('y-4') || cleanStr.includes('y4') || cleanStr.includes('ypsilon')) && (cleanStr.includes('estômago') || cleanStr.includes('estomago'))) {
             const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-stomach');
             if (matched) return matched;
         }
@@ -249,6 +255,18 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
         // Ponto Ypsilon do Intestino Delgado (Y-5 / Ypsilon 5 / Small Intestine / SI)
         if (cleanStr.includes('y-5') || cleanStr.includes('y5') || (cleanStr.includes('ypsilon') && (cleanStr.includes('delgado') || cleanStr.includes('intestino delgado')))) {
             const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-si');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon do Fígado (Liver / Fígado)
+        if (cleanStr.includes('ypsilon') && (cleanStr.includes('fígado') || cleanStr.includes('figado') || cleanStr.includes('liver'))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-liver');
+            if (matched) return matched;
+        }
+
+        // Ponto Ypsilon da Vesícula Biliar (Gallbladder / Vesícula Biliar)
+        if (cleanStr.includes('ypsilon') && (cleanStr.includes('vesícula') || cleanStr.includes('vesicula') || cleanStr.includes('biliar') || cleanStr.includes('gallbladder'))) {
+            const matched = acupressurePoints.find(p => p.id === 'ynsa-gb');
             if (matched) return matched;
         }
 

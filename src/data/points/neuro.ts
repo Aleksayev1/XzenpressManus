@@ -12,7 +12,7 @@ export const neuroPoints: AcupressurePoint[] = [
     descriptionEs: 'Punto de EMERGENCIA para pérdida de conciencia, desmayos y epilepsia. Esencial en recuperación post-ACV para restaurar conciencia y claridad mental. Ubicado en el surco debajo de la nariz, en el tercio superior.',
     descriptionFr: 'Point d\'URGENCE pour perte de conscience, évanouissements et épilepsie. Essentiel dans la récupération post-AVC pour restaurer la conscience et la clarté mentale. Situé dans le sillon sous le nez, dans le tiers supérieur.',
     position: { x: 50, y: 45 },
-    image: '/du26-renzhong.jpg',
+    image: '/mtc_du26_renzhong.jpg',
     imageAlt: 'Localização do ponto Renzhong VG26 abaixo do nariz',
     benefits: ['Restaura consciência (Desmaio/Coma)', 'Trata Epilepsia e Convulsões', 'Foco e Clareza Mental', 'Recuperação aguda Pós-AVC'],
     benefitsEn: ['Restores consciousness', 'Treats Epilepsy/Seizures', 'Focus and Mental Clarity', 'Acute Post-Stroke Recovery'],

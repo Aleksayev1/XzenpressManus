@@ -33,6 +33,66 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
   const { recordSession } = useSessionHistory();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Dicionário exato: código IA → id do banco de dados
+  // Garante correspondência perfeita mesmo quando a IA usa abreviações internacionais
+  const POINT_ALIAS_MAP: Record<string, string> = {
+    // === PULMÃO ===
+    'LU7': 'lu7-lieque', 'P7': 'lu7-lieque', 'Lieque': 'lu7-lieque',
+    'LU9': 'taiyuan-lu9', 'P9': 'taiyuan-lu9', 'Taiyuan': 'taiyuan-lu9',
+    // === INTESTINO GROSSO ===
+    'LI4': 'hegu-li4', 'IG4': 'hegu-li4', 'Hegu': 'hegu-li4',
+    'LI11': 'quchi-li11', 'IG11': 'quchi-li11', 'Quchi': 'quchi-li11',
+    // === ESTÔMAGO ===
+    'ST36': 'septicemia-zusanli-st36', 'E36': 'septicemia-zusanli-st36', 'Zusanli': 'septicemia-zusanli-st36',
+    'ST6': 'jiache-st6', 'E6': 'jiache-st6', 'Jiache': 'jiache-st6',
+    'ST7': 'xiaguan-st7', 'E7': 'xiaguan-st7', 'Xiaguan': 'xiaguan-st7',
+    // === CORAÇÃO ===
+    'HT7': 'shenmen-c7', 'C7': 'shenmen-c7', 'Shenmen': 'shenmen-c7',
+    // === PERICÁRDIO ===
+    'PC6': 'neiguan-pc6', 'CS6': 'neiguan-pc6', 'Neiguan': 'neiguan-pc6',
+    'PC8': 'laogong-pc8', 'CS8': 'laogong-pc8', 'Laogong': 'laogong-pc8',
+    // === TRIPLO AQUECEDOR ===
+    'SJ21': 'ermen-sj21', 'TA21': 'ermen-sj21', 'Ermen': 'ermen-sj21',
+    'SJ6': 'sj6-zhigou', 'TA6': 'sj6-zhigou', 'Zhigou': 'sj6-zhigou',
+    // === VESÍCULA BILIAR ===
+    'GB20': 'gb20-fengchi', 'VB20': 'gb20-fengchi', 'Fengchi': 'gb20-fengchi',
+    'GB34': 'vb34-yanglingquan', 'VB34': 'vb34-yanglingquan', 'Yanglingquan': 'vb34-yanglingquan',
+    'GB41': 'gb41-zulinqi', 'VB41': 'gb41-zulinqi', 'Zulinqi': 'gb41-zulinqi',
+    'VB21': 'jiajing-vb21', 'GB21': 'jiajing-vb21', 'Jiajing': 'jiajing-vb21',
+    // === FÍGADO ===
+    'LV3': 'lv2-xingjian', 'LR3': 'lv2-xingjian', 'F3': 'lv2-xingjian', 'Taichong': 'lv2-xingjian',
+    'LV2': 'lv2-xingjian', 'F2': 'lv2-xingjian', 'Xingjian': 'lv2-xingjian',
+    // === RIM ===
+    'KD1': 'r1-yongquan', 'KI1': 'r1-yongquan', 'R1': 'r1-yongquan', 'Yongquan': 'r1-yongquan',
+    'KD3': 'kd3-taixi', 'KI3': 'kd3-taixi', 'R3': 'kd3-taixi', 'Taixi': 'kd3-taixi',
+    // === BAÇO ===
+    'SP6': 'bp6-sanyinjiao', 'BP6': 'bp6-sanyinjiao', 'Sanyinjiao': 'bp6-sanyinjiao',
+    // === VASO CONCEPÇÃO ===
+    'CV17': 'ren17-danzhong', 'Ren17': 'ren17-danzhong', 'VC17': 'ren17-danzhong', 'Shanzhong': 'ren17-danzhong',
+    'CV4': 'ren4-guanyuan', 'Ren4': 'ren4-guanyuan', 'VC4': 'ren4-guanyuan', 'Guanyuan': 'ren4-guanyuan',
+    'CV6': 'ren6-qihai', 'Ren6': 'ren6-qihai', 'Qihai': 'ren6-qihai',
+    'CV22': 'tiantu-ren22', 'Ren22': 'tiantu-ren22', 'Tiantu': 'tiantu-ren22',
+    // === VASO GOVERNADOR ===
+    'GV20': 'baihui-gv20', 'VG20': 'baihui-gv20', 'Du20': 'baihui-gv20', 'Baihui': 'baihui-gv20',
+    'GV26': 'du26-renzhong', 'Du26': 'du26-renzhong', 'Renzhong': 'du26-renzhong',
+    // === BEXIGA ===
+    'BL13': 'bl13', 'B13': 'bl13', 'Feishu': 'bl13',
+    'BL23': 'bl23', 'B23': 'bl23', 'Shenshu': 'bl23',
+    'BL40': 'b40-weizhong', 'B40': 'b40-weizhong', 'Weizhong': 'b40-weizhong',
+    // === PONTOS EXTRA ===
+    'EX-HN3': 'exhn3-yintang', 'Yintang': 'exhn3-yintang',
+    'Taiyang': 'taiyang-exhn5',
+    'An Mian': 'anmian-sono', 'AnMian': 'anmian-sono',
+    // === YNSA BÁSICOS ===
+    'Ponto A': 'ynsa-ponto-a', 'YNSA A': 'ynsa-ponto-a',
+    'Ponto B': 'ynsa-ponto-b', 'YNSA B': 'ynsa-ponto-b',
+    'Ponto D': 'ynsa-ponto-d', 'YNSA D': 'ynsa-ponto-d',
+    'Ponto E': 'ynsa-ponto-e', 'YNSA E': 'ynsa-ponto-e',
+    'Ponto ZS': 'ynsa-zs-point', 'ZS': 'ynsa-zs-point',
+    // === HUATUOJIAJI ===
+    'Huatuojiaji T4': 'huatuo-t4', 'Huatuo T4': 'huatuo-t4',
+  };
+
   // Função para encontrar imagem do ponto com suporte a múltiplas variações
   const findPointImage = (pointName: string) => {
     // Validação de segurança: retorna null se pointName for inválido
@@ -44,9 +104,20 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
       return '/YNSA/ynsa-ypsilon-chart-hd.png';
     }
 
+    // === LOOKUP PRIMÁRIO: dicionário exato de aliases ===
+    const trimmed = pointName.trim();
+    const aliasKey = Object.keys(POINT_ALIAS_MAP).find(
+      k => k.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (aliasKey) {
+      const targetId = POINT_ALIAS_MAP[aliasKey];
+      const aliasPoint = acupressurePoints.find((p: any) => p && p.id === targetId);
+      if (aliasPoint) return aliasPoint.image;
+    }
+
     const normalized = pointName.toLowerCase().trim().replace(/[\s-]/g, '');
 
-    // Primeiro: busca exata por nome/ID/nameEn
+    // Segundo: busca exata por nome/ID/nameEn
     let point = acupressurePoints.find((p: any) => {
       // Validação: ignora pontos sem propriedades necessárias
       if (!p || !p.name || !p.id) return false;
@@ -59,7 +130,7 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
 
     if (point) return point.image;
 
-    // Segundo: busca por padrões especiais (YNSA, abreviações, códigos internacionais)
+    // Terceiro: busca por padrões especiais (YNSA, abreviações, códigos internacionais)
     const upperName = pointName.toUpperCase().trim();
 
     // Padrão YNSA A, B, C, D, E, F, ZS
@@ -150,6 +221,7 @@ export const AIRecommendationsPanel: React.FC<AIRecommendationsPanelProps> = ({
 
     return point?.image || null;
   };
+
 
   const renderMessageContent = (content: string) => {
     // Validação de segurança: retorna vazio se content for inválido

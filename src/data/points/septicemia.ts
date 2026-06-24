@@ -36,7 +36,7 @@ export const septicemiaPoints: AcupressurePoint[] = [
     descriptionEs: 'Punto para fortalecer inmunidad, combatir infecciones, reducir inflamación sistémica y acelerar recuperación. Ubicado entre pulgar e índice, en parte carnosa de la mano. Presionar firmemente por 2-3 minutos.',
     descriptionFr: 'Point pour renforcer immunité, combattre infections, réduire inflammation systémique et accélérer récupération. Situé entre pouce et index, dans partie charnue de la main. Presser fermement pendant 2-3 minutes.',
     position: { x: 30, y: 65 },
-    image: '/li4_hegu_new.jpg',
+    image: '/mtc_ig4_hegu.jpg',
     imageAlt: 'Localização do ponto Hegu LI4 entre polegar e indicador',
     benefits: ['Fortalece imunidade', 'Combate infecções', 'Reduz inflamação sistêmica', 'Acelera recuperação'],
     benefitsEn: ['Strengthens immunity', 'Fights infections', 'Reduces systemic inflammation', 'Accelerates recovery'],
@@ -417,7 +417,7 @@ export const septicemiaPoints: AcupressurePoint[] = [
     description: 'Ponto de aterramento, na sola do pé. Puxa o Excesso de Yang (Fogo) da cabeça para baixo.',
     descriptionEn: 'Grounding point on the sole of the foot. Pulls Excess Yang (Fire) down from the head.',
     position: { x: 50, y: 90 }, // Pé
-    image: '/R1 Acalma a mente, Vertigem, Tontura Agitação.jpg',
+    image: '/mtc_r1_yongquan.jpg',
     benefits: ['Aterra a energia (Gooding)', 'Acalma a mente agitada', 'Reduz calor na parte superior', 'Induz o sono reparador'],
     benefitsEn: ['Grounds energy', 'Calms agitated mind', 'Reduces heat in the upper body', 'Induces restorative sleep'],
     isPremium: true,
@@ -433,7 +433,7 @@ export const septicemiaPoints: AcupressurePoint[] = [
     description: 'Ponto distal essencial para dor nas costelas e lateral do corpo.',
     descriptionEn: 'Essential distal point for rib and lateral body pain.',
     position: { x: 80, y: 40 }, // Braço
-    image: '/sj6-zhigou.jpg',
+    image: '/mtc_ta6_zhigou.jpg',
     benefits: ['Abre o fluxo lateral (Shao Yang)', 'Alivia neuralgia intercostal', 'Move Qi estagnado'],
     benefitsEn: ['Opens lateral flow (Shao Yang)', 'Relieves intercostal neuralgia', 'Moves stagnant Qi'],
     isPremium: true,

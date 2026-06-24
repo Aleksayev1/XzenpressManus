@@ -291,69 +291,46 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   };
 
   const handleConnectWidgetDevice = async (deviceType: string) => {
+    if (deviceType === 'apple') {
+      setIsConnectingWidget(true);
+      // Apple HealthKit uses the local QR code representation in the browser
+      setTimeout(() => {
+        setIsConnectingWidget(false);
+      }, 1000);
+      return;
+    }
+
     setIsConnectingWidget(true);
-    
-    // Simulate OAuth redirect or QR Code scan time
-    setTimeout(async () => {
-      try {
-        const defaultMetrics: Record<string, { vfc: number, rhr: number, deepSleepMinutes: number, remSleepMinutes: number, name: string }> = {
-          apple: { vfc: 54, rhr: 60, deepSleepMinutes: 95, remSleepMinutes: 90, name: 'Apple Watch Series 9' },
-          oura: { vfc: 62, rhr: 52, deepSleepMinutes: 125, remSleepMinutes: 115, name: 'Oura Ring Gen 3' },
-          garmin: { vfc: 68, rhr: 48, deepSleepMinutes: 150, remSleepMinutes: 130, name: 'Garmin Fenix 7' },
-          google: { vfc: 50, rhr: 65, deepSleepMinutes: 75, remSleepMinutes: 80, name: 'Fitbit Charge 6' }
-        };
+    try {
+      const response = await fetch('/.netlify/functions/vital-auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: user?.id,
+          redirectUrl: window.location.origin + window.location.pathname + '?wearable=connected'
+        })
+      });
 
-        const metrics = defaultMetrics[deviceType] || defaultMetrics.oura;
-
-        if (user?.id && supabase) {
-          // Save to Supabase telemetry status
-          await supabase
-            .from('xzen_user_telemetry_status')
-            .upsert({
-              user_id: user.id,
-              sync_status: 'active',
-              last_sync_at: new Date().toISOString(),
-              active_device_id: metrics.name,
-              provider: 'vital'
-            });
-
-          const h = Math.floor(metrics.deepSleepMinutes / 60);
-          const m = metrics.deepSleepMinutes % 60;
-          const formattedSleep = `${h}h ${m}m`;
-
-          // Save telemetry data
-          await supabase
-            .from('xzen_user_telemetry')
-            .insert({
-              user_id: user.id,
-              wearable_vfc: metrics.vfc,
-              wearable_rhr: metrics.rhr,
-              wearable_sleep: formattedSleep,
-              wearable_deep_sleep_minutes: metrics.deepSleepMinutes,
-              wearable_rem_sleep_minutes: metrics.remSleepMinutes,
-              active_device_id: metrics.name,
-              provider: 'vital'
-            });
-          
-          // Sync values locally
-          setVfcValue(metrics.vfc);
-          setRhrValue(metrics.rhr);
-          setDeepSleepMinutes(metrics.deepSleepMinutes);
-          setRemSleepMinutes(metrics.remSleepMinutes);
-          setIsSimulating(false);
-
-          setApiSyncStatus('active');
-          setApiProvider('vital');
-          setApiDeviceName(metrics.name);
-        }
-
-        setIsConnectingWidget(false);
-        setShowVitalWidget(false);
-      } catch (err) {
-        console.error(err);
-        setIsConnectingWidget(false);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erro na API (${response.status}): ${errorText}`);
       }
-    }, 2500);
+
+      const data = await response.json();
+      if (data.widgetUrl) {
+        // Redirect to Junction/Vital OAuth Widget
+        window.location.href = data.widgetUrl;
+      } else {
+        throw new Error('Não foi possível obter o link de pareamento do wearable.');
+      }
+    } catch (err: any) {
+      console.error('Erro ao conectar wearable:', err);
+      alert(`Falha ao iniciar pareamento: ${err.message || err}`);
+    } finally {
+      setIsConnectingWidget(false);
+    }
   };
 
   const handleConnect = (id: string) => {

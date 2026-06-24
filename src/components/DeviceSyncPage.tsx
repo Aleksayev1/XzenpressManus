@@ -99,6 +99,8 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   const [showVitalWidget, setShowVitalWidget] = useState(false);
   const [selectedWidgetDevice, setSelectedWidgetDevice] = useState<string>('');
   const [isConnectingWidget, setIsConnectingWidget] = useState(false);
+  const [freeSyncUsed, setFreeSyncUsed] = useState<boolean>(false);
+  const [loadingPremiumCheck, setLoadingPremiumCheck] = useState<boolean>(true);
 
   // For visual graph animation
   const [graphData, setGraphData] = useState<number[]>(Array.from({ length: 20 }, () => 50 + Math.random() * 20));
@@ -231,7 +233,44 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
     fetchApiSyncStatus();
   }, [user?.id]);
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      alert('⚠️ Acesso Restrito\n\nPor favor, faça login para conectar e sincronizar seus wearables.');
+      onPageChange('login');
+    }
+  }, [user, onPageChange]);
+
+  // Verify if free user has already used their single trial sync
+  useEffect(() => {
+    const checkFreeSyncUsage = async () => {
+      if (!user?.id || user.isPremium || !supabase) {
+        setLoadingPremiumCheck(false);
+        return;
+      }
+      try {
+        const { count, error } = await supabase
+          .from('xzen_user_telemetry')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id);
+        
+        if (!error && count !== null && count >= 1) {
+          setFreeSyncUsed(true);
+        }
+      } catch (err) {
+        console.error('Erro ao verificar limite gratuito:', err);
+      } finally {
+        setLoadingPremiumCheck(false);
+      }
+    };
+    checkFreeSyncUsage();
+  }, [user?.id, user?.isPremium]);
+
   const handleSync = async () => {
+    if (!user?.isPremium && freeSyncUsed) {
+      alert('Seu limite de teste gratuito de sincronização foi atingido. Assine o plano Premium.');
+      return;
+    }
     if (syncStatus === 'syncing') return;
     setSyncStatus('syncing');
     
@@ -291,6 +330,10 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   };
 
   const handleConnectWidgetDevice = async (deviceType: string) => {
+    if (!user?.isPremium && freeSyncUsed) {
+      alert('Seu limite de teste gratuito de sincronização foi atingido. Assine o plano Premium.');
+      return;
+    }
     if (deviceType === 'apple') {
       setIsConnectingWidget(true);
       // Apple HealthKit uses the local QR code representation in the browser
@@ -558,6 +601,72 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
       </div>
     );
   };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-cyan-400" />
+          <p>Redirecionando para o login...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadingPremiumCheck) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-cyan-400" />
+          <p>Verificando credenciais...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user.isPremium && freeSyncUsed) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Premium background ambient light effects */}
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-900/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-purple-900/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div className="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl text-center relative z-10">
+          <div className="flex justify-center mb-6">
+            <div className="p-4 bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-full shadow-lg shadow-cyan-500/20">
+              <Activity className="w-16 h-16 text-slate-950" />
+            </div>
+          </div>
+          <h1 className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-indigo-400 tracking-tight mb-4">
+            Sincronização de Wearables
+          </h1>
+          <p className="text-slate-300 text-sm leading-relaxed mb-6">
+            Você já utilizou o seu **teste de sincronização gratuito**.
+          </p>
+          <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 text-left text-xs text-slate-400 space-y-3 mb-8">
+            <p className="font-semibold text-slate-200">💎 O que o Plano Premium libera:</p>
+            <p>• Conexão automatizada 24/7 com Garmin, Oura, Fitbit, Apple Watch, Polar e Whoop.</p>
+            <p>• Leitura contínua de VFC/HRV para prevenção de estresse simpático (luta ou fuga).</p>
+            <p>• Recomendação proativa de pontos de acupressão em tempo real baseada no seu pulso digital.</p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => onPageChange('pricing')}
+              className="w-full py-4 bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-slate-950 font-extrabold text-sm rounded-xl transition-all shadow-lg shadow-cyan-950/20"
+            >
+              Assinar Plano Premium
+            </button>
+            <button
+              onClick={() => onPageChange('home')}
+              className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl transition-all"
+            >
+              Voltar ao Início
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans pb-20 pt-20 px-4 relative overflow-hidden">

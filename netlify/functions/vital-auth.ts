@@ -62,18 +62,21 @@ export const handler: Handler = async (event: HandlerEvent) => {
 
             // 1. Registrar o usuário no Junction (idempotente — não cria duplicatas)
             const createUserRes = await fetch(
-                `${JUNCTION_BASE_URL}/v2/user/${encodeURIComponent(userId)}`,
+                `${JUNCTION_BASE_URL}/v2/user`,
                 {
                     method: 'POST',
                     headers: {
                         'x-vital-api-key': JUNCTION_API_KEY,
                         'Content-Type': 'application/json',
                     },
+                    body: JSON.stringify({
+                        client_user_id: userId
+                    })
                 }
             );
 
-            // 201 = criado, 409 = já existe — ambos são OK
-            if (!createUserRes.ok && createUserRes.status !== 409) {
+            // 201 = criado, 400 (se já existe client_user_id), 409 = já existe — ambos são OK
+            if (!createUserRes.ok && createUserRes.status !== 409 && createUserRes.status !== 400) {
                 const err = await createUserRes.text();
                 console.error('❌ Erro ao criar usuário no Junction:', err);
                 return {

@@ -20,13 +20,11 @@ const JUNCTION_BASE_URL = IS_PRODUCTION
     ? 'https://api.tryvital.io'          // produção
     : 'https://api.sandbox.tryvital.io'; // sandbox (padrão)
 
-// Widget URL também precisa ser do mesmo ambiente que a API!
-// Token de sandbox NÃO funciona no widget de produção (causa 401)
-const JUNCTION_LINK_BASE = IS_PRODUCTION
-    ? 'https://link.tryvital.io'         // widget produção
-    : 'https://link.sandbox.tryvital.io'; // widget sandbox
-
 const JUNCTION_REGION = process.env.JUNCTION_REGION || 'us'; // 'us' ou 'eu'
+
+const JUNCTION_LINK_BASE = IS_PRODUCTION
+    ? `https://link.${JUNCTION_REGION}.tryvital.io`         // widget produção
+    : `https://link.sandbox.${JUNCTION_REGION}.tryvital.io`; // widget sandbox
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',

@@ -75,31 +75,34 @@ export const handler: Handler = async (event: HandlerEvent) => {
                 }
             );
 
-            // 201 = criado, 409 = já existe — ambos são OK. 400 pode ser duplicata também.
-            if (!createUserRes.ok && createUserRes.status !== 409 && createUserRes.status !== 400) {
-                const err = await createUserRes.text();
-                console.error('❌ Erro ao criar usuário no Junction:', err);
+            // Lê o body UMA única vez para evitar "body already read" errors
+            const createUserStatus = createUserRes.status;
+            let createUserData: any = null;
+            try {
+                createUserData = await createUserRes.json();
+            } catch (_) { /* body pode não ser JSON em alguns erros */ }
+
+            // Erro real: não é 200/201 (criado) nem 409/400 (já existe)
+            if (!createUserRes.ok && createUserStatus !== 409 && createUserStatus !== 400) {
+                const errDetails = createUserData ? JSON.stringify(createUserData) : `HTTP ${createUserStatus}`;
+                console.error('❌ Erro ao criar usuário no Junction:', errDetails);
                 return {
                     statusCode: 502,
                     headers: corsHeaders,
-                    body: JSON.stringify({ error: 'Erro ao registrar usuário no Junction', details: err }),
+                    body: JSON.stringify({ error: 'Erro ao registrar usuário no Junction', details: errDetails }),
                 };
             }
 
             // Extrair o junction_user_id da resposta (necessário para gerar o link token)
-            let junctionUserId: string = userId; // fallback para client_user_id
-            if (createUserRes.ok) {
-                try {
-                    const createUserData = await createUserRes.json();
-                    // Junction retorna { user_id: "...", client_user_id: "..." }
-                    if (createUserData.user_id) {
-                        junctionUserId = createUserData.user_id;
-                        console.log(`✅ Junction user_id obtido: ${junctionUserId}`);
-                    }
-                } catch (_) { /* ignora erro de parse */ }
+            let junctionUserId: string = '';
+
+            if (createUserRes.ok && createUserData?.user_id) {
+                // Novo usuário criado com sucesso — usa o user_id retornado
+                junctionUserId = createUserData.user_id;
+                console.log(`✅ Junction user_id criado: ${junctionUserId}`);
             } else {
-                // Usuário já existe (409/400) — buscar pelo client_user_id
-                console.log(`⚠️ Usuário já existe no Junction, buscando pelo client_user_id...`);
+                // Usuário já existe (409/400) — resolve o user_id interno pelo client_user_id
+                console.log(`⚠️ Usuário já existe (${createUserStatus}), resolvendo Junction user_id...`);
                 const getUserRes = await fetch(
                     `${JUNCTION_BASE_URL}/v2/user/resolve/${encodeURIComponent(userId)}`,
                     {
@@ -112,7 +115,24 @@ export const handler: Handler = async (event: HandlerEvent) => {
                         junctionUserId = userData.user_id;
                         console.log(`✅ Junction user_id resolvido: ${junctionUserId}`);
                     }
+                } else {
+                    const resolveErr = await getUserRes.text();
+                    console.error('❌ Falha ao resolver Junction user_id:', resolveErr);
+                    return {
+                        statusCode: 502,
+                        headers: corsHeaders,
+                        body: JSON.stringify({ error: 'Não foi possível resolver o usuário no Junction', details: resolveErr }),
+                    };
                 }
+            }
+
+            // Segurança: garantir que temos um Junction user_id válido
+            if (!junctionUserId) {
+                return {
+                    statusCode: 500,
+                    headers: corsHeaders,
+                    body: JSON.stringify({ error: 'Junction user_id não pôde ser determinado' }),
+                };
             }
 
             // 2. Gerar o link de conexão OAuth usando o Junction user_id interno

@@ -75,7 +75,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
                 }
             );
 
-            // 201 = criado, 400 (se já existe client_user_id), 409 = já existe — ambos são OK
+            // 201 = criado, 409 = já existe — ambos são OK. 400 pode ser duplicata também.
             if (!createUserRes.ok && createUserRes.status !== 409 && createUserRes.status !== 400) {
                 const err = await createUserRes.text();
                 console.error('❌ Erro ao criar usuário no Junction:', err);
@@ -86,7 +86,36 @@ export const handler: Handler = async (event: HandlerEvent) => {
                 };
             }
 
-            // 2. Gerar o link de conexão OAuth
+            // Extrair o junction_user_id da resposta (necessário para gerar o link token)
+            let junctionUserId: string = userId; // fallback para client_user_id
+            if (createUserRes.ok) {
+                try {
+                    const createUserData = await createUserRes.json();
+                    // Junction retorna { user_id: "...", client_user_id: "..." }
+                    if (createUserData.user_id) {
+                        junctionUserId = createUserData.user_id;
+                        console.log(`✅ Junction user_id obtido: ${junctionUserId}`);
+                    }
+                } catch (_) { /* ignora erro de parse */ }
+            } else {
+                // Usuário já existe (409/400) — buscar pelo client_user_id
+                console.log(`⚠️ Usuário já existe no Junction, buscando pelo client_user_id...`);
+                const getUserRes = await fetch(
+                    `${JUNCTION_BASE_URL}/v2/user/resolve/${encodeURIComponent(userId)}`,
+                    {
+                        headers: { 'x-vital-api-key': JUNCTION_API_KEY },
+                    }
+                );
+                if (getUserRes.ok) {
+                    const userData = await getUserRes.json();
+                    if (userData.user_id) {
+                        junctionUserId = userData.user_id;
+                        console.log(`✅ Junction user_id resolvido: ${junctionUserId}`);
+                    }
+                }
+            }
+
+            // 2. Gerar o link de conexão OAuth usando o Junction user_id interno
             const linkRes = await fetch(
                 `${JUNCTION_BASE_URL}/v2/link/token`,
                 {
@@ -96,7 +125,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        user_id: userId,
+                        user_id: junctionUserId,
                         // URL de retorno após o usuário conectar o wearable
                         redirect_url: redirectUrl || 'https://xzenpress.com/dashboard?wearable=connected',
                         // Filtra apenas providers relevantes para saúde/HRV

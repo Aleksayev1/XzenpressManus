@@ -15,9 +15,16 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Chave da API Junction — adicionar no Netlify > Environment Variables
 // Nome: JUNCTION_API_KEY   Valor: sk_sandbox_... (pegar em app.junction.com)
 const JUNCTION_API_KEY  = process.env.JUNCTION_API_KEY || '';
-const JUNCTION_BASE_URL = process.env.JUNCTION_ENV === 'production'
-    ? 'https://api.tryvital.io'    // produção
+const IS_PRODUCTION = process.env.JUNCTION_ENV === 'production';
+const JUNCTION_BASE_URL = IS_PRODUCTION
+    ? 'https://api.tryvital.io'          // produção
     : 'https://api.sandbox.tryvital.io'; // sandbox (padrão)
+
+// Widget URL também precisa ser do mesmo ambiente que a API!
+// Token de sandbox NÃO funciona no widget de produção (causa 401)
+const JUNCTION_LINK_BASE = IS_PRODUCTION
+    ? 'https://link.tryvital.io'         // widget produção
+    : 'https://link.sandbox.tryvital.io'; // widget sandbox
 
 const JUNCTION_REGION = process.env.JUNCTION_REGION || 'us'; // 'us' ou 'eu'
 
@@ -175,7 +182,10 @@ export const handler: Handler = async (event: HandlerEvent) => {
             const { link_token, expires_at } = await linkRes.json();
 
             // 3. Construir a URL completa do widget
-            const widgetUrl = `https://link.tryvital.io/?token=${link_token}&region=${JUNCTION_REGION}`;
+            // CRÍTICO: usar o mesmo ambiente da API (sandbox ou produção)
+            // Token de sandbox falha com 401 se usado no widget de produção
+            const widgetUrl = `${JUNCTION_LINK_BASE}/?token=${link_token}&region=${JUNCTION_REGION}`;
+            console.log(`🌐 Widget URL (${IS_PRODUCTION ? 'PROD' : 'SANDBOX'}): ${widgetUrl}`);
 
             // 4. Atualizar status no Supabase como "pending"
             await supabase

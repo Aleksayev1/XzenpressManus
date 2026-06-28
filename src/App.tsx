@@ -298,7 +298,7 @@ function AppContent() {
       case 'device-sync':
         return <DeviceSyncPage onPageChange={setCurrentPage} />;
       default:
-        return <LandingPage onStart={() => setCurrentPage('login')} />;
+        return <LandingPage onStart={() => setCurrentPage('login')} onStartGuest={() => setCurrentPage('anamnese')} />;
     }
   };
 

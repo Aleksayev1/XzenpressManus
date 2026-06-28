@@ -1,11 +1,12 @@
 import React, { useRef } from 'react';
-import { Play, CheckCircle2, Star, ChevronRight, Info } from 'lucide-react';
+import { Play, CheckCircle2, Star, ChevronRight, Dna } from 'lucide-react';
 
 interface LandingPageProps {
   onStart: () => void;
+  onStartGuest?: () => void;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onStart, onStartGuest }) => {
   const scrollRef1 = useRef<HTMLDivElement>(null);
 
   return (
@@ -27,18 +28,38 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             Autocuidado guiado com Inteligência Artificial, acupressão e terapias profundas — direto do seu celular.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center py-4 animate-fadeIn">
+          <div className="flex flex-col items-center gap-4 py-4 animate-fadeIn">
+            {/* PRIMARY CTA — Login/Cadastro */}
             <button
               onClick={onStart}
-              className="px-12 py-5 btn-starry-primary rounded-xl font-bold text-2xl"
+              className="px-12 py-5 btn-starry-primary rounded-xl font-bold text-xl w-full sm:w-auto"
             >
               Começar grátis
             </button>
-            <button 
-              onClick={onStart}
-              className="px-10 py-5 btn-starry-secondary text-white rounded-xl font-bold text-xl flex items-center gap-3"
+
+            {/* SECONDARY CTA — Anamnese sem login */}
+            <button
+              onClick={onStartGuest}
+              className="group relative px-10 py-4 rounded-xl font-semibold text-base w-full sm:w-auto flex items-center justify-center gap-3 transition-all duration-300 hover:scale-[1.02]"
+              style={{
+                background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15))',
+                border: '1.5px solid rgba(168,85,247,0.4)',
+                color: '#c4b5fd',
+                boxShadow: '0 0 30px rgba(168,85,247,0.1)'
+              }}
             >
-              <Play className="w-6 h-6 fill-current" />
+              <Dna className="w-5 h-5 flex-shrink-0 group-hover:animate-pulse" style={{ color: '#a78bfa' }} />
+              <span>Salve a representação do seu Avatar de Energia<br className="hidden sm:block" />
+                <span className="text-purple-300 font-bold"> para acompanhamento futuro</span>
+              </span>
+            </button>
+
+            {/* Ghost — Ver como funciona */}
+            <button
+              onClick={onStart}
+              className="px-8 py-3 text-gray-500 text-sm hover:text-gray-300 transition-colors flex items-center gap-2"
+            >
+              <Play className="w-4 h-4 fill-current" />
               Ver como funciona
             </button>
           </div>

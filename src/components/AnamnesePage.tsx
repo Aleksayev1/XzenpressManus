@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Sparkles, Lock, UserPlus } from 'lucide-react';
 import {
   AnamneseProfile,
   FaixaEtaria,
@@ -22,6 +22,8 @@ import { fiveElements } from '../data/fiveElements';
 
 interface AnamnesePageProps {
   onComplete: (profile: AnamneseProfile) => void;
+  onRegister?: () => void;
+  isGuest?: boolean;
 }
 
 const TOTAL_STEPS = 7;
@@ -88,7 +90,12 @@ function SelectCard({
 }
 
 // ---- REVEALING SCREEN ----
-function RevealScreen({ profile, onDone }: { profile: AnamneseProfile; onDone: () => void }) {
+function RevealScreen({ profile, onDone, onRegister, isGuest }: {
+  profile: AnamneseProfile;
+  onDone: () => void;
+  onRegister?: () => void;
+  isGuest?: boolean;
+}) {
   const guardianFraco = Object.entries(profile.guardianScores).reduce(
     (min, [k, v]) => (v < min[1] ? [k, v] : min),
     ['', 100]
@@ -96,6 +103,7 @@ function RevealScreen({ profile, onDone }: { profile: AnamneseProfile; onDone: (
   const el = fiveElements.find(e => e.id === guardianFraco[0])!;
   const [phase, setPhase] = useState<'loading' | 'reveal'>('loading');
   const [showPopup, setShowPopup] = useState(true);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [animate, setAnimate] = useState(false);
 
   React.useEffect(() => {
@@ -247,7 +255,10 @@ function RevealScreen({ profile, onDone }: { profile: AnamneseProfile; onDone: (
 
             {/* Close CTA */}
             <button
-              onClick={() => setShowPopup(false)}
+              onClick={() => {
+                setShowPopup(false);
+                if (isGuest) setShowRegisterModal(true);
+              }}
               className="w-full py-3.5 rounded-2xl font-extrabold text-white text-sm flex items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98]"
               style={{
                 background: `linear-gradient(135deg, ${el.color}ee, ${el.color}99)`,
@@ -260,6 +271,70 @@ function RevealScreen({ profile, onDone }: { profile: AnamneseProfile; onDone: (
           </div>
         </div>
       )}
+
+      {/* ── MODAL DE CONVERSÃO: SALVAR PERFIL (só para visitantes) ── */}
+      {showRegisterModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4">
+          <div
+            className="relative w-full max-w-sm bg-gray-900 border border-purple-800/50 rounded-3xl p-6 text-center shadow-2xl overflow-hidden"
+            style={{ boxShadow: '0 20px 60px rgba(99,102,241,0.3)' }}
+          >
+            {/* Glow background */}
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full blur-3xl pointer-events-none opacity-25" style={{ backgroundColor: el.color }} />
+
+            {/* Lock icon */}
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: `linear-gradient(135deg, ${el.color}44, #6366f144)`, border: `2px solid ${el.color}66` }}>
+              <Lock className="w-7 h-7" style={{ color: el.color }} />
+            </div>
+
+            {/* Headline */}
+            <h3 className="text-xl font-extrabold text-white mb-2 leading-tight">
+              Seu perfil foi mapeado.<br />
+              <span style={{ color: el.color }}>Salve sua jornada!</span>
+            </h3>
+
+            <p className="text-gray-400 text-sm leading-relaxed mb-6">
+              Crie sua conta gratuita para <strong className="text-gray-200">salvar seu Mapa Vivo</strong>, acompanhar sua evolução ao longo do tempo e acessar as recomendações personalizadas do Longevity OS.
+            </p>
+
+            {/* Benefit list */}
+            <ul className="text-left text-sm text-gray-300 space-y-2 mb-6">
+              {[
+                '🧬 Perfil de Guardiões salvo na nuvem',
+                '📈 Histórico de evolução do seu Avatar',
+                '🤖 Assistente IA YNSA/MTC personalizado',
+                '🔔 Alertas de desequilíbrio em tempo real',
+              ].map((b, i) => (
+                <li key={i} className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: el.color }} />
+                  {b}
+                </li>
+              ))}
+            </ul>
+
+            {/* Primary CTA */}
+            <button
+              onClick={() => { onRegister?.(); }}
+              className="w-full py-4 rounded-2xl font-extrabold text-white text-base flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] mb-3"
+              style={{
+                background: `linear-gradient(135deg, ${el.color}, #6366f1)`,
+                boxShadow: `0 8px 28px ${el.color}44`,
+              }}
+            >
+              <UserPlus className="w-5 h-5" />
+              Criar Conta Gratuita
+            </button>
+
+            {/* Skip CTA */}
+            <button
+              onClick={() => { setShowRegisterModal(false); onDone(); }}
+              className="w-full py-2 text-gray-500 text-xs hover:text-gray-300 transition-colors"
+            >
+              Continuar sem salvar (dados serão perdidos)
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -268,7 +343,7 @@ function RevealScreen({ profile, onDone }: { profile: AnamneseProfile; onDone: (
 // COMPONENTE PRINCIPAL
 // ============================================================
 
-export const AnamnesePage: React.FC<AnamnesePageProps> = ({ onComplete }) => {
+export const AnamnesePage: React.FC<AnamnesePageProps> = ({ onComplete, onRegister, isGuest }) => {
   const [step, setStep] = useState(1);
   const [revealing, setRevealing] = useState(false);
 
@@ -379,6 +454,8 @@ export const AnamnesePage: React.FC<AnamnesePageProps> = ({ onComplete }) => {
       <RevealScreen
         profile={finalProfile}
         onDone={() => onComplete(finalProfile)}
+        onRegister={onRegister}
+        isGuest={isGuest}
       />
     );
   }

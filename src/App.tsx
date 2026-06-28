@@ -281,6 +281,8 @@ function AppContent() {
       case 'anamnese':
         return (
           <AnamnesePage
+            isGuest={!user}
+            onRegister={() => setCurrentPage('login')}
             onComplete={async (profile) => {
               setAnamneseProfile(profile);
               if (user?.id) {

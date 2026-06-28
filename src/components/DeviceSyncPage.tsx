@@ -1188,14 +1188,27 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                 {selectedWidgetDevice === 'apple' && (
                   <div className="space-y-4 text-center">
                     <p className="text-slate-300 text-xs leading-relaxed text-left">
-                      💡 **Nota sobre Apple Watch:** O iOS restringe leituras locais. Para conectar, escaneie o QR Code abaixo com seu celular para vincular o app de saúde ao nosso agregador de nuvem:
+                      💡 <strong>Nota sobre Apple Watch:</strong> O iOS restringe leituras locais. Escaneie o QR Code abaixo com seu iPhone para abrir a página de sincronização:
                     </p>
-                    <div className="bg-white p-3 rounded-2xl w-36 h-36 mx-auto flex items-center justify-center border border-slate-200">
-                      <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black rounded opacity-85" style={{ width: '100%', height: '100%', display: 'block', backgroundImage: "url('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://tryterra.co/healthkit/bridge/xzenpress')" }}></div>
+                    <div className="bg-white p-3 rounded-2xl w-40 h-40 mx-auto flex items-center justify-center border border-slate-200 shadow-lg">
+                      <img
+                        src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://xzenpress.com?page=device-sync&ecc=M"
+                        alt="QR Code - Abrir no iPhone"
+                        className="w-full h-full object-contain rounded"
+                        crossOrigin="anonymous"
+                      />
                     </div>
                     <p className="text-[10px] text-slate-500">
-                      Escaneie para instalar o app ponte e conceder permissões do HealthKit.
+                      Escaneie com a câmera do iPhone para abrir a página de sincronização.
                     </p>
+                    <a
+                      href="https://xzenpress.com?page=device-sync"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-xs text-indigo-400 underline underline-offset-2 hover:text-indigo-300 transition-colors"
+                    >
+                      Ou toque aqui para abrir diretamente →
+                    </a>
                   </div>
                 )}
 

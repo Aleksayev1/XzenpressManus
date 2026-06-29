@@ -156,6 +156,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const [hasGreeted, setHasGreeted] = useState(false);
   const [pulseActive, setPulseActive] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Guardian color for theming
@@ -173,10 +174,13 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
     return () => clearTimeout(t);
   }, []);
 
-  // Auto-scroll
+  // Auto-scroll — usa scrollTop direto (mais confiável que scrollIntoView no Safari/iOS)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages, isLoading]);
 
   // Focus input when open
   useEffect(() => {
@@ -296,7 +300,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
       className="fixed bottom-6 right-6 z-50 flex flex-col rounded-3xl overflow-hidden shadow-2xl transition-all duration-300"
       style={{
         width: isMinimized ? '260px' : '360px',
-        height: isMinimized ? 'auto' : '560px',
+        height: isMinimized ? 'auto' : '640px',
         background: 'rgba(10, 10, 20, 0.97)',
         border: `1px solid ${accentColor}44`,
         boxShadow: `0 24px 64px rgba(0,0,0,0.8), 0 0 0 1px ${accentColor}22`,
@@ -352,7 +356,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
       {!isMinimized && (
         <>
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-gray-800">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollBehavior: 'auto' }}>
             {messages.map((msg, i) => {
               const { cleanContent, actions } = parseActionButtons(msg.content, onNavigate);
 

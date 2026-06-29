@@ -22,9 +22,11 @@ const JUNCTION_BASE_URL = IS_PRODUCTION
 
 const JUNCTION_REGION = process.env.JUNCTION_REGION || 'us'; // 'us' ou 'eu'
 
+// O widget URL é retornado diretamente pela API — não precisamos construí-lo manualmente
+// Mantemos como fallback apenas para log
 const JUNCTION_LINK_BASE = IS_PRODUCTION
-    ? `https://link.${JUNCTION_REGION}.tryvital.io`         // widget produção
-    : `https://link.sandbox.${JUNCTION_REGION}.tryvital.io`; // widget sandbox
+    ? `https://link.${JUNCTION_REGION}.tryvital.io`
+    : `https://link.sandbox.${JUNCTION_REGION}.tryvital.io`;
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -177,12 +179,11 @@ export const handler: Handler = async (event: HandlerEvent) => {
                 };
             }
 
-            const { link_token, expires_at } = await linkRes.json();
+            const { link_token, link_web_url, expires_at } = await linkRes.json();
 
-            // 3. Construir a URL completa do widget
-            // CRÍTICO: usar o mesmo ambiente da API (sandbox ou produção)
-            // Token de sandbox falha com 401 se usado no widget de produção
-            const widgetUrl = `${JUNCTION_LINK_BASE}/?token=${link_token}&region=${JUNCTION_REGION}`;
+            // 3. Usar o link_web_url retornado pela API (mais confiável que construir manualmente)
+            // A Junction retorna sempre o URL correto, independente do ambiente ou rebranding
+            const widgetUrl = link_web_url || `${JUNCTION_LINK_BASE}/?token=${link_token}&region=${JUNCTION_REGION}`;
             console.log(`🌐 Widget URL (${IS_PRODUCTION ? 'PROD' : 'SANDBOX'}): ${widgetUrl}`);
 
             // 4. Atualizar status no Supabase como "pending"

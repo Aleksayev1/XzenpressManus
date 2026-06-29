@@ -50,6 +50,7 @@ import { hasCompletedAnamnese, loadAnamneseProfile, type AnamneseProfile } from 
 
 import { PremiumPartnerPitch } from './pages/PremiumPartnerPitch';
 import { DeviceSyncPage } from './components/DeviceSyncPage';
+import { ZenMentorChat } from './components/ZenMentorChat';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('landing');
@@ -375,6 +376,11 @@ function AppContent() {
         <ZSResearchFloating
           onEnroll={() => setCurrentPage('hormonal-research')}
         />
+
+        {/* ZenMentor — Mentora Virtual Flutuante */}
+        {currentPage !== 'landing' && (
+          <ZenMentorChat onNavigate={setCurrentPage} />
+        )}
       </div>
     </AudioPlayerProvider>
   );

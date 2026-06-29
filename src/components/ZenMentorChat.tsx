@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Loader2, Sparkles, ChevronDown, Bot, RotateCcw } from 'lucide-react';
+import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { fiveElements } from '../data/fiveElements';
@@ -145,7 +145,82 @@ function renderMarkdown(text: string): React.ReactNode {
   });
 }
 
-// ─── Main Component ────────────────────────────────────────────────────────────
+// ─── TTS Hook ─────────────────────────────────────────────────────────────────
+function useTTS() {
+  const [speaking, setSpeaking] = useState(false);
+  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  const stripMarkdown = (text: string) =>
+    text
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/#{1,6}\s/g, '')
+      .replace(/\[.*?\]/g, '')
+      .replace(/[🌿🧬📊⚠️💡🎯✅❌🌳🌊🔥⛰️💧]/gu, '')
+      .trim();
+
+  const speak = useCallback((text: string) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const clean = stripMarkdown(text);
+    const utter = new SpeechSynthesisUtterance(clean);
+
+    // Detecta o idioma do navegador automaticamente
+    // Ex: pt-BR, en-US, es-ES, fr-FR, zh-CN, etc.
+    const browserLang = navigator.language || 'pt-BR';
+    utter.lang = browserLang;
+    utter.rate = 0.95;
+    utter.pitch = 1.05;
+
+    // Escolhe a melhor voz feminina disponível para o idioma detectado
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length === 0) return; // ainda carregando
+
+      const langPrefix = browserLang.split('-')[0]; // ex: 'pt', 'en', 'es'
+
+      // 1. Voz feminina no idioma exato (ex: pt-BR)
+      const exactFemale = voices.find(v =>
+        v.lang === browserLang && /female|femi|woman|luciana|francisca|samantha|karen|moira|amelie|ines/i.test(v.name)
+      );
+      // 2. Qualquer voz no idioma exato
+      const exactAny = voices.find(v => v.lang === browserLang);
+      // 3. Voz feminina no mesmo idioma-base (ex: pt-PT)
+      const baseFemale = voices.find(v =>
+        v.lang.startsWith(langPrefix) && /female|femi|woman|luciana|francisca|samantha|karen/i.test(v.name)
+      );
+      // 4. Qualquer voz no mesmo idioma-base
+      const baseAny = voices.find(v => v.lang.startsWith(langPrefix));
+
+      const chosen = exactFemale || exactAny || baseFemale || baseAny;
+      if (chosen) utter.voice = chosen;
+    };
+
+    // Vozes podem não estar carregadas ainda — tenta agora e no evento
+    loadVoices();
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices, { once: true });
+    }
+
+    utter.onstart = () => setSpeaking(true);
+    utter.onend = () => setSpeaking(false);
+    utter.onerror = () => setSpeaking(false);
+    utterRef.current = utter;
+    window.speechSynthesis.speak(utter);
+  }, []);
+
+  const stop = useCallback(() => {
+    window.speechSynthesis?.cancel();
+    setSpeaking(false);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => () => { window.speechSynthesis?.cancel(); }, []);
+
+  return { speak, stop, speaking };
+}
+
+
 export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -246,6 +321,11 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
         content: data.reply,
         timestamp: new Date(),
       }]);
+      // Auto-leitura se ativada
+      if (autoRead) {
+        const { cleanContent } = parseActionButtons(data.reply, undefined);
+        speak(cleanContent);
+      }
     } catch (err: any) {
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -337,6 +417,19 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
+          {/* Toggle auto-leitura */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (autoRead) { stop(); }
+              setAutoRead(r => !r);
+            }}
+            className="p-1.5 rounded-lg transition-colors"
+            style={{ color: autoRead ? accentColor : '#6b7280' }}
+            title={autoRead ? 'Desativar voz' : 'Ativar voz'}
+          >
+            {autoRead ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+          </button>
           <button
             onClick={(e) => { e.stopPropagation(); setIsMinimized(m => !m); }}
             className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 transition-colors"
@@ -380,6 +473,31 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                     >
                       {msg.role === 'assistant' ? renderMarkdown(cleanContent) : msg.content}
                     </div>
+                    {/* Play button for assistant messages */}
+                    {msg.role === 'assistant' && (
+                      <button
+                        onClick={() => {
+                          if (speaking && playingIndex === i) {
+                            stop();
+                            setPlayingIndex(null);
+                          } else {
+                            stop();
+                            setPlayingIndex(i);
+                            speak(cleanContent);
+                          }
+                        }}
+                        className="mt-1 flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] transition-all hover:opacity-80"
+                        style={{
+                          color: speaking && playingIndex === i ? accentColor : '#4b5563',
+                          background: speaking && playingIndex === i ? `${accentColor}15` : 'transparent',
+                        }}
+                      >
+                        {speaking && playingIndex === i
+                          ? <><Square className="w-2.5 h-2.5" /> Parar</>
+                          : <><Play className="w-2.5 h-2.5" /> Ouvir</>
+                        }
+                      </button>
+                    )}
                     {/* Action buttons */}
                     {actions.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mt-1.5">

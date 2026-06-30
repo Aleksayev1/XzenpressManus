@@ -148,7 +148,8 @@ function renderMarkdown(text: string): React.ReactNode {
 // ─── TTS Hook ─────────────────────────────────────────────────────────────────
 function useTTS() {
   const [speaking, setSpeaking] = useState(false);
-  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const [loading, setLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const stripMarkdown = (text: string) =>
     text
@@ -159,98 +160,75 @@ function useTTS() {
       .replace(/[🌿🧬📊⚠️💡🎯✅❌🌳🌊🔥⛰️💧]/gu, '')
       .trim();
 
-  const speak = useCallback((text: string) => {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const clean = stripMarkdown(text);
-    const utter = new SpeechSynthesisUtterance(clean);
-
-    const browserLang = navigator.language || 'pt-BR';
-    utter.lang = browserLang;
-    
-    // Configurações para tom caloroso, acolhedor e calmo (estilo mentor / irmão mais velho)
-    // Velocidade levemente reduzida e pitch um pouco mais baixo dão peso e naturalidade
-    utter.rate = 0.88; 
-    utter.pitch = 0.96;
-
-    // Escolhe a melhor voz disponível (priorizando vozes neurais/naturais de alta qualidade)
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length === 0) return;
-
-      const langPrefix = browserLang.split('-')[0]; // ex: 'pt', 'en'
-
-      // Filtrar vozes do idioma do usuário
-      const langVoices = voices.filter(v => v.lang.startsWith(langPrefix));
-      
-      // Critérios de prioridade para vozes super-realistas
-      // 1. Vozes "Natural" (Microsoft Edge Cloud)
-      // 2. Vozes "Neural" (Cloud avançada)
-      // 3. Vozes "Google" (Chrome Cloud)
-      // 4. Vozes "Online"
-      // 5. Vozes clássicas premium do sistema (ex: Luciana, Daniel, Felipe)
-      
-      const findBestVoice = () => {
-        // Passo 1: Voz Natural/Neural/Online no dialeto exato (ex: pt-BR)
-        const exactCloud = langVoices.find(v => 
-          v.lang === browserLang && 
-          /(natural|neural|online|google)/i.test(v.name)
-        );
-        if (exactCloud) return exactCloud;
-
-        // Passo 2: Voz Natural/Neural/Online no mesmo idioma-base (ex: pt-PT)
-        const baseCloud = langVoices.find(v => 
-          /(natural|neural|online|google)/i.test(v.name)
-        );
-        if (baseCloud) return baseCloud;
-
-        // Passo 3: Voz masculina/calma aprimorada da Apple/Microsoft no dialeto
-        const exactPremium = langVoices.find(v => 
-          v.lang === browserLang && 
-          /(daniel|felipe|antonio|luciana|helena|francisca)/i.test(v.name)
-        );
-        if (exactPremium) return exactPremium;
-
-        // Passo 4: Qualquer voz no dialeto exato
-        const exactAny = langVoices.find(v => v.lang === browserLang);
-        if (exactAny) return exactAny;
-
-        // Passo 5: Qualquer voz no idioma-base
-        return langVoices[0] || null;
-      };
-
-      const bestVoice = findBestVoice();
-      if (bestVoice) {
-        utter.voice = bestVoice;
-        // Se for uma voz sabidamente masculina, podemos ajustar pitch/rate específicos
-        if (/(daniel|antonio|felipe|guy)/i.test(bestVoice.name)) {
-          utter.pitch = 0.92; // Ligeiramente mais grave para voz masculina natural
-        }
-      }
-    };
-
-    // Tenta carregar e aplicar vozes
-    loadVoices();
-    if (window.speechSynthesis.getVoices().length === 0) {
-      window.speechSynthesis.addEventListener('voiceschanged', loadVoices, { once: true });
+  const speak = useCallback(async (text: string, voice: string = 'nova') => {
+    // Para qualquer reprodução anterior e libera referências
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
     }
 
-    utter.onstart = () => setSpeaking(true);
-    utter.onend = () => setSpeaking(false);
-    utter.onerror = () => setSpeaking(false);
-    utterRef.current = utter;
-    window.speechSynthesis.speak(utter);
+    setLoading(true);
+    setSpeaking(false);
+
+    try {
+      const clean = stripMarkdown(text);
+      const { getBaseApiUrl } = await import('../lib/api');
+      const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/ai-tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: clean, voice }),
+      });
+
+      if (!response.ok) throw new Error('Falha ao processar voz no servidor');
+
+      const blob = await response.blob();
+      const audioUrl = URL.createObjectURL(blob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      audio.onplay = () => {
+        setSpeaking(true);
+        setLoading(false);
+      };
+
+      audio.onended = () => {
+        setSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      audio.onerror = () => {
+        setSpeaking(false);
+        setLoading(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      await audio.play();
+    } catch (err) {
+      console.error('Erro na reprodução de voz generativa:', err);
+      setSpeaking(false);
+      setLoading(false);
+    }
   }, []);
 
   const stop = useCallback(() => {
-    window.speechSynthesis?.cancel();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     setSpeaking(false);
+    setLoading(false);
   }, []);
 
-  // Cleanup on unmount
-  useEffect(() => () => { window.speechSynthesis?.cancel(); }, []);
+  // Limpeza ao desmontar
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
 
-  return { speak, stop, speaking };
+  return { speak, stop, speaking, loading };
 }
 
 
@@ -263,9 +241,10 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
   const [pulseActive, setPulseActive] = useState(true);
+  const [selectedVoice, setSelectedVoice] = useState<'nova' | 'echo' | 'onyx'>('nova');
   const [autoRead, setAutoRead] = useState(false);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
-  const { speak, stop, speaking } = useTTS();
+  const { speak, stop, speaking, loading: ttsLoading } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -360,7 +339,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
       // Auto-leitura se ativada
       if (autoRead) {
         const { cleanContent } = parseActionButtons(data.reply, undefined);
-        speak(cleanContent);
+        speak(cleanContent, selectedVoice);
       }
     } catch (err: any) {
       setMessages(prev => [...prev, {
@@ -446,6 +425,25 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
         </div>
 
         <div className="flex items-center gap-1">
+          {/* Seletor de voz generativa do mentor */}
+          <select
+            value={selectedVoice}
+            onChange={(e) => {
+              e.stopPropagation();
+              const voice = e.target.value as 'nova' | 'echo' | 'onyx';
+              setSelectedVoice(voice);
+              stop(); // para reprodução atual
+            }}
+            onClick={(e) => e.stopPropagation()} // impede minimizar ao clicar no select
+            className="bg-transparent text-[11px] text-gray-400 hover:text-white border-0 outline-none cursor-pointer pr-1 py-1 font-semibold transition-colors"
+            style={{ fontFamily: 'inherit' }}
+            title="Escolher Voz do Mentor"
+          >
+            <option value="nova" className="bg-[#0a0a14] text-white">👩 Nova (Empática)</option>
+            <option value="echo" className="bg-[#0a0a14] text-white">👨 Echo (Amigável)</option>
+            <option value="onyx" className="bg-[#0a0a14] text-white">👨 Onyx (Sábio)</option>
+          </select>
+
           <button
             onClick={(e) => { e.stopPropagation(); handleReset(); }}
             className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 transition-colors"
@@ -513,26 +511,29 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                     {msg.role === 'assistant' && (
                       <button
                         onClick={() => {
-                          if (speaking && playingIndex === i) {
+                          if ((speaking || ttsLoading) && playingIndex === i) {
                             stop();
                             setPlayingIndex(null);
                           } else {
                             stop();
                             setPlayingIndex(i);
-                            speak(cleanContent);
+                            speak(cleanContent, selectedVoice);
                           }
                         }}
                         className="mt-1.5 flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all hover:opacity-90"
                         style={{
-                          color: speaking && playingIndex === i ? accentColor : '#9ca3af',
-                          background: speaking && playingIndex === i ? `${accentColor}20` : 'rgba(255,255,255,0.05)',
-                          border: `1px solid ${speaking && playingIndex === i ? accentColor + '44' : 'rgba(255,255,255,0.08)'}`,
+                          color: (speaking || ttsLoading) && playingIndex === i ? accentColor : '#9ca3af',
+                          background: (speaking || ttsLoading) && playingIndex === i ? `${accentColor}20` : 'rgba(255,255,255,0.05)',
+                          border: `1px solid ${(speaking || ttsLoading) && playingIndex === i ? accentColor + '44' : 'rgba(255,255,255,0.08)'}`,
                         }}
                       >
-                        {speaking && playingIndex === i
-                          ? <><Square className="w-3 h-3" /> Parar áudio</>
-                          : <><Play className="w-3 h-3" /> 🔊 Ouvir resposta</>
-                        }
+                        {speaking && playingIndex === i ? (
+                          <><Square className="w-3 h-3" /> Parar áudio</>
+                        ) : ttsLoading && playingIndex === i ? (
+                          <><Loader2 className="w-3 h-3 animate-spin" /> Carregando...</>
+                        ) : (
+                          <><Play className="w-3 h-3" /> 🔊 Ouvir resposta</>
+                        )}
                       </button>
                     )}
                     {/* Action buttons */}

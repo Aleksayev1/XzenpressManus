@@ -489,15 +489,16 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                             speak(cleanContent);
                           }
                         }}
-                        className="mt-1 flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] transition-all hover:opacity-80"
+                        className="mt-1.5 flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all hover:opacity-90"
                         style={{
-                          color: speaking && playingIndex === i ? accentColor : '#4b5563',
-                          background: speaking && playingIndex === i ? `${accentColor}15` : 'transparent',
+                          color: speaking && playingIndex === i ? accentColor : '#9ca3af',
+                          background: speaking && playingIndex === i ? `${accentColor}20` : 'rgba(255,255,255,0.05)',
+                          border: `1px solid ${speaking && playingIndex === i ? accentColor + '44' : 'rgba(255,255,255,0.08)'}`,
                         }}
                       >
                         {speaking && playingIndex === i
-                          ? <><Square className="w-2.5 h-2.5" /> Parar</>
-                          : <><Play className="w-2.5 h-2.5" /> Ouvir</>
+                          ? <><Square className="w-3 h-3" /> Parar áudio</>
+                          : <><Play className="w-3 h-3" /> 🔊 Ouvir resposta</>
                         }
                       </button>
                     )}
@@ -549,20 +550,20 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Suggestions (shown when chat is empty after greeting) */}
-          {messages.length === 1 && (
+          {/* Suggestions — visíveis até o usuário enviar a primeira mensagem */}
+          {messages.filter(m => m.role === 'user').length === 0 && (
             <div className="px-4 pb-2 flex flex-wrap gap-1.5">
               {[
+                '🔍 Buscar pontos no Self Oracle',
                 'Como está meu equilíbrio hoje?',
                 'Protocolo para ansiedade',
                 'Pontos para insônia',
-                'Reforma íntima',
               ].map((s, i) => (
                 <button
                   key={i}
-                  onClick={() => { setInput(s); setTimeout(() => inputRef.current?.focus(), 50); }}
-                  className="px-2.5 py-1 rounded-lg text-[11px] text-gray-400 transition-all hover:text-white"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                  onClick={() => { setInput(s.replace(/^[\p{Emoji}\s]+/u, '').trim()); setTimeout(() => inputRef.current?.focus(), 50); }}
+                  className="px-2.5 py-1 rounded-lg text-xs text-gray-300 transition-all hover:text-white font-medium"
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}
                 >
                   {s}
                 </button>

@@ -166,6 +166,9 @@ function useTTS() {
       audioRef.current.pause();
       audioRef.current = null;
     }
+    if (typeof window !== 'undefined') {
+      window.speechSynthesis?.cancel();
+    }
 
     setLoading(true);
     setSpeaking(false);
@@ -204,9 +207,61 @@ function useTTS() {
 
       await audio.play();
     } catch (err) {
-      console.error('Erro na reprodução de voz generativa:', err);
-      setSpeaking(false);
-      setLoading(false);
+      console.warn('Erro na reprodução de voz generativa, usando fallback nativo:', err);
+      
+      try {
+        const clean = stripMarkdown(text);
+        if (typeof window === 'undefined' || !window.speechSynthesis) {
+          throw new Error('SpeechSynthesis não suportado neste ambiente');
+        }
+
+        const utter = new SpeechSynthesisUtterance(clean);
+        utter.lang = 'pt-BR';
+        utter.rate = 0.95;
+        utter.pitch = 1.05;
+
+        // Procura a melhor voz pt-BR disponível
+        const voices = window.speechSynthesis.getVoices();
+        const browserLang = navigator.language || 'pt-BR';
+        const baseLang = browserLang.split('-')[0];
+        const langVoices = voices.filter(v => v.lang.startsWith(baseLang));
+        const premiumKeywords = ['google', 'natural', 'premium', 'neural', 'microsoft'];
+        
+        const bestVoice = langVoices.find(v => 
+          v.lang === browserLang && 
+          premiumKeywords.some(kw => v.name.toLowerCase().includes(kw))
+        ) || langVoices.find(v => 
+          premiumKeywords.some(kw => v.name.toLowerCase().includes(kw))
+        ) || langVoices.find(v => v.lang === browserLang) || langVoices[0];
+
+        if (bestVoice) {
+          utter.voice = bestVoice;
+          if (/(daniel|antonio|felipe|guy)/i.test(bestVoice.name)) {
+            utter.pitch = 0.92;
+          }
+        }
+
+        utter.onstart = () => {
+          setSpeaking(true);
+          setLoading(false);
+        };
+
+        utter.onend = () => {
+          setSpeaking(false);
+        };
+
+        utter.onerror = (e) => {
+          console.error('Erro no SpeechSynthesis fallback:', e);
+          setSpeaking(false);
+          setLoading(false);
+        };
+
+        window.speechSynthesis.speak(utter);
+      } catch (fallbackErr) {
+        console.error('Falha crítica de áudio (generativo e fallback indisponíveis):', fallbackErr);
+        setSpeaking(false);
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -214,6 +269,9 @@ function useTTS() {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
+    }
+    if (typeof window !== 'undefined') {
+      window.speechSynthesis?.cancel();
     }
     setSpeaking(false);
     setLoading(false);
@@ -224,6 +282,9 @@ function useTTS() {
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
+      }
+      if (typeof window !== 'undefined') {
+        window.speechSynthesis?.cancel();
       }
     };
   }, []);

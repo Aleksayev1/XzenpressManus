@@ -165,38 +165,71 @@ function useTTS() {
     const clean = stripMarkdown(text);
     const utter = new SpeechSynthesisUtterance(clean);
 
-    // Detecta o idioma do navegador automaticamente
-    // Ex: pt-BR, en-US, es-ES, fr-FR, zh-CN, etc.
     const browserLang = navigator.language || 'pt-BR';
     utter.lang = browserLang;
-    utter.rate = 0.95;
-    utter.pitch = 1.05;
+    
+    // Configurações para tom caloroso, acolhedor e calmo (estilo mentor / irmão mais velho)
+    // Velocidade levemente reduzida e pitch um pouco mais baixo dão peso e naturalidade
+    utter.rate = 0.88; 
+    utter.pitch = 0.96;
 
-    // Escolhe a melhor voz feminina disponível para o idioma detectado
+    // Escolhe a melhor voz disponível (priorizando vozes neurais/naturais de alta qualidade)
     const loadVoices = () => {
       const voices = window.speechSynthesis.getVoices();
-      if (voices.length === 0) return; // ainda carregando
+      if (voices.length === 0) return;
 
-      const langPrefix = browserLang.split('-')[0]; // ex: 'pt', 'en', 'es'
+      const langPrefix = browserLang.split('-')[0]; // ex: 'pt', 'en'
 
-      // 1. Voz feminina no idioma exato (ex: pt-BR)
-      const exactFemale = voices.find(v =>
-        v.lang === browserLang && /female|femi|woman|luciana|francisca|samantha|karen|moira|amelie|ines/i.test(v.name)
-      );
-      // 2. Qualquer voz no idioma exato
-      const exactAny = voices.find(v => v.lang === browserLang);
-      // 3. Voz feminina no mesmo idioma-base (ex: pt-PT)
-      const baseFemale = voices.find(v =>
-        v.lang.startsWith(langPrefix) && /female|femi|woman|luciana|francisca|samantha|karen/i.test(v.name)
-      );
-      // 4. Qualquer voz no mesmo idioma-base
-      const baseAny = voices.find(v => v.lang.startsWith(langPrefix));
+      // Filtrar vozes do idioma do usuário
+      const langVoices = voices.filter(v => v.lang.startsWith(langPrefix));
+      
+      // Critérios de prioridade para vozes super-realistas
+      // 1. Vozes "Natural" (Microsoft Edge Cloud)
+      // 2. Vozes "Neural" (Cloud avançada)
+      // 3. Vozes "Google" (Chrome Cloud)
+      // 4. Vozes "Online"
+      // 5. Vozes clássicas premium do sistema (ex: Luciana, Daniel, Felipe)
+      
+      const findBestVoice = () => {
+        // Passo 1: Voz Natural/Neural/Online no dialeto exato (ex: pt-BR)
+        const exactCloud = langVoices.find(v => 
+          v.lang === browserLang && 
+          /(natural|neural|online|google)/i.test(v.name)
+        );
+        if (exactCloud) return exactCloud;
 
-      const chosen = exactFemale || exactAny || baseFemale || baseAny;
-      if (chosen) utter.voice = chosen;
+        // Passo 2: Voz Natural/Neural/Online no mesmo idioma-base (ex: pt-PT)
+        const baseCloud = langVoices.find(v => 
+          /(natural|neural|online|google)/i.test(v.name)
+        );
+        if (baseCloud) return baseCloud;
+
+        // Passo 3: Voz masculina/calma aprimorada da Apple/Microsoft no dialeto
+        const exactPremium = langVoices.find(v => 
+          v.lang === browserLang && 
+          /(daniel|felipe|antonio|luciana|helena|francisca)/i.test(v.name)
+        );
+        if (exactPremium) return exactPremium;
+
+        // Passo 4: Qualquer voz no dialeto exato
+        const exactAny = langVoices.find(v => v.lang === browserLang);
+        if (exactAny) return exactAny;
+
+        // Passo 5: Qualquer voz no idioma-base
+        return langVoices[0] || null;
+      };
+
+      const bestVoice = findBestVoice();
+      if (bestVoice) {
+        utter.voice = bestVoice;
+        // Se for uma voz sabidamente masculina, podemos ajustar pitch/rate específicos
+        if (/(daniel|antonio|felipe|guy)/i.test(bestVoice.name)) {
+          utter.pitch = 0.92; // Ligeiramente mais grave para voz masculina natural
+        }
+      }
     };
 
-    // Vozes podem não estar carregadas ainda — tenta agora e no evento
+    // Tenta carregar e aplicar vozes
     loadVoices();
     if (window.speechSynthesis.getVoices().length === 0) {
       window.speechSynthesis.addEventListener('voiceschanged', loadVoices, { once: true });

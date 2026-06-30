@@ -230,6 +230,9 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
   const [pulseActive, setPulseActive] = useState(true);
+  const [autoRead, setAutoRead] = useState(false);
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  const { speak, stop, speaking } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);

@@ -110,7 +110,7 @@ function buildGreeting(userName?: string): string {
 
 // ─── Action Button Parser ─────────────────────────────────────────────────────
 // Detects patterns like [ABRIR:acupressure] [ZENFLOW:liberacao] in AI responses
-function parseActionButtons(content: string, onNavigate?: (page: string) => void) {
+function parseActionButtons(content: string) {
   const actionRegex = /\[ABRIR:([\w-]+)\]/g;
   const zenflowRegex = /\[ZENFLOW:([\w]+)\]/g;
 
@@ -399,7 +399,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
       }]);
       // Auto-leitura se ativada
       if (autoRead) {
-        const { cleanContent } = parseActionButtons(data.reply, undefined);
+        const { cleanContent } = parseActionButtons(data.reply);
         speak(cleanContent, selectedVoice);
       }
     } catch (err: any) {
@@ -546,7 +546,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
           {/* Messages */}
           <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollBehavior: 'auto' }}>
             {messages.map((msg, i) => {
-              const { cleanContent, actions } = parseActionButtons(msg.content, onNavigate);
+              const { cleanContent, actions } = parseActionButtons(msg.content);
 
               return (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>

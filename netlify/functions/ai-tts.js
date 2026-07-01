@@ -1,13 +1,20 @@
 // Netlify Function: AI Text-to-Speech (TTS)
 // Comunicação segura com a API da OpenAI utilizando o modelo tts-1
 
+const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
+
 exports.handler = async (event, context) => {
   // Cabeçalhos de CORS e resposta padrão
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS'
-  };
+  const headers = getCorsHeaders(event);
+
+  // Rejeitar origens não autorizadas
+  if (!isOriginAllowed(event)) {
+    return {
+      statusCode: 403,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Origin not allowed' })
+    };
+  }
 
   // Tratar requisição OPTIONS (Preflight do CORS)
   if (event.httpMethod === 'OPTIONS') {

@@ -9,13 +9,21 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || ''
 );
 
+const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
+
 exports.handler = async (event) => {
     const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        ...getCorsHeaders(event),
         'Content-Type': 'application/json'
     };
+
+    if (!isOriginAllowed(event)) {
+        return {
+            statusCode: 403,
+            headers,
+            body: JSON.stringify({ error: 'Origin not allowed' })
+        };
+    }
 
     if (event.httpMethod === 'OPTIONS') {
         return { statusCode: 200, headers, body: '' };

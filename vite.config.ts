@@ -18,6 +18,17 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        passes: 3,
+        pure_funcs: ['console.info', 'console.debug', 'console.warn']
+      },
+      mangle: {
+        toplevel: true
+      }
+    },
     assetsDir: 'assets',
     rollupOptions: {
       output: {

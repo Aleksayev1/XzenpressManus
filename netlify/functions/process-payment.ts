@@ -50,13 +50,20 @@ function extractPlanId(orderId: string): string {
     return 'monthly'; // Default seguro
 }
 
+const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
+
 export const handler: Handler = async (event) => {
-    // CORS headers
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    };
+    // CORS headers dynamic validation
+    const headers = getCorsHeaders(event);
+
+    // Rejeitar origens não autorizadas
+    if (!isOriginAllowed(event)) {
+        return {
+            statusCode: 403,
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Origin not allowed' }),
+        };
+    }
 
     // Handle preflight
     if (event.httpMethod === 'OPTIONS') {
@@ -66,7 +73,7 @@ export const handler: Handler = async (event) => {
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
-            headers,
+            headers: { ...headers, 'Content-Type': 'application/json' },
             body: JSON.stringify({ error: 'Method not allowed' }),
         };
     }

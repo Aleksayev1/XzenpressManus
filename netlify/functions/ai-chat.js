@@ -38,14 +38,23 @@ function checkRateLimit(userEmail, limit = MAX_REQUESTS_PER_HOUR) {
     };
 }
 
+const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
+
 exports.handler = async (event, context) => {
-    // CORS headers
+    // CORS headers dynamic validation
     const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        ...getCorsHeaders(event),
         'Content-Type': 'application/json'
     };
+
+    // Rejeitar origens não autorizadas
+    if (!isOriginAllowed(event)) {
+        return {
+            statusCode: 403,
+            headers,
+            body: JSON.stringify({ error: 'Origin not allowed' })
+        };
+    }
 
     // Handle preflight
     if (event.httpMethod === 'OPTIONS') {

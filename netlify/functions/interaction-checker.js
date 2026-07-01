@@ -2,13 +2,21 @@
 // Verificador de Interações Seguras — Xzenpress
 // Cruza medicamentos + suplementos + ervas e retorna análise de risco baseada em evidências
 
+const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
+
 exports.handler = async (event) => {
     const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        ...getCorsHeaders(event),
         'Content-Type': 'application/json'
     };
+
+    if (!isOriginAllowed(event)) {
+        return {
+            statusCode: 403,
+            headers,
+            body: JSON.stringify({ error: 'Origin not allowed' })
+        };
+    }
 
     if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
     if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };

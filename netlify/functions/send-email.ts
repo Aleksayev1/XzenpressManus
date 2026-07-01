@@ -10,12 +10,18 @@ const supabase = createClient(
  * Send transactional emails
  * For now, generates HTML that can be sent via email service
  */
+const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
+
 export const handler: Handler = async (event: HandlerEvent) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
+  const headers = getCorsHeaders(event);
+
+  if (!isOriginAllowed(event)) {
+    return {
+      statusCode: 403,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Origin not allowed' }),
+    };
+  }
 
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers, body: '' };

@@ -13,12 +13,18 @@ const supabase = createClient(
  * Generate receipt/invoice for a completed payment
  * Returns HTML that can be converted to PDF on frontend
  */
+const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
+
 export const handler: Handler = async (event: HandlerEvent) => {
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-    };
+    const headers = getCorsHeaders(event);
+
+    if (!isOriginAllowed(event)) {
+        return {
+            statusCode: 403,
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Origin not allowed' }),
+        };
+    }
 
     if (event.httpMethod === 'OPTIONS') {
         return { statusCode: 204, headers, body: '' };

@@ -28,14 +28,23 @@ const JUNCTION_LINK_BASE = IS_PRODUCTION
     ? `https://link.${JUNCTION_REGION}.tryvital.io`
     : `https://link.sandbox.${JUNCTION_REGION}.tryvital.io`;
 
-const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-    'Content-Type': 'application/json',
-};
+const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
 
 export const handler: Handler = async (event: HandlerEvent) => {
+    const corsHeaders = {
+        ...getCorsHeaders(event),
+        'Content-Type': 'application/json',
+    };
+
+    // Rejeitar origens não autorizadas
+    if (!isOriginAllowed(event)) {
+        return {
+            statusCode: 403,
+            headers: corsHeaders,
+            body: JSON.stringify({ error: 'Origin not allowed' }),
+        };
+    }
+
     // ── CORS preflight ─────────────────────────────────────────────────────
     if (event.httpMethod === 'OPTIONS') {
         return { statusCode: 204, headers: corsHeaders, body: '' };

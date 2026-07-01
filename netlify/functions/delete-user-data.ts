@@ -10,12 +10,18 @@ const supabase = createClient(
  * GDPR Compliance: Delete all user data
  * PERMANENT AND IRREVERSIBLE
  */
+const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
+
 export const handler: Handler = async (event: HandlerEvent) => {
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    };
+    const headers = getCorsHeaders(event);
+
+    if (!isOriginAllowed(event)) {
+        return {
+            statusCode: 403,
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Origin not allowed' }),
+        };
+    }
 
     if (event.httpMethod === 'OPTIONS') {
         return { statusCode: 204, headers, body: '' };
@@ -24,7 +30,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
-            headers,
+            headers: { ...headers, 'Content-Type': 'application/json' },
             body: JSON.stringify({ error: 'Method not allowed' }),
         };
     }

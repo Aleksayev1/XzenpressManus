@@ -3,7 +3,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://xzenpress.com/</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -11,81 +11,87 @@
   <!-- Main Pages -->
   <url>
     <loc>https://xzenpress.com/breathing</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://xzenpress.com/acupressure</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://xzenpress.com/sounds</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://xzenpress.com/blog</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://xzenpress.com/premium</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://xzenpress.com/corporate</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <!-- Blog Posts -->
   <url>
-    <loc>https://xzenpress.com/blog/descubra-o-xzenpress-bem-estar-integrativo-em-um-so-lugar</loc>
-    <lastmod>2025-12-20</lastmod>
+    <loc>https://xzenpress.com/blog/cromoterapia-cores-afetam-bem-estar</loc>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://xzenpress.com/blog/legado-de-um-natal-8000-dias-para-mudar-o-mundo</loc>
-    <lastmod>2025-12-25</lastmod>
+    <loc>https://xzenpress.com/blog/memoria-da-agua-consciencia</loc>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://xzenpress.com/blog/vida-apos-a-morte-argumentos-cientificos-contra-o-suicidio</loc>
-    <lastmod>2025-11-15</lastmod>
+    <loc>https://xzenpress.com/blog/respiracao-4-7-8-tecnica-cientifica-ansiedade</loc>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://xzenpress.com/blog/lei-14831-2024</loc>
-    <lastmod>2025-10-10</lastmod>
+    <loc>https://xzenpress.com/blog/lei-14831-2024-empresa-promotora-saude-mental</loc>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://xzenpress.com/blog/5-pontos-de-acupressao-para-aliviar-o-estresse-diario</loc>
-    <lastmod>2025-09-01</lastmod>
+    <loc>https://xzenpress.com/blog/5-pontos-acupressao-estresse-diario</loc>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://xzenpress.com/blog/respiracao-4-7-8-a-tecnica-cientifica-para-ansiedade</loc>
-    <lastmod>2025-09-01</lastmod>
+    <loc>https://xzenpress.com/blog/prodromal-signs-workplace-stress-2026</loc>
+    <lastmod>2026-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://xzenpress.com/blog/cromoterapia-como-as-cores-afetam-nosso-bem-estar</loc>
-    <lastmod>2025-09-01</lastmod>
+    <loc>https://xzenpress.com/blog/video-apresentacao-xzenpress</loc>
+    <lastmod>2025-12-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://xzenpress.com/blog/vida-apos-morte-argumentos-cientificos</loc>
+    <lastmod>2025-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://dqjcbwjqrenubdzalicy.supabase.co';
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxamNid2pxcmVudWJkemFsaWN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzIzMDM5NjksImV4cCI6MjA0Nzg3OTk2OX0.r0wXZlpxKSXvhZ8_dO6z5FsVPvY7U16fRwCe8HVW1zI';
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxamNid2pxcmVudWJkemFsaWN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5MzE0MjcsImV4cCI6MjA3OTUwNzQyN30.KxH3diGoF-tkwLdPdPuxC5yQ8Rjpr2grV4VgGNUk5Vo';
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 

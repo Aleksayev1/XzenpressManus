@@ -161,7 +161,6 @@ export const MEDICAMENTOS_CONFIG: { id: MedicamentoPotencial; label: string }[] 
 // ============================================================
 // CALCULADORA DE SCORES DOS GUARDIÕES BASEADA NA ANAMNESE
 // ============================================================
-
 export function calcularGuardianScores(profile: Partial<AnamneseProfile>): GuardianScoresAnamnese {
   const base = 60; // Começa em 60, não em 50 — otimismo moderado
   const scores: GuardianScoresAnamnese = {
@@ -172,22 +171,26 @@ export function calcularGuardianScores(profile: Partial<AnamneseProfile>): Guard
     agua: base,
   };
 
-  // Aplicar impacto dos sintomas físicos
-  (profile.sintomasFisicos || []).forEach(sintomaId => {
-    const cfg = SINTOMAS_CONFIG.find(s => s.id === sintomaId);
-    if (cfg) {
-      scores[cfg.guardianImpact] = Math.max(5, scores[cfg.guardianImpact] + cfg.impactValue);
-    }
-  });
+  // Aplicar impacto dos sintomas físicos de forma segura
+  if (profile && Array.isArray(profile.sintomasFisicos)) {
+    profile.sintomasFisicos.forEach(sintomaId => {
+      const cfg = SINTOMAS_CONFIG.find(s => s.id === sintomaId);
+      if (cfg) {
+        scores[cfg.guardianImpact] = Math.max(5, scores[cfg.guardianImpact] + cfg.impactValue);
+      }
+    });
+  }
 
-  // Aplicar impacto das emoções dominantes
-  (profile.emocoesDominantes || []).forEach(emocaoId => {
-    const cfg = EMOCOES_CONFIG.find(e => e.id === emocaoId);
-    if (cfg) {
-      const newVal = scores[cfg.guardianImpact] + cfg.impactValue;
-      scores[cfg.guardianImpact] = Math.min(100, Math.max(5, newVal));
-    }
-  });
+  // Aplicar impacto das emoções dominantes de forma segura
+  if (profile && Array.isArray(profile.emocoesDominantes)) {
+    profile.emocoesDominantes.forEach(emocaoId => {
+      const cfg = EMOCOES_CONFIG.find(e => e.id === emocaoId);
+      if (cfg) {
+        const newVal = scores[cfg.guardianImpact] + cfg.impactValue;
+        scores[cfg.guardianImpact] = Math.min(100, Math.max(5, newVal));
+      }
+    });
+  }
 
   // Modificadores globais de sono
   const sonoModifier: Record<QualidadeSono, number> = {
@@ -197,7 +200,7 @@ export function calcularGuardianScores(profile: Partial<AnamneseProfile>): Guard
     bom: 5,
     otimo: 10,
   };
-  if (profile.qualidadeSono) {
+  if (profile && profile.qualidadeSono && sonoModifier[profile.qualidadeSono] !== undefined) {
     const mod = sonoModifier[profile.qualidadeSono];
     Object.keys(scores).forEach(k => {
       scores[k as keyof GuardianScoresAnamnese] = Math.min(100, Math.max(5, scores[k as keyof GuardianScoresAnamnese] + mod * 0.5));
@@ -212,7 +215,7 @@ export function calcularGuardianScores(profile: Partial<AnamneseProfile>): Guard
     alto: -12,
     critico: -20,
   };
-  if (profile.nivelEstresse) {
+  if (profile && profile.nivelEstresse && estresseModifier[profile.nivelEstresse] !== undefined) {
     const mod = estresseModifier[profile.nivelEstresse];
     scores.fogo = Math.min(100, Math.max(5, scores.fogo + mod));
     scores.madeira = Math.min(100, Math.max(5, scores.madeira + mod * 0.7));
@@ -246,8 +249,12 @@ export function hasCompletedAnamnese(): boolean {
 }
 
 // ---- Gerar resumo para o Oracle (injetado no system prompt) ----
+
 export function generateOracleContext(profile: AnamneseProfile): string {
-  const guardiaoFraco = Object.entries(profile.guardianScores).reduce(
+  // Garantir que guardianScores existe no perfil antigo
+  const scores = profile.guardianScores || calcularGuardianScores(profile);
+  
+  const guardiaoFraco = Object.entries(scores || {}).reduce(
     (min, [k, v]) => (v < min[1] ? [k, v] : min),
     ['', 100]
   );
@@ -263,19 +270,19 @@ export function generateOracleContext(profile: AnamneseProfile): string {
   return `
 ## PERFIL DO USUÁRIO (Anamnese Evolutiva — PILAR 0)
 - Nome: ${profile.nome || 'Usuário'}
-- Faixa etária: ${profile.faixaEtaria} anos
-- Sexo biológico: ${profile.sexoBiologico}
-- Objetivo principal: ${profile.objetivoPrincipal.replace(/_/g, ' ')}
-- Qualidade do sono: ${profile.qualidadeSono}
-- Nível de estresse: ${profile.nivelEstresse.replace(/_/g, ' ')}
-- Nível de atividade física: ${profile.nivelAtividade}
-- Padrão alimentar: ${profile.padraoAlimentar.replace(/_/g, ' ')}
-- Sintomas físicos relatados: ${profile.sintomasFisicos.join(', ') || 'nenhum'}
-- Emoções dominantes: ${profile.emocoesDominantes.join(', ') || 'não informado'}
-- Condições de saúde declaradas: ${profile.condicoesExistentes.join(', ') || 'nenhuma'}
-- Medicamentos em uso: ${profile.medicamentosEmUso.join(', ') || 'nenhum'}
-- Guardião mais fraco: ${nomeGuardiao[guardiaoFraco[0]]} (${guardiaoFraco[1]}%)
-- Scores dos Guardiões: Madeira ${profile.guardianScores.madeira}%, Fogo ${profile.guardianScores.fogo}%, Terra ${profile.guardianScores.terra}%, Metal ${profile.guardianScores.metal}%, Água ${profile.guardianScores.agua}%
+- Faixa etária: ${profile.faixaEtaria || 'Não informada'} anos
+- Sexo biológico: ${profile.sexoBiologico || 'Não informado'}
+- Objetivo principal: ${(profile.objetivoPrincipal || 'Geral').replace(/_/g, ' ')}
+- Qualidade do sono: ${profile.qualidadeSono || 'Regular'}
+- Nível de estresse: ${(profile.nivelEstresse || 'Moderado').replace(/_/g, ' ')}
+- Nível de atividade física: ${profile.nivelAtividade || 'Não informado'}
+- Padrão alimentar: ${(profile.padraoAlimentar || 'Geral').replace(/_/g, ' ')}
+- Sintomas físicos relatados: ${(profile.sintomasFisicos || []).join(', ') || 'nenhum'}
+- Emoções dominantes: ${(profile.emocoesDominantes || []).join(', ') || 'não informado'}
+- Condições de saúde declaradas: ${(profile.condicoesExistentes || []).join(', ') || 'nenhuma'}
+- Medicamentos em uso: ${(profile.medicamentosEmUso || []).join(', ') || 'nenhum'}
+- Guardião mais fraco: ${nomeGuardiao[guardiaoFraco[0]] || 'Nenhum'} (${guardiaoFraco[1]}%)
+- Scores dos Guardiões: Madeira ${scores.madeira || 60}%, Fogo ${scores.fogo || 60}%, Terra ${scores.terra || 60}%, Metal ${scores.metal || 60}%, Água ${scores.agua || 60}%
 
 INSTRUÇÕES: Use este perfil para personalizar TODAS as respostas. Sempre considere os medicamentos declarados ao sugerir plantas medicinais. Priorize o Guardião mais fraco nas recomendações. Chame o usuário pelo nome quando disponível.
 `.trim();

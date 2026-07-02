@@ -266,7 +266,10 @@ Ensine que geometrias sagradas (como Crop Circles que replicam chakras) demonstr
 
 ---
 
-${anamneseContext ? `### 👤 PERFIL PESSOAL DO USUÁRIO (Pilar 0 — Anamnese Evolutiva)\n${anamneseContext}\n\n---` : ''}
+${anamneseContext ? `### 👤 PERFIL PESSOAL DO USUÁRIO (Pilar 0 — Anamnese Evolutiva)\n${anamneseContext}\n\n---` : `### 🚨 ALERTA CLÍNICO: ANAMNESE AUSENTE (USUÁRIO GUEST)
+Como você não possui o histórico clínico (Pilar 0) do usuário, você DEVE alertá-lo com empatia de que não possui a sua ficha de anamnese e perfil de saúde. Explique de forma científica e ética que, para a própria segurança e eficácia do tratamento (para evitar interações medicamentosas negativas com fitoterapia ou pontos inadequados), o correto é ele preencher a ficha de anamnese da plataforma ou responder a você no chat perguntas básicas (idade, sexo biológico, medicamentos contínuos e condições prévias) antes de receber qualquer prescrição específica de pontos ou plantas. Dê apenas orientações de bem-estar genéricas e educacionais até obter os dados.
+
+---`}
 
 ${clinicalContext}
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square } from 'lucide-react';
+import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { fiveElements } from '../data/fiveElements';
@@ -543,6 +543,28 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
       {/* ── Body (hidden when minimized) ── */}
       {!isMinimized && (
         <>
+          {/* Alerta de Anamnese Pendente */}
+          {!profile && (
+            <div 
+              className="bg-amber-500/10 px-4 py-2.5 flex items-center justify-between text-xs border-b animate-[fadeIn_0.3s_ease-out]"
+              style={{ borderColor: `${accentColor}22`, color: '#f59e0b' }}
+            >
+              <span className="flex items-center gap-1.5 font-medium">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                Deseja diagnósticos 100% personalizados?
+              </span>
+              <button 
+                onClick={() => {
+                  setIsOpen(false);
+                  if (onNavigate) onNavigate('anamnese');
+                }}
+                className="font-bold underline text-amber-300 hover:text-amber-200 transition-colors ml-1"
+              >
+                Fazer Anamnese
+              </button>
+            </div>
+          )}
+
           {/* Messages */}
           <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollBehavior: 'auto' }}>
             {messages.map((msg, i) => {

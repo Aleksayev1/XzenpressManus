@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowLeft, ArrowRight, Brain, Zap, Activity, Send, Loader2, Sparkles, X, Crown } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Brain, Zap, Activity, Send, Loader2, Sparkles, X, Crown, CheckCircle } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
 import { emotionalStates, type EmotionalState } from '../data/emotionalMapping';
 import { acupressurePoints } from '../data/acupressurePoints';
@@ -41,6 +41,11 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [timeLeft, setTimeLeft] = useState(60);
     const [isTimerActive, setIsTimerActive] = useState(false);
     const [zenFlowStepIndex, setZenFlowStepIndex] = useState(0);
+
+    // Breathing Phase States
+    const [breathState, setBreathState] = useState<'idle' | 'inhale' | 'hold' | 'exhale' | 'done'>('idle');
+    const [breathCount, setBreathCount] = useState(0);
+    const [breathSeconds, setBreathSeconds] = useState(0);
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -99,6 +104,38 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         const count = parseInt(localStorage.getItem('sessao_mestra_usage_count') || '0');
         setUsageCount(count);
     }, []);
+
+    // Guided breathing loop: 4s inhale, 2s hold, 6s exhale
+    useEffect(() => {
+        if (phase !== 'preparation' || breathState === 'idle' || breathState === 'done') return;
+
+        const interval = setInterval(() => {
+            setBreathSeconds((prev) => {
+                const next = prev + 1;
+                
+                if (breathState === 'inhale' && next >= 4) {
+                    setBreathState('hold');
+                    return 0;
+                } else if (breathState === 'hold' && next >= 2) {
+                    setBreathState('exhale');
+                    return 0;
+                } else if (breathState === 'exhale' && next >= 6) {
+                    const nextCount = breathCount + 1;
+                    setBreathCount(nextCount);
+                    if (nextCount >= 3) {
+                        setBreathState('done');
+                    } else {
+                        setBreathState('inhale');
+                    }
+                    return 0;
+                }
+                
+                return next;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [phase, breathState, breathCount]);
 
     // Chat State
     const [messages, setMessages] = useState<Message[]>([]);
@@ -426,7 +463,12 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 </button>
                             </div>
                             <button
-                                onClick={() => setPhase('preparation')}
+                                onClick={() => {
+                                    setBreathState('idle');
+                                    setBreathCount(0);
+                                    setBreathSeconds(0);
+                                    setPhase('preparation');
+                                }}
                                 className="w-full mt-3 py-3 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl font-bold text-white hover:opacity-90 transition-all flex items-center justify-center gap-2"
                             >
                                 <span>Entendi. Iniciar Preparação</span>
@@ -479,29 +521,113 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 </div>
                             </div>
 
-                            {/* Step 2: Breathing */}
-                            <div className="bg-gray-800/50 p-6 rounded-2xl border border-blue-500/20">
-                                <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                            {/* Step 2: Breathing (Interactive Guided Pacer) */}
+                            <div className="bg-gray-800/50 p-6 rounded-2xl border border-blue-500/20 flex flex-col items-center">
+                                <h3 className="text-white font-bold mb-4 w-full flex items-center gap-2">
                                     <span className="bg-blue-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
-                                    Respiração de Aterrissagem
+                                    Respiração de Aterrissagem (4-2-6)
                                 </h3>
-                                <p className="text-gray-400 text-sm mb-4">
-                                    Faça 3 respirações profundas. Inspire contando até 4, segure 2, solte em 6.
-                                    Isso sinaliza ao seu corpo que é seguro relaxar.
+                                <p className="text-gray-400 text-sm mb-6 text-center">
+                                    A respiração compassada reequilibra seu sistema nervoso em segundos.
                                 </p>
-                                <div className="flex justify-center">
-                                    <div className="w-24 h-24 rounded-full border-4 border-blue-500/30 flex items-center justify-center animate-[pulse_4s_ease-in-out_infinite]">
-                                        <div className="w-16 h-16 bg-blue-500/20 rounded-full animate-bounce"></div>
+
+                                {/* Breathing Animation Pacer */}
+                                <div className="relative w-44 h-44 flex items-center justify-center mb-6">
+                                    {/* Outermost expanding ring */}
+                                    <div 
+                                        className={`absolute rounded-full border-2 border-blue-500/25 transition-all duration-1000 ${
+                                            breathState === 'inhale' ? 'w-44 h-44' :
+                                            breathState === 'hold' ? 'w-40 h-40' : 'w-24 h-24'
+                                        }`}
+                                    />
+                                    {/* Inner solid pacing circle */}
+                                    <div 
+                                        className={`rounded-full flex flex-col items-center justify-center text-center shadow-lg transition-all text-white font-bold select-none ${
+                                            breathState === 'inhale' ? 'w-36 h-36 bg-blue-600/40 border border-blue-400 duration-[4000ms] scale-110' :
+                                            breathState === 'hold' ? 'w-36 h-36 bg-purple-600/50 border border-purple-400 duration-[2000ms] scale-115' :
+                                            breathState === 'exhale' ? 'w-24 h-24 bg-emerald-600/30 border border-emerald-400 duration-[6000ms] scale-90' :
+                                            breathState === 'done' ? 'w-24 h-24 bg-green-500/30 border border-green-400 scale-100' :
+                                            'w-24 h-24 bg-gray-700/40 border border-gray-600 scale-100'
+                                        }`}
+                                    >
+                                        {breathState === 'idle' && (
+                                            <span className="text-xs px-2">Aguardando</span>
+                                        )}
+                                        {breathState === 'inhale' && (
+                                            <>
+                                                <span className="text-sm tracking-wider animate-pulse">💨 INSPIRE</span>
+                                                <span className="text-xs font-mono opacity-85 mt-1">{breathSeconds + 1}/4s</span>
+                                            </>
+                                        )}
+                                        {breathState === 'hold' && (
+                                            <>
+                                                <span className="text-sm tracking-wider">✋ SEGURE</span>
+                                                <span className="text-xs font-mono opacity-85 mt-1">{breathSeconds + 1}/2s</span>
+                                            </>
+                                        )}
+                                        {breathState === 'exhale' && (
+                                            <>
+                                                <span className="text-sm tracking-wider animate-pulse">🍃 SOLTE</span>
+                                                <span className="text-xs font-mono opacity-85 mt-1">{breathSeconds + 1}/6s</span>
+                                            </>
+                                        )}
+                                        {breathState === 'done' && (
+                                            <CheckCircle className="w-8 h-8 text-green-400" />
+                                        )}
                                     </div>
                                 </div>
+
+                                {/* Controls & Progress */}
+                                {breathState === 'idle' ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setBreathState('inhale');
+                                            setBreathCount(0);
+                                            setBreathSeconds(0);
+                                        }}
+                                        className="py-2.5 px-6 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-all shadow-md active:scale-95"
+                                    >
+                                        Iniciar Respiração Guiada
+                                    </button>
+                                ) : (
+                                    <div className="w-full text-center space-y-2">
+                                        <div className="text-xs text-gray-400">
+                                            {breathState === 'done' ? (
+                                                <span className="text-green-400 font-bold">✨ Exercício de Respiração Concluído!</span>
+                                            ) : (
+                                                <span>Ciclo de Respiração: <strong className="text-blue-400">{breathCount + 1} de 3</strong></span>
+                                            )}
+                                        </div>
+                                        {/* Simple reset button */}
+                                        {breathState !== 'done' && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setBreathState('idle');
+                                                    setBreathCount(0);
+                                                    setBreathSeconds(0);
+                                                }}
+                                                className="text-[11px] text-gray-500 underline hover:text-gray-300 transition-colors"
+                                            >
+                                                Reiniciar
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             <button
                                 onClick={() => setPhase('acupressure')}
-                                className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(147,51,234,0.3)] transition-all flex items-center justify-center gap-2"
+                                disabled={breathState !== 'done'}
+                                className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
+                                    breathState === 'done'
+                                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-[0_0_20px_rgba(147,51,234,0.3)]'
+                                    : 'bg-gray-800 border border-gray-700 text-gray-500 cursor-not-allowed'
+                                }`}
                             >
                                 <Zap className="w-5 h-5" />
-                                Estou Pronto para os Pontos
+                                {breathState === 'done' ? 'Estou Pronto para os Pontos' : 'Faça a Respiração para Desbloquear'}
                             </button>
                             <button
                                 onClick={onBack}

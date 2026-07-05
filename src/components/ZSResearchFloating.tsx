@@ -20,7 +20,7 @@ export const ZSResearchFloating: React.FC<ZSResearchFloatingProps> = ({ onEnroll
     return (
         <>
             {/* FLOATING ACTION BUTTON (FAB) */}
-            <div className="fixed bottom-6 right-6 z-50">
+            <div className="fixed bottom-24 right-6 z-50">
                 <button
                     onClick={handleOpenModal}
                     className="group relative bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white rounded-full p-4 shadow-2xl hover:scale-110 transition-all duration-300 animate-pulse-slow"

@@ -3,6 +3,7 @@ import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Squar
 import { useAuth } from '../contexts/AuthContext';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { fiveElements } from '../data/fiveElements';
+import { ZenAvatar } from './ZenAvatar';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -564,6 +565,11 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
               </button>
             </div>
           )}
+
+          {/* ZenAvatar Visualization Center */}
+          <div className="flex flex-col items-center justify-center py-4 bg-slate-950/30 border-b border-white/5 flex-shrink-0">
+            <ZenAvatar state={speaking || ttsLoading ? 'speaking' : isLoading ? 'listening' : 'idle'} />
+          </div>
 
           {/* Messages */}
           <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollBehavior: 'auto' }}>

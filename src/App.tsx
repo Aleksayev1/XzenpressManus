@@ -45,7 +45,7 @@ import { PhytoLibraryPage } from './pages/PhytoLibraryPage';
 import LandingPage from './components/LandingPage';
 import { FeedbackPage } from './components/FeedbackPage';
 import { MapaVivoPage } from './components/MapaVivoPage';
-import { AnamnesePage } from './components/AnamnesePage';
+import { ConversationalOnboarding } from './components/ConversationalOnboarding';
 import { hasCompletedAnamnese, loadAnamneseProfile, type AnamneseProfile } from './data/anamneseProfile';
 
 import { PremiumPartnerPitch } from './pages/PremiumPartnerPitch';
@@ -281,9 +281,7 @@ function AppContent() {
         return <MapaVivoPage onPageChange={setCurrentPage} anamneseProfile={anamneseProfile} />;
       case 'anamnese':
         return (
-          <AnamnesePage
-            isGuest={!user}
-            onRegister={() => setCurrentPage('login')}
+          <ConversationalOnboarding
             onComplete={async (profile) => {
               setAnamneseProfile(profile);
               if (user?.id) {
@@ -292,6 +290,7 @@ function AppContent() {
               }
               setCurrentPage('home');
             }}
+            userEmail={user?.email}
           />
         );
       case 'premium-partner':

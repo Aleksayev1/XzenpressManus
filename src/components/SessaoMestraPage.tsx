@@ -8,6 +8,8 @@ import { zenFlowExercises } from '../data/zenFlowExercises';
 import { useAuth } from '../contexts/AuthContext';
 import { useSessionHistory } from '../hooks/useSessionHistory';
 import { loadAnamneseProfile, generateOracleContext } from '../data/anamneseProfile';
+import { CoherenceScoreWidget } from './CoherenceScoreWidget';
+import { useCoherenceScore, computeCoherenceResult, type CoherenceSnapshot } from '../hooks/useCoherenceScore';
 
 // Internal components for the phases
 import { EmotionalCheckIn } from './EmotionalCheckIn';
@@ -31,6 +33,15 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [intensity, setIntensity] = useState<number>(0);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [currentPointIndex, setCurrentPointIndex] = useState(0);
+
+    // ── Coherence Score State ───────────────────────────────────────────────
+    const { saveCoherenceResult, loadCumulativeStats, cumulativeStats } = useCoherenceScore(user?.id);
+    const [coherenceResult, setCoherenceResult] = useState<ReturnType<typeof computeCoherenceResult> | null>(null);
+    const [preSessionRmssd, setPreSessionRmssd] = useState<number>(0);
+    const [postSessionRmssd, setPostSessionRmssd] = useState<number>(0);
+    const [preSessionAnxiety, setPreSessionAnxiety] = useState<number>(5);
+    const [postSessionAnxiety, setPostSessionAnxiety] = useState<number>(5);
+    const [showAnxietyCapture, setShowAnxietyCapture] = useState(false);
 
     // Usage Limit State
     const [usageCount, setUsageCount] = useState(0);
@@ -313,6 +324,32 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             setUsageCount(newCount);
         }
 
+        // ── Capturar ansiedade pós-sessão e calcular Coherence Score ──────
+        setShowAnxietyCapture(true);
+    };
+
+    const handleFinalizeWithCoherence = (postAnxiety: number) => {
+        setShowAnxietyCapture(false);
+        setPostSessionAnxiety(postAnxiety);
+
+        // Pegar RMSSD do wearable salvo no localStorage (sincronizado pelo DeviceSyncPage)
+        const wearableRmssd = Number(localStorage.getItem('wearable_vfc')) || 0;
+        setPostSessionRmssd(wearableRmssd);
+
+        const before: CoherenceSnapshot = {
+            rmssd: preSessionRmssd || (wearableRmssd > 0 ? Math.max(10, wearableRmssd - 8) : 0),
+            anxietyScore: preSessionAnxiety,
+            timestamp: new Date(),
+        };
+        const after: CoherenceSnapshot = {
+            rmssd: wearableRmssd,
+            anxietyScore: postAnxiety,
+            timestamp: new Date(),
+        };
+
+        const result = computeCoherenceResult(before, after);
+        setCoherenceResult(result);
+
         // Record session completion
         if (selectedEmotion && user) {
             recordSession({
@@ -325,7 +362,12 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     originalProtocolId: 'sessao-mestra'
                 }
             });
+            // Save with coherence data
+            saveCoherenceResult(before, after, result, 'integrated', 600);
         }
+
+        // Load cumulative stats
+        loadCumulativeStats();
         setPhase('summary');
     };
 
@@ -856,38 +898,69 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     </div>
                 )}
 
-                {/* PHASE 4: SUMMARY */}
+                {/* PHASE 4: SUMMARY — Coherence Score */}
                 {phase === 'summary' && (
-                    <div className="absolute inset-0 flex flex-col items-center p-6 pb-32 text-center animate-in zoom-in bg-gray-900 overflow-y-auto">
-                        <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(34,197,94,0.3)]">
-                            <Sparkles className="w-12 h-12 text-green-400" />
-                        </div>
-                        <h1 className="text-4xl font-bold text-white mb-2">Tríade Alinhada</h1>
-                        <p className="text-xl text-gray-400 mb-8">Você completou o ciclo Mente-Energia-Corpo.</p>
+                    <div className="absolute inset-0 flex flex-col items-center p-6 pb-10 bg-slate-950 overflow-y-auto">
+                        <div className="w-full max-w-sm mx-auto">
+                            {/* Header */}
+                            <div className="text-center mb-6 pt-2">
+                                <div className="text-4xl mb-2">✨</div>
+                                <h1 className="text-2xl font-extrabold text-white">Tríade Alinhada</h1>
+                                <p className="text-gray-500 text-sm mt-1">{selectedEmotion?.namePortuguese} · {selectedEmotion?.mtcOrgan}</p>
+                            </div>
 
-                        <div className="bg-gray-800 p-6 rounded-2xl max-w-md w-full mb-8 border border-gray-700">
-                            <h3 className="text-gray-300 text-sm uppercase tracking-wider mb-4">Seu Diagnóstico</h3>
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-gray-400">Emoção</span>
-                                <span className="text-white font-bold">{selectedEmotion?.namePortuguese}</span>
-                            </div>
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-gray-400">Órgão</span>
-                                <span className="text-purple-400 font-bold">{selectedEmotion?.mtcOrgan}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-gray-400">Elemento</span>
-                                <span className="text-blue-400 font-bold capitalize">{selectedEmotion?.mtcElement}</span>
-                            </div>
-                            <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-700">
-                                <span className="text-gray-400">Intensidade Inicial</span>
-                                <span className="text-red-400 font-bold">{intensity}/5</span>
-                            </div>
+                            {/* Coherence Widget or fallback */}
+                            {coherenceResult ? (
+                                <CoherenceScoreWidget
+                                    result={coherenceResult}
+                                    rmssdBefore={preSessionRmssd}
+                                    rmssdAfter={postSessionRmssd}
+                                    cumulative={cumulativeStats}
+                                    onClose={onBack}
+                                />
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="bg-slate-900 border border-white/5 rounded-2xl p-5 text-center">
+                                        <p className="text-gray-400 text-sm">Conecte um wearable Bluetooth na próxima sessão para ver seu Índice de Coerência em tempo real.</p>
+                                    </div>
+                                    <button onClick={onBack} className="w-full py-4 rounded-2xl font-bold text-white border border-white/10 hover:bg-white/5 transition-all">
+                                        Voltar ao Menu
+                                    </button>
+                                </div>
+                            )}
                         </div>
+                    </div>
+                )}
 
-                        <button onClick={onBack} className="px-8 py-3 border border-gray-600 hover:bg-gray-800 text-white rounded-xl transition-all">
-                            Voltar ao Menu Principal
-                        </button>
+                {/* Modal de captura de ansiedade pós-sessão */}
+                {showAnxietyCapture && (
+                    <div className="absolute inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm">
+                        <div className="w-full max-w-sm bg-slate-900 border border-white/10 rounded-t-3xl p-6 pb-10">
+                            <div className="text-center mb-5">
+                                <div className="text-2xl mb-2">🧘</div>
+                                <h3 className="text-lg font-bold text-white">Como você está agora?</h3>
+                                <p className="text-gray-500 text-xs mt-1">Avalie seu nível de ansiedade após a sessão</p>
+                            </div>
+                            <div className="mb-6">
+                                <div className="flex justify-between text-xs text-gray-500 mb-2">
+                                    <span>Tranquilo(a)</span>
+                                    <span>{postSessionAnxiety}/10</span>
+                                    <span>Ansioso(a)</span>
+                                </div>
+                                <input
+                                    type="range" min="0" max="10" step="1"
+                                    value={postSessionAnxiety}
+                                    onChange={e => setPostSessionAnxiety(Number(e.target.value))}
+                                    className="w-full accent-purple-500"
+                                />
+                            </div>
+                            <button
+                                onClick={() => handleFinalizeWithCoherence(postSessionAnxiety)}
+                                className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg transition-all hover:opacity-90"
+                            >
+                                Ver meu Índice de Coerência
+                            </button>
+                        </div>
                     </div>
                 )}
                 {/* Standardized Image Zoom Modal */}

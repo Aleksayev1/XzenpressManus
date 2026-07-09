@@ -21,20 +21,48 @@ interface QuestionStep {
 
 const STEPS: QuestionStep[] = [
   {
-    text: "Olá! Sou a sua ZenMentor. Vamos realizar a calibração do seu Mapa de Guardiões. Para começarmos, me diga: qual é o seu objetivo principal hoje de bem-estar (como gerenciar ansiedade, energia, imunidade, sono) e como você sente o seu nível de energia geral?",
-    fieldPrompt: "Objetivo Principal e Nível de Energia"
+    // Bloco 1 — OBJETIVO + CRENÇA (Maiêutica)
+    // A crença sobre a causa é a primeira informação maiêutica.
+    // O ZenMentor captura o que o usuário ACHA que está causando o problema.
+    text: "Olá! Sou a sua ZenMentor. Estou aqui para criar um mapa completo e personalizado da sua saúde — esse mapa vai guiar todas as recomendações que você receberá no XZenPress. Cada detalhe que você compartilhar tem valor clínico real.\n\nVamos começar pelo mais essencial: qual é o seu objetivo central de bem-estar neste momento? E na sua percepção, o que você acredita estar causando ou alimentando esse estado? Não existe resposta errada — sua intuição sobre o próprio corpo é a primeira pista que vou registrar.",
+    fieldPrompt: "Objetivo Central de Bem-Estar e Percepção da Causa (Maiêutica)"
   },
   {
-    text: "Compreendido. E fisicamente, você tem sentido alguma dor ou sintoma recorrente no corpo? Por exemplo, tensão na nuca/ombros, palpitações, má digestão, inchaço ou dores nas costas?",
-    fieldPrompt: "Dores e Sintomas Físicos"
+    // Bloco 2 — ÁGUA + CRONICICIDADE (Epigenética + MTC)
+    // Quanto tempo o padrão existe determina a profundidade epigenética e o nível Ben/Biao.
+    text: "Obrigada. Agora quero entender o seu combustível vital — na Medicina Tradicional Chinesa, chamamos de Jing, a energia primordial armazenada nos rins.\n\nComo está a sua energia ao longo do dia? Você acorda descansado ou já se levanta sentindo cansaço? Essa fadiga é física, mental ou as duas? Você percebe medo específico, insegurança profunda ou sensação de que lhe falta 'chão'? Dores na região lombar ou nos joelhos também fazem parte dessa pergunta.\n\nUma pergunta fundamental: há quanto tempo você carrega esse padrão — dias, semanas, meses, anos, ou desde sempre? Isso é clinicamente muito importante.",
+    fieldPrompt: "Energia Vital, Lombalgias, Segurança e Cronicicidade do Padrão (Elemento Água + Epigenética)"
   },
   {
-    text: "Anotado. Em relação às suas noites, como está a qualidade do seu sono? E quais emoções você tem sentido mais presentes no seu dia a dia (como ansiedade, preocupação, raiva, melancolia ou paz)?",
-    fieldPrompt: "Sono e Emoções Dominantes"
+    // Bloco 3 — MADEIRA (Fígado, Tensões, Planejamento)
+    text: "Importante. Agora o sistema de movimento e planejamento — na MTC, ligado ao Fígado, que governa os tendões, a visão e a fluidez das nossas decisões e emoções.\n\nVocê sente tensão ou rigidez muscular com frequência, especialmente no pescoço, ombros, nuca ou coluna? Como está a sua visão — cansaço visual, ardência, visão turva? E emocionalmente: você percebe irritabilidade, impaciência, raiva que surge rapidamente, ou dificuldade em deixar ir situações e mágoas? Se for o caso, inclua também irregularidades no ciclo menstrual, TPM intensa ou dores.",
+    fieldPrompt: "Tensões Musculares, Visão, Irritabilidade e Ciclo (Elemento Madeira — Fígado)"
   },
   {
-    text: "Para finalizarmos e garantir sua total segurança nas recomendações: você possui alguma condição de saúde diagnosticada (pressão alta, diabetes, etc.) ou faz uso contínuo de algum medicamento?",
-    fieldPrompt: "Condições Clínicas e Medicamentos"
+    // Bloco 4 — FOGO + HORÁRIO DO SINTOMA (MTC: Relógio dos Órgãos)
+    // O horário em que o sintoma aparece ou piora revela diretamente o meridiano comprometido.
+    text: "Muito bem. Agora o centro — na MTC, o Coração é o Imperador do corpo e o guardião da mente e das emoções.\n\nComo está a qualidade do seu sono? Você demora para pegar no sono, acorda no meio da noite ou acorda mais cedo do que gostaria com a mente acelerada? Você sente palpitações ou coração acelerado em repouso? E em relação à memória e concentração: você tem dificuldade em lembrar coisas recentes ou em manter o foco?\n\nUma pergunta precisa: em que horário do dia o seu sintoma principal costuma aparecer ou piorar? Isso revela qual órgão está mais comprometido no ciclo de 24 horas.",
+    fieldPrompt: "Sono, Coração, Ansiedade, Memória e Horário do Sintoma (Elemento Fogo + Relógio dos Órgãos MTC)"
+  },
+  {
+    // Bloco 5 — TERRA (Digestão, Preocupação, Apetite)
+    text: "Anotei. Agora o centro da nutrição física e mental — o elemento Terra, associado ao Baço e Estômago na MTC.\n\nComo está a sua digestão? Você sente inchaço, gases, peso após as refeições, refluxo, ou alterna entre constipação e diarreia? Qual é o seu apetite — você come nos horários certos, pula refeições, ou sente compulsão por doces em momentos de estresse? E mentalmente: você se pega ruminando os mesmos pensamentos repetidamente, preocupado com situações que ainda não aconteceram?",
+    fieldPrompt: "Digestão, Apetite, Compulsão Alimentar e Ruminação Mental (Elemento Terra — Baço)"
+  },
+  {
+    // Bloco 6 — METAL (Pulmão, Respiração, Pele, Tristeza)
+    text: "Importante. O elemento Metal — associado ao Pulmão e ao Intestino Grosso, que governam a capacidade de receber o novo e de soltar o que não serve mais.\n\nComo está a sua respiração no cotidiano? Você respira de forma superficial, sente aperto no peito, ou tem histórico de bronquite, sinusite ou alergias respiratórias? A sua pele apresenta ressecamento, coceira, acne ou outros problemas? E emocionalmente: você carrega tristeza, melancolia, ou tem dificuldade em se desapegar de pessoas, situações ou do passado?",
+    fieldPrompt: "Respiração, Pele, Intestino Grosso e Capacidade de Soltar (Elemento Metal — Pulmão)"
+  },
+  {
+    // Bloco 7 — HISTÓRICO CLÍNICO (Segurança clínica)
+    text: "Estamos quase concluindo o seu mapa. Este ponto é fundamental para a sua segurança — preciso conhecer o seu histórico clínico para que nenhuma recomendação entre em conflito com a sua situação de saúde.\n\nVocê possui alguma condição diagnosticada por um médico? Por exemplo: hipertensão, diabetes, hipotireoidismo, transtornos de ansiedade ou depressão, doenças autoimunes, cardiopatias, problemas renais ou hepáticos. Faz uso contínuo de algum medicamento ou suplemento? Se houver cirurgias recentes ou histórico familiar relevante, este é o momento.",
+    fieldPrompt: "Histórico Clínico, Diagnósticos Médicos e Medicamentos Contínuos"
+  },
+  {
+    // Bloco 8 — CONFIRMAÇÃO ATIVA (Fechamento de Gaps)
+    text: "Obrigada pela confiança em compartilhar tudo isso comigo. Antes de finalizar o seu Mapa de Guardiões, quero garantir que nenhum detalhe importante ficou de fora.\n\nHá algo sobre a sua saúde, o seu corpo ou a sua história que você considera relevante e que ainda não mencionou? Pode ser um padrão que você nota em si mesmo há muito tempo, um sintoma que parece pequeno mas te incomoda, uma sensação que você tem dificuldade de nomear — tudo isso tem valor clínico. Este espaço é seu.",
+    fieldPrompt: "Informações Complementares e Fechamento de Gaps Clínicos"
   }
 ];
 

@@ -159,9 +159,30 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    // Initialize from LocalStorage (if navigated from Home Check-In)
+    // Initialize from LocalStorage (if navigated from Home Check-In OR from ZenMentor)
     useEffect(() => {
         try {
+            // ── Priority 1: ZenMentor handoff (< 30 min) ──────────────────────────────────
+            const handoffRaw = localStorage.getItem('zenmentor_handoff');
+            if (handoffRaw) {
+                const handoff = JSON.parse(handoffRaw);
+                const age = Date.now() - (handoff.timestamp || 0);
+                if (age < 30 * 60 * 1000 && handoff.emotionId) {
+                    const emotion = emotionalStates.find(e => e.id === handoff.emotionId);
+                    if (emotion && !selectedEmotion) {
+                        localStorage.removeItem('zenmentor_handoff');
+                        setSelectedEmotion(emotion);
+                        setIntensity(handoff.intensity || 3);
+                        setPhase('insight');
+                        initiateChat(emotion, handoff.intensity || 3);
+                        return; // handoff handled, skip the rest
+                    }
+                }
+                // Expired or invalid → clean up
+                localStorage.removeItem('zenmentor_handoff');
+            }
+
+            // ── Priority 2: Home check-in (< 1 hour) ────────────────────────────────
             const saved = localStorage.getItem('last_emotional_checkin');
             if (saved) {
                 const data = JSON.parse(saved);

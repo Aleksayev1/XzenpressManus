@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles } from 'lucide-react';
+import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles, ArrowRight } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { fiveElements } from '../data/fiveElements';
 import { ZenAvatar } from './ZenAvatar';
+import { emotionalStates } from '../data/emotionalMapping';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -126,6 +127,31 @@ function parseActionButtons(content: string) {
 
   const cleanContent = content.replace(actionRegex, '').replace(zenflowRegex, '').trim();
   return { cleanContent, actions };
+}
+
+// ─── Emotion Detector ─────────────────────────────────────────────────────────
+// Scans an AI reply for known emotional keywords and returns the best match
+function extractEmotionFromReply(text: string): string | null {
+  const lower = text.toLowerCase();
+  // Priority keyword map: emotion ID → search terms
+  const emotionKeywords: [string, string[]][] = [
+    ['anxiety',    ['ansiedade', 'ansioso', 'ansiosa', 'nervosismo', 'preocupação']],
+    ['fear',       ['medo', 'receio', 'insegurança', 'temor']],
+    ['sadness',    ['tristeza', 'triste', 'melancolia', 'choro']],
+    ['anger',      ['raiva', 'irritação', 'frustração', 'ira', 'fúria']],
+    ['grief',      ['luto', 'perda', 'saudade profunda']],
+    ['stress',     ['estresse', 'sobrecarga', 'esgotamento', 'burnout']],
+    ['insomnia',   ['insônia', 'sono', 'não consigo dormir']],
+    ['fatigue',    ['fadiga', 'cansaço', 'exaustão']],
+  ];
+  for (const [id, terms] of emotionKeywords) {
+    if (terms.some(t => lower.includes(t))) {
+      // Verify the emotion exists in our data
+      const found = emotionalStates.find(e => e.id === id);
+      if (found) return id;
+    }
+  }
+  return null;
 }
 
 // ─── Markdown-lite renderer ───────────────────────────────────────────────────
@@ -306,6 +332,10 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const [selectedVoice, setSelectedVoice] = useState<'nova' | 'echo' | 'onyx'>('nova');
   const [autoRead, setAutoRead] = useState(false);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  // ── Sessão Mestra handoff ──────────────────────────────────────────────────
+  // Index of the last assistant message that triggered an emotion CTA
+  const [sessionReadyMsgIndex, setSessionReadyMsgIndex] = useState<number | null>(null);
+  const [detectedEmotionId, setDetectedEmotionId] = useState<string | null>(null);
   const { speak, stop, speaking, loading: ttsLoading } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -393,11 +423,20 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Erro ao processar mensagem');
 
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: data.reply,
-        timestamp: new Date(),
-      }]);
+      setMessages(prev => {
+        const updated = [...prev, {
+          role: 'assistant' as const,
+          content: data.reply,
+          timestamp: new Date(),
+        }];
+        // Detect emotional context for Sessão Mestra handoff
+        const emotionId = extractEmotionFromReply(data.reply);
+        if (emotionId && sessionReadyMsgIndex === null) {
+          setDetectedEmotionId(emotionId);
+          setSessionReadyMsgIndex(updated.length - 1);
+        }
+        return updated;
+      });
       // Auto-leitura se ativada
       if (autoRead) {
         const { cleanContent } = parseActionButtons(data.reply);
@@ -643,6 +682,34 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                           </button>
                         ))}
                       </div>
+                    )}
+                    {/* ── Sessão Mestra CTA — aparece na msg que detectou a emoção ── */}
+                    {msg.role === 'assistant' && i === sessionReadyMsgIndex && detectedEmotionId && (
+                      <button
+                        onClick={() => {
+                          // Salva handoff: emoção detectada + resumo dos últimos 3 msgs
+                          const lastMsgs = messages.slice(-3).map(m => ({ role: m.role, content: m.content }));
+                          localStorage.setItem('zenmentor_handoff', JSON.stringify({
+                            emotionId: detectedEmotionId,
+                            intensity: 3, // intensidade padrão moderada
+                            summary: lastMsgs,
+                            timestamp: Date.now(),
+                          }));
+                          setIsOpen(false);
+                          onNavigate?.('triad-session');
+                        }}
+                        className="mt-2 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all hover:scale-105 w-full justify-center"
+                        style={{
+                          background: `linear-gradient(135deg, ${accentColor}33, #6366f122)`,
+                          border: `1px solid ${accentColor}66`,
+                          color: 'white',
+                          boxShadow: `0 0 12px ${accentColor}22`,
+                        }}
+                      >
+                        <Sparkles className="w-3.5 h-3.5" style={{ color: accentColor }} />
+                        Iniciar Sessão Integrativa
+                        <ArrowRight className="w-3.5 h-3.5" style={{ color: accentColor }} />
+                      </button>
                     )}
                   </div>
                 </div>

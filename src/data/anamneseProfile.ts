@@ -14,6 +14,17 @@ export type ObjetivoPrincipal =
 
 export type FaixaEtaria = '18-29' | '30-44' | '45-59' | '60+';
 
+/**
+ * Cronicicidade do padrão principal — conecta MTC, Epigenética e André Luiz.
+ * Quanto mais antigo, mais profunda a expressão epigenética e o padrão espiritual.
+ */
+export type Cronicicidade =
+  | 'dias'       // Agudo — reação recente, sem marcador epigenético consolidado
+  | 'semanas'    // Subagudo — início de padrão, epigenética em formação
+  | 'meses'      // Crônico leve — metilação inicial de genes regulatórios
+  | 'anos'       // Crônico — expressão epigenética estabelecida, padrão de Qi consolidado
+  | 'vida_toda'; // Constitucional — possível herança epigenética, padrão kármico (André Luiz)
+
 export type NivelAtividade = 'sedentario' | 'leve' | 'moderado' | 'intenso';
 
 export type QualidadeSono = 'pessimo' | 'ruim' | 'regular' | 'bom' | 'otimo';
@@ -78,6 +89,31 @@ export interface AnamneseProfile {
   // Saúde declarada
   condicoesExistentes: CondicaoExistente[];
   medicamentosEmUso: MedicamentoPotencial[];
+
+  // ─── Campos Integrativos (os 3 elos da cadeia causal) ───────────────────
+
+  /**
+   * Há quanto tempo o padrão principal existe.
+   * Epigenética: determina grau de metilação e expressão gênica consolidada.
+   * André Luiz: padrões mais longos sugerem carga perispiritual acumulada.
+   * MTC: define se é condição aguda (Biao) ou raiz profunda (Ben).
+   */
+  cronicicidade?: Cronicicidade;
+
+  /**
+   * Horário do dia em que o sintoma principal piora ou aparece.
+   * MTC: mapeia diretamente ao Relógio dos Órgãos (Horloge Circadienne).
+   * Ex: 1h–3h → Fígado (Madeira) | 3h–5h → Pulmão (Metal) | 11h–13h → Coração (Fogo)
+   */
+  horarioSintoma?: string;
+
+  /**
+   * O que o usuário acredita ser a causa do seu estado.
+   * Maiêutica: ponto de entrada para o insight terapêutico.
+   * Epigenética: crenças cronificadas alteram eixo HPA e expressão de BDNF/COMT.
+   * ZenMentor usa isso para formular a pergunta socrática certa.
+   */
+  crencaLimitante?: string;
 
   // Scores calculados dos Guardiões
   guardianScores: GuardianScoresAnamnese;
@@ -146,6 +182,56 @@ export const CONDICOES_CONFIG: { id: CondicaoExistente; label: string; emoji: st
   { id: 'insonia_cronica', label: 'Insônia crônica', emoji: '🌙' },
   { id: 'problemas_hormonais', label: 'Desequilíbrio hormonal', emoji: '⚗️' },
   { id: 'nenhuma', label: 'Nenhuma das acima', emoji: '✅' },
+];
+
+// ---- Cronicicidade ----
+export const CRONICICIDADE_CONFIG: { id: Cronicicidade; label: string; epigeneticNote: string; mtcNote: string }[] = [
+  {
+    id: 'dias',
+    label: 'Há alguns dias',
+    epigeneticNote: 'Padrão agudo — sem marcador epigenético consolidado. Alta reversibilidade.',
+    mtcNote: 'Condição de Biao (superfície) — desequilíbrio recente, responde bem à intervenção imediata.'
+  },
+  {
+    id: 'semanas',
+    label: 'Há algumas semanas',
+    epigeneticNote: 'Início de metilação em genes do eixo HPA (cortisol). Ainda reversível com prática regular.',
+    mtcNote: 'Transição Biao→Ben — o Qi está começando a comprometer o órgão subjacente.'
+  },
+  {
+    id: 'meses',
+    label: 'Há alguns meses',
+    epigeneticNote: 'Metilação de genes regulatórios (NF-κB, IL-6) em consolidação. Requer prática consistente.',
+    mtcNote: 'Condição de Ben (raiz) estabelecida — o padrão já afeta o órgão Zang e o meridiano.'
+  },
+  {
+    id: 'anos',
+    label: 'Há anos',
+    epigeneticNote: 'Expressão epigenética estabelecida — genes COMT, MAOA, BDNF provavelmente afetados. Requer trabalho longitudinal.',
+    mtcNote: 'Deficiência do Jing (essência) — o padrão penetrou no nível mais profundo do sistema energético.'
+  },
+  {
+    id: 'vida_toda',
+    label: 'Desde que me lembro / vida toda',
+    epigeneticNote: 'Possível herança epigenética intergeracional. Padrão inscrito no epigenoma desde o desenvolvimento fetal.',
+    mtcNote: 'Constituição Pré-Natal (Xian Tian Zhi Jing) — padrão herdado dos ancestrais. André Luiz: carga kármica familiar.'
+  },
+];
+
+// ---- Horários MTC (Relógio dos Órgãos / Horloge Circadienne) ----
+export const HORARIOS_MTC: { range: string; organ: string; element: string; guardian: keyof GuardianScoresAnamnese }[] = [
+  { range: '23h–1h',  organ: 'Vesícula Biliar', element: 'Madeira', guardian: 'madeira' },
+  { range: '1h–3h',   organ: 'Fígado',          element: 'Madeira', guardian: 'madeira' },
+  { range: '3h–5h',   organ: 'Pulmão',           element: 'Metal',   guardian: 'metal'   },
+  { range: '5h–7h',   organ: 'Intestino Grosso', element: 'Metal',   guardian: 'metal'   },
+  { range: '7h–9h',   organ: 'Estômago',         element: 'Terra',   guardian: 'terra'   },
+  { range: '9h–11h',  organ: 'Baço',             element: 'Terra',   guardian: 'terra'   },
+  { range: '11h–13h', organ: 'Coração',           element: 'Fogo',    guardian: 'fogo'    },
+  { range: '13h–15h', organ: 'Intestino Delgado', element: 'Fogo',    guardian: 'fogo'    },
+  { range: '15h–17h', organ: 'Bexiga',            element: 'Água',    guardian: 'agua'    },
+  { range: '17h–19h', organ: 'Rim',               element: 'Água',    guardian: 'agua'    },
+  { range: '19h–21h', organ: 'Pericárdio',        element: 'Fogo',    guardian: 'fogo'    },
+  { range: '21h–23h', organ: 'Triplo Aquecedor',  element: 'Fogo',    guardian: 'fogo'    },
 ];
 
 // ---- Medicamentos ----
@@ -267,8 +353,24 @@ export function generateOracleContext(profile: AnamneseProfile): string {
     agua: 'Guardião da Água (Rim)',
   };
 
+  // Interpretar cronicicidade nos múltiplos sistemas
+  const cronicicidadeContext = profile.cronicicidade ? (() => {
+    const cfg = CRONICICIDADE_CONFIG.find(c => c.id === profile.cronicicidade);
+    return cfg ? `\n  → Epigenética: ${cfg.epigeneticNote}\n  → MTC: ${cfg.mtcNote}` : '';
+  })() : '';
+
+  // Interpretar horário do sintoma no Relógio dos Órgãos
+  const horarioContext = profile.horarioSintoma
+    ? `\n  → Relógio dos Órgãos (MTC): Sintomas no horário "${profile.horarioSintoma}" sugerem verificar qual meridiano está em pico nesse período. Cruze com o Guardião mais fraco para confirmar o padrão.`
+    : '';
+
+  // Crença limitante para a maiêutica do ZenMentor
+  const crencaContext = profile.crencaLimitante
+    ? `\n  → Maiêutica: O usuário acredita que a causa é "${profile.crencaLimitante}". Use isso como ponto de entrada socrático — não confronte diretamente, faça a pergunta que abre a reflexão.`
+    : '';
+
   return `
-## PERFIL DO USUÁRIO (Anamnese Evolutiva — PILAR 0)
+## PERFIL DO USUÁRIO (Anamnese Evolutiva Integrativa — PILAR 0)
 - Nome: ${profile.nome || 'Usuário'}
 - Faixa etária: ${profile.faixaEtaria || 'Não informada'} anos
 - Sexo biológico: ${profile.sexoBiologico || 'Não informado'}
@@ -284,6 +386,17 @@ export function generateOracleContext(profile: AnamneseProfile): string {
 - Guardião mais fraco: ${nomeGuardiao[guardiaoFraco[0]] || 'Nenhum'} (${guardiaoFraco[1]}%)
 - Scores dos Guardiões: Madeira ${scores.madeira || 60}%, Fogo ${scores.fogo || 60}%, Terra ${scores.terra || 60}%, Metal ${scores.metal || 60}%, Água ${scores.agua || 60}%
 
-INSTRUÇÕES: Use este perfil para personalizar TODAS as respostas. Sempre considere os medicamentos declarados ao sugerir plantas medicinais. Priorize o Guardião mais fraco nas recomendações. Chame o usuário pelo nome quando disponível.
+## CADEIA CAUSAL INTEGRATIVA
+- Cronicicidade do padrão: ${profile.cronicicidade || 'não informado'}${cronicicidadeContext}
+- Horário do sintoma: ${profile.horarioSintoma || 'não informado'}${horarioContext}
+- Crença sobre a causa (Maiêutica): ${profile.crencaLimitante || 'não informada'}${crencaContext}
+
+INSTRUÇÕES INTEGRATIVAS: Use o perfil completo para personalizar TODAS as respostas.
+1. Sempre considere os medicamentos declarados ao sugerir plantas medicinais.
+2. Priorize o Guardião mais fraco nas recomendações de acupressão e Qi Gong.
+3. Use a cronicicidade para calibrar a profundidade da intervenção (aguda vs. constitucional).
+4. Se o horário do sintoma estiver informado, relacione com o meridiano correspondente.
+5. Use a crença limitante como ponto de entrada maiêutico — nunca confronte, pergunte.
+6. Chame o usuário pelo nome quando disponível.
 `.trim();
 }

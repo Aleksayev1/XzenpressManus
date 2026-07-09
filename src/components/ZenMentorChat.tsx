@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles } from 'lucide-react';
+import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles, ArrowRight } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { fiveElements } from '../data/fiveElements';
+import { ZenAvatar } from './ZenAvatar';
+import { emotionalStates } from '../data/emotionalMapping';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -125,6 +127,29 @@ function parseActionButtons(content: string) {
 
   const cleanContent = content.replace(actionRegex, '').replace(zenflowRegex, '').trim();
   return { cleanContent, actions };
+}
+
+// ─── Emotion Detector ─────────────────────────────────────────────────────────────
+// Scans an AI reply for emotional keywords and returns the best matching emotion ID
+function extractEmotionFromReply(text: string): string | null {
+  const lower = text.toLowerCase();
+  const emotionKeywords: [string, string[]][] = [
+    ['anxiety',  ['ansiedade', 'ansioso', 'ansiosa', 'nervosismo', 'preocupação']],
+    ['fear',     ['medo', 'receio', 'insegurança', 'temor', 'pavor']],
+    ['sadness',  ['tristeza', 'triste', 'melancolia', 'depressão', 'choro']],
+    ['anger',    ['raiva', 'irritação', 'frustração', 'ira', 'fúria']],
+    ['grief',    ['luto', 'perda', 'saudade profunda', 'vazio']],
+    ['stress',   ['estresse', 'sobrecarga', 'esgotamento', 'burnout']],
+    ['insomnia', ['insônia', 'não consigo dormir', 'sono ruim', 'acorda']],
+    ['fatigue',  ['fadiga', 'cansaço', 'exaustão', 'sem energia']],
+  ];
+  for (const [id, terms] of emotionKeywords) {
+    if (terms.some(t => lower.includes(t))) {
+      const found = emotionalStates.find(e => e.id === id);
+      if (found) return id;
+    }
+  }
+  return null;
 }
 
 // ─── Markdown-lite renderer ───────────────────────────────────────────────────
@@ -305,6 +330,9 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const [selectedVoice, setSelectedVoice] = useState<'nova' | 'echo' | 'onyx'>('nova');
   const [autoRead, setAutoRead] = useState(false);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  // ── Ciclo Terapêutico handoff ──────────────────────────────────────────────────
+  const [sessionReadyMsgIndex, setSessionReadyMsgIndex] = useState<number | null>(null);
+  const [detectedEmotionId, setDetectedEmotionId] = useState<string | null>(null);
   const { speak, stop, speaking, loading: ttsLoading } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -392,11 +420,20 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Erro ao processar mensagem');
 
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: data.reply,
-        timestamp: new Date(),
-      }]);
+      setMessages(prev => {
+        const updated = [...prev, {
+          role: 'assistant' as const,
+          content: data.reply,
+          timestamp: new Date(),
+        }];
+        // Detectar emoção para handoff do Ciclo Terapêutico
+        const emotionId = extractEmotionFromReply(data.reply);
+        if (emotionId && sessionReadyMsgIndex === null) {
+          setDetectedEmotionId(emotionId);
+          setSessionReadyMsgIndex(updated.length - 1);
+        }
+        return updated;
+      });
       // Auto-leitura se ativada
       if (autoRead) {
         const { cleanContent } = parseActionButtons(data.reply);
@@ -565,6 +602,11 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
             </div>
           )}
 
+          {/* ZenAvatar Visualization Center */}
+          <div className="flex flex-col items-center justify-center py-4 bg-slate-950/30 border-b border-white/5 flex-shrink-0">
+            <ZenAvatar state={speaking || ttsLoading ? 'speaking' : isLoading ? 'listening' : 'idle'} />
+          </div>
+
           {/* Messages */}
           <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollBehavior: 'auto' }}>
             {messages.map((msg, i) => {
@@ -637,6 +679,34 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                           </button>
                         ))}
                       </div>
+                    )}
+                    {/* ── Ciclo Terapêutico CTA ── */}
+                    {msg.role === 'assistant' && i === sessionReadyMsgIndex && detectedEmotionId && (
+                      <button
+                        onClick={() => {
+                          const lastMsgs = messages.slice(-4).map(m => ({ role: m.role, content: m.content }));
+                          localStorage.setItem('zenmentor_handoff', JSON.stringify({
+                            emotionId: detectedEmotionId,
+                            intensity: 3,
+                            summary: lastMsgs,
+                            timestamp: Date.now(),
+                            source: 'zenmentor',
+                          }));
+                          setIsOpen(false);
+                          onNavigate?.('triad-session');
+                        }}
+                        className="mt-2 flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all hover:scale-105 w-full justify-center"
+                        style={{
+                          background: `linear-gradient(135deg, ${accentColor}33, #6366f122)`,
+                          border: `1px solid ${accentColor}66`,
+                          color: 'white',
+                          boxShadow: `0 0 16px ${accentColor}22`,
+                        }}
+                      >
+                        <Sparkles className="w-3.5 h-3.5" style={{ color: accentColor }} />
+                        Iniciar Ciclo Terapêutico Completo
+                        <ArrowRight className="w-3.5 h-3.5" style={{ color: accentColor }} />
+                      </button>
                     )}
                   </div>
                 </div>

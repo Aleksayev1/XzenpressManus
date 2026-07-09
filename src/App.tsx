@@ -94,6 +94,18 @@ function AppContent() {
     }
   }, []);
 
+  // ── Ciclo Terapêutico ──────────────────────────────────────────────────────────
+  // Escuta evento global 'xzen-navigate' disparado por qualquer componente
+  // para fazer roteamento sem precisar de props callback profundas.
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      const page = (e as CustomEvent<string>).detail;
+      if (page) setCurrentPage(page);
+    };
+    window.addEventListener('xzen-navigate', handler);
+    return () => window.removeEventListener('xzen-navigate', handler);
+  }, []);
+
   // Detectar callbacks OAuth e Spotify
   React.useEffect(() => {
     const hash = window.location.hash;

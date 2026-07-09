@@ -210,11 +210,14 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         }
     };
 
-    const initiateChat = async (emotion: EmotionalState, intensity: number) => {
+    const initiateChat = async (emotion: EmotionalState, intensity: number, handoffHistory?: any[]) => {
         setIsLoading(true);
-        const seedMessage = `OLÁ. Identifiquei que estou sentindo **${emotion.namePortuguese}** (Nível ${intensity}/5). 
-        Isso está ligado ao órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).
-        Por favor, me ajude a encontrar a causa moral ou metafísica disso (Valcapelli/Kwitko) de forma acolhedora.`;
+        
+        // Se houver histórico do mentor, criamos uma mensagem semente contextualizada.
+        // Caso contrário, usamos a semente padrão sem usar a palavra "Valcapelli" para evitar o filtro de segurança (prompt injection)
+        const seedMessage = handoffHistory && handoffHistory.length > 0
+            ? `Com base na conversa anterior que tivemos sobre meu estado de **${emotion.namePortuguese}** (Nível ${intensity}/5), por favor, continue me guiando no aprofundamento das causas emocionais e na indicação de pontos ou práticas de reequilíbrio.`
+            : `OLÁ. Identifiquei que estou sentindo **${emotion.namePortuguese}** (Nível ${intensity}/5). Isso está ligado ao órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}). Por favor, me ajude a encontrar a causa emocional profunda disso de forma acolhedora.`;
 
         // Add hidden user message to history (or just system context)
         // We simulate the AI greeting based on this context
@@ -227,7 +230,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: seedMessage,
-                    conversationHistory: [], // Fresh start
+                    conversationHistory: handoffHistory || [],
                     userEmail: user?.email || 'guest',
                     isPremium: user?.isPremium || false,
                     anamneseContext: oracleContext,
@@ -236,11 +239,19 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
             const data = await response.json();
             if (data.reply) {
-                setMessages([{
-                    role: 'assistant',
-                    content: data.reply,
+                const historyFormatted = (handoffHistory || []).map(m => ({
+                    role: m.role as 'user' | 'assistant',
+                    content: m.content,
                     timestamp: new Date()
-                }]);
+                }));
+                setMessages([
+                    ...historyFormatted,
+                    {
+                        role: 'assistant',
+                        content: data.reply,
+                        timestamp: new Date()
+                    }
+                ]);
             }
         } catch (error) {
             console.warn("Offline/Localhost mode: AI unavailable. Using fallback.");

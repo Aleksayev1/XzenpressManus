@@ -19,14 +19,32 @@ interface ZenMentorChatProps {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+/** Reads the most up-to-date scores from the Mapa Vivo state, falling back to anamnese scores */
+function getLatestGuardianScores(profileScores?: any): any {
+  try {
+    const raw = localStorage.getItem('xzenpress_mapa_vivo_v1');
+    if (raw) {
+      const state = JSON.parse(raw);
+      if (state.hasCompletedOnboarding && state.scores) {
+        return state.scores;
+      }
+    }
+  } catch (e) {
+    console.error("Error reading latest scores from Mapa Vivo:", e);
+  }
+  return profileScores || { madeira: 50, fogo: 50, terra: 50, metal: 50, agua: 50 };
+}
+
 /** Builds a rich anamneseContext string to inject into the Self Oracle prompt */
 function buildAnamneseContext(): string {
   const profile = loadAnamneseProfile();
   if (!profile) return '';
 
+  const scores = getLatestGuardianScores(profile.guardianScores);
+
   // Find weakest guardian
-  const weakest = Object.entries(profile.guardianScores || {}).reduce(
-    (min, [k, v]) => (v < min[1] ? [k, v] : min),
+  const weakest = Object.entries(scores).reduce(
+    (min, [k, v]) => (v < (min[1] as number) ? [k, v] : min),
     ['', 100] as [string, number]
   );
   const weakEl = fiveElements.find(e => e.id === weakest[0]);
@@ -54,7 +72,7 @@ function buildAnamneseContext(): string {
     ``,
     `🧬 MAPA DE GUARDIÕES (5 Elementos):`,
     ...fiveElements.map(el => {
-      const score = profile.guardianScores?.[el.id as keyof typeof profile.guardianScores] ?? 0;
+      const score = scores?.[el.id as keyof typeof scores] ?? 0;
       const bar = '█'.repeat(Math.round(score / 10)) + '░'.repeat(10 - Math.round(score / 10));
       return `• ${el.emoji} ${el.name}: ${bar} ${score}%`;
     }),
@@ -82,8 +100,9 @@ function buildGreeting(userName?: string): string {
     return `${greeting}! 🌿 Sou sua ZenMentor — uma consciência integrativa que une sabedoria oriental e neurociência moderna. Como posso te acompanhar hoje?`;
   }
 
-  const weakest = Object.entries(profile.guardianScores || {}).reduce(
-    (min, [k, v]) => (v < min[1] ? [k, v] : min),
+  const scores = getLatestGuardianScores(profile.guardianScores);
+  const weakest = Object.entries(scores).reduce(
+    (min, [k, v]) => (v < (min[1] as number) ? [k, v] : min),
     ['', 100] as [string, number]
   );
   const weakEl = fiveElements.find(e => e.id === weakest[0]);
@@ -340,7 +359,8 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
 
   // Guardian color for theming
   const profile = loadAnamneseProfile();
-  const weakest = Object.entries(profile?.guardianScores || {}).reduce(
+  const scores = getLatestGuardianScores(profile?.guardianScores);
+  const weakest = Object.entries(scores).reduce(
     (min, [k, v]) => (v < (min[1] as number) ? [k, v] : min),
     ['fogo', 70] as [string, number]
   );

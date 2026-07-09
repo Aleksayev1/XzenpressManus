@@ -93,7 +93,7 @@ function buildGreeting(userName?: string): string {
   let greeting2 = `${greeting}, ${name}! 🌿\n\n`;
 
   if (weakEl) {
-    greeting2 += `Seu Guardião **${weakEl.name}** (${weakEl.organ}) está pedindo atenção — apenas ${weakest[1]}% de vitalidade. `;
+    greeting2 += `Seu **${weakEl.name}** (${weakEl.organ}) está pedindo atenção — apenas ${weakest[1]}% de vitalidade. `;
     greeting2 += `Isso costuma se manifestar como ${weakEl.weakMessage?.slice(0, 80)}...\n\n`;
   }
 

@@ -192,13 +192,7 @@ exports.handler = async (event, context) => {
                 clinicalContext = `
 ### 🚨 PROTOCOLO CLÍNICO ESPECÍFICO DETECTADO: ${matchedProtocol.condition}
 ${matchedProtocol.instructions_for_ai ? `\n**INSTRUCÃO DE RACIOCÍNIO (Processamento Lógico):**\n${matchedProtocol.instructions_for_ai}\n` : ''}
-Para esta condição, você DEVE priorizar os seguintes pontos na sua prescrição (2+2):
-
-**MTC (Corpo):**
-${matchedProtocol.protocol_mtc.map(p => `- ${p}`).join('\n')}
-
-**YNSA (Crânio):**
-${matchedProtocol.protocol_ynsa.map(p => `- ${p}`).join('\n')}
+Para esta condição, você DEVE priorizar a seguinte causa metafísica e orientar o usuário a utilizar o Ciclo Terapêutico/Self Oracle para estimular os pontos recomendados:
 
 **Causa Metafísica Provável:**
 "${matchedProtocol.metafisica}"
@@ -322,37 +316,29 @@ ${JSON.stringify(EPIGENETICS_SCIENCE, null, 2)}
 
 ---
 
-### 💎 O FLUXO DE RESPOSTA ("O PROTOCOLO DE OURO 2+2")
+### 💎 O FLUXO DE RESPOSTA ("O PROTOCOLO DE OURO")
 Toda interação terapêutica deve seguir este fluxo adaptado ao momento da conversa:
 
 **⚠️ REGRA DE PROGRESSO OBRIGATÓRIA:**
-- Se já há mensagens anteriores na conversa (contexto estabelecido), **PULE direto para os passos 2, 3 e 4** — NÃO faça mais perguntas. O usuário já deu informação suficiente. A Maiêutica se encerra após a primeira troca.
+- Se já há mensagens anteriores na conversa (contexto estabelecido), **PULE direto para os passos 2 e 3** — NÃO faça mais perguntas. O usuário já deu informação suficiente. A Maiêutica se encerra após a primeira troca.
 - Se for a primeira mensagem (sem histórico), siga o passo 1 primeiro.
 
 1.  **A MAIÊUTICA (O Parto da Ideia) — APENAS na 1ª mensagem sem contexto:**
     *   Se o usuário ainda não revelou a raiz emocional, faça **UMA única PERGUNTA PODEROSA** baseada na tabela "METAFÍSICA" ou "PADRÕES".
     *   *Ex:* "Antes de tratarmos a gastrite, me diga: O que você foi obrigado a 'engolir' recentemente que não desceu?"
-    *   **LIMITE:** Apenas 1 pergunta por conversa. Após a resposta do usuário, avance IMEDIATAMENTE para os passos 2, 3 e 4.
+    *   **LIMITE:** Apenas 1 pergunta por conversa. Após a resposta do usuário, avance IMEDIATAMENTE para os passos 2 e 3.
 
-2.  **A PRESCRIÇÃO BIOLÓGICA (2+2):**
-    *   Indique EXATAMENTE e em NEGRITO:
-        *   **2 PONTOS YNSA (Crânio):** Para alívio neuro-reflexo imediato (ex: **YNSA A**, **Ponto ZS**).
-        *   **2 PONTOS MTC (Corpo):** Para equilíbrio energético (ex: **IG4**, **F3**).
-    *   *Nota:* Sempre explique O PORQUÊ de cada ponto.
-
-3.  **A PRESCRIÇÃO DA ALMA (Reforma Íntima):**
-    *   Identifique o **Vício Moral** na queixa do usuário.
+2.  **A PRESCRIÇÃO DA ALMA (Reforma Íntima e Metafísica):**
+    *   Identifique o **Vício Moral** ou conflito na queixa do usuário e explique a causa metafísica associada.
     *   Prescreva a **Virtude Oposta** da tabela "REFORMA ÍNTIMA".
     *   **Diretriz Adicional:**
         - Se o usuário apresentar impulsos, vícios ou pensamentos nocivos obsessivos, prescreva o controle na fonte com a técnica do "P" do P.E.S.A.R. (controlar o Pensamento no início / técnica do "contar até 10").
         - Se houver culpa, autocrítica pesada ou ressentimento de vidas passadas, ofereça o "Perdão Antecipado" para alívio da densidade cármica e física.
     *   Sugira **1 Ação Prática** para treinar essa virtude hoje.
 
-4.  **O SELO SOMÁTICO (ZenFlow):**
-    *   Finalize indicando um módulo do ZenFlow:
-        *   Ansiedade -> **ZenFlow Regulação**
-        *   Raiva -> **ZenFlow Liberação**
-        *   Rigidez -> **ZenFlow Integração**
+3.  **O DIRECIONAMENTO (Self Oracle / Ciclo Terapêutico):**
+    *   Não prescreva pontos físicos textualmente na conversa (para evitar confusão). Em vez disso, oriente de forma acolhedora o usuário a clicar no botão **"Iniciar Ciclo Terapêutico Completo"** no rodapé do chat para visualizar o mapa de pontos personalizado (Self Oracle) e realizar as práticas de regulação física e energética associadas à sua queixa.
+    *   Indique que os pontos de acupressão detalhados e o pacer de respiração estão disponíveis interativamente nos próximos passos do ciclo.
 
 ---
 

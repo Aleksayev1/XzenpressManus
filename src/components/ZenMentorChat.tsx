@@ -44,7 +44,7 @@ function buildAnamneseContext(): string {
 
   // Find weakest guardian
   const weakest = Object.entries(scores).reduce(
-    (min, [k, v]) => (v < (min[1] as number) ? [k, v] : min),
+    (min, [k, v]) => ((v as number) < (min[1] as number) ? [k, v] : min),
     ['', 100] as [string, number]
   );
   const weakEl = fiveElements.find(e => e.id === weakest[0]);
@@ -102,7 +102,7 @@ function buildGreeting(userName?: string): string {
 
   const scores = getLatestGuardianScores(profile.guardianScores);
   const weakest = Object.entries(scores).reduce(
-    (min, [k, v]) => (v < (min[1] as number) ? [k, v] : min),
+    (min, [k, v]) => ((v as number) < (min[1] as number) ? [k, v] : min),
     ['', 100] as [string, number]
   );
   const weakEl = fiveElements.find(e => e.id === weakest[0]);
@@ -361,7 +361,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const profile = loadAnamneseProfile();
   const scores = getLatestGuardianScores(profile?.guardianScores);
   const weakest = Object.entries(scores).reduce(
-    (min, [k, v]) => (v < (min[1] as number) ? [k, v] : min),
+    (min, [k, v]) => ((v as number) < (min[1] as number) ? [k, v] : min),
     ['fogo', 70] as [string, number]
   );
   const guardianEl = fiveElements.find(e => e.id === weakest[0]) || fiveElements[0];

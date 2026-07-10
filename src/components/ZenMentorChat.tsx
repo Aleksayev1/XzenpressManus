@@ -448,9 +448,8 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
         }];
         // Detectar emoção para handoff do Ciclo Terapêutico
         const emotionId = extractEmotionFromReply(data.reply);
-        if (emotionId && sessionReadyMsgIndex === null) {
+        if (emotionId) {
           setDetectedEmotionId(emotionId);
-          setSessionReadyMsgIndex(updated.length - 1);
         }
         return updated;
       });
@@ -701,33 +700,43 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                       </div>
                     )}
                     {/* ── Ciclo Terapêutico CTA ── */}
-                    {msg.role === 'assistant' && i === sessionReadyMsgIndex && detectedEmotionId && (
-                      <button
-                        onClick={() => {
-                          const lastMsgs = messages.slice(-4).map(m => ({ role: m.role, content: m.content }));
-                          localStorage.setItem('zenmentor_handoff', JSON.stringify({
-                            emotionId: detectedEmotionId,
-                            intensity: 3,
-                            summary: lastMsgs,
-                            timestamp: Date.now(),
-                            source: 'zenmentor',
-                          }));
-                          setIsOpen(false);
-                          onNavigate?.('triad-session');
-                        }}
-                        className="mt-2 flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all hover:scale-105 w-full justify-center"
-                        style={{
-                          background: `linear-gradient(135deg, ${accentColor}33, #6366f122)`,
-                          border: `1px solid ${accentColor}66`,
-                          color: 'white',
-                          boxShadow: `0 0 16px ${accentColor}22`,
-                        }}
-                      >
-                        <Sparkles className="w-3.5 h-3.5" style={{ color: accentColor }} />
-                        Iniciar Ciclo Terapêutico Completo
-                        <ArrowRight className="w-3.5 h-3.5" style={{ color: accentColor }} />
-                      </button>
-                    )}
+                    {msg.role === 'assistant' && i === messages.length - 1 && messages.length > 1 && (() => {
+                      const elementToEmotionMap: Record<string, string> = {
+                        terra: 'anxiety',
+                        madeira: 'anger',
+                        fogo: 'stress',
+                        metal: 'sadness',
+                        agua: 'fear'
+                      };
+                      const effectiveEmotionId = detectedEmotionId || elementToEmotionMap[weakest[0]] || 'anxiety';
+                      return (
+                        <button
+                          onClick={() => {
+                            const lastMsgs = messages.slice(-4).map(m => ({ role: m.role, content: m.content }));
+                            localStorage.setItem('zenmentor_handoff', JSON.stringify({
+                              emotionId: effectiveEmotionId,
+                              intensity: 3,
+                              summary: lastMsgs,
+                              timestamp: Date.now(),
+                              source: 'zenmentor',
+                            }));
+                            setIsOpen(false);
+                            onNavigate?.('triad-session');
+                          }}
+                          className="mt-2 flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all hover:scale-105 w-full justify-center"
+                          style={{
+                            background: `linear-gradient(135deg, ${accentColor}33, #6366f122)`,
+                            border: `1px solid ${accentColor}66`,
+                            color: 'white',
+                            boxShadow: `0 0 16px ${accentColor}22`,
+                          }}
+                        >
+                          <Sparkles className="w-3.5 h-3.5" style={{ color: accentColor }} />
+                          Iniciar Ciclo Terapêutico Completo
+                          <ArrowRight className="w-3.5 h-3.5" style={{ color: accentColor }} />
+                        </button>
+                      );
+                    })()}
                   </div>
                 </div>
               );

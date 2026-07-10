@@ -8,6 +8,8 @@ import { zenFlowExercises } from '../data/zenFlowExercises';
 import { useAuth } from '../contexts/AuthContext';
 import { useSessionHistory } from '../hooks/useSessionHistory';
 import { loadAnamneseProfile, generateOracleContext } from '../data/anamneseProfile';
+import { CoherenceScoreWidget } from './CoherenceScoreWidget';
+import { useCoherenceScore, computeCoherenceResult, type CoherenceSnapshot } from '../hooks/useCoherenceScore';
 
 // Internal components for the phases
 import { EmotionalCheckIn } from './EmotionalCheckIn';
@@ -31,6 +33,15 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [intensity, setIntensity] = useState<number>(0);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [currentPointIndex, setCurrentPointIndex] = useState(0);
+
+    // ── Coherence Score State ───────────────────────────────────────────────
+    const { saveCoherenceResult, loadCumulativeStats, cumulativeStats } = useCoherenceScore(user?.id);
+    const [coherenceResult, setCoherenceResult] = useState<ReturnType<typeof computeCoherenceResult> | null>(null);
+    const [preSessionRmssd, setPreSessionRmssd] = useState<number>(0);
+    const [postSessionRmssd, setPostSessionRmssd] = useState<number>(0);
+    const [preSessionAnxiety, setPreSessionAnxiety] = useState<number>(5);
+    const [postSessionAnxiety, setPostSessionAnxiety] = useState<number>(5);
+    const [showAnxietyCapture, setShowAnxietyCapture] = useState(false);
 
     // Usage Limit State
     const [usageCount, setUsageCount] = useState(0);
@@ -163,7 +174,12 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         setSelectedEmotion(emotion);
                         setIntensity(handoff.intensity || 3);
                         setPhase('insight');
-                        initiateChat(emotion, handoff.intensity || 3);
+                        
+                        const currentVfc = Number(localStorage.getItem('wearable_vfc')) || Number(localStorage.getItem('xzen_vfc_current')) || 0;
+                        setPreSessionRmssd(currentVfc);
+                        setPreSessionAnxiety((handoff.intensity || 3) * 2);
+                        
+                        initiateChat(emotion, handoff.intensity || 3, handoff.summary);
                         return;
                     }
                 }
@@ -182,7 +198,13 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         setSelectedEmotion(emotion);
                         setIntensity(data.intensity);
                         setPhase('insight');
+                        
+                        const currentVfc = Number(localStorage.getItem('wearable_vfc')) || Number(localStorage.getItem('xzen_vfc_current')) || 0;
+                        setPreSessionRmssd(currentVfc);
+                        setPreSessionAnxiety(data.intensity * 2);
+                        
                         initiateChat(emotion, data.intensity);
+                        return;
                     }
                 }
             }
@@ -204,6 +226,10 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             setSelectedEmotion(emotion);
             setIntensity(intensityValue);
             setPhase('insight');
+
+            const currentVfc = Number(localStorage.getItem('wearable_vfc')) || Number(localStorage.getItem('xzen_vfc_current')) || 0;
+            setPreSessionRmssd(currentVfc);
+            setPreSessionAnxiety(intensityValue * 2);
 
             // Seed the chat with the context
             initiateChat(emotion, intensityValue);
@@ -343,6 +369,32 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             setUsageCount(newCount);
         }
 
+        // ── Capturar ansiedade pós-sessão e calcular Coherence Score ──────
+        setShowAnxietyCapture(true);
+    };
+
+    const handleFinalizeWithCoherence = (postAnxiety: number) => {
+        setShowAnxietyCapture(false);
+        setPostSessionAnxiety(postAnxiety);
+
+        // Pegar RMSSD do wearable salvo no localStorage (sincronizado pelo DeviceSyncPage)
+        const wearableRmssd = Number(localStorage.getItem('wearable_vfc')) || Number(localStorage.getItem('xzen_vfc_current')) || 0;
+        setPostSessionRmssd(wearableRmssd);
+
+        const before: CoherenceSnapshot = {
+            rmssd: preSessionRmssd || (wearableRmssd > 0 ? Math.max(10, wearableRmssd - 8) : 0),
+            anxietyScore: preSessionAnxiety,
+            timestamp: new Date(),
+        };
+        const after: CoherenceSnapshot = {
+            rmssd: wearableRmssd,
+            anxietyScore: postAnxiety,
+            timestamp: new Date(),
+        };
+
+        const result = computeCoherenceResult(before, after);
+        setCoherenceResult(result);
+
         // Record session completion
         if (selectedEmotion && user) {
             recordSession({
@@ -355,7 +407,12 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     originalProtocolId: 'sessao-mestra'
                 }
             });
+            // Save with coherence data
+            saveCoherenceResult(before, after, result, 'integrated', 600);
         }
+
+        // Load cumulative stats
+        loadCumulativeStats();
         setPhase('summary');
     };
 
@@ -897,9 +954,20 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 <p className="text-gray-500 text-sm mt-1">{selectedEmotion?.namePortuguese} · {selectedEmotion?.mtcOrgan}</p>
                             </div>
 
-                            <div className="bg-slate-900 border border-white/5 rounded-2xl p-5 text-center mb-4">
-                                <p className="text-gray-400 text-sm">Você completou o ciclo Mente-Energia-Corpo.</p>
-                            </div>
+                            {coherenceResult ? (
+                                <div className="mb-6 w-full">
+                                    <CoherenceScoreWidget
+                                        result={coherenceResult}
+                                        rmssdBefore={preSessionRmssd}
+                                        rmssdAfter={postSessionRmssd}
+                                        cumulative={cumulativeStats}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="bg-slate-900 border border-white/5 rounded-2xl p-5 text-center mb-4">
+                                    <p className="text-gray-400 text-sm">Você completou o ciclo Mente-Energia-Corpo.</p>
+                                </div>
+                            )}
 
                             {/* ──────────────────────────────────────────────────────── */}
                             {/* OFICINA TERAPÊUTICA — Próximos Setores                       */}
@@ -1030,6 +1098,38 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         </div>
                     </div>
                 )}
+                {/* Modal de captura de ansiedade pós-sessão */}
+                {showAnxietyCapture && (
+                    <div className="absolute inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm">
+                        <div className="w-full max-w-sm bg-slate-900 border border-white/10 rounded-t-3xl p-6 pb-10">
+                            <div className="text-center mb-5">
+                                <div className="text-2xl mb-2">🧘</div>
+                                <h3 className="text-lg font-bold text-white">Como você está agora?</h3>
+                                <p className="text-gray-500 text-xs mt-1">Avalie seu nível de ansiedade após a sessão</p>
+                            </div>
+                            <div className="mb-6">
+                                <div className="flex justify-between text-xs text-gray-500 mb-2">
+                                    <span>Tranquilo(a)</span>
+                                    <span>{postSessionAnxiety}/10</span>
+                                    <span>Ansioso(a)</span>
+                                </div>
+                                <input
+                                    type="range" min="0" max="10" step="1"
+                                    value={postSessionAnxiety}
+                                    onChange={e => setPostSessionAnxiety(Number(e.target.value))}
+                                    className="w-full accent-purple-500"
+                                />
+                            </div>
+                            <button
+                                onClick={() => handleFinalizeWithCoherence(postSessionAnxiety)}
+                                className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg transition-all hover:opacity-90"
+                            >
+                                Ver meu Índice de Coerência
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* Standardized Image Zoom Modal */}
                 <ImageZoomModal
                     isVisible={!!selectedImage}

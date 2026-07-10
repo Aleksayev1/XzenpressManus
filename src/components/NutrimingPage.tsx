@@ -148,6 +148,12 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
     const [showAddForm, setShowAddForm] = useState(false);
     const [newSupplement, setNewSupplement] = useState({ name: '', dosage: '', notes: '' });
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [contextBanner, setContextBanner] = useState<{
+        organ: string;
+        element: string;
+        emotionName: string;
+        symptom: string | null;
+    } | null>(null);
 
     // Novo Estado para Segurança
     const [showSafetyModal, setShowSafetyModal] = useState(false);
@@ -361,11 +367,64 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
             const savedProfile = await NutrimingStorageService.loadProfile(user.id); // Agora é async
 
             setSupplements(savedSupplements);
+
+            // ── Ler nutriming_context ──────────────────────────────────────
+            let updatedSymptoms = savedProfile.symptoms || [];
+            try {
+                const raw = localStorage.getItem('nutriming_context');
+                if (raw) {
+                    const context = JSON.parse(raw);
+                    localStorage.removeItem('nutriming_context'); // Clear it immediately
+
+                    const emotionToSymptomMap: Record<string, string> = {
+                        anxiety: 'Ansiedade',
+                        stress: 'Estresse',
+                        insomnia: 'Insônia',
+                        fatigue: 'Fadiga',
+                        anger: 'Estresse',
+                        sadness: 'Estresse',
+                        grief: 'Estresse',
+                    };
+
+                    const symptom = emotionToSymptomMap[context.emotionId];
+                    if (symptom && !updatedSymptoms.includes(symptom)) {
+                        updatedSymptoms = [...updatedSymptoms, symptom];
+
+                        // Save profile with new symptom
+                        await NutrimingStorageService.saveProfile(user.id, {
+                            ...savedProfile,
+                            symptoms: updatedSymptoms
+                        });
+                    }
+
+                    // Set context banner state
+                    const emotionNames: Record<string, string> = {
+                        anxiety: 'Ansiedade',
+                        stress: 'Estresse',
+                        insomnia: 'Insônia',
+                        fatigue: 'Fadiga',
+                        anger: 'Raiva',
+                        sadness: 'Tristeza',
+                        grief: 'Luto/Pesar'
+                    };
+                    const emotionName = emotionNames[context.emotionId] || context.emotionId || '';
+
+                    setContextBanner({
+                        organ: context.organ || '',
+                        element: context.element || '',
+                        emotionName,
+                        symptom: symptom || null
+                    });
+                }
+            } catch (err) {
+                console.error('Error reading nutriming_context:', err);
+            }
+
             // Garantir que profile tenha todos os campos
             setUserProfile({
                 age: savedProfile.age || 35,
                 gender: savedProfile.gender || 'other',
-                symptoms: savedProfile.symptoms || []
+                symptoms: updatedSymptoms
             });
         };
 
@@ -683,8 +742,24 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                                 </p>
                             </div>
                         </div>
-                    </div>
                 </div>
+
+                {/* Contextual Onboarding/Oficina Banner */}
+                {contextBanner && (
+                    <div className="max-w-6xl mx-auto mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 animate-in slide-in-from-top duration-300">
+                        <div className="flex items-center gap-3">
+                            <div className="p-3 bg-emerald-100 rounded-xl shrink-0 text-emerald-600 text-xl font-bold">
+                                🥗
+                            </div>
+                            <div className="text-left">
+                                <h4 className="font-bold text-emerald-900 text-sm">Oficina Terapêutica — Conexão Ativa</h4>
+                                <p className="text-xs text-gray-600 mt-0.5">
+                                    Identificamos que você concluiu o trabalho para o órgão <strong>{contextBanner.organ}</strong> (Elemento {contextBanner.element}) decorrente do estado de <strong>{contextBanner.emotionName}</strong>. Carregamos recomendações alimentares e nutricionais específicas para este pilar.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Perfil do Usuário */}

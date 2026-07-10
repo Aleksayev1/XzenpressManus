@@ -12,6 +12,11 @@ import { headachePoints } from './headache';
 import { digestivePoints } from './digestive';
 import { immunityPoints } from './immunity';
 import { ynsaPoints } from './ynsa';
+import { spleenPoints } from './spleen';
+import { lungPoints } from './lung';
+import { largeIntestinePoints } from './large_intestine';
+import { heartPoints } from './heart';
+import { remainingMeridianPoints } from './remaining_meridians';
 
 export const acupressurePoints: AcupressurePoint[] = [
   ...generalPoints,
@@ -26,7 +31,12 @@ export const acupressurePoints: AcupressurePoint[] = [
   ...headachePoints,
   ...digestivePoints,
   ...immunityPoints,
-  ...ynsaPoints
+  ...ynsaPoints,
+  ...spleenPoints,
+  ...lungPoints,
+  ...largeIntestinePoints,
+  ...heartPoints,
+  ...remainingMeridianPoints
 ];
 
 // Export individual categories for direct access if needed
@@ -43,7 +53,12 @@ export {
   headachePoints,
   digestivePoints,
   immunityPoints,
-  ynsaPoints
+  ynsaPoints,
+  spleenPoints,
+  lungPoints,
+  largeIntestinePoints,
+  heartPoints,
+  remainingMeridianPoints
 };
 
 // ===== QUERY HELPER FUNCTIONS =====

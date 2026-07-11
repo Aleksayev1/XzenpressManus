@@ -682,6 +682,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                     {/* Play button for assistant messages */}
                     {msg.role === 'assistant' && (
                       <button
+                        translate="no"
                         onClick={() => {
                           if ((speaking || ttsLoading) && playingIndex === i) {
                             stop();
@@ -695,7 +696,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                             speak(textToSpeak, selectedVoice);
                           }
                         }}
-                        className="mt-1.5 flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all hover:opacity-90"
+                        className="notranslate mt-1.5 flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all hover:opacity-90 animate-in fade-in duration-200"
                         style={{
                           color: (speaking || ttsLoading) && playingIndex === i ? accentColor : '#9ca3af',
                           background: (speaking || ttsLoading) && playingIndex === i ? `${accentColor}20` : 'rgba(255,255,255,0.05)',
@@ -703,11 +704,11 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                         }}
                       >
                         {speaking && playingIndex === i ? (
-                          <><Square className="w-3 h-3" /> Parar áudio</>
+                          <><Square className="w-3 h-3" /> <span>Parar áudio</span></>
                         ) : ttsLoading && playingIndex === i ? (
-                          <><Loader2 className="w-3 h-3 animate-spin" /> Carregando...</>
+                          <><Loader2 className="w-3 h-3 animate-spin" /> <span>Carregando...</span></>
                         ) : (
-                          <><Play className="w-3 h-3" /> 🔊 Ouvir resposta</>
+                          <><Play className="w-3 h-3" /> <span>🔊 Ouvir resposta</span></>
                         )}
                       </button>
                     )}

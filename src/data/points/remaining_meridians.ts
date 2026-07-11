@@ -255,7 +255,7 @@ export const remainingMeridianPoints: AcupressurePoint[] = [
     description: 'Ponto Mu do Pericárdio e ponto de reunião do Qi. Localizado na linha média do peito, no nível do 4º espaço intercostal (entre os mamilos). É o centro de equilíbrio das emoções (Chakra Cardíaco), abrindo o peito e acalmando a ansiedade, tristezas intensas e estresse imediatamente.',
     descriptionEn: 'Front-Mu of Pericardium, meeting point of Qi. On the midline of the sternum, level with the 4th intercostal space. Heart Chakra center for emotional relief.',
     position: { x: 50, y: 28 },
-    image: '/mtc_ren_points.jpg',
+    image: '/mtc_ren17_cardio_orig.jpg',
     imageAlt: 'Localização do ponto Ren 17 (Danzhong) no esterno',
     benefits: ['Alivia ansiedade, pânico e aperto no peito imediatamente', 'Dissipa tristezas, mágoas e sensação de choro preso', 'Combate tosses e falta de ar', 'Harmoniza as emoções e acalma palpitações'],
     benefitsEn: ['Relieves anxiety and chest pressure instantly', 'Helps release sadness and grief'],

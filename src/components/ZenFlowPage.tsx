@@ -90,19 +90,16 @@ export const ZenFlowPage: React.FC<ZenFlowPageProps> = ({ onBack }) => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 pt-20 px-4">
-            {/* Header */}
-            <div className="flex items-center absolute left-0 top-1">
+            {/* Botão Voltar (Alinhado e Visível abaixo do Header fixo) */}
+            <div className="max-w-4xl mx-auto mb-6 flex items-center pt-2">
                 <button
                     onClick={onBack}
-                    className="p-2 mr-4 bg-white/80 hover:bg-white rounded-full shadow-sm hover:shadow transition-all group border border-gray-100"
+                    className="flex items-center gap-2 text-gray-650 hover:text-gray-900 transition-all text-xs font-bold bg-white px-4 py-2.5 rounded-xl shadow-sm border border-gray-200 hover:scale-105 active:scale-95"
                     title="Voltar ao Menu Principal"
                 >
-                    <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-purple-600 transition-colors" />
+                    <ArrowLeft className="w-4 h-4 text-gray-500" />
+                    <span>Voltar ao Menu Principal</span>
                 </button>
-                {/* Visual Cue - Drawing */}
-                <div className="hidden sm:flex items-center gap-2 text-xs text-purple-400 font-handwriting opacity-80 animate-fade-in select-none">
-                    <span>↵ Menu Principal</span>
-                </div>
             </div>
 
             <div className="text-center pt-2">

@@ -21,8 +21,6 @@ interface QuestionStep {
 
 const STEPS: QuestionStep[] = [
   {
-    text: "Olá! Sou a sua ZenMentor. Vamos realizar a calibração do seu Mapa de Guardiões. Para começarmos, me diga: qual é o seu objetivo principal hoje de bem-estar (como gerenciar ansiedade, energia, imunidade, sono) e como você sente o seu nível de energia geral?",
-    fieldPrompt: "Objetivo Principal e Nível de Energia"
     // Bloco 1: IDENTIDADE & OBJETIVO — Base para personalização
     text: "Olá! Sou a sua ZenMentor. Estou aqui para criar um mapa completo e personalizado da sua saúde — esse mapa vai guiar todas as recomendações que você receberá no XZenPress. Cada detalhe que você compartilhar é importante, por isso vou fazer perguntas específicas.\n\nVamos começar pelo mais essencial: qual é o seu objetivo central de bem-estar neste momento? Pode ser algo que você quer melhorar, reduzir, conquistar ou compreender melhor sobre si mesmo. Não existe resposta errada — quanto mais honesto você for, mais preciso será o seu mapa.",
     fieldPrompt: "Objetivo Central de Bem-Estar"

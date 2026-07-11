@@ -742,6 +742,7 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
                                 </p>
                             </div>
                         </div>
+                    </div>
                 </div>
 
                 {/* Contextual Onboarding/Oficina Banner */}

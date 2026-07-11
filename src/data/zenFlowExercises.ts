@@ -34,7 +34,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '5 min',
         targetEmotion: ['ansiedade', 'stress', 'insônia', 'fogo'],
         intention: 'Eu permito que meu corpo encontre o silêncio.',
-        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u', // Peaceful Piano (Calm/Fire)
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO', // Peaceful Piano (Calm/Fire)
         steps: [
             {
                 id: 'shake',
@@ -120,7 +120,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '5 min',
         targetEmotion: ['tristeza', 'angústia', 'metal', 'pulmão'],
         intention: 'Meu coração tem espaço para respirar.',
-        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX5uO6lD4yPgl', // Heart Chakra Healing (Metal/Air)
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO', // Peaceful Piano (Metal/Air)
         steps: [
             {
                 id: 'open-wings',

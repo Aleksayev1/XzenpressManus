@@ -48,6 +48,8 @@ export const ZenFlowSession: React.FC<ZenFlowSessionProps> = ({ sequence, onClos
     }, [phase, timeLeft, isPaused]);
 
     const handleStepComplete = () => {
+        import('../lib/audio').then(({ playTibetanBell }) => playTibetanBell());
+
         if (currentStepIndex < sequence.steps.length - 1) {
             // Próximo passo
             setCurrentStepIndex(prev => prev + 1);

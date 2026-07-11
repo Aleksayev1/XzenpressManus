@@ -65,6 +65,11 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 setTimeLeft((prev) => prev - 1);
             }, 1000);
         } else if (timeLeft === 0) {
+            if (isTimerActive) {
+                // Notificar término do ciclo de acupressão ou movimento com sino tibetano
+                import('../lib/audio').then(({ playTibetanBell }) => playTibetanBell());
+            }
+
             if (phase === 'zenflow') {
                 const exercise = selectedEmotion?.zenFlowExerciseId
                     ? zenFlowExercises.find(z => z.id === selectedEmotion?.zenFlowExerciseId)
@@ -354,8 +359,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             case 'fire': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4WYPdgoIcn6"; // Chill/Piano (Calm Anxiety)
             case 'wood': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO"; // Nature Sounds (Wood/Forest Relaxation)
             case 'earth': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX6VdMW310YC7"; // Chill Vibes (Grounding)
-            case 'metal': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX3qCx5yEZkcJ"; // Jazz (Comfort Sadness)
-            case 'water': return "https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u"; // Peaceful Piano (Safety for Fear)
+            case 'metal': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhpia6bJ"; // Chill Lofi (Comfort Sadness)
+            case 'water': return "https://open.spotify.com/embed/playlist/37i9dQZF1DWZeK26796QX0"; // Deep Focus (Safety for Fear)
             default: return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4WYPdgoIcn6";
         }
     };

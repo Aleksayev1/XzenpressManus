@@ -81,6 +81,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     setTimeLeft(exercise.steps[nextStep].durationSeconds);
                 } else {
                     setIsTimerActive(false);
+                    // Finalizar a sessão automaticamente ao término do último exercício de movimento
+                    handleCompleteSession();
                 }
             } else {
                 setIsTimerActive(false);
@@ -580,6 +582,15 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 {/* PHASE 1.5: PREPARATION (Sound & Breathing) */}
                 {phase === 'preparation' && (
                     <div className="absolute inset-0 flex flex-col items-center p-6 pb-32 animate-in slide-in-from-right overflow-y-auto bg-gray-900">
+                        {/* Floating Exit Button */}
+                        <button
+                            onClick={onBack}
+                            className="absolute top-4 right-4 z-30 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-800 text-gray-400 hover:text-white transition-colors border border-gray-700"
+                            title="Interromper Sessão"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
                         <div className="text-center mb-8 mt-4">
                             <h1 className="text-2xl font-bold text-purple-400 mb-2 flex items-center justify-center gap-2">
                                 <Activity className="w-6 h-6" />
@@ -721,6 +732,16 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 <Zap className="w-5 h-5" />
                                 {breathState === 'done' ? 'Estou Pronto para os Pontos' : 'Faça a Respiração para Desbloquear'}
                             </button>
+
+                            {breathState !== 'done' && (
+                                <button
+                                    onClick={() => setPhase('acupressure')}
+                                    className="w-full mt-3 py-2.5 text-sm text-purple-400 hover:text-purple-300 underline font-semibold transition-colors flex items-center justify-center gap-1"
+                                >
+                                    Pular Respiração e Ir para os Pontos ⚡
+                                </button>
+                            )}
+
                             <button
                                 onClick={onBack}
                                 className="w-full mt-4 py-4 border border-gray-700 bg-transparent rounded-xl font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
@@ -735,6 +756,15 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 {/* PHASE 2: GUIDED ACUPRESSURE */}
                 {phase === 'acupressure' && (
                     <div className="absolute inset-0 flex flex-col items-center p-6 pb-32 animate-in slide-in-from-right overflow-y-auto">
+                        {/* Floating Exit Button */}
+                        <button
+                            onClick={onBack}
+                            className="absolute top-4 left-4 z-30 p-2 rounded-xl bg-gray-900/50 hover:bg-gray-800 text-gray-400 hover:text-white transition-colors border border-gray-800"
+                            title="Interromper Sessão"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
                         <div className="text-center mb-4">
                             <h1 className="text-2xl font-bold text-yellow-400 mb-1 flex items-center justify-center gap-2">
                                 <Zap className="w-6 h-6" />
@@ -850,6 +880,15 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 {/* PHASE 3: ZENFLOW */}
                 {phase === 'zenflow' && (
                     <div className="absolute inset-0 flex flex-col items-center p-6 pb-32 animate-in slide-in-from-right bg-black overflow-y-auto">
+                        {/* Floating Exit Button */}
+                        <button
+                            onClick={onBack}
+                            className="absolute top-4 left-4 z-30 p-2 rounded-xl bg-gray-900/50 hover:bg-gray-800 text-gray-400 hover:text-white transition-colors border border-gray-800"
+                            title="Interromper Sessão"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
                         <div className="absolute inset-0 opacity-20 pointer-events-none">
                             <MatrixRain />
                         </div>
@@ -864,6 +903,17 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
                             return (
                                 <div className="relative z-10 w-full max-w-4xl text-center pb-20">
+                                    {/* Timer Control */}
+                                    <div className="absolute top-0 right-4 z-20">
+                                        <button
+                                            onClick={toggleTimer}
+                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border transition-all ${timeLeft === 0 ? 'bg-green-500/20 border-green-500 text-green-400' : 'bg-gray-900/50 border-gray-600 text-gray-300'}`}
+                                        >
+                                            {timeLeft === 0 ? <Sparkles className="w-4 h-4" /> : <Activity className={`w-4 h-4 ${isTimerActive ? 'animate-pulse' : ''}`} />}
+                                            <span className="font-mono font-bold">{formatTime(timeLeft)}</span>
+                                        </button>
+                                    </div>
+
                                     <div className="mb-6">
                                         <div className="inline-flex items-center justify-center p-3 bg-blue-900/30 rounded-full mb-4 ring-2 ring-blue-500/50">
                                             <Activity className="w-8 h-8 text-blue-400" />
@@ -934,6 +984,38 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                             O que a mente entendeu e a agulha tocou, o corpo agora expulsa."
                                         </p>
                                     </div>
+
+                                     {/* Navigation for ZenFlow Steps */}
+                                     <div className="flex gap-4 w-full max-w-md mx-auto mb-6">
+                                         <button
+                                             type="button"
+                                             onClick={() => {
+                                                 if (zenFlowStepIndex > 0) {
+                                                     const prevStep = zenFlowStepIndex - 1;
+                                                     setZenFlowStepIndex(prevStep);
+                                                     setTimeLeft(exercise.steps[prevStep].durationSeconds);
+                                                 }
+                                             }}
+                                             disabled={zenFlowStepIndex === 0}
+                                             className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-colors border border-gray-700"
+                                         >
+                                             Passo Anterior
+                                         </button>
+                                         <button
+                                             type="button"
+                                             onClick={() => {
+                                                 if (exercise && zenFlowStepIndex < exercise.steps.length - 1) {
+                                                     const nextStep = zenFlowStepIndex + 1;
+                                                     setZenFlowStepIndex(nextStep);
+                                                     setTimeLeft(exercise.steps[nextStep].durationSeconds);
+                                                 }
+                                             }}
+                                             disabled={!exercise || zenFlowStepIndex === exercise.steps.length - 1}
+                                             className="flex-1 py-3 bg-blue-900/60 hover:bg-blue-800 text-blue-200 font-semibold rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition-colors border border-blue-500/30"
+                                         >
+                                             Próximo Passo
+                                         </button>
+                                     </div>
 
                                     <button
                                         onClick={handleCompleteSession}

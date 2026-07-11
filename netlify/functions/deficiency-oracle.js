@@ -11,6 +11,32 @@ const supabase = createClient(
 
 const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
 
+// Sistema de rate limiting simples (em memória)
+const rateLimitStore = new Map();
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hora
+const MAX_REQUESTS_PER_HOUR = 100;
+
+function checkRateLimit(userEmail, limit = MAX_REQUESTS_PER_HOUR) {
+    const now = Date.now();
+    const userRequests = rateLimitStore.get(userEmail) || [];
+
+    // Remove requisições antigas (fora da janela de 1 hora)
+    const recentRequests = userRequests.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
+
+    if (recentRequests.length >= limit) {
+        return { allowed: false, remaining: 0 };
+    }
+
+    // Adiciona nova requisição
+    recentRequests.push(now);
+    rateLimitStore.set(userEmail, recentRequests);
+
+    return {
+        allowed: true,
+        remaining: limit - recentRequests.length
+    };
+}
+
 exports.handler = async (event) => {
     const headers = {
         ...getCorsHeaders(event),
@@ -38,6 +64,8 @@ exports.handler = async (event) => {
     let geneticMarkers = null;
     let organClock = null;
     let anamnese = null;
+    let userEmail = null;
+    let isPremium = false;
     try {
         const body = JSON.parse(event.body || '{}');
         symptom = (body.symptom || '').trim();
@@ -45,8 +73,42 @@ exports.handler = async (event) => {
         geneticMarkers = body.geneticMarkers || null;
         organClock = body.organClock || null;
         anamnese = body.anamnese || null;
+        userEmail = body.userEmail || null;
+        isPremium = body.isPremium || false;
     } catch {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'JSON invÃ¡lido' }) };
+    }
+
+    // Determinar chave e limite para controle de requisições (Rate Limit)
+    const getClientIp = () => {
+        if (!event || !event.headers) return 'guest-fallback';
+        const ipHeader = event.headers['client-ip'] || 
+                         event.headers['x-nf-client-connection-ip'] || 
+                         event.headers['x-forwarded-for'];
+        if (ipHeader) {
+            return ipHeader.split(',')[0].trim();
+        }
+        return 'guest-fallback';
+    };
+
+    const isDeveloper = userEmail && (userEmail.toLowerCase().includes('aleksayev') || userEmail.toLowerCase().includes('alexandre'));
+    const rateLimitKey = userEmail || getClientIp();
+    const limit = (isPremium || isDeveloper) ? 100 : 3; // 100 para Premium/Dev, 3 para Gratuitos/Visitantes
+    const rateLimit = checkRateLimit(rateLimitKey, limit);
+
+    if (!rateLimit.allowed) {
+        let errorMessage = `Degustação diária do Oráculo de Deficiências concluída! 🌟\n\nPara continuar fazendo consultas ilimitadas ao oráculo e receber protocolos personalizados, assine o plano Premium ou faça o login!`;
+        if (isPremium) {
+            errorMessage = 'Limite de requisições excedido. Tente novamente em 1 hora.';
+        }
+        return {
+            statusCode: 429,
+            headers,
+            body: JSON.stringify({
+                error: errorMessage,
+                remaining: 0
+            })
+        };
     }
 
     if (!symptom || symptom.length < 3) {

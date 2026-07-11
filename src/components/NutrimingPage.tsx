@@ -195,7 +195,12 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
             const res = await fetch(`${getBaseApiUrl()}/.netlify/functions/interaction-checker`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ medications, supplements: supplements.map(s => s.name) })
+                body: JSON.stringify({ 
+                    medications, 
+                    supplements: supplements.map(s => s.name),
+                    userEmail: user?.email || null,
+                    isPremium: user?.isPremium || false
+                })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Erro na análise');

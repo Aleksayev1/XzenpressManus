@@ -4,6 +4,32 @@
 
 const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
 
+// Sistema de rate limiting simples (em memória)
+const rateLimitStore = new Map();
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hora
+const MAX_REQUESTS_PER_HOUR = 100;
+
+function checkRateLimit(userEmail, limit = MAX_REQUESTS_PER_HOUR) {
+    const now = Date.now();
+    const userRequests = rateLimitStore.get(userEmail) || [];
+
+    // Remove requisições antigas (fora da janela de 1 hora)
+    const recentRequests = userRequests.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
+
+    if (recentRequests.length >= limit) {
+        return { allowed: false, remaining: 0 };
+    }
+
+    // Adiciona nova requisição
+    recentRequests.push(now);
+    rateLimitStore.set(userEmail, recentRequests);
+
+    return {
+        allowed: true,
+        remaining: limit - recentRequests.length
+    };
+}
+
 exports.handler = async (event) => {
     const headers = {
         ...getCorsHeaders(event),
@@ -21,13 +47,47 @@ exports.handler = async (event) => {
     if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
     if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
 
-    let medications = [], supplements = [];
+    let medications = [], supplements = [], userEmail = null, isPremium = false;
     try {
         const body = JSON.parse(event.body || '{}');
         medications = Array.isArray(body.medications) ? body.medications.map(m => String(m).trim()).filter(Boolean) : [];
         supplements = Array.isArray(body.supplements) ? body.supplements.map(s => String(s).trim()).filter(Boolean) : [];
+        userEmail = body.userEmail || null;
+        isPremium = body.isPremium || false;
     } catch {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'JSON inválido' }) };
+    }
+
+    // Determinar chave e limite para controle de requisições (Rate Limit)
+    const getClientIp = () => {
+        if (!event || !event.headers) return 'guest-fallback';
+        const ipHeader = event.headers['client-ip'] || 
+                         event.headers['x-nf-client-connection-ip'] || 
+                         event.headers['x-forwarded-for'];
+        if (ipHeader) {
+            return ipHeader.split(',')[0].trim();
+        }
+        return 'guest-fallback';
+    };
+
+    const isDeveloper = userEmail && (userEmail.toLowerCase().includes('aleksayev') || userEmail.toLowerCase().includes('alexandre'));
+    const rateLimitKey = userEmail || getClientIp();
+    const limit = (isPremium || isDeveloper) ? 100 : 3; // 100 para Premium/Dev, 3 para Gratuitos/Visitantes
+    const rateLimit = checkRateLimit(rateLimitKey, limit);
+
+    if (!rateLimit.allowed) {
+        let errorMessage = `Degustação diária do Verificador de Interações concluída! 🌟\n\nPara continuar fazendo análises ilimitadas de interações entre medicamentos e suplementos, assine o plano Premium ou faça o login!`;
+        if (isPremium) {
+            errorMessage = 'Limite de requisições excedido. Tente novamente em 1 hora.';
+        }
+        return {
+            statusCode: 429,
+            headers,
+            body: JSON.stringify({
+                error: errorMessage,
+                remaining: 0
+            })
+        };
     }
 
     if (medications.length === 0 && supplements.length === 0) {

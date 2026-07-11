@@ -189,6 +189,26 @@ function renderMarkdown(text: string): React.ReactNode {
   });
 }
 
+// Stop words para detecção dinâmica de idioma (para apoiar Google Translate e fallbacks)
+function detectLanguage(text: string): string {
+  const lower = text.toLowerCase();
+  const ptWords = [/\bo\b/, /\ba\b/, /\bde\b/, /\bem\b/, /\bque\b/, /\bcom\b/, /\bpara\b/, /\buma\b/, /\bmais\b/, /\bna\b/, /\bno\b/, /\be\b/];
+  const enWords = [/\bthe\b/, /\bof\b/, /\band\b/, /\bto\b/, /\bin\b/, /\bis\b/, /\byou\b/, /\bthat\b/, /\bwith\b/, /\bfor\b/, /\bon\b/, /\bare\b/];
+  const esWords = [/\bel\b/, /\bla\b/, /\blos\b/, /\blas\b/, /\bdel\b/, /\bpara\b/, /\bcon\b/, /\bpor\b/, /\bmás\b/, /\by\b/];
+
+  let ptCount = 0;
+  let enCount = 0;
+  let esCount = 0;
+
+  ptWords.forEach(regex => { if (regex.test(lower)) ptCount++; });
+  enWords.forEach(regex => { if (regex.test(lower)) enCount++; });
+  esWords.forEach(regex => { if (regex.test(lower)) esCount++; });
+
+  if (enCount > ptCount && enCount > esCount) return 'en-US';
+  if (esCount > ptCount && esCount > enCount) return 'es-ES';
+  return 'pt-BR'; // padrão fallback
+}
+
 // ─── TTS Hook ─────────────────────────────────────────────────────────────────
 function useTTS() {
   const [speaking, setSpeaking] = useState(false);
@@ -260,23 +280,23 @@ function useTTS() {
         }
 
         const utter = new SpeechSynthesisUtterance(clean);
-        utter.lang = 'pt-BR';
+        const detectedLang = detectLanguage(clean);
+        utter.lang = detectedLang;
         utter.rate = 0.95;
         utter.pitch = 1.05;
 
-        // Procura a melhor voz pt-BR disponível
+        // Procura a melhor voz disponível para o idioma detectado
         const voices = window.speechSynthesis.getVoices();
-        const browserLang = navigator.language || 'pt-BR';
-        const baseLang = browserLang.split('-')[0];
-        const langVoices = voices.filter(v => v.lang.startsWith(baseLang));
+        const baseLang = detectedLang.split('-')[0];
+        const langVoices = voices.filter(v => v.lang.toLowerCase().startsWith(baseLang.toLowerCase()));
         const premiumKeywords = ['google', 'natural', 'premium', 'neural', 'microsoft'];
         
         const bestVoice = langVoices.find(v => 
-          v.lang === browserLang && 
+          v.lang.toLowerCase() === detectedLang.toLowerCase() && 
           premiumKeywords.some(kw => v.name.toLowerCase().includes(kw))
         ) || langVoices.find(v => 
           premiumKeywords.some(kw => v.name.toLowerCase().includes(kw))
-        ) || langVoices.find(v => v.lang === browserLang) || langVoices[0];
+        ) || langVoices.find(v => v.lang.toLowerCase().startsWith(baseLang.toLowerCase())) || langVoices[0];
 
         if (bestVoice) {
           utter.voice = bestVoice;
@@ -642,6 +662,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                   )}
                   <div className="max-w-[82%]">
                     <div
+                      id={`zen-msg-text-${i}`}
                       className="px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed"
                       style={msg.role === 'user'
                         ? { background: `linear-gradient(135deg, ${accentColor}cc, #6366f1aa)`, color: 'white', borderBottomRightRadius: '6px' }
@@ -660,7 +681,10 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                           } else {
                             stop();
                             setPlayingIndex(i);
-                            speak(cleanContent, selectedVoice);
+                            // Extrai o texto diretamente do DOM para capturar traduções ativas do navegador (ex: Google Translate)
+                            const domNode = document.getElementById(`zen-msg-text-${i}`);
+                            const textToSpeak = domNode?.textContent || cleanContent;
+                            speak(textToSpeak, selectedVoice);
                           }
                         }}
                         className="mt-1.5 flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all hover:opacity-90"

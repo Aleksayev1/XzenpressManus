@@ -350,7 +350,6 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const [autoRead, setAutoRead] = useState(false);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
   // ── Ciclo Terapêutico handoff ──────────────────────────────────────────────────
-  const [sessionReadyMsgIndex, setSessionReadyMsgIndex] = useState<number | null>(null);
   const [detectedEmotionId, setDetectedEmotionId] = useState<string | null>(null);
   const { speak, stop, speaking, loading: ttsLoading } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);

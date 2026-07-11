@@ -24,6 +24,8 @@ const SoundFusion: React.FC = () => {
     });
 
     const audioRefs = useRef<{ [key: string]: HTMLAudioElement }>({});
+    const gainNodesRef = useRef<{ [key: string]: GainNode }>({});
+    const audioContextRef = useRef<AudioContext | null>(null);
 
     // Supabase Storage CDN URLs - arquivos hospedados no bucket 'sounds/fusion'
     const SUPABASE_AUDIO_BASE = 'https://dqjcbwjqrenubdzalicy.supabase.co/storage/v1/object/public/sounds/Fusion';
@@ -58,32 +60,92 @@ const SoundFusion: React.FC = () => {
             if (!audioRefs.current[track.id]) {
                 const audio = new Audio(track.src);
                 audio.loop = true;
+                audio.crossOrigin = 'anonymous';
                 audio.volume = volumes[track.id];
                 audioRefs.current[track.id] = audio;
             }
         });
 
         return () => {
-            // Cleanup: pause all audio when leaving
+            // Cleanup: pause all audio and close context when leaving
             Object.values(audioRefs.current).forEach(audio => {
                 audio.pause();
                 audio.src = '';
             });
             audioRefs.current = {};
+            gainNodesRef.current = {};
+            if (audioContextRef.current) {
+                audioContextRef.current.close().catch(e => console.error(e));
+                audioContextRef.current = null;
+            }
         };
     }, []);
 
+    // Initialize AudioContext and connect Web Audio nodes
+    const initAudio = () => {
+        if (audioContextRef.current) return;
+
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioContextClass) return;
+
+        const ctx = new AudioContextClass();
+        audioContextRef.current = ctx;
+
+        tracks.forEach(track => {
+            let audio = audioRefs.current[track.id];
+            if (!audio) {
+                audio = new Audio(track.src);
+                audio.loop = true;
+                audio.crossOrigin = 'anonymous';
+                audioRefs.current[track.id] = audio;
+            }
+
+            try {
+                const source = ctx.createMediaElementSource(audio);
+                const gainNode = ctx.createGain();
+                gainNode.gain.setValueAtTime(
+                    muted[track.id] ? 0 : volumes[track.id],
+                    ctx.currentTime
+                );
+
+                source.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                gainNodesRef.current[track.id] = gainNode;
+            } catch (err) {
+                console.error(`Error connecting Web Audio nodes for track ${track.id}:`, err);
+            }
+        });
+    };
+
     // Update volumes when state changes
     useEffect(() => {
+        Object.keys(gainNodesRef.current).forEach(id => {
+            const gainNode = gainNodesRef.current[id];
+            const ctx = audioContextRef.current;
+            if (gainNode && ctx) {
+                const targetVolume = muted[id] ? 0 : volumes[id];
+                gainNode.gain.setValueAtTime(targetVolume, ctx.currentTime);
+            }
+        });
+
         Object.keys(audioRefs.current).forEach(id => {
             const audio = audioRefs.current[id];
             if (audio) {
-                audio.volume = muted[id] ? 0 : volumes[id];
+                try {
+                    audio.volume = muted[id] ? 0 : volumes[id];
+                } catch (e) {}
             }
         });
     }, [volumes, muted]);
 
-    const togglePlay = () => {
+    const togglePlay = async () => {
+        initAudio();
+
+        const ctx = audioContextRef.current;
+        if (ctx && ctx.state === 'suspended') {
+            await ctx.resume();
+        }
+
         const newIsPlaying = !isPlaying;
         setIsPlaying(newIsPlaying);
 

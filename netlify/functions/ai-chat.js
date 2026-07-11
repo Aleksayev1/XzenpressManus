@@ -354,102 +354,162 @@ Toda interação terapêutica deve seguir este fluxo adaptado ao momento da conv
 ---
 `;
 
-        // === CHAMADA À API DE IA (Gemini primeiro, OpenAI como fallback) ===
+        // === CHAMADA À API DE IA (Anthropic Fable 5 para Premium/Dev, Gemini/OpenAI para outros com fallback) ===
         let reply;
         let usageData = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
+        const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
-        if (process.env.GEMINI_API_KEY) {
-            // --- Google Gemini API ---
-            const geminiHistory = conversationHistory.slice(-10).map(msg => ({
-                role: msg.role === 'assistant' ? 'model' : 'user',
-                parts: [{ text: msg.content }]
-            }));
-            geminiHistory.push({ role: 'user', parts: [{ text: message }] });
+        const isPremiumOrDev = isPremium || (userEmail && (userEmail.toLowerCase().includes('aleksayev') || userEmail.toLowerCase().includes('alexandre')));
 
-            const geminiRes = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: systemPrompt }] },
-                        contents: geminiHistory,
-                        generationConfig: {
-                            temperature: 0.3,
-                            maxOutputTokens: 2500
-                        },
-                        safetySettings: [
-                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
-                        ]
-                    })
+        if (anthropicKey && isPremiumOrDev) {
+            // --- Anthropic Claude Fable 5 (Premium / Dev Override) ---
+            try {
+                // Filtra e garante que o histórico para Anthropic comece com o papel 'user' e alterne corretamente
+                let anthropicHistory = conversationHistory.slice(-10).map(msg => ({
+                    role: msg.role === 'assistant' ? 'assistant' : 'user',
+                    content: msg.content
+                }));
+                
+                const firstUserIdx = anthropicHistory.findIndex(m => m.role === 'user');
+                if (firstUserIdx !== -1) {
+                    anthropicHistory = anthropicHistory.slice(firstUserIdx);
+                } else {
+                    anthropicHistory = [];
                 }
-            );
+                
+                anthropicHistory.push({ role: 'user', content: message });
 
-            if (!geminiRes.ok) {
-                const errText = await geminiRes.text();
-                console.error('Gemini API Error:', geminiRes.status, errText);
-                return {
-                    statusCode: 500,
-                    headers,
-                    body: JSON.stringify({ error: 'Erro ao consultar a IA. Tente novamente em instantes.' })
-                };
+                const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': anthropicKey,
+                        'anthropic-version': '2023-06-01',
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-fable-5',
+                        system: systemPrompt,
+                        messages: anthropicHistory,
+                        max_tokens: 2500,
+                        temperature: 0.3
+                    })
+                });
+
+                if (!anthropicRes.ok) {
+                    const errBody = await anthropicRes.text();
+                    throw new Error(`Anthropic API Error: ${anthropicRes.status} ${errBody}`);
+                }
+
+                const anthropicData = await anthropicRes.json();
+                reply = anthropicData?.content?.[0]?.text || 'Resposta indisponível no momento.';
+                
+                if (anthropicData.usage) {
+                    usageData = {
+                        promptTokens: anthropicData.usage.input_tokens || 0,
+                        completionTokens: anthropicData.usage.output_tokens || 0,
+                        totalTokens: (anthropicData.usage.input_tokens || 0) + (anthropicData.usage.output_tokens || 0)
+                    };
+                }
+                console.log('Successfully generated response using Claude Fable 5 for:', userEmail || 'premium-user');
+
+            } catch (anthropicErr) {
+                console.warn('Falha no Claude Fable 5, recorrendo a Gemini/OpenAI:', anthropicErr.message);
+                // Se falhar o Fable 5, executa a cadeia de fallbacks abaixo (Gemini/OpenAI)
+                await runFallbackChain();
             }
-
-            const geminiData = await geminiRes.json();
-            reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Resposta indisponível no momento.';
-            
-            if (geminiData.usageMetadata) {
-                usageData = {
-                    promptTokens: geminiData.usageMetadata.promptTokenCount || 0,
-                    completionTokens: geminiData.usageMetadata.candidatesTokenCount || 0,
-                    totalTokens: geminiData.usageMetadata.totalTokenCount || 0
-                };
-            }
-
         } else {
-            // --- OpenAI Fallback ---
-            const messages = [
-                { role: 'system', content: systemPrompt },
-                ...conversationHistory.slice(-10),
-                { role: 'user', content: message }
-            ];
+            // Usuário gratuito ou chave Anthropic ausente -> vai direto para os modelos padrão
+            await runFallbackChain();
+        }
 
-            const oaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: 'gpt-4o-mini',
-                    messages,
-                    temperature: 0.3,
-                    max_tokens: 2500
-                })
-            });
+        // Helper para encapsular a cadeia padrão (Gemini -> OpenAI)
+        async function runFallbackChain() {
+            if (process.env.GEMINI_API_KEY) {
+                // --- Google Gemini API ---
+                const geminiHistory = conversationHistory.slice(-10).map(msg => ({
+                    role: msg.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: msg.content }]
+                }));
+                geminiHistory.push({ role: 'user', parts: [{ text: message }] });
 
-            if (!oaiRes.ok) {
-                const errorData = await oaiRes.json().catch(() => ({}));
-                console.error('OpenAI Error:', errorData);
-                return {
-                    statusCode: 500,
-                    headers,
-                    body: JSON.stringify({ error: errorData?.error?.message || 'Erro ao processar sua solicitação.' })
-                };
-            }
+                const geminiRes = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            systemInstruction: { parts: [{ text: systemPrompt }] },
+                            contents: geminiHistory,
+                            generationConfig: {
+                                temperature: 0.3,
+                                maxOutputTokens: 2500
+                            },
+                            safetySettings: [
+                                { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+                            ]
+                        })
+                    }
+                );
 
-            const oaiData = await oaiRes.json();
-            reply = oaiData.choices[0].message.content;
-            
-            if (oaiData.usage) {
-                usageData = {
-                    promptTokens: oaiData.usage.prompt_tokens || 0,
-                    completionTokens: oaiData.usage.completion_tokens || 0,
-                    totalTokens: oaiData.usage.total_tokens || 0
-                };
+                if (!geminiRes.ok) {
+                    const errText = await geminiRes.text();
+                    console.error('Gemini API Error:', geminiRes.status, errText);
+                    throw new Error(`Gemini API returned status ${geminiRes.status}`);
+                }
+
+                const geminiData = await geminiRes.json();
+                reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Resposta indisponível no momento.';
+                
+                if (geminiData.usageMetadata) {
+                    usageData = {
+                        promptTokens: geminiData.usageMetadata.promptTokenCount || 0,
+                        completionTokens: geminiData.usageMetadata.candidatesTokenCount || 0,
+                        totalTokens: geminiData.usageMetadata.totalTokenCount || 0
+                    };
+                }
+            } else if (process.env.OPENAI_API_KEY) {
+                // --- OpenAI Fallback ---
+                const oaiMessages = [
+                    { role: 'system', content: systemPrompt },
+                    ...conversationHistory.slice(-10),
+                    { role: 'user', content: message }
+                ];
+
+                const oaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: oaiMessages,
+                        temperature: 0.3,
+                        max_tokens: 2500
+                    })
+                });
+
+                if (!oaiRes.ok) {
+                    const errorData = await oaiRes.json().catch(() => ({}));
+                    console.error('OpenAI Error:', errorData);
+                    throw new Error(`OpenAI API returned status ${oaiRes.status}`);
+                }
+
+                const oaiData = await oaiRes.json();
+                reply = oaiData.choices[0].message.content;
+                
+                if (oaiData.usage) {
+                    usageData = {
+                        promptTokens: oaiData.usage.prompt_tokens || 0,
+                        completionTokens: oaiData.usage.completion_tokens || 0,
+                        totalTokens: oaiData.usage.total_tokens || 0
+                    };
+                }
+            } else {
+                throw new Error('Nenhuma API key de fallback configurada (Gemini ou OpenAI)');
             }
         }
 

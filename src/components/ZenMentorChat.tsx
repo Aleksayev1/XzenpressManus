@@ -191,6 +191,7 @@ function renderMarkdown(text: string): React.ReactNode {
 
 // Stop words para detecção dinâmica de idioma (para apoiar Google Translate e fallbacks)
 function detectLanguage(text: string): string {
+  if (!text || typeof text !== 'string') return 'pt-BR';
   const lower = text.toLowerCase();
   const ptWords = [/\bo\b/, /\ba\b/, /\bde\b/, /\bem\b/, /\bque\b/, /\bcom\b/, /\bpara\b/, /\buma\b/, /\bmais\b/, /\bna\b/, /\bno\b/, /\be\b/];
   const enWords = [/\bthe\b/, /\bof\b/, /\band\b/, /\bto\b/, /\bin\b/, /\bis\b/, /\byou\b/, /\bthat\b/, /\bwith\b/, /\bfor\b/, /\bon\b/, /\bare\b/];
@@ -215,16 +216,23 @@ function useTTS() {
   const [loading, setLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const stripMarkdown = (text: string) =>
-    text
+  const stripMarkdown = (text: string) => {
+    if (!text || typeof text !== 'string') return '';
+    return text
       .replace(/\*\*(.*?)\*\*/g, '$1')
       .replace(/\*(.*?)\*/g, '$1')
       .replace(/#{1,6}\s/g, '')
       .replace(/\[.*?\]/g, '')
       .replace(/[🌿🧬📊⚠️💡🎯✅❌🌳🌊🔥⛰️💧]/gu, '')
       .trim();
+  };
 
   const speak = useCallback(async (text: string, voice: string = 'nova') => {
+    if (!text || typeof text !== 'string') {
+      console.warn('useTTS: text is empty or invalid', text);
+      return;
+    }
+
     // Para qualquer reprodução anterior e libera referências
     if (audioRef.current) {
       audioRef.current.pause();
@@ -285,22 +293,22 @@ function useTTS() {
         utter.rate = 0.95;
         utter.pitch = 1.05;
 
-        // Procura a melhor voz disponível para o idioma detectado
-        const voices = window.speechSynthesis.getVoices();
+        // Procura a melhor voz disponível para o idioma detectado (com proteção nula para v.lang/v.name)
+        const voices = window.speechSynthesis.getVoices() || [];
         const baseLang = detectedLang.split('-')[0];
-        const langVoices = voices.filter(v => v.lang.toLowerCase().startsWith(baseLang.toLowerCase()));
+        const langVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith(baseLang.toLowerCase()));
         const premiumKeywords = ['google', 'natural', 'premium', 'neural', 'microsoft'];
         
         const bestVoice = langVoices.find(v => 
-          v.lang.toLowerCase() === detectedLang.toLowerCase() && 
-          premiumKeywords.some(kw => v.name.toLowerCase().includes(kw))
+          v.lang && v.lang.toLowerCase() === detectedLang.toLowerCase() && 
+          v.name && premiumKeywords.some(kw => v.name.toLowerCase().includes(kw))
         ) || langVoices.find(v => 
-          premiumKeywords.some(kw => v.name.toLowerCase().includes(kw))
-        ) || langVoices.find(v => v.lang.toLowerCase().startsWith(baseLang.toLowerCase())) || langVoices[0];
+          v.name && premiumKeywords.some(kw => v.name.toLowerCase().includes(kw))
+        ) || langVoices.find(v => v.lang && v.lang.toLowerCase().startsWith(baseLang.toLowerCase())) || langVoices[0];
 
         if (bestVoice) {
           utter.voice = bestVoice;
-          if (/(daniel|antonio|felipe|guy)/i.test(bestVoice.name)) {
+          if (bestVoice.name && /(daniel|antonio|felipe|guy)/i.test(bestVoice.name)) {
             utter.pitch = 0.92;
           }
         }

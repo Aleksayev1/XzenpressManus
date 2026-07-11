@@ -145,22 +145,39 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Verificar rate limit (se userEmail fornecido)
-        if (userEmail) {
-            const limit = isPremium ? 100 : 3; // 100 para Premium, 3 para Degustação
-            const rateLimit = checkRateLimit(userEmail, limit);
-            if (!rateLimit.allowed) {
-                return {
-                    statusCode: 429,
-                    headers,
-                    body: JSON.stringify({
-                        error: isPremium
-                            ? 'Limite de requisições excedido. Tente novamente em 1 hora.'
-                            : 'Degustação finalizada (3 mensagens). Torne-se Premium para continuar.',
-                        remaining: 0
-                    })
-                };
+        // Determinar chave e limite para controle de requisições (Rate Limit)
+        const getClientIp = () => {
+            if (!event || !event.headers) return 'guest-fallback';
+            const ipHeader = event.headers['client-ip'] || 
+                             event.headers['x-nf-client-connection-ip'] || 
+                             event.headers['x-forwarded-for'];
+            if (ipHeader) {
+                return ipHeader.split(',')[0].trim();
             }
+            return 'guest-fallback';
+        };
+
+        const rateLimitKey = userEmail || getClientIp();
+        const limit = isPremium ? 100 : 3; // 100 para Premium, 3 para Gratuitos/Visitantes
+        const rateLimit = checkRateLimit(rateLimitKey, limit);
+        const remainingMessages = rateLimit.remaining;
+
+        if (!rateLimit.allowed) {
+            let errorMessage = `Degustação diária concluída! 🌟\n\nVocê sabia que a consistência é a chave para moldar sua epigenética e calibrar seus Guardiões? Acessar o Zen Mentor diariamente ajuda você a se compreender, liberar tensões e otimizar sua vida de forma integral: física, mental e espiritualmente antes que as sobrecargas se transformem em sintomas.\n\nPara continuar este diálogo transformador e ter consultas ilimitadas, assine o plano Premium!`;
+            if (!userEmail) {
+                errorMessage = `Degustação finalizada (3 mensagens)! 🌟\n\nO Zen Mentor (Self Oracle) é apenas o início. A verdadeira transformação acontece com a prática constante: um espaço seguro sempre disponível para escutar você, ajudar a decifrar a raiz das suas dores e otimizar sua vida física, mental e espiritualmente.\n\nPara dar continuidade ao seu tratamento e liberar consultas ilimitadas, faça o seu login ou assine o plano Premium!`;
+            } else if (isPremium) {
+                errorMessage = 'Limite de requisições excedido. Para proteger a estabilidade do sistema, tente novamente em 1 hora.';
+            }
+
+            return {
+                statusCode: 429,
+                headers,
+                body: JSON.stringify({
+                    error: errorMessage,
+                    remaining: 0
+                })
+            };
         }
 
         // Verificar se a API key está configurada
@@ -616,7 +633,7 @@ Toda interação terapêutica deve seguir este fluxo adaptado ao momento da conv
             headers,
             body: JSON.stringify({
                 reply: reply,
-                remaining: userEmail ? checkRateLimit(userEmail, isPremium ? 100 : 3).remaining : null,
+                remaining: remainingMessages,
                 flags: qualityFlags, // Retorna flags para frontend (futuro feedback UI)
                 usage: usageData
             })

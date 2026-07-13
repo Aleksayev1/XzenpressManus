@@ -222,6 +222,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
       };
     } else if (timeLeft === 0 && isTimerActive) {
       stopTimer();
+      import('../lib/audio').then(({ playTibetanBell }) => playTibetanBell());
     }
   }, [isTimerActive, timeLeft]);
 

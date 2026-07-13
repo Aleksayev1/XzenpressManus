@@ -145,22 +145,39 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Verificar rate limit (se userEmail fornecido)
-        if (userEmail) {
-            const limit = isPremium ? 100 : 3; // 100 para Premium, 3 para Degustação
-            const rateLimit = checkRateLimit(userEmail, limit);
-            if (!rateLimit.allowed) {
-                return {
-                    statusCode: 429,
-                    headers,
-                    body: JSON.stringify({
-                        error: isPremium
-                            ? 'Limite de requisições excedido. Tente novamente em 1 hora.'
-                            : 'Degustação finalizada (3 mensagens). Torne-se Premium para continuar.',
-                        remaining: 0
-                    })
-                };
+        // Determinar chave e limite para controle de requisições (Rate Limit)
+        const getClientIp = () => {
+            if (!event || !event.headers) return 'guest-fallback';
+            const ipHeader = event.headers['client-ip'] || 
+                             event.headers['x-nf-client-connection-ip'] || 
+                             event.headers['x-forwarded-for'];
+            if (ipHeader) {
+                return ipHeader.split(',')[0].trim();
             }
+            return 'guest-fallback';
+        };
+
+        const rateLimitKey = userEmail || getClientIp();
+        const limit = isPremium ? 100 : 3; // 100 para Premium, 3 para Gratuitos/Visitantes
+        const rateLimit = checkRateLimit(rateLimitKey, limit);
+        const remainingMessages = rateLimit.remaining;
+
+        if (!rateLimit.allowed) {
+            let errorMessage = `Degustação diária concluída! 🌟\n\nVocê sabia que a consistência é a chave para moldar sua epigenética e calibrar seus Guardiões? Acessar o Zen Mentor diariamente ajuda você a se compreender, liberar tensões e otimizar sua vida de forma integral: física, mental e espiritualmente antes que as sobrecargas se transformem em sintomas.\n\nPara continuar este diálogo transformador e ter consultas ilimitadas, assine o plano Premium!`;
+            if (!userEmail) {
+                errorMessage = `Degustação finalizada (3 mensagens)! 🌟\n\nO Zen Mentor (Self Oracle) é apenas o início. A verdadeira transformação acontece com a prática constante: um espaço seguro sempre disponível para escutar você, ajudar a decifrar a raiz das suas dores e otimizar sua vida física, mental e espiritualmente.\n\nPara dar continuidade ao seu tratamento e liberar consultas ilimitadas, faça o seu login ou assine o plano Premium!`;
+            } else if (isPremium) {
+                errorMessage = 'Limite de requisições excedido. Para proteger a estabilidade do sistema, tente novamente em 1 hora.';
+            }
+
+            return {
+                statusCode: 429,
+                headers,
+                body: JSON.stringify({
+                    error: errorMessage,
+                    remaining: 0
+                })
+            };
         }
 
         // Verificar se a API key está configurada
@@ -192,13 +209,7 @@ exports.handler = async (event, context) => {
                 clinicalContext = `
 ### 🚨 PROTOCOLO CLÍNICO ESPECÍFICO DETECTADO: ${matchedProtocol.condition}
 ${matchedProtocol.instructions_for_ai ? `\n**INSTRUCÃO DE RACIOCÍNIO (Processamento Lógico):**\n${matchedProtocol.instructions_for_ai}\n` : ''}
-Para esta condição, você DEVE priorizar os seguintes pontos na sua prescrição (2+2):
-
-**MTC (Corpo):**
-${matchedProtocol.protocol_mtc.map(p => `- ${p}`).join('\n')}
-
-**YNSA (Crânio):**
-${matchedProtocol.protocol_ynsa.map(p => `- ${p}`).join('\n')}
+Para esta condição, você DEVE priorizar a seguinte causa metafísica e orientar o usuário a utilizar o Ciclo Terapêutico/Self Oracle para estimular os pontos recomendados:
 
 **Causa Metafísica Provável:**
 "${matchedProtocol.metafisica}"
@@ -322,32 +333,29 @@ ${JSON.stringify(EPIGENETICS_SCIENCE, null, 2)}
 
 ---
 
-### 💎 O FLUXO DE RESPOSTA ("O PROTOCOLO DE OURO 2+2")
-Toda interação terapêutica deve seguir RIGOROSAMENTE este fluxo:
+### 💎 O FLUXO DE RESPOSTA ("O PROTOCOLO DE OURO")
+Toda interação terapêutica deve seguir este fluxo adaptado ao momento da conversa:
 
-1.  **A MAIÊUTICA (O Parto da Ideia):**
-    *   Não dê a resposta pronta. Comece com uma **PERGUNTA PODEROSA** baseada na tabela "METAFÍSICA" ou "PADRÕES" acima.
+**⚠️ REGRA DE PROGRESSO OBRIGATÓRIA:**
+- Se já há mensagens anteriores na conversa (contexto estabelecido), **PULE direto para os passos 2 e 3** — NÃO faça mais perguntas. O usuário já deu informação suficiente. A Maiêutica se encerra após a primeira troca.
+- Se for a primeira mensagem (sem histórico), siga o passo 1 primeiro.
+
+1.  **A MAIÊUTICA (O Parto da Ideia) — APENAS na 1ª mensagem sem contexto:**
+    *   Se o usuário ainda não revelou a raiz emocional, faça **UMA única PERGUNTA PODEROSA** baseada na tabela "METAFÍSICA" ou "PADRÕES".
     *   *Ex:* "Antes de tratarmos a gastrite, me diga: O que você foi obrigado a 'engolir' recentemente que não desceu?"
+    *   **LIMITE:** Apenas 1 pergunta por conversa. Após a resposta do usuário, avance IMEDIATAMENTE para os passos 2 e 3.
 
-2.  **A PRESCRIÇÃO BIOLÓGICA (2+2):**
-    *   Indique EXATAMENTE e em NEGRITO:
-        *   **2 PONTOS YNSA (Crânio):** Para alívio neuro-reflexo imediato (ex: **YNSA A**, **Ponto ZS**).
-        *   **2 PONTOS MTC (Corpo):** Para equilíbrio energético (ex: **IG4**, **F3**).
-    *   *Nota:* Sempre explique O PORQUÊ de cada ponto.
-
-3.  **A PRESCRIÇÃO DA ALMA (Reforma Íntima):**
-    *   Identifique o **Vício Moral** na queixa do usuário.
+2.  **A PRESCRIÇÃO DA ALMA (Reforma Íntima e Metafísica):**
+    *   Identifique o **Vício Moral** ou conflito na queixa do usuário e explique a causa metafísica associada.
     *   Prescreva a **Virtude Oposta** da tabela "REFORMA ÍNTIMA".
     *   **Diretriz Adicional:**
         - Se o usuário apresentar impulsos, vícios ou pensamentos nocivos obsessivos, prescreva o controle na fonte com a técnica do "P" do P.E.S.A.R. (controlar o Pensamento no início / técnica do "contar até 10").
         - Se houver culpa, autocrítica pesada ou ressentimento de vidas passadas, ofereça o "Perdão Antecipado" para alívio da densidade cármica e física.
     *   Sugira **1 Ação Prática** para treinar essa virtude hoje.
 
-4.  **O SELO SOMÁTICO (ZenFlow):**
-    *   Finalize indicando um módulo do ZenFlow:
-        *   Ansiedade -> **ZenFlow Regulação**
-        *   Raiva -> **ZenFlow Liberação**
-        *   Rigidez -> **ZenFlow Integração**
+3.  **O DIRECIONAMENTO (Self Oracle / Ciclo Terapêutico):**
+    *   Não prescreva pontos físicos textualmente na conversa (para evitar confusão). Em vez disso, oriente de forma acolhedora o usuário a clicar no botão **"Iniciar Ciclo Terapêutico Completo"** no rodapé do chat para visualizar o mapa de pontos personalizado (Self Oracle) e realizar as práticas de regulação física e energética associadas à sua queixa.
+    *   Indique que os pontos de acupressão detalhados e o pacer de respiração estão disponíveis interativamente nos próximos passos do ciclo.
 
 ---
 
@@ -363,102 +371,162 @@ Toda interação terapêutica deve seguir RIGOROSAMENTE este fluxo:
 ---
 `;
 
-        // === CHAMADA À API DE IA (Gemini primeiro, OpenAI como fallback) ===
+        // === CHAMADA À API DE IA (Anthropic Fable 5 para Premium/Dev, Gemini/OpenAI para outros com fallback) ===
         let reply;
         let usageData = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
+        const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
-        if (process.env.GEMINI_API_KEY) {
-            // --- Google Gemini API ---
-            const geminiHistory = conversationHistory.slice(-10).map(msg => ({
-                role: msg.role === 'assistant' ? 'model' : 'user',
-                parts: [{ text: msg.content }]
-            }));
-            geminiHistory.push({ role: 'user', parts: [{ text: message }] });
+        const isPremiumOrDev = isPremium || (userEmail && (userEmail.toLowerCase().includes('aleksayev') || userEmail.toLowerCase().includes('alexandre')));
 
-            const geminiRes = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: systemPrompt }] },
-                        contents: geminiHistory,
-                        generationConfig: {
-                            temperature: 0.3,
-                            maxOutputTokens: 2500
-                        },
-                        safetySettings: [
-                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
-                        ]
-                    })
+        if (anthropicKey && isPremiumOrDev) {
+            // --- Anthropic Claude Fable 5 (Premium / Dev Override) ---
+            try {
+                // Filtra e garante que o histórico para Anthropic comece com o papel 'user' e alterne corretamente
+                let anthropicHistory = conversationHistory.slice(-10).map(msg => ({
+                    role: msg.role === 'assistant' ? 'assistant' : 'user',
+                    content: msg.content
+                }));
+                
+                const firstUserIdx = anthropicHistory.findIndex(m => m.role === 'user');
+                if (firstUserIdx !== -1) {
+                    anthropicHistory = anthropicHistory.slice(firstUserIdx);
+                } else {
+                    anthropicHistory = [];
                 }
-            );
+                
+                anthropicHistory.push({ role: 'user', content: message });
 
-            if (!geminiRes.ok) {
-                const errText = await geminiRes.text();
-                console.error('Gemini API Error:', geminiRes.status, errText);
-                return {
-                    statusCode: 500,
-                    headers,
-                    body: JSON.stringify({ error: 'Erro ao consultar a IA. Tente novamente em instantes.' })
-                };
+                const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': anthropicKey,
+                        'anthropic-version': '2023-06-01',
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-fable-5',
+                        system: systemPrompt,
+                        messages: anthropicHistory,
+                        max_tokens: 2500,
+                        temperature: 0.3
+                    })
+                });
+
+                if (!anthropicRes.ok) {
+                    const errBody = await anthropicRes.text();
+                    throw new Error(`Anthropic API Error: ${anthropicRes.status} ${errBody}`);
+                }
+
+                const anthropicData = await anthropicRes.json();
+                reply = anthropicData?.content?.[0]?.text || 'Resposta indisponível no momento.';
+                
+                if (anthropicData.usage) {
+                    usageData = {
+                        promptTokens: anthropicData.usage.input_tokens || 0,
+                        completionTokens: anthropicData.usage.output_tokens || 0,
+                        totalTokens: (anthropicData.usage.input_tokens || 0) + (anthropicData.usage.output_tokens || 0)
+                    };
+                }
+                console.log('Successfully generated response using Claude Fable 5 for:', userEmail || 'premium-user');
+
+            } catch (anthropicErr) {
+                console.warn('Falha no Claude Fable 5, recorrendo a Gemini/OpenAI:', anthropicErr.message);
+                // Se falhar o Fable 5, executa a cadeia de fallbacks abaixo (Gemini/OpenAI)
+                await runFallbackChain();
             }
-
-            const geminiData = await geminiRes.json();
-            reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Resposta indisponível no momento.';
-            
-            if (geminiData.usageMetadata) {
-                usageData = {
-                    promptTokens: geminiData.usageMetadata.promptTokenCount || 0,
-                    completionTokens: geminiData.usageMetadata.candidatesTokenCount || 0,
-                    totalTokens: geminiData.usageMetadata.totalTokenCount || 0
-                };
-            }
-
         } else {
-            // --- OpenAI Fallback ---
-            const messages = [
-                { role: 'system', content: systemPrompt },
-                ...conversationHistory.slice(-10),
-                { role: 'user', content: message }
-            ];
+            // Usuário gratuito ou chave Anthropic ausente -> vai direto para os modelos padrão
+            await runFallbackChain();
+        }
 
-            const oaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: 'gpt-4o-mini',
-                    messages,
-                    temperature: 0.3,
-                    max_tokens: 2500
-                })
-            });
+        // Helper para encapsular a cadeia padrão (Gemini -> OpenAI)
+        async function runFallbackChain() {
+            if (process.env.GEMINI_API_KEY) {
+                // --- Google Gemini API ---
+                const geminiHistory = conversationHistory.slice(-10).map(msg => ({
+                    role: msg.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: msg.content }]
+                }));
+                geminiHistory.push({ role: 'user', parts: [{ text: message }] });
 
-            if (!oaiRes.ok) {
-                const errorData = await oaiRes.json().catch(() => ({}));
-                console.error('OpenAI Error:', errorData);
-                return {
-                    statusCode: 500,
-                    headers,
-                    body: JSON.stringify({ error: errorData?.error?.message || 'Erro ao processar sua solicitação.' })
-                };
-            }
+                const geminiRes = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            systemInstruction: { parts: [{ text: systemPrompt }] },
+                            contents: geminiHistory,
+                            generationConfig: {
+                                temperature: 0.3,
+                                maxOutputTokens: 2500
+                            },
+                            safetySettings: [
+                                { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+                            ]
+                        })
+                    }
+                );
 
-            const oaiData = await oaiRes.json();
-            reply = oaiData.choices[0].message.content;
-            
-            if (oaiData.usage) {
-                usageData = {
-                    promptTokens: oaiData.usage.prompt_tokens || 0,
-                    completionTokens: oaiData.usage.completion_tokens || 0,
-                    totalTokens: oaiData.usage.total_tokens || 0
-                };
+                if (!geminiRes.ok) {
+                    const errText = await geminiRes.text();
+                    console.error('Gemini API Error:', geminiRes.status, errText);
+                    throw new Error(`Gemini API returned status ${geminiRes.status}`);
+                }
+
+                const geminiData = await geminiRes.json();
+                reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Resposta indisponível no momento.';
+                
+                if (geminiData.usageMetadata) {
+                    usageData = {
+                        promptTokens: geminiData.usageMetadata.promptTokenCount || 0,
+                        completionTokens: geminiData.usageMetadata.candidatesTokenCount || 0,
+                        totalTokens: geminiData.usageMetadata.totalTokenCount || 0
+                    };
+                }
+            } else if (process.env.OPENAI_API_KEY) {
+                // --- OpenAI Fallback ---
+                const oaiMessages = [
+                    { role: 'system', content: systemPrompt },
+                    ...conversationHistory.slice(-10),
+                    { role: 'user', content: message }
+                ];
+
+                const oaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: oaiMessages,
+                        temperature: 0.3,
+                        max_tokens: 2500
+                    })
+                });
+
+                if (!oaiRes.ok) {
+                    const errorData = await oaiRes.json().catch(() => ({}));
+                    console.error('OpenAI Error:', errorData);
+                    throw new Error(`OpenAI API returned status ${oaiRes.status}`);
+                }
+
+                const oaiData = await oaiRes.json();
+                reply = oaiData.choices[0].message.content;
+                
+                if (oaiData.usage) {
+                    usageData = {
+                        promptTokens: oaiData.usage.prompt_tokens || 0,
+                        completionTokens: oaiData.usage.completion_tokens || 0,
+                        totalTokens: oaiData.usage.total_tokens || 0
+                    };
+                }
+            } else {
+                throw new Error('Nenhuma API key de fallback configurada (Gemini ou OpenAI)');
             }
         }
 
@@ -565,7 +633,7 @@ Toda interação terapêutica deve seguir RIGOROSAMENTE este fluxo:
             headers,
             body: JSON.stringify({
                 reply: reply,
-                remaining: userEmail ? checkRateLimit(userEmail, isPremium ? 100 : 3).remaining : null,
+                remaining: remainingMessages,
                 flags: qualityFlags, // Retorna flags para frontend (futuro feedback UI)
                 usage: usageData
             })

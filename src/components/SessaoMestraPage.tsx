@@ -919,9 +919,9 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     </div>
                 )}
 
-                {/* PHASE 4: SUMMARY — Coherence Score */}
+                {/* PHASE 4: SUMMARY — Coherence Score + Próximos Passos */}
                 {phase === 'summary' && (
-                    <div className="absolute inset-0 flex flex-col items-center p-6 pb-10 bg-slate-950 overflow-y-auto">
+                    <div className="absolute inset-0 flex flex-col items-center p-6 pb-10 bg-slate-950 overflow-y-auto text-center animate-in zoom-in">
                         <div className="w-full max-w-sm mx-auto">
                             {/* Header */}
                             <div className="text-center mb-6 pt-2">
@@ -930,25 +930,146 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 <p className="text-gray-500 text-sm mt-1">{selectedEmotion?.namePortuguese} · {selectedEmotion?.mtcOrgan}</p>
                             </div>
 
-                            {/* Coherence Widget or fallback */}
                             {coherenceResult ? (
-                                <CoherenceScoreWidget
-                                    result={coherenceResult}
-                                    rmssdBefore={preSessionRmssd}
-                                    rmssdAfter={postSessionRmssd}
-                                    cumulative={cumulativeStats}
-                                    onClose={onBack}
-                                />
+                                <div className="mb-6 w-full">
+                                    <CoherenceScoreWidget
+                                        result={coherenceResult}
+                                        rmssdBefore={preSessionRmssd}
+                                        rmssdAfter={postSessionRmssd}
+                                        cumulative={cumulativeStats}
+                                    />
+                                </div>
                             ) : (
-                                <div className="space-y-4">
-                                    <div className="bg-slate-900 border border-white/5 rounded-2xl p-5 text-center">
-                                        <p className="text-gray-400 text-sm">Conecte um wearable Bluetooth na próxima sessão para ver seu Índice de Coerência em tempo real.</p>
-                                    </div>
-                                    <button onClick={onBack} className="w-full py-4 rounded-2xl font-bold text-white border border-white/10 hover:bg-white/5 transition-all">
-                                        Voltar ao Menu
-                                    </button>
+                                <div className="bg-slate-900 border border-white/5 rounded-2xl p-5 text-center mb-4">
+                                    <p className="text-gray-400 text-sm">Você completou o ciclo Mente-Energia-Corpo.</p>
                                 </div>
                             )}
+
+                            {/* ──────────────────────────────────────────────────────── */}
+                            {/* OFICINA TERAPÊUTICA — Próximos Setores                       */}
+                            {/* ──────────────────────────────────────────────────────── */}
+                            <div className="mt-6 mb-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <div className="flex-1 h-px bg-white/10"></div>
+                                    <span className="text-xs text-gray-500 font-semibold uppercase tracking-widest">Continuar o Ciclo</span>
+                                    <div className="flex-1 h-px bg-white/10"></div>
+                                </div>
+                                <p className="text-gray-600 text-xs text-center mb-4">
+                                    Sua sessão foi só o início. Cada setor da oficina cuida de uma parte do seu equilíbrio.
+                                </p>
+
+                                <div className="space-y-2.5">
+                                    {/* 1 ─ ZenFlow (Movimento) */}
+                                    <button
+                                        onClick={() => {
+                                            localStorage.setItem('zenflow_context', JSON.stringify({
+                                                emotionId: selectedEmotion?.id,
+                                                element: selectedEmotion?.mtcElement,
+                                                zenFlowExerciseId: selectedEmotion?.zenFlowExerciseId,
+                                                source: 'triad-session',
+                                            }));
+                                            onBack();
+                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'zenflow' }));
+                                        }}
+                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
+                                        style={{ background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.25)' }}
+                                    >
+                                        <span className="text-2xl">🌊</span>
+                                        <div className="flex-1">
+                                            <div className="text-white font-bold text-sm">ZenFlow — Corpo & Qi</div>
+                                            <div className="text-blue-400 text-xs mt-0.5">Movimento de liberação para o elemento {selectedEmotion?.mtcElement}</div>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                                    </button>
+
+                                    {/* 2 ─ Nutriming (Nutrição) */}
+                                    <button
+                                        onClick={() => {
+                                            localStorage.setItem('nutriming_context', JSON.stringify({
+                                                emotionId: selectedEmotion?.id,
+                                                element: selectedEmotion?.mtcElement,
+                                                organ: selectedEmotion?.mtcOrgan,
+                                                source: 'triad-session',
+                                            }));
+                                            onBack();
+                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'nutriming-ai' }));
+                                        }}
+                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
+                                        style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)' }}
+                                    >
+                                        <span className="text-2xl">🥗</span>
+                                        <div className="flex-1">
+                                            <div className="text-white font-bold text-sm">Nutriming IA — Nutrição</div>
+                                            <div className="text-emerald-400 text-xs mt-0.5">Protocolo alimentar para nutrir {selectedEmotion?.mtcOrgan}</div>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                                    </button>
+
+                                    {/* 3 ─ Plantas Medicinais */}
+                                    <button
+                                        onClick={() => {
+                                            localStorage.setItem('phyto_context', JSON.stringify({
+                                                emotionId: selectedEmotion?.id,
+                                                element: selectedEmotion?.mtcElement,
+                                                organ: selectedEmotion?.mtcOrgan,
+                                                source: 'triad-session',
+                                            }));
+                                            onBack();
+                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'plantas-medicinais' }));
+                                        }}
+                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
+                                        style={{ background: 'rgba(132,204,22,0.12)', border: '1px solid rgba(132,204,22,0.25)' }}
+                                    >
+                                        <span className="text-2xl">🌿</span>
+                                        <div className="flex-1">
+                                            <div className="text-white font-bold text-sm">Plantas Medicinais</div>
+                                            <div className="text-lime-400 text-xs mt-0.5">Fitoterapia complementar para o elemento {selectedEmotion?.mtcElement}</div>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-lime-400 flex-shrink-0" />
+                                    </button>
+
+                                    {/* 4 ─ VFC/HRV (Monitoramento) */}
+                                    <button
+                                        onClick={() => {
+                                            onBack();
+                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'device-sync' }));
+                                        }}
+                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
+                                        style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.25)' }}
+                                    >
+                                        <span className="text-2xl">📊</span>
+                                        <div className="flex-1">
+                                            <div className="text-white font-bold text-sm">VFC / HRV — Monitoramento</div>
+                                            <div className="text-amber-400 text-xs mt-0.5">Acompanhe a recuperação do seu sistema nervoso</div>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                                    </button>
+
+                                    {/* 5 ─ Self Oracle (Aprofundamento) */}
+                                    <button
+                                        onClick={() => {
+                                            onBack();
+                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'acupressure' }));
+                                        }}
+                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
+                                        style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.25)' }}
+                                    >
+                                        <span className="text-2xl">🔮</span>
+                                        <div className="flex-1">
+                                            <div className="text-white font-bold text-sm">Self Oracle — Aprofundamento</div>
+                                            <div className="text-purple-400 text-xs mt-0.5">Pontos específicos com fotos e protocolo detalhado</div>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                                    </button>
+                                </div>
+
+                                <button
+                                    onClick={onBack}
+                                    className="w-full mt-4 py-3 rounded-2xl font-semibold text-gray-500 border border-white/5 hover:bg-white/5 transition-all text-sm"
+                                >
+                                    Concluir e Voltar ao Menu
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}

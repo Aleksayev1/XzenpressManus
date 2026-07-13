@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Wind, Activity, Zap, Play, Info } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Wind, Activity, Zap, Play, Info, Sparkles } from 'lucide-react';
 import { ZenFlowSession } from './ZenFlowSession';
 import { ZenFlowSequence, zenFlowExercises } from '../data/zenFlowExercises';
+import { emotionalStates } from '../data/emotionalMapping';
 
 interface ZenFlowPageProps {
     onBack: () => void;
@@ -9,6 +10,40 @@ interface ZenFlowPageProps {
 
 export const ZenFlowPage: React.FC<ZenFlowPageProps> = ({ onBack }) => {
     const [activeSession, setActiveSession] = useState<ZenFlowSequence | null>(null);
+    const [contextBanner, setContextBanner] = useState<{
+        emotionName: string;
+        element: string;
+        recommendedExercise: string | null;
+        seq: ZenFlowSequence | null;
+    } | null>(null);
+
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem('zenflow_context');
+            if (raw) {
+                const context = JSON.parse(raw);
+                localStorage.removeItem('zenflow_context'); // Clear it immediately
+
+                const seq = zenFlowExercises.find(s => s.id === context.zenFlowExerciseId) || null;
+                const emotionObj = emotionalStates.find(e => e.id === context.emotionId);
+                const emotionName = emotionObj?.namePortuguese || context.emotionId || '';
+
+                setContextBanner({
+                    emotionName,
+                    element: context.element || '',
+                    recommendedExercise: seq?.title || null,
+                    seq
+                });
+
+                // Auto-initiate the sequence if found
+                if (seq) {
+                    setActiveSession(seq);
+                }
+            }
+        } catch (e) {
+            console.error("Error reading zenflow_context:", e);
+        }
+    }, []);
 
     const categories = [
         {
@@ -55,19 +90,16 @@ export const ZenFlowPage: React.FC<ZenFlowPageProps> = ({ onBack }) => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 pt-20 px-4">
-            {/* Header */}
-            <div className="flex items-center absolute left-0 top-1">
+            {/* Botão Voltar (Alinhado e Visível abaixo do Header fixo) */}
+            <div className="max-w-4xl mx-auto mb-6 flex items-center pt-2">
                 <button
                     onClick={onBack}
-                    className="p-2 mr-4 bg-white/80 hover:bg-white rounded-full shadow-sm hover:shadow transition-all group border border-gray-100"
+                    className="flex items-center gap-2 text-gray-650 hover:text-gray-900 transition-all text-xs font-bold bg-white px-4 py-2.5 rounded-xl shadow-sm border border-gray-200 hover:scale-105 active:scale-95"
                     title="Voltar ao Menu Principal"
                 >
-                    <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-purple-600 transition-colors" />
+                    <ArrowLeft className="w-4 h-4 text-gray-500" />
+                    <span>Voltar ao Menu Principal</span>
                 </button>
-                {/* Visual Cue - Drawing */}
-                <div className="hidden sm:flex items-center gap-2 text-xs text-purple-400 font-handwriting opacity-80 animate-fade-in select-none">
-                    <span>↵ Menu Principal</span>
-                </div>
             </div>
 
             <div className="text-center pt-2">
@@ -80,6 +112,30 @@ export const ZenFlowPage: React.FC<ZenFlowPageProps> = ({ onBack }) => {
                 </p>
             </div>
 
+            {/* Contextual Onboarding/Oficina Banner */}
+            {contextBanner && (
+                <div className="max-w-4xl mx-auto mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4 animate-in slide-in-from-top duration-300">
+                    <div className="flex items-center gap-3">
+                        <div className="p-3 bg-purple-100 rounded-xl shrink-0 text-purple-600 text-xl font-bold">
+                            ✨
+                        </div>
+                        <div className="text-left">
+                            <h4 className="font-bold text-purple-900 text-sm">Oficina Terapêutica — Conexão Ativa</h4>
+                            <p className="text-xs text-gray-650 mt-0.5">
+                                Identificamos que você concluiu o trabalho de <strong>{contextBanner.emotionName}</strong> (Elemento {contextBanner.element}).
+                            </p>
+                        </div>
+                    </div>
+                    {contextBanner.seq && (
+                        <button
+                            onClick={() => setActiveSession(contextBanner.seq)}
+                            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl shadow-md transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+                        >
+                            Refazer Sequência Recomendada →
+                        </button>
+                    )}
+                </div>
+            )}
 
             {/* Educational Banner */}
             <div className="max-w-4xl mx-auto mb-12 bg-white rounded-2xl p-6 shadow-sm border border-purple-100 relative overflow-hidden">
@@ -111,7 +167,7 @@ export const ZenFlowPage: React.FC<ZenFlowPageProps> = ({ onBack }) => {
                             <div className={`p-3 rounded-xl ${cat.color} shrink-0`}>
                                 {cat.icon}
                             </div>
-                            <div>
+                            <div className="text-left">
                                 <h3 className="text-xl font-bold text-gray-900">{cat.title}</h3>
                                 <p className="text-sm font-semibold uppercase tracking-wide opacity-60 mb-2">{cat.subtitle}</p>
                                 <p className="text-gray-600 text-sm leading-relaxed">{cat.description}</p>

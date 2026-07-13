@@ -5,12 +5,14 @@ import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { fiveElements } from '../data/fiveElements';
 import { ZenAvatar } from './ZenAvatar';
 import { emotionalStates } from '../data/emotionalMapping';
+import { ZenMemoryEngine, MemoryCategory, ZenMemory } from '../services/zenMemoryEngine';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  eurekaMemory?: ZenMemory;
 }
 
 interface ZenMentorChatProps {
@@ -18,6 +20,17 @@ interface ZenMentorChatProps {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function getCategoryTriggers(text: string): MemoryCategory[] {
+  const lower = text.toLowerCase();
+  const categories: MemoryCategory[] = [];
+  if (/(sono|dormir|insônia|acord|cansaço|fadiga)/.test(lower)) categories.push('sleep');
+  if (/(estresse|tenso|tensão|pressão|trabalho|nervoso|preocupa)/.test(lower)) categories.push('stress');
+  if (/(comida|comer|fome|estômago|aliment|nutri)/.test(lower)) categories.push('nutrition');
+  if (/(dor|dói|machuca|desconforto|corpo|pescoço|costas)/.test(lower)) categories.push('pain');
+  if (/(triste|raiva|medo|choro|emocion|sinto|ansiedad)/.test(lower)) categories.push('emotion');
+  return categories.length > 0 ? categories : ['general'];
+}
 
 /** Builds a rich anamneseContext string to inject into the Self Oracle prompt */
 function buildAnamneseContext(): string {
@@ -332,6 +345,11 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const [selectedVoice, setSelectedVoice] = useState<'nova' | 'echo' | 'onyx'>('nova');
   const [autoRead, setAutoRead] = useState(false);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  
+  // ── ZenMemory UI States ────────────────────────────────────────────────────
+  const [isRetrievingMemory, setIsRetrievingMemory] = useState(false);
+  const [showEurekaReason, setShowEurekaReason] = useState<number | null>(null);
+
   // ── Sessão Mestra handoff ──────────────────────────────────────────────────
   // Index of the last assistant message that triggered an emotion CTA
   const [sessionReadyMsgIndex, setSessionReadyMsgIndex] = useState<number | null>(null);
@@ -405,7 +423,24 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
         content: m.content,
       }));
 
-      const anamneseContext = buildAnamneseContext();
+      // ── ZenMemory Retrieval (Camada 2) ──
+      setIsRetrievingMemory(true);
+      const categories = getCategoryTriggers(userMessage.content);
+      const topMemories = user?.id 
+        ? await ZenMemoryEngine.retrieveActiveContext(user.id, categories)
+        : [];
+      setIsRetrievingMemory(false);
+
+      let anamneseContext = buildAnamneseContext();
+      
+      // Injecting ZenMemory Context
+      if (topMemories.length > 0) {
+        anamneseContext += '\n\n🧠 MEMÓRIA LONGITUDINAL XZEN (Memórias Ativadas):\n';
+        topMemories.forEach(m => {
+          anamneseContext += `• [Categoria: ${m.memory_category}] ${m.memory_content} (Confiança: ${m.confidence_score}, Estado: ${m.memory_state})\n`;
+        });
+        anamneseContext += `\nREGRAS DO ESPELHO COGNITIVO:\n${ZenMemoryEngine.getMemoryContract()}`;
+      }
 
       const { getBaseApiUrl } = await import('../lib/api');
       const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/ai-chat`, {
@@ -428,6 +463,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
           role: 'assistant' as const,
           content: data.reply,
           timestamp: new Date(),
+          eurekaMemory: topMemories[0] // Salva a principal para o UI
         }];
         // Detect emotional context for Sessão Mestra handoff
         const emotionId = extractEmotionFromReply(data.reply);
@@ -711,12 +747,68 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                         <ArrowRight className="w-3.5 h-3.5" style={{ color: accentColor }} />
                       </button>
                     )}
+                    
+                    {/* ── Eureka UI — aparece na msg do assistente se houver memória ── */}
+                    {msg.role === 'assistant' && msg.eurekaMemory && (
+                      <div className="mt-2.5 p-3 rounded-xl" style={{ background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+                        <div className="flex items-start gap-2">
+                          <span className="text-emerald-400 text-sm">🌱</span>
+                          <div className="flex-1">
+                            <p className="text-xs text-indigo-200 font-medium leading-relaxed">
+                              Encontrei uma experiência anterior que pode ajudar nesta reflexão.
+                            </p>
+                            <button 
+                              onClick={() => setShowEurekaReason(prev => prev === i ? null : i)}
+                              className="mt-1.5 text-[11px] text-indigo-400 hover:text-indigo-300 underline underline-offset-2 transition-colors"
+                            >
+                              Por que isso apareceu?
+                            </button>
+                            
+                            {showEurekaReason === i && (
+                              <div className="mt-3 p-3 rounded-lg bg-black/40 border border-white/10 space-y-3 animate-[fadeIn_0.2s_ease-out]">
+                                <p className="text-[11px] text-gray-300 leading-relaxed">
+                                  Esta conexão apareceu porque você relatou algo semelhante antes: <br/>
+                                  <span className="italic text-gray-400 mt-1 inline-block">"{msg.eurekaMemory.memory_content}"</span>
+                                </p>
+                                <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
+                                   <button 
+                                      onClick={() => ZenMemoryEngine.applyMemoryFeedback(msg.eurekaMemory!.id!, 'confirmed')}
+                                      className="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold hover:bg-emerald-500/20 transition-colors"
+                                   >
+                                     👍 Faz sentido
+                                   </button>
+                                   <button 
+                                      onClick={() => ZenMemoryEngine.applyMemoryFeedback(msg.eurekaMemory!.id!, 'rejected')}
+                                      className="px-2.5 py-1 rounded bg-red-500/10 text-red-400 text-[10px] font-semibold hover:bg-red-500/20 transition-colors"
+                                   >
+                                     👎 Não representa minha experiência
+                                   </button>
+                                   <button className="px-2.5 py-1 rounded bg-white/5 text-gray-300 text-[10px] font-semibold hover:bg-white/10 transition-colors">
+                                     ✏️ Corrigir
+                                   </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
             })}
 
-            {isLoading && (
+            {/* ── Conectando UI ── */}
+            {isRetrievingMemory && (
+              <div className="flex justify-start opacity-80 mb-2">
+                 <div className="px-4 py-2 rounded-2xl text-xs font-medium flex items-center gap-2" style={{ background: `${accentColor}22`, color: accentColor }}>
+                    <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                    Conectando com sua jornada...
+                 </div>
+              </div>
+            )}
+
+            {isLoading && !isRetrievingMemory && (
               <div className="flex justify-start">
                 <div
                   className="w-6 h-6 rounded-lg flex items-center justify-center text-xs flex-shrink-0 mr-2 mt-0.5"

@@ -466,7 +466,9 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                     chronicity,
                     geneticMarkers,
                     organClock,
-                    anamnese
+                    anamnese,
+                    userEmail: user?.email || null,
+                    isPremium: user?.isPremium || false
                 })
             });
 

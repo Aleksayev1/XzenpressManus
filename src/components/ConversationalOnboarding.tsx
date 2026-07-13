@@ -91,7 +91,7 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
       const rec = new SpeechRecognition();
-      rec.continuous = true;
+      rec.continuous = false;
       rec.lang = 'pt-BR';
       rec.interimResults = true;
 

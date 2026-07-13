@@ -501,6 +501,22 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
       </div>
 
       <div className="overflow-y-auto pb-24">
+        {!user && (
+          <div className="px-4 pt-4 max-w-lg mx-auto">
+            <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-purple-500/10 border border-orange-500/30 rounded-2xl p-4 text-center space-y-3">
+              <p className="text-sm text-orange-200">
+                Você está no modo <strong>Convidado</strong>. Salve seu perfil e seu Mapa Vivo na nuvem para não perder o histórico!
+              </p>
+              <button
+                onClick={() => onPageChange('login')}
+                className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-bold text-xs rounded-xl shadow-lg transition-all"
+              >
+                🔐 Criar Conta / Fazer Login
+              </button>
+            </div>
+          </div>
+        )}
+
         <GuardianDisplay
           scores={state.scores}
           baselineScores={state.baselineScores || (anamneseProfile?.guardianScores ? buildInitialScores(anamneseProfile) : undefined) || state.scores}

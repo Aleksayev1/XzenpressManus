@@ -300,7 +300,7 @@ function AppContent() {
                 const { MapaVivoStorageService } = await import('./services/mapaVivoStorageService');
                 await MapaVivoStorageService.saveAnamneseProfile(user.id, profile);
               }
-              setCurrentPage('home');
+              setCurrentPage('mapa-vivo');
             }}
             userEmail={user?.email}
           />

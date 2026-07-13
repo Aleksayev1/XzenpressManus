@@ -157,7 +157,7 @@ export class ZenMemoryEngine {
   /**
    * Motor de Consolidação e User Feedback Loop
    */
-  static async applyMemoryFeedback(memoryId: string, feedbackType: 'confirmed' | 'corrected' | 'ignored' | 'helped'): Promise<void> {
+  static async applyMemoryFeedback(memoryId: string, feedbackType: 'confirmed' | 'corrected' | 'ignored' | 'helped' | 'rejected'): Promise<void> {
     if (!supabase) return;
     
     try {

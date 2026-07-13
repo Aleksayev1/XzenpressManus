@@ -161,8 +161,44 @@ export class ZenMemoryEngine {
     if (!supabase) return;
     
     try {
-      // Aqui haveria a gravação no `memory_usage_log`.
-      // Seguido do update de estado na `zen_memory` (ex: passando de 'candidate' para 'confirmed').
+      const { data: session } = await supabase.auth.getSession();
+      const userId = session?.session?.user?.id;
+      
+      if (!userId) {
+        console.warn('Cannot apply memory feedback: No active user session');
+        return;
+      }
+
+      // 1. Grava no memory_usage_log
+      await supabase.from('memory_usage_log').insert([{
+        user_id: userId,
+        memory_id: memoryId,
+        interaction_type: feedbackType,
+        context_score_delta: feedbackType === 'confirmed' ? 50 : feedbackType === 'rejected' ? -50 : 0
+      }]);
+
+      // 2. Atualiza estado na zen_memory dependendo do feedback
+      let updateData: any = {};
+      
+      if (feedbackType === 'confirmed') {
+        updateData.user_confirmed = true;
+        updateData.memory_state = 'confirmed';
+        // Incrementa contagem de confirmações (requeriria ler o dado atual, mas vamos simplificar o update usando raw sql ou atualizando estado)
+        // Para simplificar, sem RPC, apenas atualizamos o estado
+      } else if (feedbackType === 'rejected') {
+        updateData.memory_state = 'archived';
+        updateData.memory_status = 'inactive';
+      } else if (feedbackType === 'helped') {
+        // Incrementa influence_weight sutilmente (fictício, se houvesse RPC)
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        await supabase
+          .from('zen_memory')
+          .update(updateData)
+          .eq('id', memoryId);
+      }
+
       console.log(`[ZenMemoryEngine] Feedback '${feedbackType}' registrado para memória ${memoryId}`);
     } catch (error) {
        console.error('Erro no Memory Feedback:', error);

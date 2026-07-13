@@ -10,7 +10,7 @@ import { useSessionHistory } from '../hooks/useSessionHistory';
 import { loadAnamneseProfile, generateOracleContext } from '../data/anamneseProfile';
 import { CoherenceScoreWidget } from './CoherenceScoreWidget';
 import { useCoherenceScore, computeCoherenceResult, type CoherenceSnapshot } from '../hooks/useCoherenceScore';
-
+import { ZenMemoryEngine } from '../services/zenMemoryEngine';
 // Internal components for the phases
 import { EmotionalCheckIn } from './EmotionalCheckIn';
 
@@ -385,6 +385,19 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             });
             // Save with coherence data
             saveCoherenceResult(before, after, result, 'integrated', 600);
+
+            // ZenMemory: Captura de Memória Episódica
+            ZenMemoryEngine.captureCandidateMemory({
+                user_id: user.id,
+                memory_type: 'episodic',
+                memory_category: 'emotion',
+                tags: [selectedEmotion.id, 'sessao_mestra', ...getRecommendedPoints().map(p => p.id)],
+                memory_content: `Sessão Mestra concluída para ${selectedEmotion.namePortuguese}. Ansiedade relatada de ${preSessionAnxiety}/10 para ${postAnxiety}/10. ${result.improved ? 'Houve melhora.' : 'Sem melhora fisiológica imediata.'}`,
+                source_type: 'session_result',
+                privacy_level: 'personal_context',
+                influence_weight: 3,
+                confidence_score: 50
+            });
         }
 
         // Load cumulative stats

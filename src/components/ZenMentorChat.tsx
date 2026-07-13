@@ -124,10 +124,11 @@ function buildGreeting(userName?: string): string {
 }
 
 // ─── Action Button Parser ─────────────────────────────────────────────────────
-// Detects patterns like [ABRIR:acupressure] [ZENFLOW:liberacao] in AI responses
+// Detects patterns like [ABRIR:acupressure] [ZENFLOW:liberacao] and [CANDIDATA: "text"] in AI responses
 function parseActionButtons(content: string) {
   const actionRegex = /\[ABRIR:([\w-]+)\]/g;
   const zenflowRegex = /\[ZENFLOW:([\w]+)\]/g;
+  const candidataRegex = /\[CANDIDATA:\s*"([^"]+)"\]/gi;
 
   const actions: { label: string; page: string }[] = [];
   let match;
@@ -138,8 +139,19 @@ function parseActionButtons(content: string) {
     actions.push({ label: `Iniciar ZenFlow ${match[1]}`, page: 'zenflow' });
   }
 
-  const cleanContent = content.replace(actionRegex, '').replace(zenflowRegex, '').trim();
-  return { cleanContent, actions };
+  let candidateMemoryText = null;
+  const candidateMatch = candidataRegex.exec(content);
+  if (candidateMatch) {
+      candidateMemoryText = candidateMatch[1];
+  }
+
+  const cleanContent = content
+    .replace(actionRegex, '')
+    .replace(zenflowRegex, '')
+    .replace(candidataRegex, '')
+    .trim();
+    
+  return { cleanContent, actions, candidateMemoryText };
 }
 
 // ─── Emotion Detector ─────────────────────────────────────────────────────────
@@ -459,14 +471,31 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
       if (!response.ok) throw new Error(data.error || 'Erro ao processar mensagem');
 
       setMessages(prev => {
+        const { cleanContent, candidateMemoryText } = parseActionButtons(data.reply);
+        
+        // Se a IA gerou uma memória candidata, registramos silenciosamente
+        if (candidateMemoryText && user?.id) {
+            ZenMemoryEngine.captureCandidateMemory({
+                user_id: user.id,
+                memory_type: 'episodic',
+                memory_category: 'general',
+                tags: ['ai_inference'],
+                memory_content: candidateMemoryText,
+                source_type: 'ai_inference',
+                privacy_level: 'personal_context',
+                influence_weight: 2,
+                confidence_score: 30 // baixa confiança inicial, aguarda usuário confirmar na próxima que aparecer
+            });
+        }
+
         const updated = [...prev, {
           role: 'assistant' as const,
-          content: data.reply,
+          content: cleanContent,
           timestamp: new Date(),
           eurekaMemory: topMemories[0] // Salva a principal para o UI
         }];
         // Detect emotional context for Sessão Mestra handoff
-        const emotionId = extractEmotionFromReply(data.reply);
+        const emotionId = extractEmotionFromReply(cleanContent);
         if (emotionId && sessionReadyMsgIndex === null) {
           setDetectedEmotionId(emotionId);
           setSessionReadyMsgIndex(updated.length - 1);

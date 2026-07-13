@@ -128,7 +128,7 @@ function buildGreeting(userName?: string): string {
 function parseActionButtons(content: string) {
   const actionRegex = /\[ABRIR:([\w-]+)\]/g;
   const zenflowRegex = /\[ZENFLOW:([\w]+)\]/g;
-  const candidataRegex = /\[CANDIDATA:\s*"([^"]+)"\]/gi;
+  const candidataRegex = /\[CANDIDATA:\s*(.+?)\]/gi;
 
   const actions: { label: string; page: string }[] = [];
   let match;
@@ -142,8 +142,12 @@ function parseActionButtons(content: string) {
   let candidateMemoryText = null;
   const candidateMatch = candidataRegex.exec(content);
   if (candidateMatch) {
-      candidateMemoryText = candidateMatch[1];
+      // Remove any quotes (straight or curly) surrounding the text
+      candidateMemoryText = candidateMatch[1].replace(/^["“”']|["“”']$/g, '').trim();
   }
+  
+  // Reset lastIndex for the .replace call below
+  candidataRegex.lastIndex = 0;
 
   const cleanContent = content
     .replace(actionRegex, '')

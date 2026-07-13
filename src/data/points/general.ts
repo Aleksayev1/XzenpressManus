@@ -588,7 +588,7 @@ export const generalPoints: AcupressurePoint[] = [
     descriptionEs: 'Punto meridiano Corazón para tristeza, ira, miedo y depresión. Ubicado 0.5 cun arriba pliegue muñeca, lado meñique (entre C4-C6). Trata inquietud mental, ira, miedo, depresión, agitación, afasia, tartamudeo, dolor ojos/cara, aftas, dolor cabeza y ardor al orinar. Presión leve 2-3 min bilateral.',
     descriptionFr: 'Point méridien Cœur pour tristesse, colère, peur et dépression. Situé 0.5 cun au-dessus pli poignet, côté auriculaire (entre C4-C6). Traite agitation mentale, colère, peur, dépression, agitation, aphasie, bégaiement, douleur yeux/visage, aphtes, céphalée et brûlure miction. Pression légère 2-3 min bilatéral.',
     position: { x: 30, y: 58 },
-    image: '/uploaded_media_1770057308756.png',
+    image: '/mtc_tongli_ht5.jpg',
     imageAlt: 'Localização do ponto C5 (HT5) Tongli no punho',
     benefits: [
       'Trata tristeza e depressão',

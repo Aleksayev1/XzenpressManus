@@ -86,7 +86,7 @@ export const heartPoints: AcupressurePoint[] = [
     description: 'Ponto Luo de Conexão. Localizado a 1 cun acima da prega do punho. Abre a mente, regula o ritmo cardíaco e melhora a fala e a gagueira.',
     descriptionEn: 'Luo-Connecting point. 1 cun superior to the wrist crease. Opens the mind and benefits the tongue.',
     position: { x: 31, y: 62 },
-    image: '/mtc_tongli.jpg',
+    image: '/mtc_tongli_ht5.jpg',
     imageAlt: 'Localização do ponto C5 (Tongli) no antebraço interno',
     benefits: ['Trata perda súbita da fala ou gagueira', 'Combate insônia e ansiedade noturna', 'Harmoniza palpitações e arritmias leves'],
     benefitsEn: ['Helps with speech loss and stuttering', 'Combates insomnia'],

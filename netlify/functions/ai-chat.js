@@ -209,7 +209,7 @@ exports.handler = async (event, context) => {
                 clinicalContext = `
 ### 🚨 PROTOCOLO CLÍNICO ESPECÍFICO DETECTADO: ${matchedProtocol.condition}
 ${matchedProtocol.instructions_for_ai ? `\n**INSTRUCÃO DE RACIOCÍNIO (Processamento Lógico):**\n${matchedProtocol.instructions_for_ai}\n` : ''}
-Para esta condição, você DEVE priorizar a seguinte causa metafísica e orientar o usuário a utilizar o Ciclo Terapêutico/Self Oracle para estimular os pontos recomendados:
+Para esta condição, você DEVE priorizar a seguinte causa metafísica e orientar o usuário a utilizar a Sessão Mestra para estimular os pontos recomendados. Importante: Você DEVE incluir a tag [ABRIR:sessao-mestra] no final da sua resposta para gerar o botão.
 
 **Causa Metafísica Provável:**
 "${matchedProtocol.metafisica}"
@@ -361,8 +361,8 @@ Toda interação terapêutica deve seguir este fluxo adaptado ao momento da conv
         - Se houver culpa, autocrítica pesada ou ressentimento de vidas passadas, ofereça o "Perdão Antecipado" para alívio da densidade cármica e física.
     *   Sugira **1 Ação Prática** para treinar essa virtude hoje.
 
-3.  **O DIRECIONAMENTO (Self Oracle / Ciclo Terapêutico):**
-    *   Não prescreva pontos físicos textualmente na conversa (para evitar confusão). Em vez disso, oriente de forma acolhedora o usuário a clicar no botão **"Iniciar Ciclo Terapêutico Completo"** no rodapé do chat para visualizar o mapa de pontos personalizado (Self Oracle) e realizar as práticas de regulação física e energética associadas à sua queixa.
+    *   Não prescreva pontos físicos textualmente na conversa (para evitar confusão). Em vez disso, oriente de forma acolhedora o usuário a clicar no botão para iniciar o ciclo terapêutico completo.
+    *   IMPORTANTE: Para que o botão apareça na tela do usuário, você DEVE gerar a tag [ABRIR:sessao-mestra] no final da sua resposta!
     *   Indique que os pontos de acupressão detalhados e o pacer de respiração estão disponíveis interativamente nos próximos passos do ciclo.
 
 ---

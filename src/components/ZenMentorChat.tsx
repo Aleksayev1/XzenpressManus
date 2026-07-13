@@ -133,7 +133,12 @@ function parseActionButtons(content: string) {
   const actions: { label: string; page: string }[] = [];
   let match;
   while ((match = actionRegex.exec(content)) !== null) {
-    actions.push({ label: `Abrir ${match[1]}`, page: match[1] });
+    const page = match[1];
+    let label = `Abrir ${page}`;
+    if (page === 'sessao-mestra') label = '🧘 Iniciar Sessão Mestra';
+    if (page === 'acupressure') label = '💆 Mapa de Acupressão';
+    if (page === 'breathing') label = '🌬️ Exercício de Respiração';
+    actions.push({ label, page });
   }
   while ((match = zenflowRegex.exec(content)) !== null) {
     actions.push({ label: `Iniciar ZenFlow ${match[1]}`, page: 'zenflow' });

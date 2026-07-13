@@ -248,6 +248,9 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
         emocoesDominantes: Array.isArray(data.emocoesDominantes) ? data.emocoesDominantes : [],
         condicoesExistentes: Array.isArray(data.condicoesExistentes) ? data.condicoesExistentes : ['nenhuma'],
         medicamentosEmUso: Array.isArray(data.medicamentosEmUso) ? data.medicamentosEmUso : ['nenhum'],
+        cronicicidade: data.cronicicidade || undefined,
+        horarioSintoma: data.horarioSintoma || undefined,
+        crencaLimitante: data.crencaLimitante || undefined,
         guardianScores: { madeira: 60, fogo: 60, terra: 60, metal: 60, agua: 60 },
         completedAt: new Date().toISOString(),
         version: 1
@@ -275,6 +278,9 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
         emocoesDominantes: [],
         condicoesExistentes: ['nenhuma'],
         medicamentosEmUso: ['nenhum'],
+        cronicicidade: undefined,
+        horarioSintoma: undefined,
+        crencaLimitante: undefined,
         guardianScores: { madeira: 60, fogo: 60, terra: 60, metal: 60, agua: 60 },
         completedAt: new Date().toISOString(),
         version: 1

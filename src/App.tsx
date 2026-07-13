@@ -46,7 +46,7 @@ import LandingPage from './components/LandingPage';
 import { FeedbackPage } from './components/FeedbackPage';
 import { MapaVivoPage } from './components/MapaVivoPage';
 import { ConversationalOnboarding } from './components/ConversationalOnboarding';
-import { hasCompletedAnamnese, loadAnamneseProfile, type AnamneseProfile } from './data/anamneseProfile';
+import { hasCompletedAnamnese, loadAnamneseProfile, saveAnamneseProfile, type AnamneseProfile } from './data/anamneseProfile';
 
 import { PremiumPartnerPitch } from './pages/PremiumPartnerPitch';
 import { DeviceSyncPage } from './components/DeviceSyncPage';
@@ -299,6 +299,8 @@ function AppContent() {
               if (user?.id) {
                 const { MapaVivoStorageService } = await import('./services/mapaVivoStorageService');
                 await MapaVivoStorageService.saveAnamneseProfile(user.id, profile);
+              } else {
+                saveAnamneseProfile(profile);
               }
               setCurrentPage('mapa-vivo');
             }}

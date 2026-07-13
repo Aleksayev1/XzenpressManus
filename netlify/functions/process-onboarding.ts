@@ -64,6 +64,9 @@ REPRESENTATION SCHEMAS:
 8. emocoesDominantes (An array containing only valid strings from: 'raiva', 'ansiedade', 'preocupacao', 'tristeza', 'medo', 'paz', 'alegria', 'foco')
 9. condicoesExistentes (An array containing only valid strings from: 'hipertensao', 'diabetes', 'ansiedade_diagnosticada', 'depressao_diagnosticada', 'problemas_digestivos', 'dores_cronicas', 'insonia_cronica', 'problemas_hormonais', 'nenhuma')
 10. medicamentosEmUso (An array containing only valid strings from: 'anticoagulantes', 'antidepressivos', 'antihipertensivos', 'hipoglicemiantes', 'anticoncepcionais', 'nenhum')
+11. cronicicidade (Must be exactly one of: 'dias', 'semanas', 'meses', 'anos', 'vida_toda')
+12. horarioSintoma (A string describing the hour or time range when symptoms occur or worsen, e.g. "17h-19h", "madrugada", "manhã", or null if not mentioned)
+13. crencaLimitante (A string describing what the user believes is the cause of their symptoms/condition, or null if not mentioned)
 
 INSTRUCTIONS:
 - Analyze the user replies in the transcript carefully.
@@ -83,7 +86,10 @@ Example output:
   "sintomasFisicos": ["tensao_nuca", "cansaco_cronico"],
   "emocoesDominantes": ["ansiedade", "preocupacao"],
   "condicoesExistentes": ["ansiedade_diagnosticada"],
-  "medicamentosEmUso": ["nenhum"]
+  "medicamentosEmUso": ["nenhum"],
+  "cronicicidade": "meses",
+  "horarioSintoma": "17h-19h",
+  "crencaLimitante": "excesso de trabalho"
 }
 `;
 

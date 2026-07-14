@@ -22,6 +22,49 @@ interface Message {
     timestamp: Date;
 }
 
+// Helper to parse and strip action tags in Sessão Mestra chat
+function parseActionButtonsSM(content: string) {
+  const actionRegex = /\[ABRIR:([\w-]+)\]/g;
+  const zenflowRegex = /\[ZENFLOW:([\w]+)\]/g;
+  const candidataRegex = /\[CANDIDATA:\s*(.+?)\]/gi;
+
+  let candidateMemoryText = null;
+  const candidateMatch = candidataRegex.exec(content);
+  if (candidateMatch) {
+      // Remove any quotes (straight or curly) surrounding the text
+      candidateMemoryText = candidateMatch[1].replace(/^["“”']|["“”']$/g, '').trim();
+  }
+  
+  // Reset lastIndex for the .replace call below
+  candidataRegex.lastIndex = 0;
+
+  const cleanContent = content
+    .replace(actionRegex, '')
+    .replace(zenflowRegex, '')
+    .replace(candidataRegex, '')
+    .trim();
+    
+  return { cleanContent, candidateMemoryText };
+}
+
+// Markdown bold renderer helper
+function renderMarkdown(text: string): React.ReactNode {
+  const lines = text.split('\n');
+  return lines.map((line, i) => {
+    // Bold
+    const parts = line.split(/\*\*(.*?)\*\*/g);
+    const rendered = parts.map((part, j) =>
+      j % 2 === 1 ? <strong key={j} className="text-white font-semibold">{part}</strong> : part
+    );
+    return (
+      <React.Fragment key={i}>
+        {rendered}
+        {i < lines.length - 1 && <br />}
+      </React.Fragment>
+    );
+  });
+}
+
 export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { user } = useAuth();
     const { recordSession } = useSessionHistory();
@@ -249,9 +292,26 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
             const data = await response.json();
             if (data.reply) {
+                const { cleanContent, candidateMemoryText } = parseActionButtonsSM(data.reply);
+
+                // Register candidate memory if found
+                if (candidateMemoryText && user?.id) {
+                    ZenMemoryEngine.captureCandidateMemory({
+                        user_id: user.id,
+                        memory_type: 'episodic',
+                        memory_category: 'general',
+                        tags: ['ai_inference', 'sessao_mestra_chat'],
+                        memory_content: candidateMemoryText,
+                        source_type: 'ai_inference',
+                        privacy_level: 'personal_context',
+                        influence_weight: 2,
+                        confidence_score: 30
+                    });
+                }
+
                 setMessages([{
                     role: 'assistant',
-                    content: data.reply,
+                    content: cleanContent,
                     timestamp: new Date()
                 }]);
             }
@@ -291,7 +351,26 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 })
             });
             const data = await response.json();
-            setMessages(prev => [...prev, { role: 'assistant', content: data.reply, timestamp: new Date() }]);
+            if (data.reply) {
+                const { cleanContent, candidateMemoryText } = parseActionButtonsSM(data.reply);
+
+                // Register candidate memory if found
+                if (candidateMemoryText && user?.id) {
+                    ZenMemoryEngine.captureCandidateMemory({
+                        user_id: user.id,
+                        memory_type: 'episodic',
+                        memory_category: 'general',
+                        tags: ['ai_inference', 'sessao_mestra_chat'],
+                        memory_content: candidateMemoryText,
+                        source_type: 'ai_inference',
+                        privacy_level: 'personal_context',
+                        influence_weight: 2,
+                        confidence_score: 30
+                    });
+                }
+
+                setMessages(prev => [...prev, { role: 'assistant', content: cleanContent, timestamp: new Date() }]);
+            }
         } catch (e) {
             console.warn("Offline/Localhost mode: AI unavailable. Using fallback.");
             // Fallback for Localhost/Offline
@@ -510,7 +589,9 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             {messages.map((msg, idx) => (
                                 <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`max-w-[85%] rounded-2xl px-5 py-4 ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-200 border border-gray-700'}`}>
-                                        <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                                        <p className="whitespace-pre-wrap leading-relaxed">
+                                            {msg.role === 'assistant' ? renderMarkdown(msg.content) : msg.content}
+                                        </p>
                                     </div>
                                 </div>
                             ))}

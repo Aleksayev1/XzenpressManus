@@ -135,10 +135,20 @@ function parseActionButtons(content: string) {
   while ((match = actionRegex.exec(content)) !== null) {
     const page = match[1];
     let label = `Abrir ${page}`;
-    if (page === 'sessao-mestra') label = '🧘 Iniciar Sessão Mestra';
+    let targetPage = page;
+    if (page === 'sessao-mestra') {
+      label = '🧘 Iniciar Sessão Mestra';
+      targetPage = 'triad-session';
+    }
     if (page === 'acupressure') label = '💆 Mapa de Acupressão';
     if (page === 'breathing') label = '🌬️ Exercício de Respiração';
-    actions.push({ label, page });
+    actions.push({ label, page: targetPage });
+  }
+
+  // Fallback: Se a IA falar do botão mas não colocar a tag
+  const contentLower = content.toLowerCase();
+  if ((contentLower.includes('botão abaixo') || contentLower.includes('ciclo terapêutico')) && !actions.some(a => a.page === 'triad-session')) {
+    actions.push({ label: '🧘 Iniciar Sessão Mestra', page: 'triad-session' });
   }
   while ((match = zenflowRegex.exec(content)) !== null) {
     actions.push({ label: `Iniciar ZenFlow ${match[1]}`, page: 'zenflow' });

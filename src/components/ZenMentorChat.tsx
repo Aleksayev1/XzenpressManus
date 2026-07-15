@@ -934,7 +934,15 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
           </div>
 
           {/* Footer */}
-          <div className="px-4 pb-2 text-[10px] text-gray-700 text-center">
+          <div className="px-4 pb-1">
+            <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-lg p-1.5 text-center flex items-center justify-center gap-1">
+              <Sparkles className="w-3 h-3 text-indigo-400 opacity-70" />
+              <span className="text-[10px] text-indigo-300/80 font-medium leading-tight">
+                Seus insights ficam salvos automaticamente no Mapa Vivo (Premium)
+              </span>
+            </div>
+          </div>
+          <div className="px-4 pb-2 pt-1 text-[9px] text-gray-700 text-center">
             Self Oracle · YNSA + MTC + Metafísica · Não substitui cuidado médico
           </div>
         </>

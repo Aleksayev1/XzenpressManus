@@ -269,8 +269,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const initiateChat = async (emotion: EmotionalState, intensity: number) => {
         setIsLoading(true);
         const seedMessage = `OLÁ. Identifiquei que estou sentindo **${emotion.namePortuguese}** (Nível ${intensity}/5). 
-        Isso está ligado ao órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).
-        Por favor, me ajude a encontrar a causa moral ou metafísica disso (Valcapelli/Kwitko) de forma acolhedora.`;
+        Isso está ligado energeticamente ao órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).
+        Por favor, me ajude a compreender a causa emocional e a metafísica por trás disso de forma acolhedora.`;
 
         // Add hidden user message to history (or just system context)
         // We simulate the AI greeting based on this context

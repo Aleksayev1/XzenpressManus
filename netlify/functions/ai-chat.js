@@ -109,7 +109,6 @@ exports.handler = async (event, context) => {
             /debug\s*mode/i,
 
             // Meta-perguntas estratégicas (propriedade)
-            /valcapelli/i,
             /metafísica.*código/i,
             /protocolo.*síntese/i,
             /reforma.*íntima.*algoritmo/i,

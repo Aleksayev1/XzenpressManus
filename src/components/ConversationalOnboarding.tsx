@@ -21,50 +21,47 @@ interface QuestionStep {
 
 const STEPS: QuestionStep[] = [
   {
-    // Bloco 1 — OBJETIVO + CRENÇA (Maiêutica)
-    // A crença sobre a causa é a primeira informação maiêutica.
-    // O ZenMentor captura o que o usuário ACHA que está causando o problema.
-    text: "Olá! Sou a sua ZenMentor. Estou aqui para criar um mapa completo e personalizado da sua saúde — esse mapa vai guiar todas as recomendações que você receberá no XZenPress. Cada detalhe que você compartilhar tem valor clínico real.\n\nVamos começar pelo mais essencial: qual é o seu objetivo central de bem-estar neste momento? E na sua percepção, o que você acredita estar causando ou alimentando esse estado? Não existe resposta errada — sua intuição sobre o próprio corpo é a primeira pista que vou registrar.",
-    fieldPrompt: "Objetivo Central de Bem-Estar e Percepção da Causa (Maiêutica)"
+    // ── PERGUNTA MESTRA: A porta de entrada (captura intent + emoção dominante)
+    text: "Olá! Que bom ter você aqui. 🌿\n\nSou a ZenMentor, e nossa conversa de hoje vai me ajudar a criar algo único para você: um mapa personalizado da sua saúde e energia.\n\nSem formulários, sem respostas certas ou erradas. Só uma conversa.\n\nVamos começar com a pergunta mais importante:\n\n👉 Se você pudesse mudar apenas UMA coisa no seu dia de hoje, o que seria?",
+    fieldPrompt: "Intenção Central, Estado Emocional e Prioridade Imediata (Pergunta Mestra)"
   },
   {
-    // Bloco 2 — ÁGUA + CRONICICIDADE (Epigenética + MTC)
-    // Quanto tempo o padrão existe determina a profundidade epigenética e o nível Ben/Biao.
-    text: "Obrigada. Agora quero entender o seu combustível vital — na Medicina Tradicional Chinesa, chamamos de Jing, a energia primordial armazenada nos rins.\n\nComo está a sua energia ao longo do dia? Você acorda descansado ou já se levanta sentindo cansaço? Essa fadiga é física, mental ou as duas? Você percebe medo específico, insegurança profunda ou sensação de que lhe falta 'chão'? Dores na região lombar ou nos joelhos também fazem parte dessa pergunta.\n\nUma pergunta fundamental: há quanto tempo você carrega esse padrão — dias, semanas, meses, anos, ou desde sempre? Isso é clinicamente muito importante.",
-    fieldPrompt: "Energia Vital, Lombalgias, Segurança e Cronicicidade do Padrão (Elemento Água + Epigenética)"
+    // ── ENERGIA E VITALIDADE: Capta padrão Água/Rim sem jargão
+    text: "Entendo. Obrigada por compartilhar isso comigo.\n\nAgora me conta uma coisa:\n\n👉 Como é a sua energia ao longo do dia? Você sente que carrega o dia com facilidade, ou já acorda sentindo que a bateria começou pela metade?",
+    fieldPrompt: "Nível de Energia Vital, Fadiga e Cronicicidade (Elemento Água)"
   },
   {
-    // Bloco 3 — MADEIRA (Fígado, Tensões, Planejamento)
-    text: "Importante. Agora o sistema de movimento e planejamento — na MTC, ligado ao Fígado, que governa os tendões, a visão e a fluidez das nossas decisões e emoções.\n\nVocê sente tensão ou rigidez muscular com frequência, especialmente no pescoço, ombros, nuca ou coluna? Como está a sua visão — cansaço visual, ardência, visão turva? E emocionalmente: você percebe irritabilidade, impaciência, raiva que surge rapidamente, ou dificuldade em deixar ir situações e mágoas? Se for o caso, inclua também irregularidades no ciclo menstrual, TPM intensa ou dores.",
-    fieldPrompt: "Tensões Musculares, Visão, Irritabilidade e Ciclo (Elemento Madeira — Fígado)"
+    // ── CORPO E TENSÃO: Capta padrão Madeira/Fígado sem jargão
+    text: "Faz sentido.\n\n👉 O seu corpo costuma guardar tensão em algum lugar específico? Pescoço, ombros, mandíbula, lombar... onde você sente o estresse se instalar?",
+    fieldPrompt: "Tensão Física e Localização Somática (Elemento Madeira)"
   },
   {
-    // Bloco 4 — FOGO + HORÁRIO DO SINTOMA (MTC: Relógio dos Órgãos)
-    // O horário em que o sintoma aparece ou piora revela diretamente o meridiano comprometido.
-    text: "Muito bem. Agora o centro — na MTC, o Coração é o Imperador do corpo e o guardião da mente e das emoções.\n\nComo está a qualidade do seu sono? Você demora para pegar no sono, acorda no meio da noite ou acorda mais cedo do que gostaria com a mente acelerada? Você sente palpitações ou coração acelerado em repouso? E em relação à memória e concentração: você tem dificuldade em lembrar coisas recentes ou em manter o foco?\n\nUma pergunta precisa: em que horário do dia o seu sintoma principal costuma aparecer ou piorar? Isso revela qual órgão está mais comprometido no ciclo de 24 horas.",
-    fieldPrompt: "Sono, Coração, Ansiedade, Memória e Horário do Sintoma (Elemento Fogo + Relógio dos Órgãos MTC)"
+    // ── SONO E MENTE: Capta padrão Fogo/Coração sem jargão
+    text: "Anotado.\n\n👉 E o seu sono, como tem sido? Você descansa de verdade, ou acorda de madrugada, ou já levanta com a mente acelerada?",
+    fieldPrompt: "Qualidade do Sono, Ansiedade e Equilíbrio Mental (Elemento Fogo)"
   },
   {
-    // Bloco 5 — TERRA (Digestão, Preocupação, Apetite)
-    text: "Anotei. Agora o centro da nutrição física e mental — o elemento Terra, associado ao Baço e Estômago na MTC.\n\nComo está a sua digestão? Você sente inchaço, gases, peso após as refeições, refluxo, ou alterna entre constipação e diarreia? Qual é o seu apetite — você come nos horários certos, pula refeições, ou sente compulsão por doces em momentos de estresse? E mentalmente: você se pega ruminando os mesmos pensamentos repetidamente, preocupado com situações que ainda não aconteceram?",
-    fieldPrompt: "Digestão, Apetite, Compulsão Alimentar e Ruminação Mental (Elemento Terra — Baço)"
+    // ── DIGESTÃO E RUMINAÇÃO: Capta padrão Terra/Baço sem jargão
+    text: "Entendo.\n\n👉 Como está a sua digestão? E mentalmente — você tem o hábito de ficar ruminando os mesmos pensamentos, preocupado com coisas que ainda podem nem acontecer?",
+    fieldPrompt: "Digestão, Apetite e Padrão de Ruminação Mental (Elemento Terra)"
   },
   {
-    // Bloco 6 — METAL (Pulmão, Respiração, Pele, Tristeza)
-    text: "Importante. O elemento Metal — associado ao Pulmão e ao Intestino Grosso, que governam a capacidade de receber o novo e de soltar o que não serve mais.\n\nComo está a sua respiração no cotidiano? Você respira de forma superficial, sente aperto no peito, ou tem histórico de bronquite, sinusite ou alergias respiratórias? A sua pele apresenta ressecamento, coceira, acne ou outros problemas? E emocionalmente: você carrega tristeza, melancolia, ou tem dificuldade em se desapegar de pessoas, situações ou do passado?",
-    fieldPrompt: "Respiração, Pele, Intestino Grosso e Capacidade de Soltar (Elemento Metal — Pulmão)"
+    // ── EMOÇÃO DOMINANTE: Capta a emoção que guia o protocolo
+    text: "Ótimo, você está me ajudando muito.\n\n👉 Qual emoção tem aparecido com mais frequência pra você ultimamente? Pode ser irritação, ansiedade, tristeza, medo, sensação de vazio... Não precisa nomear perfeitamente, pode descrever como você se sente.",
+    fieldPrompt: "Emoção Dominante e Gatilho Emocional Principal"
   },
   {
-    // Bloco 7 — HISTÓRICO CLÍNICO (Segurança clínica)
-    text: "Estamos quase concluindo o seu mapa. Este ponto é fundamental para a sua segurança — preciso conhecer o seu histórico clínico para que nenhuma recomendação entre em conflito com a sua situação de saúde.\n\nVocê possui alguma condição diagnosticada por um médico? Por exemplo: hipertensão, diabetes, hipotireoidismo, transtornos de ansiedade ou depressão, doenças autoimunes, cardiopatias, problemas renais ou hepáticos. Faz uso contínuo de algum medicamento ou suplemento? Se houver cirurgias recentes ou histórico familiar relevante, este é o momento.",
-    fieldPrompt: "Histórico Clínico, Diagnósticos Médicos e Medicamentos Contínuos"
+    // ── HISTÓRICO E SAÚDE: Segurança clínica em linguagem simples
+    text: "Obrigada pela honestidade. Isso tem muito valor.\n\n👉 Tem alguma condição de saúde que um médico já identificou — como pressão alta, diabetes, ansiedade, tireoide, ou qualquer outra coisa? E usa algum remédio de uso contínuo?",
+    fieldPrompt: "Histórico Clínico, Diagnósticos e Medicamentos (Segurança)"
   },
   {
-    // Bloco 8 — CONFIRMAÇÃO ATIVA (Fechamento de Gaps)
-    text: "Obrigada pela confiança em compartilhar tudo isso comigo. Antes de finalizar o seu Mapa de Guardiões, quero garantir que nenhum detalhe importante ficou de fora.\n\nHá algo sobre a sua saúde, o seu corpo ou a sua história que você considera relevante e que ainda não mencionou? Pode ser um padrão que você nota em si mesmo há muito tempo, um sintoma que parece pequeno mas te incomoda, uma sensação que você tem dificuldade de nomear — tudo isso tem valor clínico. Este espaço é seu.",
-    fieldPrompt: "Informações Complementares e Fechamento de Gaps Clínicos"
+    // ── FECHAMENTO ABERTO: Captura o que o sistema ainda não sabe
+    text: "Estamos quase lá! Você compartilhou coisas muito importantes.\n\n👉 Há algo sobre você, sobre o seu corpo ou sobre o que está vivendo agora que você sente que é importante eu saber — e que a gente ainda não falou?\n\nPode ser qualquer coisa. Às vezes o detalhe que parece pequeno é exatamente a chave.",
+    fieldPrompt: "Informações Complementares e Fechamento de Gaps"
   }
 ];
+
 
 export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> = ({ onComplete, userEmail }) => {
   // Demographic Info
@@ -308,8 +305,8 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
         <div className="max-w-md mx-auto w-full flex-1 flex flex-col justify-center space-y-8">
           <div className="text-center">
             <span className="text-5xl mb-4 block animate-bounce">🌱</span>
-            <h1 className="text-3xl font-extrabold text-white">Retrato Integrativo</h1>
-            <p className="text-gray-400 text-sm mt-2">Identidade Biopsíquica · Pilar 0</p>
+            <h1 className="text-3xl font-extrabold text-white">Primeiros Passos</h1>
+            <p className="text-gray-400 text-sm mt-2">Construindo o seu Mapa Vivo · Conversa Inicial</p>
           </div>
 
           <div className="space-y-5 bg-slate-900/50 p-6 rounded-3xl border border-white/5 backdrop-blur-xl">
@@ -364,7 +361,7 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
             disabled={!nome.trim()}
             className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-95 text-white font-bold rounded-2xl shadow-xl shadow-purple-600/10 disabled:opacity-30 disabled:pointer-events-none transition-all flex items-center justify-center gap-2"
           >
-            Iniciar Consulta por Voz
+            Iniciar minha Jornada
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -379,9 +376,9 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
         <div className="max-w-md mx-auto w-full flex items-center justify-between border-b border-white/5 pb-4">
           <div className="flex items-center gap-3">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-sm font-semibold text-white">Consulta ZenMentor</span>
+            <span className="text-sm font-semibold text-white">Conhecendo sua Jornada</span>
           </div>
-          <span className="text-xs text-gray-500">Passo {currentStep + 1} de {STEPS.length}</span>
+          <span className="text-xs text-gray-500">{currentStep + 1} de {STEPS.length}</span>
         </div>
 
         {/* Mid Avatar & Audio Animation */}
@@ -451,9 +448,9 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
         <ZenAvatar state="listening" />
-        <h2 className="text-xl font-bold text-white mb-2 mt-6">Estruturando Retrato Integrativo...</h2>
+        <h2 className="text-xl font-bold text-white mb-2 mt-6">Construindo seu Mapa Vivo...</h2>
         <p className="text-gray-400 text-sm max-w-xs mb-8 leading-relaxed">
-          O ZenCore AI está consolidando seu Mapa de Guardiões e cruzando os 5 Elementos sem lacunas de dados.
+          Estou analisando tudo que você compartilhou e preparando um mapa personalizado da sua energia e bem-estar.
         </p>
         <Loader2 className="w-8 h-8 text-purple-500 animate-spin" />
       </div>
@@ -480,7 +477,7 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
             {weakEl.emoji}
           </div>
           <div>
-            <div className="text-xs uppercase tracking-widest text-gray-500 mb-2">Seu Guardião Primário</div>
+            <div className="text-xs uppercase tracking-widest text-gray-500 mb-2">Seu Perfil de Energia</div>
             <h2 className="text-3xl font-extrabold text-white">{weakEl.name}</h2>
             <p className="text-sm mt-1" style={{ color: weakEl.color }}>{weakEl.organ} · {weakEl.frequency} Hz</p>
           </div>

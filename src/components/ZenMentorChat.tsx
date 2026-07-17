@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles, ArrowRight } from 'lucide-react';
+import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles, ArrowRight, Mic, MicOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { fiveElements } from '../data/fiveElements';
@@ -376,6 +376,52 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const [selectedVoice, setSelectedVoice] = useState<'nova' | 'echo' | 'onyx'>('nova');
   const [autoRead, setAutoRead] = useState(false);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+
+  // ── Speech Recognition ─────────────────────────────────────────────────────
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const rec = new SpeechRecognition();
+      rec.continuous = false;
+      rec.lang = 'pt-BR';
+      rec.interimResults = true;
+
+      rec.onresult = (event: any) => {
+        let text = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            text += event.results[i][0].transcript;
+          }
+        }
+        if (text) {
+          setInput(prev => (prev + ' ' + text).trim());
+        }
+      };
+
+      rec.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognitionRef.current = rec;
+    }
+  }, []);
+
+  const toggleRecording = () => {
+    if (!recognitionRef.current) {
+      alert('Gravação de voz não suportada neste navegador. Por favor, digite sua resposta.');
+      return;
+    }
+
+    if (isRecording) {
+      recognitionRef.current.stop();
+    } else {
+      setIsRecording(true);
+      recognitionRef.current.start();
+    }
+  };
   
   // ── ZenMemory UI States ────────────────────────────────────────────────────
   const [isRetrievingMemory, setIsRetrievingMemory] = useState(false);
@@ -916,6 +962,18 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
               className="flex-1 bg-transparent text-white placeholder-gray-600 text-sm resize-none outline-none leading-relaxed max-h-24 overflow-y-auto"
               style={{ fontFamily: 'inherit' }}
             />
+            {/* Mic Toggle Button */}
+            <button
+              onClick={toggleRecording}
+              className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all flex-shrink-0
+                ${isRecording 
+                  ? 'bg-rose-500 text-white animate-pulse shadow-[0_0_12px_rgba(244,63,94,0.3)]' 
+                  : 'bg-white/10 hover:bg-white/15 text-gray-300'
+                }
+              `}
+            >
+              {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
             <button
               onClick={handleSend}
               disabled={!input.trim() || isLoading}

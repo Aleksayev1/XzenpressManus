@@ -484,6 +484,42 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
+    // 🔒 Controle de Custos: Rate Limit no Frontend para usuários gratuitos
+    const isUserPremium = user?.isPremium || false;
+    if (!isUserPremium) {
+      const now = Date.now();
+      const usageRaw = localStorage.getItem('zenmentor_usage_timestamps');
+      let timestamps: number[] = [];
+      if (usageRaw) {
+        try {
+          timestamps = JSON.parse(usageRaw);
+        } catch (e) {}
+      }
+      // Filtra requisições das últimas 1 hora
+      timestamps = timestamps.filter(t => now - t < 60 * 60 * 1000);
+
+      if (timestamps.length >= 3) {
+        const limitMessage = user ? 
+          `Degustação diária concluída! 🌟\n\nVocê sabia que a consistência é a chave para moldar sua epigenética e calibrar seus Guardiões? Acessar o Zen Mentor diariamente ajuda você a se compreender de forma integral.\n\nPara continuar este diálogo transformador e ter consultas ilimitadas, assine o plano Premium!` :
+          `Degustação finalizada (3 mensagens)! 🌟\n\nO Zen Mentor é apenas o início. Para dar continuidade ao seu tratamento e liberar consultas ilimitadas, faça o seu login ou assine o plano Premium!`;
+
+        setMessages(prev => [...prev, 
+          { role: 'user', content: input.trim(), timestamp: new Date() },
+          { 
+            role: 'assistant', 
+            content: limitMessage, 
+            timestamp: new Date() 
+          }
+        ]);
+        setInput('');
+        return;
+      }
+
+      // Salva novo timestamp
+      timestamps.push(now);
+      localStorage.setItem('zenmentor_usage_timestamps', JSON.stringify(timestamps));
+    }
+
     const userMessage: Message = {
       role: 'user',
       content: input.trim(),

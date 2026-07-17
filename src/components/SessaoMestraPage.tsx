@@ -65,6 +65,40 @@ function renderMarkdown(text: string): React.ReactNode {
   });
 }
 
+// Synthesizes a Zen Gong/Tibetan Bell sound using Web Audio API
+function playGong() {
+  try {
+    const AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const now = ctx.currentTime;
+    
+    // Frequencies of a Tibetan bowl (non-harmonic frequencies create the metallic timbre)
+    const freqs = [180, 271, 410, 544, 811, 1085];
+    const gains = [0.6, 0.4, 0.25, 0.15, 0.08, 0.04];
+    
+    freqs.forEach((f, idx) => {
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f, now);
+      
+      // Beautiful exponential decay (4 seconds)
+      gainNode.gain.setValueAtTime(gains[idx], now);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 4.0);
+      
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      osc.start(now);
+      osc.stop(now + 4.0);
+    });
+  } catch (e) {
+    console.warn("Web Audio Gong failed:", e);
+  }
+}
+
 export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { user } = useAuth();
     const { recordSession } = useSessionHistory();
@@ -108,6 +142,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 setTimeLeft((prev) => prev - 1);
             }, 1000);
         } else if (timeLeft === 0) {
+            playGong();
             if (phase === 'zenflow') {
                 const exercise = selectedEmotion?.zenFlowExerciseId
                     ? zenFlowExercises.find(z => z.id === selectedEmotion?.zenFlowExerciseId)

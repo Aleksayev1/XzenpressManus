@@ -123,7 +123,24 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     // Usage Limit State
     const [usageCount, setUsageCount] = useState(0);
     const [showLimitModal, setShowLimitModal] = useState(false);
-    const USAGE_LIMIT = 3;
+    const USAGE_LIMIT = 2;
+
+    // Premium Features Modal State
+    const [premiumModal, setPremiumModal] = useState<{
+        isOpen: boolean;
+        moduleName: string;
+        detail: string;
+        targetPage: string;
+        contextKey: string;
+        contextData: any;
+    }>({
+        isOpen: false,
+        moduleName: '',
+        detail: '',
+        targetPage: '',
+        contextKey: '',
+        contextData: null
+    });
 
     // Timer State
     const [timeLeft, setTimeLeft] = useState(60);
@@ -189,11 +206,6 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
-    useEffect(() => {
-        const count = parseInt(localStorage.getItem('sessao_mestra_usage_count') || '0');
-        setUsageCount(count);
-    }, []);
-
     // Guided breathing loop: 4s inhale, 2s hold, 6s exhale
     useEffect(() => {
         if (phase !== 'preparation' || breathState === 'idle' || breathState === 'done') return;
@@ -240,6 +252,15 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     // Initialize from LocalStorage (if navigated from Home Check-In OR from ZenMentor)
     useEffect(() => {
         try {
+            // Check usage limit first
+            const count = parseInt(localStorage.getItem('sessao_mestra_usage_count') || '0');
+            setUsageCount(count);
+            
+            if (!user?.isPremium && count >= USAGE_LIMIT) {
+                setShowLimitModal(true);
+                return;
+            }
+
             // ── Priority 1: ZenMentor handoff (< 30 min) ──────────────────────────────────
             const handoffRaw = localStorage.getItem('zenmentor_handoff');
             if (handoffRaw) {
@@ -1112,50 +1133,96 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     </button>
 
                                     {/* 2 ─ Nutriming (Nutrição) */}
-                                    <button
-                                        onClick={() => {
-                                            localStorage.setItem('nutriming_context', JSON.stringify({
-                                                emotionId: selectedEmotion?.id,
-                                                element: selectedEmotion?.mtcElement,
-                                                organ: selectedEmotion?.mtcOrgan,
-                                                source: 'triad-session',
-                                            }));
-                                            onBack();
-                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'nutriming-ai' }));
-                                        }}
-                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
-                                        style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)' }}
-                                    >
-                                        <span className="text-2xl">🥗</span>
-                                        <div className="flex-1">
-                                            <div className="text-white font-bold text-sm">Nutriming IA — Nutrição</div>
-                                            <div className="text-emerald-400 text-xs mt-0.5">Protocolo alimentar para nutrir {selectedEmotion?.mtcOrgan}</div>
-                                        </div>
-                                        <ArrowRight className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                                    </button>
+                                     <button
+                                         onClick={() => {
+                                             if (!user?.isPremium) {
+                                                 setPremiumModal({
+                                                     isOpen: true,
+                                                     moduleName: 'Nutriming IA — Nutrição',
+                                                     detail: `o protocolo alimentar específico para o seu caso de desequilíbrio no órgão ${selectedEmotion?.mtcOrgan || 'Baço'}`,
+                                                     targetPage: 'nutriming-ai',
+                                                     contextKey: 'nutriming_context',
+                                                     contextData: {
+                                                         emotionId: selectedEmotion?.id,
+                                                         element: selectedEmotion?.mtcElement,
+                                                         organ: selectedEmotion?.mtcOrgan,
+                                                         source: 'triad-session',
+                                                     }
+                                                 });
+                                             } else {
+                                                 localStorage.setItem('nutriming_context', JSON.stringify({
+                                                     emotionId: selectedEmotion?.id,
+                                                     element: selectedEmotion?.mtcElement,
+                                                     organ: selectedEmotion?.mtcOrgan,
+                                                     source: 'triad-session',
+                                                 }));
+                                                 onBack();
+                                                 window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'nutriming-ai' }));
+                                             }
+                                         }}
+                                         className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
+                                         style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)' }}
+                                     >
+                                         <span className="text-2xl">🥗</span>
+                                         <div className="flex-1">
+                                             <div className="text-white font-bold text-sm flex items-center gap-2">
+                                                 Nutriming IA — Nutrição
+                                                 {!user?.isPremium && (
+                                                     <span className="text-[9px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Premium</span>
+                                                 )}
+                                             </div>
+                                             <div className="text-emerald-400 text-xs mt-0.5">
+                                                 {!user?.isPremium ? "🔓 Requer Premium para indicação clínica personalizada" : `Protocolo alimentar para nutrir ${selectedEmotion?.mtcOrgan}`}
+                                             </div>
+                                         </div>
+                                         <ArrowRight className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                                     </button>
 
                                     {/* 3 ─ Plantas Medicinais */}
-                                    <button
-                                        onClick={() => {
-                                            localStorage.setItem('phyto_context', JSON.stringify({
-                                                emotionId: selectedEmotion?.id,
-                                                element: selectedEmotion?.mtcElement,
-                                                organ: selectedEmotion?.mtcOrgan,
-                                                source: 'triad-session',
-                                            }));
-                                            onBack();
-                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'plantas-medicinais' }));
-                                        }}
-                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
-                                        style={{ background: 'rgba(132,204,22,0.12)', border: '1px solid rgba(132,204,22,0.25)' }}
-                                    >
-                                        <span className="text-2xl">🌿</span>
-                                        <div className="flex-1">
-                                            <div className="text-white font-bold text-sm">Plantas Medicinais</div>
-                                            <div className="text-lime-400 text-xs mt-0.5">Fitoterapia complementar para o elemento {selectedEmotion?.mtcElement}</div>
-                                        </div>
-                                        <ArrowRight className="w-4 h-4 text-lime-400 flex-shrink-0" />
-                                    </button>
+                                     <button
+                                         onClick={() => {
+                                             if (!user?.isPremium) {
+                                                 setPremiumModal({
+                                                     isOpen: true,
+                                                     moduleName: 'Plantas Medicinais',
+                                                     detail: `a indicação fitoterápica específica para o seu caso de desequilíbrio no elemento ${selectedEmotion?.mtcElement || 'Terra'}`,
+                                                     targetPage: 'plantas-medicinais',
+                                                     contextKey: 'phyto_context',
+                                                     contextData: {
+                                                         emotionId: selectedEmotion?.id,
+                                                         element: selectedEmotion?.mtcElement,
+                                                         organ: selectedEmotion?.mtcOrgan,
+                                                         source: 'triad-session',
+                                                     }
+                                                 });
+                                             } else {
+                                                 localStorage.setItem('phyto_context', JSON.stringify({
+                                                     emotionId: selectedEmotion?.id,
+                                                     element: selectedEmotion?.mtcElement,
+                                                     organ: selectedEmotion?.mtcOrgan,
+                                                     source: 'triad-session',
+                                                 }));
+                                                 onBack();
+                                                 window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'plantas-medicinais' }));
+                                             }
+                                         }}
+                                         className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
+                                         style={{ background: 'rgba(132,204,22,0.12)', border: '1px solid rgba(132,204,22,0.25)' }}
+                                     >
+                                         <span className="text-2xl">🌿</span>
+                                         <div className="flex-1">
+                                             <div className="text-white font-bold text-sm flex items-center gap-2">
+                                                 Plantas Medicinais
+                                                 {!user?.isPremium && (
+                                                     <span className="text-[9px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Premium</span>
+                                                 )}
+                                             </div>
+                                             <div className="text-lime-400 text-xs mt-0.5">
+                                                 {!user?.isPremium ? "🔓 Requer Premium para indicação clínica personalizada" : `Fitoterapia complementar para o elemento ${selectedEmotion?.mtcElement}`}
+                                             </div>
+                                         </div>
+                                         <ArrowRight className="w-4 h-4 text-lime-400 flex-shrink-0" />
+                                     </button>
 
                                     {/* 4 ─ VFC/HRV (Monitoramento) */}
                                     <button
@@ -1240,6 +1307,53 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     imageUrl={selectedImage}
                     onClose={() => setSelectedImage(null)}
                 />
+
+                {/* Premium Features Upgrade Modal */}
+                {premiumModal.isOpen && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in">
+                        <div className="w-full max-w-sm bg-slate-900 border border-white/10 rounded-2xl p-6 text-center shadow-2xl relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent pointer-events-none"></div>
+                            <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Crown className="w-6 h-6 text-purple-400" />
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2">Recurso Premium 🌟</h3>
+                            <p className="text-gray-400 text-xs leading-relaxed mb-6">
+                                Para visualizar <strong>{premiumModal.detail}</strong> e ter acesso à indicação personalizada do seu caso, você precisa fazer parte do plano Premium (incluso na assinatura 360).
+                            </p>
+                            <div className="space-y-2.5">
+                                <button
+                                    onClick={() => {
+                                        setPremiumModal(prev => ({ ...prev, isOpen: false }));
+                                        onBack();
+                                        window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'premium' }));
+                                    }}
+                                    className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-bold text-white text-xs hover:scale-105 transition-transform"
+                                >
+                                    Ver Assinatura Premium / 360 👑
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (premiumModal.contextKey && premiumModal.contextData) {
+                                            localStorage.setItem(premiumModal.contextKey, JSON.stringify(premiumModal.contextData));
+                                        }
+                                        setPremiumModal(prev => ({ ...prev, isOpen: false }));
+                                        onBack();
+                                        window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: premiumModal.targetPage }));
+                                    }}
+                                    className="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:text-white text-xs transition-colors"
+                                >
+                                    Continuar na versão geral (sem indicação)
+                                </button>
+                                <button
+                                    onClick={() => setPremiumModal(prev => ({ ...prev, isOpen: false }))}
+                                    className="w-full py-2.5 text-gray-500 hover:text-gray-400 text-xs transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

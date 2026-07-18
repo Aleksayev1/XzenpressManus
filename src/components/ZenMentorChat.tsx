@@ -869,7 +869,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                                 timestamp: Date.now(),
                               }));
                               setIsOpen(false);
-                              onNavigate?.('sessao-mestra');
+                              onNavigate?.('triad-session');
                             }}
                             className="w-full flex flex-col items-center gap-0.5 px-4 py-3 rounded-xl font-bold transition-all hover:scale-[1.02] hover:brightness-110"
                             style={{

@@ -42,6 +42,7 @@ function parseActionButtonsSM(content: string) {
     .replace(actionRegex, '')
     .replace(zenflowRegex, '')
     .replace(candidataRegex, '')
+    .replace(/\[[A-Z0-9_]+:[^\]]*$/gi, '') // Clean up any truncated/unclosed tags at the end
     .trim();
     
   return { cleanContent, candidateMemoryText };

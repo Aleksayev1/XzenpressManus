@@ -183,7 +183,7 @@ export const fiveElements: GuardianElement[] = [
     foods: ['abóbora', 'batata-doce', 'cenoura', 'inhame', 'maçã', 'gengibre', 'cúrcuma'],
     plants: ['Gengibre', 'Cúrcuma', 'Camomila', 'Erva-doce'],
     points: ['SP6 (San Yin Jiao)', 'SP9 (Yin Ling Quan)', 'ST36 (Zu San Li)'],
-    frequency: 174,
+    frequency: 396,
     weakMessage: 'A mente está consumindo energia que deveria ir para o corpo. A Terra pede quietude e confiança.',
     strongMessage: 'Você está nutrido, estável e confiante. O Guardião da Terra está firme e acolhedor.',
     onboardingQuestion: 'Você tem sentido preocupação excessiva, ruminação mental ou dificuldade em confiar no processo?',

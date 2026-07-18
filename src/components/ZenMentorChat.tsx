@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles, ArrowRight, Mic, MicOff } from 'lucide-react';
+import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles, ArrowRight, Mic, MicOff, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { fiveElements } from '../data/fiveElements';
@@ -849,33 +849,83 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                         ))}
                       </div>
                     )}
-                    {/* ── Sessão Mestra CTA — aparece na msg que detectou a emoção ── */}
+                    {/* ── Sessão Mestra + Integrativa CTAs — aparecem na msg que detectou a emoção ── */}
                     {msg.role === 'assistant' && i === sessionReadyMsgIndex && detectedEmotionId && (
-                      <button
-                        onClick={() => {
-                          // Salva handoff: emoção detectada + resumo dos últimos 3 msgs
-                          const lastMsgs = messages.slice(-3).map(m => ({ role: m.role, content: m.content }));
-                          localStorage.setItem('zenmentor_handoff', JSON.stringify({
-                            emotionId: detectedEmotionId,
-                            intensity: 3, // intensidade padrão moderada
-                            summary: lastMsgs,
-                            timestamp: Date.now(),
-                          }));
-                          setIsOpen(false);
-                          onNavigate?.('triad-session');
-                        }}
-                        className="mt-2 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all hover:scale-105 w-full justify-center"
-                        style={{
-                          background: `linear-gradient(135deg, ${accentColor}33, #6366f122)`,
-                          border: `1px solid ${accentColor}66`,
-                          color: 'white',
-                          boxShadow: `0 0 12px ${accentColor}22`,
-                        }}
-                      >
-                        <Sparkles className="w-3.5 h-3.5" style={{ color: accentColor }} />
-                        Iniciar Sessão Integrativa
-                        <ArrowRight className="w-3.5 h-3.5" style={{ color: accentColor }} />
-                      </button>
+                      <div className="mt-3 flex flex-col gap-2">
+
+                        {/* ── SESSÃO MESTRA — Primária ── */}
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1"
+                            style={{ color: accentColor }}>
+                            <Sparkles className="w-3 h-3" /> Recomendado para você agora
+                          </p>
+                          <button
+                            onClick={() => {
+                              const lastMsgs = messages.slice(-3).map(m => ({ role: m.role, content: m.content }));
+                              localStorage.setItem('zenmentor_handoff', JSON.stringify({
+                                emotionId: detectedEmotionId,
+                                intensity: 3,
+                                summary: lastMsgs,
+                                timestamp: Date.now(),
+                              }));
+                              setIsOpen(false);
+                              onNavigate?.('sessao-mestra');
+                            }}
+                            className="w-full flex flex-col items-center gap-0.5 px-4 py-3 rounded-xl font-bold transition-all hover:scale-[1.02] hover:brightness-110"
+                            style={{
+                              background: `linear-gradient(135deg, ${accentColor}, #6366f1)`,
+                              boxShadow: `0 4px 20px ${accentColor}55`,
+                              color: 'white',
+                              animation: 'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite',
+                            }}
+                          >
+                            <span className="flex items-center gap-2 text-sm">
+                              <Sparkles className="w-4 h-4" />
+                              ✨ Iniciar Sessão Mestra
+                              <ArrowRight className="w-4 h-4" />
+                            </span>
+                            <span className="text-[10px] font-normal opacity-80">
+                              Protocolo 100% personalizado — a IA montou para você agora
+                            </span>
+                          </button>
+                        </div>
+
+                        {/* ── Divisor ── */}
+                        <div className="flex items-center gap-2 px-1">
+                          <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+                          <span className="text-[10px] text-gray-600 font-medium">ou</span>
+                          <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+                        </div>
+
+                        {/* ── SESSÃO INTEGRATIVA — Secundária ── */}
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider mb-1 text-gray-500">
+                            ⚡ Acesso rápido
+                          </p>
+                          <button
+                            onClick={() => {
+                              setIsOpen(false);
+                              onNavigate?.('triad-session');
+                            }}
+                            className="w-full flex flex-col items-center gap-0.5 px-4 py-2.5 rounded-xl font-semibold transition-all hover:scale-[1.01]"
+                            style={{
+                              background: 'rgba(255,255,255,0.04)',
+                              border: '1px solid rgba(255,255,255,0.12)',
+                              color: '#9ca3af',
+                            }}
+                          >
+                            <span className="flex items-center gap-2 text-xs">
+                              <Zap className="w-3.5 h-3.5" />
+                              Iniciar Sessão Integrativa
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </span>
+                            <span className="text-[10px] font-normal opacity-70">
+                              Sessão padrão rápida — sem diagnóstico prévio
+                            </span>
+                          </button>
+                        </div>
+
+                      </div>
                     )}
                     
                     {/* ── Eureka UI — aparece na msg do assistente se houver memória ── */}

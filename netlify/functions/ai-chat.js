@@ -462,6 +462,41 @@ Esta pergunta produz: humor + ansiedade + trabalho + família + sono + propósit
 - **Plantas e Suplementos:** Indique a **Biblioteca de Plantas Medicinais** e o **Nutriming** para ajustar o tratamento integrativo.
 
 ---
+
+### 🌐 ZENSENSE COGNITIVE ENGINE (SAÍDA OBRIGATÓRIA EM JSON)
+Você é o sensor cognitivo do sistema. Além de formular a resposta clínica, você DEVE extrair sinais estruturais da linguagem do usuário e escolher uma mistura (blend) probabilística de comportamento.
+
+**A. Sinais Linguísticos a Extrair (Apenas inferências qualitativas):**
+- *fragmentation*: (alta, media, baixa) O usuário escreve de forma lógica ou caótica/fragmentada?
+- *ego_focus*: (alta, media, baixa) Excesso de "eu", "meu"? Foco interno exacerbado sinaliza ansiedade.
+- *causal_reasoning*: (alta, media, baixa, ausente) Uso de "porque", "então", "percebi que".
+- *emotional_intensity*: (alta, media, baixa) Intensidade da carga emocional (seja raiva, tristeza ou euforia).
+
+**B. Mentor State Blend (Distribuição de Comportamento - soma 1.0):**
+Adapte o tom e o tamanho da sua resposta ("reply") baseado nesta mistura:
+- *regulator*: (0.0 a 1.0) Respostas curtas, âncora parassimpática, reduz estímulos.
+- *explorer*: (0.0 a 1.0) Faz perguntas gentis investigativas sobre gatilhos.
+- *reflector*: (0.0 a 1.0) Valida a percepção e ilumina o insight.
+- *mentor*: (0.0 a 1.0) Aprofunda filosofia, ensina e prescreve novos hábitos.
+
+**⚠️ REGRA CRÍTICA DE OUTPUT (FORMATO JSON OBRIGATÓRIO):**
+A sua resposta inteira DEVE ser EXCLUSIVAMENTE um objeto JSON válido. NÃO inclua \`\`\`json no início. Retorne APENAS a estrutura abaixo:
+{
+  "reply": "O seu texto acolhedor e terapêutico que será lido pelo usuário.",
+  "mentor_state": {
+    "regulator": 0.7,
+    "mentor": 0.1,
+    "reflector": 0.1,
+    "explorer": 0.1
+  },
+  "linguistic_signals": {
+    "fragmentation": "baixa",
+    "ego_focus": "alta",
+    "causal_reasoning": "media",
+    "emotional_intensity": "baixa"
+  }
+}
+---
 `;
 
 
@@ -696,6 +731,29 @@ Esta pergunta produz: humor + ansiedade + trabalho + família + sono + propósit
             });
         }
 
+        // 🧩 ZENSENSE PARSER: Extrai o JSON estruturado do LLM
+        let finalReply = reply;
+        let zensenseData = null;
+        try {
+            // Remove crases de markdown caso o LLM não obedeça à regra estrita
+            const jsonStr = reply.replace(/```json/gi, '').replace(/```/g, '').trim();
+            const parsed = JSON.parse(jsonStr);
+            if (parsed.reply) {
+                finalReply = parsed.reply;
+                zensenseData = {
+                    mentor_state: parsed.mentor_state,
+                    linguistic_signals: parsed.linguistic_signals
+                };
+            }
+        } catch (e) {
+            console.warn('ZenSense Parser Warning: LLM output is not strict JSON', e.message);
+            // Fallback rudimentar para extrair a resposta caso a formatação quebre levemente
+            const match = reply.match(/"reply"\s*:\s*"([^"]+)"/i);
+            if (match) {
+                finalReply = match[1];
+            }
+        }
+
         // LOGGING TO SUPABASE (PERSISTENCE)
         if (supabase) {
             try {
@@ -705,7 +763,7 @@ Esta pergunta produz: humor + ansiedade + trabalho + família + sono + propósit
                         {
                             user_email: userEmail || 'guest',
                             message: message,
-                            response: reply,
+                            response: finalReply,
                             tokens_used: usageData.totalTokens
                         }
                     ]);
@@ -726,10 +784,11 @@ Esta pergunta produz: humor + ansiedade + trabalho + família + sono + propósit
             statusCode: 200,
             headers,
             body: JSON.stringify({
-                reply: reply,
+                reply: finalReply,
                 remaining: remainingMessages,
                 flags: qualityFlags, // Retorna flags para frontend (futuro feedback UI)
-                usage: usageData
+                usage: usageData,
+                zensense: zensenseData
             })
         };
 

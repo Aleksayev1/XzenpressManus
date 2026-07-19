@@ -739,6 +739,8 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   };
 
   const handleReset = () => {
+    // Princípio da Retomada — salva contexto antes de resetar
+    saveSessionContext(messages.map(m => ({ role: m.role, content: m.content })));
     setMessages([]);
     setHasGreeted(false);
     const greetingText = buildGreeting(user?.email?.split('@')[0]);
@@ -850,7 +852,12 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
             <ChevronDown className={`w-4 h-4 transition-transform ${isMinimized ? 'rotate-180' : ''}`} />
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              // Princípio da Retomada — salva contexto da sessão antes de fechar
+              saveSessionContext(messages.map(m => ({ role: m.role, content: m.content })));
+              setIsOpen(false);
+            }}
             className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 transition-colors"
           >
             <X className="w-4 h-4" />

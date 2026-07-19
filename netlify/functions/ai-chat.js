@@ -39,6 +39,8 @@ function checkRateLimit(userEmail, limit = MAX_REQUESTS_PER_HOUR) {
 }
 
 const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
+const { sentinelLayer1 } = require('./lib/zenSentinel');
+
 
 exports.handler = async (event, context) => {
     // CORS headers dynamic validation
@@ -143,6 +145,39 @@ exports.handler = async (event, context) => {
                 })
             };
         }
+
+        // =============================================================
+        // 🛡️ CAMADA 0: ZENSENTINEL — Triagem de Segurança Clínica
+        // Roda ANTES de qualquer engine. NUNCA pode ser bypassado.
+        // Fail-safe: em erro -> CAUTION, nunca SAFE.
+        // =============================================================
+        const zenSentinelResult = sentinelLayer1(message);
+
+        if (zenSentinelResult.level === 'CRITICAL') {
+            console.warn('🚨 ZENSENTINEL CRITICAL:', {
+                categories: zenSentinelResult.categories,
+                matchedRules: zenSentinelResult.matchedRules,
+                userEmail: userEmail || 'guest',
+                timestamp: new Date().toISOString()
+            });
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({
+                    reply: zenSentinelResult.responseTemplate,
+                    remaining: null,
+                    flags: ['sentinel_critical', ...zenSentinelResult.categories],
+                    sentinelLevel: 'CRITICAL'
+                })
+            };
+        }
+
+        // Restrições de contexto clínico (gravidez, cardíaco, etc.)
+        // Passadas ao sistema de IA para filtrar protocolos inadequados
+        const sentinelRestrictions = zenSentinelResult.restrictions || [];
+        const sentinelCautionNote = zenSentinelResult.level === 'CAUTION'
+            ? zenSentinelResult.responseTemplate
+            : null;
 
         // Determinar chave e limite para controle de requisições (Rate Limit)
         const getClientIp = () => {

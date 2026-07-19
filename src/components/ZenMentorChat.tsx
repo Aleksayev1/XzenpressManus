@@ -123,6 +123,113 @@ function buildGreeting(userName?: string): string {
   return greeting2;
 }
 
+/**
+ * PRINCÍPIO DA RETOMADA — ZenCognitive Architecture v2
+ * Verifica se há contexto de sessão anterior salvo e constrói
+ * uma abertura que referencia o que foi dito antes.
+ * Isso é o que transforma um chatbot em um terapeuta que lembra.
+ */
+async function buildRetomadaGreeting(
+  userId: string | undefined,
+  userName?: string
+): Promise<string> {
+  const profile = loadAnamneseProfile();
+  const hour = new Date().getHours();
+  const saudacao = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
+  const name = userName || profile?.nome || 'você';
+
+  // 1. Verificar contexto da última sessão salvo no localStorage
+  const lastSessionRaw = localStorage.getItem('xzen_last_session_context');
+  const lastSessionDate = localStorage.getItem('xzen_last_session_date');
+
+  let lastContext: { queixa?: string; protocolo?: string; topMemory?: string } | null = null;
+  if (lastSessionRaw) {
+    try { lastContext = JSON.parse(lastSessionRaw); } catch {}
+  }
+
+  // 2. Se há memórias longitudinais e userId, buscar a mais recente ativa
+  let topMemoryContent: string | null = lastContext?.topMemory || null;
+  if (userId && !topMemoryContent) {
+    try {
+      const memories = await ZenMemoryEngine.retrieveActiveContext(userId, ['general', 'emotion', 'stress', 'sleep']);
+      if (memories.length > 0) {
+        topMemoryContent = memories[0].memory_content;
+      }
+    } catch {}
+  }
+
+  // 3. Calcular dias desde a última sessão
+  let diasDesdeUltima: number | null = null;
+  if (lastSessionDate) {
+    const diff = Date.now() - new Date(lastSessionDate).getTime();
+    diasDesdeUltima = Math.floor(diff / (1000 * 60 * 60 * 24));
+  }
+
+  // 4. Construir a abertura com Princípio da Retomada
+  // Casos: nunca usou | voltou hoje | voltou após dias | voltou com memória ativa
+
+  // CASO A: Nunca usou — saudação de boas-vindas padrão
+  if (!lastSessionDate && !topMemoryContent) {
+    return buildGreeting(userName);
+  }
+
+  let retomada = `${saudacao}, ${name}! 🌿\n\n`;
+
+  // CASO B: Tem memória longitudinal ativa — referencia diretamente
+  if (topMemoryContent) {
+    retomada += `Estive lembrando de você. `;
+    if (diasDesdeUltima !== null && diasDesdeUltima > 0) {
+      retomada += `Faz ${diasDesdeUltima === 1 ? '1 dia' : `${diasDesdeUltima} dias`} desde nossa última conversa. `;
+    }
+    retomada += `\n\nNa nossa última sessão, observei que **${topMemoryContent}** — `;
+    retomada += `como está isso hoje?`;
+    return retomada;
+  }
+
+  // CASO C: Tem contexto de queixa anterior mas sem memória formal
+  if (lastContext?.queixa) {
+    retomada += `Fico feliz em te ver de novo. `;
+    if (diasDesdeUltima !== null && diasDesdeUltima > 0) {
+      retomada += `Faz ${diasDesdeUltima === 1 ? '1 dia' : `${diasDesdeUltima} dias`} desde nossa última conversa. `;
+    }
+    retomada += `\n\nNa última vez você mencionou **${lastContext.queixa}**. Como está isso agora?`;
+    if (lastContext.protocolo) {
+      retomada += ` A prática de **${lastContext.protocolo}** fez alguma diferença?`;
+    }
+    return retomada;
+  }
+
+  // CASO D: Voltou mas sem contexto específico
+  if (diasDesdeUltima !== null) {
+    retomada += diasDesdeUltima === 0
+      ? `Que bom que voltou hoje. O que está sentindo agora?`
+      : `Que bom ter você de volta após ${diasDesdeUltima === 1 ? '1 dia' : `${diasDesdeUltima} dias`}. Como está se sentindo?`;
+    return retomada;
+  }
+
+  return buildGreeting(userName);
+}
+
+/** Salva o contexto da sessão atual para ser usado na próxima abertura (Princípio da Retomada) */
+function saveSessionContext(messages: { role: string; content: string }[]): void {
+  const userMessages = messages.filter(m => m.role === 'user');
+  const assistantMessages = messages.filter(m => m.role === 'assistant');
+  if (userMessages.length === 0) return;
+
+  // Extrai a queixa principal da primeira mensagem do usuário
+  const queixa = userMessages[0]?.content?.substring(0, 150) || '';
+
+  // Tenta extrair protocolo mencionado pela IA (respiração, acupressão, etc.)
+  const allAssistantText = assistantMessages.map(m => m.content).join(' ');
+  let protocolo: string | undefined;
+  const protocolMatch = allAssistantText.match(/(respiração [\w-]+|ponto [\w\d]+|4-7-8|técnica [\w]+)/i);
+  if (protocolMatch) protocolo = protocolMatch[0];
+
+  const context = { queixa, protocolo, savedAt: new Date().toISOString() };
+  localStorage.setItem('xzen_last_session_context', JSON.stringify(context));
+  localStorage.setItem('xzen_last_session_date', new Date().toISOString());
+}
+
 // ─── Action Button Parser ─────────────────────────────────────────────────────
 // Detects patterns like [ABRIR:acupressure] [ZENFLOW:liberacao] and [CANDIDATA: "text"] in AI responses
 function parseActionButtons(content: string) {
@@ -467,12 +574,16 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
     }
   }, [isOpen, isMinimized]);
 
-  // Initial greeting when first opened
-  const handleOpen = useCallback(() => {
+  // Initial greeting when first opened — Princípio da Retomada (ZenCognitive Architecture v2)
+  const handleOpen = useCallback(async () => {
     setIsOpen(true);
     setIsMinimized(false);
     if (!hasGreeted) {
-      const greetingText = buildGreeting(user?.email?.split('@')[0]);
+      // Usa o Princípio da Retomada: referencia sessão anterior se existir
+      const greetingText = await buildRetomadaGreeting(
+        user?.id,
+        user?.email?.split('@')[0]
+      );
       setMessages([{
         role: 'assistant',
         content: greetingText,

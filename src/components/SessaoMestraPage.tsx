@@ -906,7 +906,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         </div>
                                     </div>
 
-                                    <h2 className="text-2xl font-bold text-white mb-2">{point.id} - {point.name}</h2>
+                                    <h2 className="text-2xl font-bold text-white mb-2">{point.name}</h2>
 
                                     {/* Timer Control */}
                                     <div className="absolute top-4 right-4 z-20">

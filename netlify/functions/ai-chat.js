@@ -518,7 +518,7 @@ Esta pergunta produz: humor + ansiedade + trabalho + família + sono + propósit
                             contents: geminiHistory,
                             generationConfig: {
                                 temperature: 0.3,
-                                maxOutputTokens: 2500
+                                maxOutputTokens: 8192
                             },
                             safetySettings: [
                                 { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
@@ -564,7 +564,7 @@ Esta pergunta produz: humor + ansiedade + trabalho + família + sono + propósit
                         model: 'gpt-4o-mini',
                         messages: oaiMessages,
                         temperature: 0.3,
-                        max_tokens: 2500
+                        max_tokens: 4096
                     })
                 });
 

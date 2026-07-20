@@ -1,4 +1,3 @@
-
 // ZenFlow - Farmácia de Movimentos
 // Estrutura Mínima Viável (MVP): 9 Sequências Mestras
 // Foco: Regulação, Liberação, Integração
@@ -80,6 +79,66 @@ export const zenFlowExercises: ZenFlowSequence[] = [
             }
         ]
     },
+    {
+        id: 'reg-earth-center',
+        type: 'regulation',
+        title: 'O Centro Estável',
+        subtitle: 'Para ruminação mental, preocupação e digestão lenta',
+        durationTotal: '4 min',
+        targetEmotion: ['preocupação', 'compulsão', 'ruminação', 'terra', 'baço', 'anxiety'],
+        intention: 'Estou centrado, equilibrado e em paz com o presente.',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWXLeA8Omikj7',
+        steps: [
+            {
+                id: 'belly-rub',
+                name: 'Massagem do Dan Tien',
+                durationSeconds: 60,
+                instruction: 'Pouse as mãos sobre o abdômen e faça massagens circulares suaves no sentido horário para estimular a digestão física e mental.'
+            },
+            {
+                id: 'heaven-earth',
+                name: 'Conectar Céu e Terra',
+                durationSeconds: 120,
+                instruction: 'Estique uma das mãos para o céu e a outra para o chão, alternando os lados lentamente com a respiração. Sinta o alongamento das laterais do corpo.'
+            },
+            {
+                id: 'square-breath',
+                name: 'Respiração Quadrada',
+                durationSeconds: 60,
+                instruction: 'Inspire por 4 segundos, segure cheio por 4, expire por 4 e segure vazio por 4. Repita para centrar seus pensamentos.'
+            }
+        ]
+    },
+    {
+        id: 'reg-water-vitality',
+        type: 'regulation',
+        title: 'A Fonte da Vitalidade',
+        subtitle: 'Para esgotamento físico, cansaço mental e medo',
+        durationTotal: '4 min',
+        targetEmotion: ['medo', 'insegurança', 'fadiga', 'rim', 'água', 'lack_of_purpose'],
+        intention: 'Minha energia vital é profunda e inesgotável.',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX889U0CL85jj',
+        steps: [
+            {
+                id: 'kidney-warm',
+                name: 'Aquecer os Rins',
+                durationSeconds: 60,
+                instruction: 'Friccione rapidamente as palmas das mãos uma na outra até gerar calor. Em seguida, pouse as mãos aquecidas sobre a região lombar.'
+            },
+            {
+                id: 'spine-wave',
+                name: 'Ondulação da Coluna',
+                durationSeconds: 120,
+                instruction: 'Mova o corpo em movimentos de ondas suaves, começando nos joelhos, passando pela pelve e subindo pela coluna até a cabeça. Respire fluído.'
+            },
+            {
+                id: 'kidney-breath',
+                name: 'Respiração nos Rins',
+                durationSeconds: 60,
+                instruction: 'Respire direcionando o ar para a parte baixa das costas. Sinta a lombar expandir na inspiração e relaxar na expiração.'
+            }
+        ]
+    },
 
     // --- NÍVEL 2: LIBERAÇÃO (Fígado / Peito / Pélvis) ---
     {
@@ -113,6 +172,30 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         ]
     },
     {
+        id: 'rel-wood-bamboo',
+        type: 'release',
+        title: 'Flutuar como Bambu',
+        subtitle: 'Para rigidez física, irritabilidade e estresse acumulado',
+        durationTotal: '4 min',
+        targetEmotion: ['raiva', 'frustração', 'mágoa', 'madeira', 'fígado', 'resentment'],
+        intention: 'Eu me flexibilizo diante dos ventos da vida.',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX889U0CL85jj',
+        steps: [
+            {
+                id: 'bamboo-sway',
+                name: 'O Bambu ao Vento',
+                durationSeconds: 120,
+                instruction: 'Fique em pé com os braços soltos. Gire o corpo suavemente deixando os braços baterem nas laterais do quadril e costas, flexibilizando a coluna.'
+            },
+            {
+                id: 'meridian-stretch',
+                name: 'Alongamento de Vesícula',
+                durationSeconds: 120,
+                instruction: 'Entrelace as mãos e incline o tronco lateralmente para um lado, mantendo a postura por 3 respirações, e depois mude para o outro lado.'
+            }
+        ]
+    },
+    {
         id: 'rel-chest',
         type: 'release',
         title: 'Abrir o Coração',
@@ -133,6 +216,30 @@ export const zenFlowExercises: ZenFlowSequence[] = [
                 name: 'Tamborilar do Timo',
                 durationSeconds: 60,
                 instruction: 'Com a ponta dos dedos, dê batidinhas leves no centro do peito (esterno). Ative sua imunidade emocional.'
+            }
+        ]
+    },
+    {
+        id: 'rel-metal-breath',
+        type: 'release',
+        title: 'O Sopro da Liberação',
+        subtitle: 'Para tristeza profunda, apego e cansaço respiratório',
+        durationTotal: '3 min',
+        targetEmotion: ['tristeza', 'angústia', 'luto', 'metal', 'pulmão', 'guilt'],
+        intention: 'Eu me liberto do passado e me abro para o novo.',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO',
+        steps: [
+            {
+                id: 'push-palms',
+                name: 'Empurrar as Montanhas',
+                durationSeconds: 120,
+                instruction: 'Inspire trazendo as mãos ao peito. Expire empurrando as palmas para as laterais, como se afastasse paredes, soltando toda a tristeza.'
+            },
+            {
+                id: 'clavicle-tap',
+                name: 'Tamborilar da Clavícula',
+                durationSeconds: 60,
+                instruction: 'Use a ponta dos dedos para dar batidinhas leves na região abaixo das clavículas, liberando o acúmulo de estresse respiratório.'
             }
         ]
     },

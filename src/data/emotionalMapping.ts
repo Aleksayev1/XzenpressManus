@@ -41,7 +41,7 @@ export const emotionalStates: EmotionalState[] = [
             'lu10-yuji'       // Add: Mental restless
         ],
         recommendedProtocol: 'harmonia-mental',
-        zenFlowExerciseId: 'reg-calm', // Acalmar o Mar Interno
+        zenFlowExerciseId: 'reg-earth-center', // O Centro Estável
         cycle: {
             mother: 'fire',
             son: 'metal',
@@ -255,7 +255,7 @@ export const emotionalStates: EmotionalState[] = [
             'ynsa-basal-ganglia'
         ],
         recommendedProtocol: 'harmonia-mental',
-        zenFlowExerciseId: 'rel-chest',
+        zenFlowExerciseId: 'rel-metal-breath', // O Sopro da Liberação
         cycle: {
             mother: 'earth',
             son: 'water',
@@ -278,7 +278,7 @@ export const emotionalStates: EmotionalState[] = [
             'septicemia-hegu-li4'
         ],
         recommendedProtocol: 'equilibrio-raiva',
-        zenFlowExerciseId: 'rel-liver',
+        zenFlowExerciseId: 'rel-wood-bamboo', // Flutuar como Bambu
         cycle: {
             mother: 'water',
             son: 'fire',
@@ -301,7 +301,7 @@ export const emotionalStates: EmotionalState[] = [
             'cv4-guanyuan'
         ],
         recommendedProtocol: 'decisao-coragem',
-        zenFlowExerciseId: 'reg-ground',
+        zenFlowExerciseId: 'reg-water-vitality', // A Fonte da Vitalidade
         cycle: {
             mother: 'metal',
             son: 'wood',

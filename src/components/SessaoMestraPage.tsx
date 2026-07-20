@@ -991,7 +991,11 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                             <Activity className="w-8 h-8 text-blue-400" />
                                         </div>
                                         <h1 className="text-3xl font-bold text-white mb-2">
-                                            Movimento de Liberação
+                                            {exercise?.type === 'regulation'
+                                                ? 'Movimento de Regulação'
+                                                : exercise?.type === 'integration'
+                                                ? 'Movimento de Integração'
+                                                : 'Movimento de Liberação'}
                                         </h1>
                                         <h2 className="text-xl text-blue-300 font-semibold mb-1">
                                             {exercise?.title}

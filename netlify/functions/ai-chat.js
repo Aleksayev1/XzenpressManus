@@ -588,7 +588,8 @@ A sua resposta inteira DEVE ser EXCLUSIVAMENTE um objeto JSON válido. NÃO incl
                             contents: geminiHistory,
                             generationConfig: {
                                 temperature: 0.3,
-                                maxOutputTokens: 2500
+                                maxOutputTokens: 8192,
+                                responseMimeType: "application/json"
                             },
                             safetySettings: [
                                 { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
@@ -634,7 +635,8 @@ A sua resposta inteira DEVE ser EXCLUSIVAMENTE um objeto JSON válido. NÃO incl
                         model: 'gpt-4o-mini',
                         messages: oaiMessages,
                         temperature: 0.3,
-                        max_tokens: 2500
+                        max_tokens: 4096,
+                        response_format: { type: "json_object" }
                     })
                 });
 
@@ -747,10 +749,16 @@ A sua resposta inteira DEVE ser EXCLUSIVAMENTE um objeto JSON válido. NÃO incl
             }
         } catch (e) {
             console.warn('ZenSense Parser Warning: LLM output is not strict JSON', e.message);
-            // Fallback rudimentar para extrair a resposta caso a formatação quebre levemente
-            const match = reply.match(/"reply"\s*:\s*"([^"]+)"/i);
+            // Fallback robusto para extrair a resposta caso a formatação quebre ou seja truncada
+            const match = reply.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)(?:"|$)/i) || 
+                          reply.match(/'reply'\s*:\s*'((?:[^'\\]|\\.)*)(?:'|$)/i);
             if (match) {
-                finalReply = match[1];
+                finalReply = match[1]
+                    .replace(/\\"/g, '"')
+                    .replace(/\\'/g, "'")
+                    .replace(/\\n/g, '\n')
+                    .replace(/\\t/g, '\t')
+                    .replace(/\\r/g, '\r');
             }
         }
 

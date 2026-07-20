@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Crown, Star, Lock, Zap, MessageCircle, Target, Brain, Shield, CheckCircle, Clock, ArrowRight, CreditCard, Smartphone, Bitcoin, Copy, ArrowLeft, Home } from 'lucide-react';
+import { Crown, Star, Lock, Zap, MessageCircle, Target, Brain, Shield, CheckCircle, Clock, ArrowRight, CreditCard, Smartphone, Bitcoin, Copy, ArrowLeft, Home, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { AIRecommendationsPanel } from './AIRecommendationsPanel';
@@ -19,6 +19,7 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
   const [showPayment, setShowPayment] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit' | 'crypto'>('pix');
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const [showOfflineModal, setShowOfflineModal] = useState(false);
   const [pixPaymentData, setPixPaymentData] = useState<{
     amount: number;
     description: string;
@@ -79,7 +80,7 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
           </div>
 
           {/* Premium Features Access */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {/* AI Assistant - ACTIVE */}
             <div
               onClick={() => setShowAIPanel(true)}
@@ -160,38 +161,55 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
                   <span><strong>MTC Geral:</strong> 34+ pontos avançados</span>
                 </li>
               </ul>
-              {/*               <p className="text-gray-600 mb-4">
-                <strong className="text-purple-700">+ 22 Jornadas Clínicas Completas</strong><br />
-                <span className="text-sm">Protocolos guiados para Ansiedade, Dor, Sono e mais</span>
-              </p> */}
               <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
                 <span>Explorar pontos</span>
                 <Zap className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
 
-            {/* Coming Soon Features */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200">
+            {/* AI Recommendations - ACTIVE */}
+            <div
+              onClick={() => setShowAIPanel(true)}
+              className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-purple-200 hover:border-purple-300"
+            >
               <div className="flex items-center mb-6">
-                <div className="p-3 bg-gray-100 rounded-xl">
+                <div className="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
                   <Brain className="w-8 h-8 text-purple-600" />
                 </div>
                 <div className="ml-4">
                   <h3 className="text-xl font-bold text-gray-900">Recomendações IA</h3>
-                  <p className="text-purple-600 font-medium">Demonstração Disponível</p>
+                  <p className="text-green-600 font-medium">ATIVO</p>
                 </div>
               </div>
               <p className="text-gray-600 mb-4">
-                Inteligência artificial que analisa seus padrões e sugere terapias personalizadas
+                Inteligência artificial personalizada que analisa seus padrões de comportamento e sugere terapias e pontos de acupressão otimizados.
               </p>
-              <div className="flex items-center text-purple-600 font-medium">
-                <button
-                  onClick={() => setShowAIPanel(true)}
-                  className="flex items-center space-x-2 bg-purple-100 hover:bg-purple-200 px-4 py-2 rounded-lg transition-colors"
-                >
-                  <Brain className="w-4 h-4" />
-                  <span>Ver Demonstração</span>
-                </button>
+              <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
+                <span>Ver Recomendações</span>
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+
+            {/* Offline Mode - ACTIVE */}
+            <div
+              onClick={() => setShowOfflineModal(true)}
+              className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-purple-200 hover:border-purple-300"
+            >
+              <div className="flex items-center mb-6">
+                <div className="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
+                  <Shield className="w-8 h-8 text-indigo-600" />
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-xl font-bold text-gray-900">Modo Offline</h3>
+                  <p className="text-green-600 font-medium">ATIVO</p>
+                </div>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Uso completo do aplicativo sem necessidade de internet. Seus dados e sessões salvos localmente são sincronizados automaticamente.
+              </p>
+              <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
+                <span>Ver Detalhes</span>
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </div>
@@ -442,8 +460,8 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
         t('premium.features.ai.benefit3'),
         t('premium.features.ai.benefit4')
       ],
-      status: 'coming-soon',
-      action: () => { }
+      status: 'active',
+      action: () => setShowAIPanel(true)
     },
     {
       id: 'offline-mode',
@@ -456,8 +474,8 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
         t('premium.features.offline.benefit3'),
         t('premium.features.offline.benefit4')
       ],
-      status: 'coming-soon',
-      action: () => { }
+      status: 'active',
+      action: () => setShowOfflineModal(true)
     }
   ];
 
@@ -1014,6 +1032,40 @@ export const PremiumStructure: React.FC<PremiumStructureProps> = ({ onPageChange
           </div>
         </div>
       </div>
+
+      {/* Offline Mode Info Modal */}
+      {showOfflineModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-indigo-100 relative overflow-hidden transform animate-in zoom-in-95 duration-200">
+            <div className="absolute top-0 right-0 p-4">
+              <button
+                onClick={() => setShowOfflineModal(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 border border-indigo-100">
+              <Shield className="w-8 h-8 text-indigo-600" />
+            </div>
+            
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Modo Offline Ativo!</h3>
+            <p className="text-indigo-600 font-semibold mb-4 text-sm">Recurso de Sincronização Inteligente</p>
+            
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              O XZenPress possui suporte completo a funcionamento offline. Seu progresso, sessões de acupressão, respirações e anotações são salvos localmente e serão sincronizados de forma automática e segura com a nuvem assim que você recuperar sua conexão com a internet.
+            </p>
+            
+            <button
+              onClick={() => setShowOfflineModal(false)}
+              className="w-full py-3.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-100"
+            >
+              Entendi
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

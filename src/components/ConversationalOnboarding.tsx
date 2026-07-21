@@ -112,6 +112,17 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
     }
   }, []);
 
+  // Auto-submit after voice recording stops
+  useEffect(() => {
+    // Se parar de gravar e tiver texto, envia automaticamente após 1 segundo
+    if (!isRecording && input.trim().length > 0) {
+      const t = setTimeout(() => {
+        document.getElementById('btn-send-answer')?.click();
+      }, 1200); // delay suave
+      return () => clearTimeout(t);
+    }
+  }, [isRecording]);
+
   // Voice narration of ZenMentor questions
   const speakQuestion = async (text: string) => {
     if (audioRef.current) {
@@ -432,6 +443,7 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
 
             {/* Send Button */}
             <button
+              id="btn-send-answer"
               onClick={handleNextQuestion}
               disabled={!input.trim()}
               className="w-14 h-14 rounded-2xl bg-indigo-600 disabled:opacity-30 disabled:pointer-events-none hover:bg-indigo-500 text-white flex items-center justify-center shadow-lg transition-all"

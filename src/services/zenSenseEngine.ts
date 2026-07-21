@@ -56,6 +56,7 @@ export interface HumanState {
     projection: string; // Ex: "Alta probabilidade de melhora no sono se mantiver rotina"
     risk_warning?: string;
   };
+  sense_making_index: number; // SMI (0 a 100): Marcador longitudinal de reorganização cognitiva
   timestamp: string;
 }
 
@@ -135,6 +136,7 @@ export class ZenSenseEngine {
       recovery_signature: { best_modality: 'respiração', confidence: 0.8 },
       trajectory: { trend: 'stable', velocity: 0, confidence: 0.5 },
       adaptation_forecast: { projection: "Estável, manter a rotina." },
+      sense_making_index: 50, // Baseline inicial neutro (0-100)
       timestamp: new Date().toISOString()
     };
   }

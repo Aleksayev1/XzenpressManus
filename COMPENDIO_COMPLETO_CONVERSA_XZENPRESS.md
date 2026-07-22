@@ -82,10 +82,13 @@ Substituímos métricas superficiais de "humor" pelo **Sense-Making Index (SMI)*
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Fundamentação Física e Biofísica
-1. **Sonocitologia (UCLA - Science 2004)**: Células vivas oscilam mecanicamente entre 800 Hz e 1.600 Hz. A patologia manifesta-se como dissonância harmônica.
-2. **Mecanotransdução Acústica (Prêmio Nobel 2021 - Piezo1/2)**: Ondas sonoras de pressão longitudinal geram micro-deformações na membrana, abrindo canais iônicos Piezo1/2, restaurando o potencial de **-70 mV** e reativando a síntese mitocondrial de ATP.
-3. **Primeira Lei de Newton & Atratores Biológicos**: A intervenção sonora atua como a força externa que redireciona o organismo do *Atrator Dissonante (Estresse)* de volta ao *Atrator Estável (Homeostase)*.
+### Fundamentação Física, Transdução e Mecanobiologia
+1. **A Cascata da Transdução Física**:
+   $$\text{Som (Onda Mecânica)} \longrightarrow \text{Mecanotransdução (Piezo1/2 na Cóclea/Tecidos)} \longrightarrow \text{Bioeletricidade (-70mV)} \longrightarrow \text{Bioquímica (ATP/Cálcio)} \longrightarrow \text{Cognição}$$
+   *O cérebro não escuta som — ele recebe padrões elétricos gerados por transdutores mecânicos.*
+2. **Mecanobiologia Celular**: Forças mecânicas (tensão, pressão acústica, ultrassom, vibração) alteram diretamente a expressão gênica, o arranjo do citoesqueleto e o destino metabólico da célula.
+3. **Física da Informação (*It from Bit*)**: O pensamento consome ~20W metabólicos e gera assinaturas elétricas (EEG) e magnéticas (MEG/coração). Na física da informação (Rolf Landauer / John Wheeler), a **informação organizada modifica sistemas físicos**, e o XZenPress atua enviando informação organizada para o sistema nervoso.
+4. **Primeira Lei de Newton & Atratores Biológicos**: A intervenção multimodal atua como a força externa que redireciona o organismo do *Atrator Dissonante (Estresse)* de volta ao *Atrator Estável (Homeostase)*.
 
 ---
 
@@ -99,8 +102,8 @@ A música deixa de ser entretenimento passivo e passa a ser **Intervenção Tera
 3. **Focus Flow (Concentração Profunda / 25-45 min)**: 60-70 BPM constante + Pulso Beta/Gamma (14-40 Hz) + Músicas puramente instrumentais.
 4. **Sleep Transition (Indução ao Sono Profundo)**: Sequência em 3 fases ($\text{Desaceleração} \to \text{Theta} \to \text{Delta} \to \text{Fade}$).
 
-### O "Efeito Maestro" (Lição do Alzheimer)
-No Alzheimer, embora a memória episódica (hipocampo) seja destruída, os circuitos auditivo-límbicos e a memória procedimental continuam intactos. A música atua como um **Maestro**, utilizando essas rotas alternativas para re-sincronizar temporariamente a atividade cortical.
+### O "Efeito Maestro" Biológico
+No Alzheimer, embora a memória episódica (hipocampo) seja destruída, os circuitos auditivo-límbicos e a memória procedimental continuam intactos. O XZenPress atua como um **Maestro Biológico**, utilizando múltiplos estímulos coordenados (som, respiração, movimento, acupressão, atenção e biofeedback) para ressincronizar a orquestra organísmica.
 
 ---
 

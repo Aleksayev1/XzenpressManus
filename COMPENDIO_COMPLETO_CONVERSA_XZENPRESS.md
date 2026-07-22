@@ -82,33 +82,20 @@ Substituímos métricas superficiais de "humor" pelo **Sense-Making Index (SMI)*
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Transdução Física, Mecanobiologia e Física da Informação
-1. **A Cascata da Transdução Fisiológica**:
-   $$\text{Som (Onda Mecânica)} \longrightarrow \text{Mecanotransdução (Piezo1/2 na Cóclea/Tecidos)} \longrightarrow \text{Bioeletricidade (-70mV)} \longrightarrow \text{Bioquímica (ATP/Cálcio)} \longrightarrow \text{Cognição}$$
-   *O cérebro não escuta som direto — ele lê padrões elétricos gerados por transdutores mecanossensíveis.*
-2. **Mecanobiologia Celular**: Ondas de ultrassom/infrassom e pressão acústica alteram o citoesqueleto, a rigidez tecidual e a expressão gênica sem mediação auditiva consciente.
-3. **Física da Informação (*It from Bit* — Landauer & Wheeler)**: O cérebro consome ~20W metabólicos gerando campos eletromagnéticos mensuráveis (EEG/MEG). O pensamento é **Informação Organizada** expressa em redes neurais. O XZenPress atua emitindo informação organizada para guiar o sistema.
+---
+
+## 5. Capítulo 4: Os 3 Pilares Científicos Oficiais (Manifesto Baseado em Evidências)
+
+1. **Pilar 1 — Alostase e Redução de Carga Alostática (Sterling & Eyer / Bruce McEwen - NEJM 1998)**:
+   - O corpo adapta-se continuamente antecipando demandas. O XZenPress reduz a carga alostática acumulada ampliando a janela de recuperação autonômica do indivíduo.
+2. **Pilar 2 — Complexidade e Variabilidade Fractal como Marca da Saúde (Lipsitz & Goldberger - JAMA 1992)**:
+   - Sistemas fisiológicos saudáveis possuem variabilidade fractal complexa, enquanto a rigidez/regularidade é sinal de envelhecimento e patologia. O XZenPress mede **RMSSD/SDNN** como aumento da complexidade adaptativa do SNA.
+3. **Pilar 3 — Treino de Frequência de Ressonância Respiratória / HRV Biofeedback (Lehrer & Gevirtz 2014)**:
+   - Treinar a respiração na frequência de ressonância individual (~4.5 a 6.5 RPM) maximiza a arritmia sinusal respiratória (RSA) e o tônus vagal parassimpático.
 
 ---
 
-## 5. Capítulo 4: XZen Audio Lab & XZen Acoustic Intelligence
-
-A música deixa de ser entretenimento passivo e passa a ser **Intervenção Terapêutica Personalizada**.
-
-### Os 4 Protocolos Sonoros (XZen Audio Lab)
-1. **Down Regulation (Descompressão Simpática / 8 min)**: Rampa descendente de BPM ($80 \to 58\text{ BPM}$) + Respiração 4-7-8 + Frequências graves de grounding (174 Hz / 128 Hz).
-2. **Mental Reset (Interrupção de Ruminação / 10 min)**: Pads ambientes Alfa (10 Hz) + Respiração coerente + Sons de floresta.
-3. **Focus Flow (Concentração Profunda / 25-45 min)**: 60-70 BPM constante + Pulso Beta/Gamma (14-40 Hz) + Músicas puramente instrumentais.
-4. **Sleep Transition (Indução ao Sono Profundo)**: Sequência em 3 fases ($\text{Desaceleração} \to \text{Theta} \to \text{Delta} \to \text{Fade}$).
-
-### O "Efeito Maestro" Biológico
-No Alzheimer, embora a memória episódica (hipocampo) seja destruída, os circuitos auditivo-límbicos e a memória procedimental continuam intactos. O XZenPress atua como um **Maestro Biológico**, utilizando múltiplos estímulos coordenados (som, respiração, movimento, acupressão, atenção e biofeedback) para ressincronizar a orquestra organísmica.
-
----
-
-## 6. Capítulo 5: VFC Real, Biofeedback e Frequência de Ressonância Respiratória (RFB)
-
-A inclusão do dispositivo/sensor de Variabilidade da Frequência Cardíaca (VFC) fecha o ponto cego do sistema: **saímos da estimativa subjetiva e entramos no Biofeedback Clínico**.
+## 6. Capítulo 5: VFC Real, Biofeedback e Proteção LGPD
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -121,61 +108,18 @@ A inclusão do dispositivo/sensor de Variabilidade da Frequência Cardíaca (VFC
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Treinamento da Frequência de Ressonância Respiratória Individual (Lehrer & Gevirtz)
-Em vez de prometer "frequências mágicas", o XZenPress aplica o protocolo comprovado de **Resonance Frequency Breathing (RFB)**:
-- O app identifica a frequência respiratória individual exata (geralmente entre 4.5 e 6.5 respirações por minuto - RPM) na qual a VFC do usuário atinge a máxima oscilação.
-- O áudio procedural nativo guia essa taxa respiratória em tempo real.
-
 ### Proteção de Dados de Saúde & LGPD
-Em conformidade com o Art. 5º, II da LGPD (dados sensíveis de saúde):
-- **Processamento 100% On-Device**: Os intervalos R-R e os cálculos de RMSSD/SDNN são computados localmente no dispositivo do usuário, sem jamais enviar dados eletrofisiológicos brutos para servidores de terceiros.
+- **Processamento 100% On-Device**: Conforme o Art. 5º, II da LGPD, os intervalos R-R e cálculos eletrofisiológicos são computados no dispositivo do usuário sem transmissão de dados brutos a servidores externos.
 
 ---
 
-## 7. Capítulo 6: Arquitetura Técnica do ZenAudioEngine (Web Audio API)
+## 7. Capítulo 6: Arquitetura Técnica do ZenAudioEngine & Roadmap
 
-### Desacoplamento do Spotify
-Devido às deprecações recentes na API pública do Spotify (remoção dos endpoints de `audio-features` e `BPM` em tempo real):
+### Desacoplamento do Spotify e Motor Nativo
+- **Etapa 1 (Spotify Embed)**: Playlists curadas executadas via iframe para medições de $\Delta\text{RMSSD}$ pós-sessão.
+- **Etapa 2 (ZenAudioEngine Nativo - Web Audio API)**: Motor nativo em JavaScript rodando *on-device*, gerando tons procedurais e envelopes de ganho sincronizados com o pacer respiratório em tempo real.
 
-```
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                     ESTRUTURA DE ÁUDIO DUPLA DO XZEN PRESS                             │
-├────────────────────────────────────────────────────────────────────────────────────────┤
-│ 🟢 ETAPA 1 (Spotify / External Player):                                                │
-│    • Executa playlists curadas em iframe embed                                         │
-│    • Adequado para intervenções passivas e medição de ΔRMSSD pré/pós-sessão            │
-│                                                                                        │
-│ ⚡ ETAPA 2 (ZenAudioEngine Nativo - Web Audio API):                                     │
-│    • Motor nativo em JavaScript/Web Audio API rodando diretamente no dispositivo      │
-│    • Geração procedural de senoides puras (Solfeggio/Pentatônica) e tons binaurais     │
-│    • Time-stretching e envelopes de ganho em tempo real sem artefatos de áudio        │
-│    • 100% offline, zero custo de servidor e imunidade a alterações de APIs externas    │
-└────────────────────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 8. Capítulo 7: Terapia por Coerência & O Maestro Biológico (ONE 26 Final)
-
-Esta síntese fecha o ciclo conceitual do projeto XZenPress:
-
-```
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                        O NOVO PARADIGMA: TERAPIA POR COERÊNCIA                         │
-├────────────────────────────────────────────────────────────────────────────────────────┤
-│ ❌ O Paradigma Antigo (Reducionista):                                                  │
-│    "Qual é a frequência fixa de hertz que cura o órgão X?"                             │
-├────────────────────────────────────────────────────────────────────────────────────────┤
-│ ✨ O Paradigma XZenPress (Fisiologia de Sistemas Acoplados):                           │
-│    "Como o XZenPress pode atuar como um MAESTRO BIOLÓGICO, emitindo a combinação       │
-│     temporal exata de estímulos (Som + BPM + Respiração RFB + VFC + Acupressão +      │
-│     Qi Gong + Pennebaker) para fazer a orquestra organísmica recuperar sua            │
-│     coerência e autorregulação espontânea?"                                           │
-└────────────────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Roadmap de Produto em 3 Horizontes
-
-1. **Horizonte 1 (Imediato)**: `ZenAudioEngine` Nativo via Web Audio API + Playlists curadas estáticas no Spotify + Biofeedback de VFC real (Apple Health / Google Fit / BLE).
-2. **Horizonte 2 (Médio Prazo)**: Integração contínua com sensores vestíveis (Oura, Whoop, Garmin) para refinamento do **Human Resonance Profile (HRP)**.
-3. **Horizonte 3 (Longo Prazo)**: Criação da **Gravadora Própria (XZen Records)**, produzindo um acervo autoral de áudio imersivo 3D e consolidando um ativo bilionário de Propriedade Intelectual (IP).
+### Roadmap de 3 Horizontes
+1. **Horizonte 1 (Imediato)**: `ZenAudioEngine` Nativo + Playlists Curadas no Spotify + VFC Real (HealthKit/Google Fit/BLE).
+2. **Horizonte 2 (Médio Prazo)**: Integração com wearables (Oura, Whoop, Garmin) para refinamento do **Human Resonance Profile (HRP)**.
+3. **Horizonte 3 (Longo Prazo)**: **Gravadora Própria (XZen Records)**, produzindo acervo autoral de áudio e consolidando ativo proprietário de Propriedade Intelectual (IP).

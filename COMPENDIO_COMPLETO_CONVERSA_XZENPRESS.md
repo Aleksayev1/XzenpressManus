@@ -82,13 +82,12 @@ Substituímos métricas superficiais de "humor" pelo **Sense-Making Index (SMI)*
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Fundamentação Física, Transdução e Mecanobiologia
-1. **A Cascata da Transdução Física**:
+### Transdução Física, Mecanobiologia e Física da Informação
+1. **A Cascata da Transdução Fisiológica**:
    $$\text{Som (Onda Mecânica)} \longrightarrow \text{Mecanotransdução (Piezo1/2 na Cóclea/Tecidos)} \longrightarrow \text{Bioeletricidade (-70mV)} \longrightarrow \text{Bioquímica (ATP/Cálcio)} \longrightarrow \text{Cognição}$$
-   *O cérebro não escuta som — ele recebe padrões elétricos gerados por transdutores mecânicos.*
-2. **Mecanobiologia Celular**: Forças mecânicas (tensão, pressão acústica, ultrassom, vibração) alteram diretamente a expressão gênica, o arranjo do citoesqueleto e o destino metabólico da célula.
-3. **Física da Informação (*It from Bit*)**: O pensamento consome ~20W metabólicos e gera assinaturas elétricas (EEG) e magnéticas (MEG/coração). Na física da informação (Rolf Landauer / John Wheeler), a **informação organizada modifica sistemas físicos**, e o XZenPress atua enviando informação organizada para o sistema nervoso.
-4. **Primeira Lei de Newton & Atratores Biológicos**: A intervenção multimodal atua como a força externa que redireciona o organismo do *Atrator Dissonante (Estresse)* de volta ao *Atrator Estável (Homeostase)*.
+   *O cérebro não escuta som direto — ele lê padrões elétricos gerados por transdutores mecanossensíveis.*
+2. **Mecanobiologia Celular**: Ondas de ultrassom/infrassom e pressão acústica alteram o citoesqueleto, a rigidez tecidual e a expressão gênica sem mediação auditiva consciente.
+3. **Física da Informação (*It from Bit* — Landauer & Wheeler)**: O cérebro consome ~20W metabólicos gerando campos eletromagnéticos mensuráveis (EEG/MEG). O pensamento é **Informação Organizada** expressa em redes neurais. O XZenPress atua emitindo informação organizada para guiar o sistema.
 
 ---
 
@@ -151,6 +150,27 @@ Devido às deprecações recentes na API pública do Spotify (remoção dos endp
 │    • Geração procedural de senoides puras (Solfeggio/Pentatônica) e tons binaurais     │
 │    • Time-stretching e envelopes de ganho em tempo real sem artefatos de áudio        │
 │    • 100% offline, zero custo de servidor e imunidade a alterações de APIs externas    │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 8. Capítulo 7: Terapia por Coerência & O Maestro Biológico (ONE 26 Final)
+
+Esta síntese fecha o ciclo conceitual do projeto XZenPress:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        O NOVO PARADIGMA: TERAPIA POR COERÊNCIA                         │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ ❌ O Paradigma Antigo (Reducionista):                                                  │
+│    "Qual é a frequência fixa de hertz que cura o órgão X?"                             │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ ✨ O Paradigma XZenPress (Fisiologia de Sistemas Acoplados):                           │
+│    "Como o XZenPress pode atuar como um MAESTRO BIOLÓGICO, emitindo a combinação       │
+│     temporal exata de estímulos (Som + BPM + Respiração RFB + VFC + Acupressão +      │
+│     Qi Gong + Pennebaker) para fazer a orquestra organísmica recuperar sua            │
+│     coerência e autorregulação espontânea?"                                           │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 

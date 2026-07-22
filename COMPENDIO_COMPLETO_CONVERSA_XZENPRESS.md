@@ -12,8 +12,11 @@ A jornada de pesquisa demonstrou que a saúde humana não depende de um único e
 > **A Hipótese Central do XZenPress**:  
 > *"O estado de saúde não depende de um único fator isolado, mas emerge da coerência dinâmica entre múltiplos sistemas biológicos, cognitivos, emocionais e ambientais. O XZenPress busca detectar padrões de desorganização e aplicar intervenções multimodais adaptativas capazes de favorecer processos naturais de autorregulação."*
 
-> **O Grande Princípio**:  
-> *"O XZenPress não procura a frequência mágica que cura. Procura compreender como o organismo retorna espontaneamente à coerência quando recebe a informação certa, no momento certo, pela via sensorial mais adequada."*
+> **Declaração de Missão Inabalável**:  
+> *"O XZenPress existe para aumentar a capacidade adaptativa humana por meio da integração de evidências fisiológicas, comportamentais, cognitivas e contextuais, promovendo maior autorregulação, recuperação e aprendizagem ao longo do tempo."*
+
+> **Definição de Longo Prazo**:  
+> *"Uma plataforma de inteligência adaptativa humana, capaz de observar continuamente sinais fisiológicos, comportamentais e linguísticos para favorecer autorregulação, aprendizagem e evolução individual ao longo do tempo."*
 
 ---
 
@@ -84,14 +87,31 @@ Substituímos métricas superficiais de "humor" pelo **Sense-Making Index (SMI)*
 
 ---
 
-## 5. Capítulo 4: Os 3 Pilares Científicos Oficiais (Manifesto Baseado em Evidências)
+## 5. Capítulo 4: Os 6 Pilares Científicos Oficiais do XZenPress
 
-1. **Pilar 1 — Alostase e Redução de Carga Alostática (Sterling & Eyer / Bruce McEwen - NEJM 1998)**:
-   - O corpo adapta-se continuamente antecipando demandas. O XZenPress reduz a carga alostática acumulada ampliando a janela de recuperação autonômica do indivíduo.
-2. **Pilar 2 — Complexidade e Variabilidade Fractal como Marca da Saúde (Lipsitz & Goldberger - JAMA 1992)**:
-   - Sistemas fisiológicos saudáveis possuem variabilidade fractal complexa, enquanto a rigidez/regularidade é sinal de envelhecimento e patologia. O XZenPress mede **RMSSD/SDNN** como aumento da complexidade adaptativa do SNA.
-3. **Pilar 3 — Treino de Frequência de Ressonância Respiratória / HRV Biofeedback (Lehrer & Gevirtz 2014)**:
-   - Treinar a respiração na frequência de ressonância individual (~4.5 a 6.5 RPM) maximiza a arritmia sinusal respiratória (RSA) e o tônus vagal parassimpático.
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        OS 6 PILARES DA ARQUITETURA XZEN PRESS                          │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ 1. 🧬 ALOSTASE & CARGA ALOSTÁTICA (Bruce McEwen - NEJM / Sterling & Eyer)               │
+│    • Redução da Carga Alostática acumulada expandindo a janela de recuperação autonômica│
+│                                                                                        │
+│ 2. 🌀 PERDA DE COMPLEXIDADE FRACTAL (James Lipsitz & Ary Goldberger - JAMA)            │
+│    • Medição do Índice Global de Complexidade Adaptativa (VFC + Linguagem + Sono)       │
+│                                                                                        │
+│ 3. 🫁 TREINO DE FREQUÊNCIA DE RESSONÂNCIA / HRV BIOFEEDBACK (Lehrer, Gevirtz, Shaffer) │
+│    • Treino respiratório na frequência individual (~4.5-6.5 RPM) com VFC real (BLE/PPG)│
+│                                                                                        │
+│ 4. 🧠 INFERÊNCIA ATIVA & PREDIÇÃO CORTICAL (Karl Friston - Neurociência Computacional)│
+│    • Atualização contínua de modelos internos (ZenMemory / Curiosity Engine / ZenSense)│
+│                                                                                        │
+│ 5. 🎯 MEDICINA DE PRECISÃO & SAÚDE PERSONALIZADA (Stanford / Harvard / Mayo Clinic)    │
+│    • Substituição do tratamento médio por intervenções multimodais personalizadas       │
+│                                                                                        │
+│ 6. 📊 FENOTIPAGEM COMPUTACIONAL / DIGITAL PHENOTYPING (MIT / Stanford / Oxford)         │
+│    • Observação integrada de micro-sinais (fala, VFC, sono, comportamento) pelo ZenSense│
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -120,6 +140,6 @@ Substituímos métricas superficiais de "humor" pelo **Sense-Making Index (SMI)*
 - **Etapa 2 (ZenAudioEngine Nativo - Web Audio API)**: Motor nativo em JavaScript rodando *on-device*, gerando tons procedurais e envelopes de ganho sincronizados com o pacer respiratório em tempo real.
 
 ### Roadmap de 3 Horizontes
-1. **Horizonte 1 (Imediato)**: `ZenAudioEngine` Nativo + Playlists Curadas no Spotify + VFC Real (HealthKit/Google Fit/BLE).
+1. **Horizonte 1 (Imediato)**: `ZenAudioEngine` Nativo via Web Audio API + Playlists curadas estáticas no Spotify + Biofeedback de VFC real (Apple Health / Google Fit / BLE).
 2. **Horizonte 2 (Médio Prazo)**: Integração com wearables (Oura, Whoop, Garmin) para refinamento do **Human Resonance Profile (HRP)**.
 3. **Horizonte 3 (Longo Prazo)**: **Gravadora Própria (XZen Records)**, produzindo acervo autoral de áudio e consolidando ativo proprietário de Propriedade Intelectual (IP).

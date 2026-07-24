@@ -8,7 +8,6 @@ import { emotionalStates } from '../data/emotionalMapping';
 import { ZenMemoryEngine, MemoryCategory, ZenMemory } from '../services/zenMemoryEngine';
 import {
   playMtcElement, startBinauralBeats, startQigongRhythm, startDownRegulationProtocol,
-  MTC_ELEMENT_NAMES, BINAURAL_LABELS,
   type MtcElement, type BinauralState, type ZenAudioSession
 } from '../services/zenAudioEngine';
 
@@ -18,6 +17,8 @@ interface Message {
   content: string;
   timestamp: Date;
   eurekaMemory?: ZenMemory;
+  zenSomProtocols?: string[];
+  actions?: { label: string; page: string }[];
 }
 
 interface ZenMentorChatProps {
@@ -326,11 +327,12 @@ function parseActionButtons(content: string) {
   const cleanContent = content
     .replace(actionRegex, '')
     .replace(zenflowRegex, '')
+    .replace(zenSomRegex, '')
     .replace(candidataRegex, '')
     .replace(/\[[A-Z0-9_]+:[^\]]*$/gi, '') // Clean up any truncated/unclosed tags at the end
     .trim();
     
-  return { cleanContent, actions, candidateMemoryText };
+  return { cleanContent, actions, zenSomProtocols, candidateMemoryText };
 }
 
 // ─── Emotion Detector ─────────────────────────────────────────────────────────
@@ -823,6 +825,7 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
           timestamp: new Date(),
           eurekaMemory: topMemories[0], // Salva a principal para o UI
           zenSomProtocols,              // Salva protocolos sonoros para renderizar
+          actions,                      // Salva as ações detectadas para renderizar
         }];
         // Detect emotional context for Sessão Mestra handoff
         const emotionId = extractEmotionFromReply(cleanContent);
@@ -838,7 +841,6 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
       });
       // Auto-leitura se ativada
       if (autoRead) {
-        const { cleanContent } = parseActionButtons(data.reply);
         speak(cleanContent, selectedVoice);
       }
     } catch (err: any) {
@@ -1019,7 +1021,9 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
           {/* Messages */}
           <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollBehavior: 'auto' }}>
             {messages.map((msg, i) => {
-              const { cleanContent, actions } = parseActionButtons(msg.content);
+              const cleanContent = msg.content;
+              const msgActions = msg.actions || [];
+              const msgZenSom = msg.zenSomProtocols || [];
 
               return (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -1071,9 +1075,9 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                       </button>
                     )}
                     {/* Action buttons */}
-                    {actions.length > 0 && (
+                    {msgActions.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mt-1.5">
-                        {actions.map((action, ai) => (
+                        {msgActions.map((action, ai) => (
                           <button
                             key={ai}
                             onClick={() => onNavigate?.(action.page)}
@@ -1087,6 +1091,54 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                             {action.label} →
                           </button>
                         ))}
+                      </div>
+                    )}
+                    {/* ZenSom active protocol mini-player card */}
+                    {msg.role === 'assistant' && msgZenSom.length > 0 && (
+                      <div className="mt-2.5 space-y-1.5">
+                        {msgZenSom.map((protoId) => {
+                          const proto = ZEN_SOM_PROTOCOLS[protoId];
+                          if (!proto) return null;
+                          const isActive = zenSomActive === protoId;
+                          return (
+                            <div
+                              key={protoId}
+                              className="p-2 rounded-xl border flex items-center justify-between gap-3 transition-all duration-300 bg-white/5 border-white/10"
+                              style={{
+                                background: isActive ? 'rgba(99, 102, 241, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                                borderColor: isActive ? 'rgba(99, 102, 241, 0.3)' : 'rgba(255, 255, 255, 0.08)'
+                              }}
+                            >
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <span className="text-base flex-shrink-0">{proto.emoji}</span>
+                                <div className="min-w-0">
+                                  <p className="text-[11px] font-bold text-gray-200 truncate">{proto.label}</p>
+                                  <p className="text-[9px] text-gray-500 truncate">{proto.description}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {isActive && proto.type === 'downreg' && (
+                                  <span className="text-[9px] font-bold text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded-full animate-pulse">BPM: {zenSomBpm}</span>
+                                )}
+                                {isActive && proto.type === 'qigong' && (
+                                  <span className="text-[9px] font-bold text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded-full animate-pulse">
+                                    {zenSomPhase === 'inspire' ? '↑ Inspire' : '↓ Expire'}
+                                  </span>
+                                )}
+                                <button
+                                  onClick={() => launchZenSom(protoId)}
+                                  className={`p-1.5 rounded-lg transition-all flex items-center justify-center ${
+                                    isActive
+                                      ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
+                                      : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30'
+                                  }`}
+                                >
+                                  {isActive ? <Square className="w-3 h-3 fill-red-400" /> : <Play className="w-3 h-3 fill-indigo-300" />}
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                     {/* ── Sessão Mestra + Integrativa CTAs — aparecem na msg que detectou a emoção ── */}

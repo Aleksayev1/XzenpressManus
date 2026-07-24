@@ -484,6 +484,16 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
   const [selectedVoice, setSelectedVoice] = useState<'nova' | 'echo' | 'onyx'>('nova');
   const [autoRead, setAutoRead] = useState(false);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  const [memoryFeedbackStatus, setMemoryFeedbackStatus] = useState<Record<string, 'confirmed' | 'rejected'>>({});
+
+  const handleMemoryFeedback = async (memoryId: string, feedbackType: 'confirmed' | 'rejected') => {
+    setMemoryFeedbackStatus(prev => ({ ...prev, [memoryId]: feedbackType }));
+    try {
+      await ZenMemoryEngine.applyMemoryFeedback(memoryId, feedbackType);
+    } catch (err) {
+      console.error('Error applying memory feedback', err);
+    }
+  };
 
   // ── Speech Recognition ─────────────────────────────────────────────────────
   const [isRecording, setIsRecording] = useState(false);
@@ -1071,16 +1081,24 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
                                 </p>
                                 <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
                                    <button 
-                                      onClick={() => ZenMemoryEngine.applyMemoryFeedback(msg.eurekaMemory!.id!, 'confirmed')}
-                                      className="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold hover:bg-emerald-500/20 transition-colors"
+                                      onClick={() => handleMemoryFeedback(msg.eurekaMemory!.id!, 'confirmed')}
+                                      className={`px-2.5 py-1 rounded text-[10px] font-semibold transition-colors ${
+                                        memoryFeedbackStatus[msg.eurekaMemory!.id!] === 'confirmed'
+                                          ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-400'
+                                          : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+                                      }`}
                                    >
-                                     👍 Faz sentido
+                                     {memoryFeedbackStatus[msg.eurekaMemory!.id!] === 'confirmed' ? '✅ Confirmado' : '👍 Faz sentido'}
                                    </button>
                                    <button 
-                                      onClick={() => ZenMemoryEngine.applyMemoryFeedback(msg.eurekaMemory!.id!, 'rejected')}
-                                      className="px-2.5 py-1 rounded bg-red-500/10 text-red-400 text-[10px] font-semibold hover:bg-red-500/20 transition-colors"
+                                      onClick={() => handleMemoryFeedback(msg.eurekaMemory!.id!, 'rejected')}
+                                      className={`px-2.5 py-1 rounded text-[10px] font-semibold transition-colors ${
+                                        memoryFeedbackStatus[msg.eurekaMemory!.id!] === 'rejected'
+                                          ? 'bg-red-500/30 text-red-300 border border-red-400'
+                                          : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
+                                      }`}
                                    >
-                                     👎 Não representa minha experiência
+                                     {memoryFeedbackStatus[msg.eurekaMemory!.id!] === 'rejected' ? '❌ Descartado' : '👎 Não representa minha experiência'}
                                    </button>
                                    <button className="px-2.5 py-1 rounded bg-white/5 text-gray-300 text-[10px] font-semibold hover:bg-white/10 transition-colors">
                                      ✏️ Corrigir

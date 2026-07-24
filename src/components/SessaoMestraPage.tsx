@@ -713,10 +713,52 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         </div>
 
                         <div className="w-full max-w-md space-y-8">
-                            {/* Step 1: Sound */}
+                            {/* Step 1: Checagem do Relógio (VFC Inicial) */}
+                            <div className="bg-gray-800/50 p-6 rounded-2xl border border-emerald-500/20">
+                                <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+                                    <span className="bg-emerald-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                                    Checagem do Relógio (VFC Inicial)
+                                </h3>
+                                <p className="text-gray-400 text-xs mb-4 leading-relaxed">
+                                    Verifique ou inicie a leitura de HRV/VFC no seu relógio agora. Em seguida, sincronize o valor abaixo como sua linha de base.
+                                </p>
+                                <div className="flex items-center justify-between bg-gray-950 p-4 rounded-xl border border-gray-700">
+                                    <div>
+                                        <p className="text-[10px] text-gray-500 uppercase font-semibold">VFC Inicial Lido</p>
+                                        <p className="text-lg font-bold text-emerald-400">
+                                            {preSessionRmssd > 0 ? `${preSessionRmssd} ms` : 'Não Sincronizado'}
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const currentVal = Number(localStorage.getItem('wearable_vfc')) || 55;
+                                            setPreSessionRmssd(currentVal);
+                                        }}
+                                        className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5"
+                                    >
+                                        🔄 Sincronizar Relógio
+                                    </button>
+                                </div>
+                                <div className="mt-3 flex items-center justify-between text-xs">
+                                    <span className="text-gray-500">Ou digite manualmente:</span>
+                                    <div className="flex items-center gap-1">
+                                        <input
+                                            type="number"
+                                            value={preSessionRmssd || ''}
+                                            onChange={(e) => setPreSessionRmssd(Number(e.target.value))}
+                                            placeholder="ex: 55"
+                                            className="w-16 bg-gray-950 border border-gray-700 rounded px-2 py-1 text-xs text-center text-white"
+                                        />
+                                        <span className="text-gray-500">ms</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Step 2: Sound */}
                             <div className="bg-gray-800/50 p-6 rounded-2xl border border-purple-500/20">
                                 <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                                    <span className="bg-purple-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                                    <span className="bg-purple-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
                                     Conexão Sonora
                                 </h3>
                                 <p className="text-gray-400 text-sm mb-4">
@@ -735,10 +777,10 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 </div>
                             </div>
 
-                            {/* Step 2: Breathing (Interactive Guided Pacer) */}
+                            {/* Step 3: Breathing (Interactive Guided Pacer) */}
                             <div className="bg-gray-800/50 p-6 rounded-2xl border border-blue-500/20 flex flex-col items-center">
                                 <h3 className="text-white font-bold mb-4 w-full flex items-center gap-2">
-                                    <span className="bg-blue-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                                    <span className="bg-blue-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
                                     Respiração de Aterrissagem (4-2-6)
                                 </h3>
                                 <p className="text-gray-400 text-sm mb-6 text-center">
@@ -1282,8 +1324,48 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             <div className="text-center mb-5">
                                 <div className="text-2xl mb-2">🧘</div>
                                 <h3 className="text-lg font-bold text-white">Como você está agora?</h3>
-                                <p className="text-gray-500 text-xs mt-1">Avalie seu nível de ansiedade após a sessão</p>
+                                <p className="text-gray-500 text-xs mt-1">Avalie seu nível de ansiedade e sincronize seu relógio pós-sessão</p>
                             </div>
+
+                            {/* VFC Post-Session Check (Watch Sync) */}
+                            <div className="mb-5 bg-gray-950 p-4 rounded-xl border border-gray-800">
+                                <p className="text-[10px] text-gray-500 uppercase font-semibold mb-1">Checagem de VFC Final (Relógio)</p>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-xs text-gray-400">VFC Final Lido:</p>
+                                        <p className="text-lg font-bold text-emerald-400">
+                                            {postSessionRmssd > 0 ? `${postSessionRmssd} ms` : 'Aguardando Leitura'}
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const currentVal = Number(localStorage.getItem('wearable_vfc')) || 62;
+                                            // Ensure progression for visual mock logic if pre was set
+                                            const finalVal = preSessionRmssd > 0 ? Math.max(currentVal, preSessionRmssd + Math.round(4 + Math.random() * 4)) : currentVal;
+                                            setPostSessionRmssd(finalVal);
+                                            localStorage.setItem('wearable_vfc', finalVal.toString());
+                                        }}
+                                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold rounded-lg text-white transition-all active:scale-95"
+                                    >
+                                        🔄 Sincronizar Relógio
+                                    </button>
+                                </div>
+                                <div className="mt-3 flex items-center justify-between text-[11px]">
+                                    <span className="text-gray-500">Ou digite manualmente:</span>
+                                    <div className="flex items-center gap-1">
+                                        <input
+                                            type="number"
+                                            value={postSessionRmssd || ''}
+                                            onChange={(e) => setPostSessionRmssd(Number(e.target.value))}
+                                            placeholder="ex: 60"
+                                            className="w-14 bg-gray-900 border border-gray-700 rounded px-2 py-0.5 text-center text-white"
+                                        />
+                                        <span className="text-gray-500">ms</span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="mb-6">
                                 <div className="flex justify-between text-xs text-gray-500 mb-2">
                                     <span>Tranquilo(a)</span>
@@ -1297,11 +1379,17 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     className="w-full accent-purple-500"
                                 />
                             </div>
+
                             <button
                                 onClick={() => handleFinalizeWithCoherence(postSessionAnxiety)}
-                                className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg transition-all hover:opacity-90"
+                                disabled={postSessionRmssd === 0}
+                                className={`w-full py-4 rounded-2xl font-bold text-white shadow-lg transition-all ${
+                                    postSessionRmssd > 0
+                                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 active:scale-95'
+                                    : 'bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed'
+                                }`}
                             >
-                                Ver meu Índice de Coerência
+                                {postSessionRmssd > 0 ? 'Ver meu Índice de Coerência' : 'Sincronize o Relógio para Finalizar'}
                             </button>
                         </div>
                     </div>

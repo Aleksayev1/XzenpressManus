@@ -6,6 +6,11 @@ import { fiveElements } from '../data/fiveElements';
 import { ZenAvatar } from './ZenAvatar';
 import { emotionalStates } from '../data/emotionalMapping';
 import { ZenMemoryEngine, MemoryCategory, ZenMemory } from '../services/zenMemoryEngine';
+import {
+  playMtcElement, startBinauralBeats, startQigongRhythm, startDownRegulationProtocol,
+  MTC_ELEMENT_NAMES, BINAURAL_LABELS,
+  type MtcElement, type BinauralState, type ZenAudioSession
+} from '../services/zenAudioEngine';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -230,14 +235,56 @@ function saveSessionContext(messages: { role: string; content: string }[]): void
   localStorage.setItem('xzen_last_session_date', new Date().toISOString());
 }
 
+// ─── ZenSom Protocol Config ──────────────────────────────────────────────────
+// Maps tag IDs used by AI to human-readable info and engine function keys
+const ZEN_SOM_PROTOCOLS: Record<string, {
+  label: string; emoji: string; description: string;
+  type: 'mtc' | 'binaural' | 'qigong' | 'downreg';
+  param?: MtcElement | BinauralState;
+}> = {
+  'down-regulation': {
+    label: 'Down Regulation',   emoji: '🏥',
+    description: 'Rampa BPM 80→58 · Grounding 174Hz · 8 min',
+    type: 'downreg'
+  },
+  'binaural-alpha': {
+    label: 'Alpha 10Hz',  emoji: '😌',
+    description: 'Relaxamento e foco suave',
+    type: 'binaural', param: 'alpha' as BinauralState
+  },
+  'binaural-theta': {
+    label: 'Theta 6Hz',   emoji: '🎯',
+    description: 'Meditação e criatividade',
+    type: 'binaural', param: 'theta' as BinauralState
+  },
+  'binaural-delta': {
+    label: 'Delta 2Hz',   emoji: '😴',
+    description: 'Indução ao sono profundo',
+    type: 'binaural', param: 'delta' as BinauralState
+  },
+  'binaural-gamma': {
+    label: 'Gamma 40Hz',  emoji: '🧠',
+    description: 'Cognição máxima · Foco',
+    type: 'binaural', param: 'gamma' as BinauralState
+  },
+  'mtc-wood':  { label: 'MTC Madeira', emoji: '🌿', description: 'Fígado/Vesícula · Jiao 288Hz', type: 'mtc', param: 'wood' as MtcElement },
+  'mtc-fire':  { label: 'MTC Fogo',    emoji: '🔥', description: 'Coração · Zhi 384Hz',        type: 'mtc', param: 'fire' as MtcElement },
+  'mtc-earth': { label: 'MTC Terra',   emoji: '🌍', description: 'Baço/Estômago · Gong 432Hz', type: 'mtc', param: 'earth' as MtcElement },
+  'mtc-metal': { label: 'MTC Metal',   emoji: '⚙️', description: 'Pulmão · Shang 480Hz',       type: 'mtc', param: 'metal' as MtcElement },
+  'mtc-water': { label: 'MTC Água',    emoji: '💧', description: 'Rim/Bexiga · Yu 324Hz',      type: 'mtc', param: 'water' as MtcElement },
+  'qigong':    { label: 'Qigong',      emoji: '🌬️', description: 'Âncora respiratória 5.5s/fase', type: 'qigong' },
+};
+
 // ─── Action Button Parser ─────────────────────────────────────────────────────
-// Detects patterns like [ABRIR:acupressure] [ZENFLOW:liberacao] and [CANDIDATA: "text"] in AI responses
+// Detects patterns like [ABRIR:acupressure] [ZENFLOW:liberacao] [ZENSOM:protocol] and [CANDIDATA: "text"] in AI responses
 function parseActionButtons(content: string) {
   const actionRegex = /\[ABRIR:([\w-]+)\]/g;
   const zenflowRegex = /\[ZENFLOW:([\w]+)\]/g;
+  const zenSomRegex = /\[ZENSOM:([\w-]+)\]/g;
   const candidataRegex = /\[CANDIDATA:\s*(.+?)\]/gi;
 
   const actions: { label: string; page: string }[] = [];
+  const zenSomProtocols: string[] = [];
   let match;
   while ((match = actionRegex.exec(content)) !== null) {
     const page = match[1];
@@ -259,6 +306,11 @@ function parseActionButtons(content: string) {
   }
   while ((match = zenflowRegex.exec(content)) !== null) {
     actions.push({ label: `Iniciar ZenFlow ${match[1]}`, page: 'zenflow' });
+  }
+
+  // ZenSom protocol tags
+  while ((match = zenSomRegex.exec(content)) !== null) {
+    if (ZEN_SOM_PROTOCOLS[match[1]]) zenSomProtocols.push(match[1]);
   }
 
   let candidateMemoryText = null;
@@ -495,6 +547,39 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
     }
   };
 
+  // ── ZenSom (sound engine inside chat) ─────────────────────────────────
+  const [zenSomActive, setZenSomActive] = useState<string | null>(null); // protocolId active
+  const [zenSomBpm, setZenSomBpm] = useState<number>(80);
+  const [zenSomPhase, setZenSomPhase] = useState<'inspire' | 'expire'>('inspire');
+  const zenSomRef = useRef<ZenAudioSession | null>(null);
+
+  const stopZenSom = useCallback(() => {
+    zenSomRef.current?.stop();
+    zenSomRef.current = null;
+    setZenSomActive(null);
+  }, []);
+
+  const launchZenSom = useCallback((protocolId: string) => {
+    const proto = ZEN_SOM_PROTOCOLS[protocolId];
+    if (!proto) return;
+    if (zenSomActive === protocolId) { stopZenSom(); return; }
+    stopZenSom();
+    let session: ZenAudioSession | null = null;
+    if (proto.type === 'downreg') {
+      session = startDownRegulationProtocol((bpm) => setZenSomBpm(bpm), 0.2);
+    } else if (proto.type === 'binaural') {
+      session = startBinauralBeats(proto.param as BinauralState, 0.18);
+    } else if (proto.type === 'mtc') {
+      session = playMtcElement(proto.param as MtcElement, 0.22);
+    } else if (proto.type === 'qigong') {
+      session = startQigongRhythm((phase) => setZenSomPhase(phase), 0.15);
+    }
+    if (session) { zenSomRef.current = session; setZenSomActive(protocolId); }
+  }, [zenSomActive, stopZenSom]);
+
+  // Cleanup on unmount
+  useEffect(() => () => { zenSomRef.current?.stop(); }, []);
+
   // ── Speech Recognition ─────────────────────────────────────────────────────
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -677,6 +762,27 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
         anamneseContext += `\nREGRAS DO ESPELHO COGNITIVO:\n${ZenMemoryEngine.getMemoryContract()}`;
       }
 
+      // ── ZenSom Instructions ── informa a IA sobre os protocolos sonoros disponíveis
+      anamneseContext += `
+
+🔊 ZENSOM — PROTOCOLOS SONOROS CLÍNICOS DISPONÍVEIS:
+Você pode prescrever um protocolo sonoro terapêutico adicionando uma tag [ZENSOM:id] ao final da sua resposta.
+Use apenas quando identificar claramente que o usuário se beneficiaria de intervenção sonora.
+Protocolos disponíveis:
+• [ZENSOM:down-regulation] → Alta ativação simpática, ansiedade aguda, estresse severo, pânico. Rampa BPM 80→58 + Grounding 174Hz (8 min).
+• [ZENSOM:binaural-alpha] → Tensão moderada, dificuldade de focar, mente agitada. Alpha 10Hz — relaxamento com clareza.
+• [ZENSOM:binaural-theta] → Bloqueio criativo, meditação, introspecção profunda. Theta 6Hz.
+• [ZENSOM:binaural-delta] → Insônia, sono fragmentado, exaustão. Delta 2Hz — indução ao sono.
+• [ZENSOM:binaural-gamma] → Baixo desempenho cognitivo, falta de foco para trabalho intelectual. Gamma 40Hz.
+• [ZENSOM:qigong] → Dificuldade com respiração, ansiedade leve, tensão muscular. Âncora respiratória 5.5s.
+• [ZENSOM:mtc-wood] → Irritabilidade, raiva, tensão no pescoço/ombros, problemas de fígado. MTC Madeira 288Hz.
+• [ZENSOM:mtc-fire] → Palpitações, excesso de calor, ansiedade cardíaca. MTC Fogo 384Hz.
+• [ZENSOM:mtc-earth] → Preocupação excessiva, ruminação, problemas digestivos. MTC Terra 432Hz.
+• [ZENSOM:mtc-metal] → Tristeza, luto, problemas respiratórios, aperto no peito. MTC Metal 480Hz.
+• [ZENSOM:mtc-water] → Medo, insegurança, fadiga renal, dores lombares. MTC Água 324Hz.
+EXEMPLO: Se o usuário relatar alta ansiedade: responda normalmente e adicione [ZENSOM:down-regulation] no final.
+Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por resposta.`;
+
       const { getBaseApiUrl } = await import('../lib/api');
       const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/ai-chat`, {
         method: 'POST',
@@ -694,7 +800,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
       if (!response.ok) throw new Error(data.error || 'Erro ao processar mensagem');
 
       setMessages(prev => {
-        const { cleanContent, candidateMemoryText } = parseActionButtons(data.reply);
+        const { cleanContent, actions, zenSomProtocols, candidateMemoryText } = parseActionButtons(data.reply);
         
         // Se a IA gerou uma memória candidata, registramos silenciosamente
         if (candidateMemoryText && user?.id) {
@@ -715,13 +821,18 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
           role: 'assistant' as const,
           content: cleanContent,
           timestamp: new Date(),
-          eurekaMemory: topMemories[0] // Salva a principal para o UI
+          eurekaMemory: topMemories[0], // Salva a principal para o UI
+          zenSomProtocols,              // Salva protocolos sonoros para renderizar
         }];
         // Detect emotional context for Sessão Mestra handoff
         const emotionId = extractEmotionFromReply(cleanContent);
         if (emotionId && sessionReadyMsgIndex === null) {
           setDetectedEmotionId(emotionId);
           setSessionReadyMsgIndex(updated.length - 1);
+        }
+        // Auto-launch ZenSom if protocol recommended
+        if (zenSomProtocols.length > 0) {
+          setTimeout(() => launchZenSom(zenSomProtocols[0]), 800);
         }
         return updated;
       });

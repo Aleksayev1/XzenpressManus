@@ -1,8 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, Music, Heart, Waves, CloudRain, Wind, Flame, Leaf, Star, Lock, Crown, ExternalLink, Zap, Cloud, ArrowLeft, Home, Activity } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Play, Pause, Volume2, VolumeX, Music, Heart, Waves, CloudRain, Wind, Flame, Leaf, Star, Lock, Crown, ExternalLink, Zap, Cloud, ArrowLeft, Home, Activity, Square } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { createSpotifyService } from '../services/spotifyService';
 import { useLanguage } from '../contexts/LanguageContext';
+import {
+  playMtcElement, startBinauralBeats, startQigongRhythm, startDownRegulationProtocol,
+  MTC_ELEMENT_NAMES, BINAURAL_LABELS,
+  type MtcElement, type BinauralState, type ZenAudioSession
+} from '../services/zenAudioEngine';
 
 interface SoundsLibraryPageProps {
   onPageChange: (page: string) => void;
@@ -34,6 +39,53 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // ── Native ZenAudioEngine state ──────────────────────────────────────────
+  const [activePillar, setActivePillar] = useState<'mtc' | 'qigong' | 'binaural' | 'downreg' | null>(null);
+  const [activeMtc, setActiveMtc] = useState<MtcElement>('wood');
+  const [activeBinaural, setActiveBinaural] = useState<BinauralState>('alpha');
+  const [qigongPhase, setQigongPhase] = useState<'inspire' | 'expire'>('inspire');
+  const [downRegBpm, setDownRegBpm] = useState<number>(80);
+  const zenSessionRef = useRef<ZenAudioSession | null>(null);
+
+  const stopZenSession = useCallback(() => {
+    if (zenSessionRef.current) {
+      zenSessionRef.current.stop();
+      zenSessionRef.current = null;
+    }
+    setActivePillar(null);
+  }, []);
+
+  const toggleMtc = useCallback((element: MtcElement) => {
+    if (activePillar === 'mtc' && activeMtc === element) { stopZenSession(); return; }
+    stopZenSession();
+    const session = playMtcElement(element, 0.22);
+    if (session) { zenSessionRef.current = session; setActiveMtc(element); setActivePillar('mtc'); }
+  }, [activePillar, activeMtc, stopZenSession]);
+
+  const toggleBinaural = useCallback((state: BinauralState) => {
+    if (activePillar === 'binaural' && activeBinaural === state) { stopZenSession(); return; }
+    stopZenSession();
+    const session = startBinauralBeats(state, 0.18);
+    if (session) { zenSessionRef.current = session; setActiveBinaural(state); setActivePillar('binaural'); }
+  }, [activePillar, activeBinaural, stopZenSession]);
+
+  const toggleQigong = useCallback(() => {
+    if (activePillar === 'qigong') { stopZenSession(); return; }
+    stopZenSession();
+    const session = startQigongRhythm((phase) => setQigongPhase(phase), 0.15);
+    if (session) { zenSessionRef.current = session; setActivePillar('qigong'); }
+  }, [activePillar, stopZenSession]);
+
+  const toggleDownReg = useCallback(() => {
+    if (activePillar === 'downreg') { stopZenSession(); return; }
+    stopZenSession();
+    const session = startDownRegulationProtocol((bpm) => setDownRegBpm(bpm), 0.2);
+    if (session) { zenSessionRef.current = session; setActivePillar('downreg'); }
+  }, [activePillar, stopZenSession]);
+
+  // Cleanup on unmount
+  useEffect(() => () => { zenSessionRef.current?.stop(); }, []);
 
   // Spotify sempre disponível via links diretos
   useEffect(() => {
@@ -291,7 +343,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
         </div>
 
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <div className="flex justify-center mb-6">
             <div className="p-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
               <Music className="w-12 h-12 text-white" />
@@ -305,6 +357,200 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             {t('sounds.subtitle')}
           </p>
+        </div>
+
+        {/* ═══════════════════════════════════════════════════════════════════
+             🎯  PROTOCOLO CLÍNICO SONORO — 3 PILARES XZENPRESS
+             Geradores nativos via Web Audio API · Zero arquivos externos
+            ═══════════════════════════════════════════════════════════════════ */}
+        <div className="mb-10">
+          <div className="text-center mb-6">
+            <span className="inline-block bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-3">
+              🔬 Protocolo Clínico Exclusivo
+            </span>
+            <h2 className="text-2xl font-bold text-gray-800">Sons Terapêuticos Nativos</h2>
+            <p className="text-gray-500 text-sm mt-1 max-w-xl mx-auto">
+              Gerados em tempo real pelo seu dispositivo · Requer fones de ouvido para Binaural
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+            {/* ── PILAR 1: MTC PENTATÔNICA ──────────────────────────────── */}
+            <div className={`rounded-2xl p-5 border-2 transition-all ${
+              activePillar === 'mtc'
+                ? 'border-emerald-400 bg-gradient-to-br from-emerald-50 to-green-50 shadow-lg'
+                : 'border-gray-200 bg-white hover:border-emerald-300'
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-2xl">☯️</span>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-sm">MTC Pentatônica</h3>
+                  <p className="text-xs text-gray-500">5 Tons · 5 Elementos · 432 Hz puro</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mb-4 leading-relaxed">
+                Cada tom ressoa com um par de órgãos via meridianos da medicina milenar chinesa.
+              </p>
+              <div className="grid grid-cols-5 gap-1.5 mb-3">
+                {([
+                  { el: 'wood' as MtcElement, label: '🌿', name: 'Mad.' },
+                  { el: 'fire' as MtcElement, label: '🔥', name: 'Fog.' },
+                  { el: 'earth' as MtcElement, label: '🌍', name: 'Ter.' },
+                  { el: 'metal' as MtcElement, label: '⚙️', name: 'Met.' },
+                  { el: 'water' as MtcElement, label: '💧', name: 'Águ.' },
+                ]).map(({ el, label, name }) => (
+                  <button
+                    key={el}
+                    onClick={() => toggleMtc(el)}
+                    title={MTC_ELEMENT_NAMES[el]}
+                    className={`flex flex-col items-center p-2 rounded-xl text-xs font-semibold transition-all ${
+                      activePillar === 'mtc' && activeMtc === el
+                        ? 'bg-emerald-500 text-white shadow-md scale-105'
+                        : 'bg-gray-100 text-gray-600 hover:bg-emerald-100'
+                    }`}
+                  >
+                    <span>{label}</span>
+                    <span className="mt-0.5">{name}</span>
+                  </button>
+                ))}
+              </div>
+              {activePillar === 'mtc' && (
+                <div className="text-center">
+                  <p className="text-xs text-emerald-700 font-semibold animate-pulse mb-2">
+                    🔊 {MTC_ELEMENT_NAMES[activeMtc]}
+                  </p>
+                  <button onClick={stopZenSession} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 mx-auto">
+                    <Square className="w-3 h-3" /> Parar
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* ── PILAR 2: QIGONG RHYTHM ────────────────────────────────── */}
+            <div className={`rounded-2xl p-5 border-2 transition-all ${
+              activePillar === 'qigong'
+                ? 'border-sky-400 bg-gradient-to-br from-sky-50 to-blue-50 shadow-lg'
+                : 'border-gray-200 bg-white hover:border-sky-300'
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-2xl">🌬️</span>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-sm">Qigong Rhythm</h3>
+                  <p className="text-xs text-gray-500">Âncora Respiratória · 5.5s/fase</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mb-4 leading-relaxed">
+                Metrônomo sonoro sincronizado com a respiração de coerência cardíaca (11s/ciclo).
+              </p>
+              {activePillar === 'qigong' ? (
+                <div className="text-center">
+                  <div className={`text-4xl mb-2 transition-all duration-500 ${
+                    qigongPhase === 'inspire' ? 'scale-110' : 'scale-90'
+                  }`}>
+                    {qigongPhase === 'inspire' ? '🫧' : '🍃'}
+                  </div>
+                  <p className={`text-sm font-bold mb-1 ${
+                    qigongPhase === 'inspire' ? 'text-sky-600' : 'text-blue-800'
+                  }`}>
+                    {qigongPhase === 'inspire' ? '↑ Inspire' : '↓ Expire'}
+                  </p>
+                  <button onClick={stopZenSession} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 mx-auto mt-2">
+                    <Square className="w-3 h-3" /> Parar
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={toggleQigong}
+                  className="w-full py-2.5 rounded-xl bg-sky-500 text-white text-sm font-semibold hover:bg-sky-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Play className="w-4 h-4" /> Iniciar Qigong
+                </button>
+              )}
+            </div>
+
+            {/* ── PILAR 3: BINAURAL / NEUROCIÊNCIA ─────────────────────── */}
+            <div className={`rounded-2xl p-5 border-2 transition-all ${
+              activePillar === 'binaural'
+                ? 'border-violet-400 bg-gradient-to-br from-violet-50 to-purple-50 shadow-lg'
+                : 'border-gray-200 bg-white hover:border-violet-300'
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-2xl">🧠</span>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-sm">Binaural Beats</h3>
+                  <p className="text-xs text-gray-500">Neurociência · Arrastamento Neural</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mb-3 leading-relaxed">
+                Dois tons em L/R que forçam o cérebro a sincronizar no estado desejado.
+              </p>
+              <div className="space-y-1.5 mb-3">
+                {([
+                  { state: 'alpha' as BinauralState, color: 'bg-violet-500' },
+                  { state: 'theta' as BinauralState, color: 'bg-purple-600' },
+                  { state: 'delta' as BinauralState, color: 'bg-indigo-700' },
+                  { state: 'beta'  as BinauralState, color: 'bg-blue-500' },
+                  { state: 'gamma' as BinauralState, color: 'bg-pink-500' },
+                ]).map(({ state, color }) => (
+                  <button
+                    key={state}
+                    onClick={() => toggleBinaural(state)}
+                    className={`w-full px-3 py-1.5 rounded-lg text-xs font-semibold text-left transition-all ${
+                      activePillar === 'binaural' && activeBinaural === state
+                        ? `${color} text-white shadow-md`
+                        : 'bg-gray-100 text-gray-600 hover:bg-violet-100'
+                    }`}
+                  >
+                    {BINAURAL_LABELS[state]}
+                  </button>
+                ))}
+              </div>
+              {activePillar === 'binaural' && (
+                <button onClick={stopZenSession} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 mx-auto mt-1">
+                  <Square className="w-3 h-3" /> Parar
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ── PROTOCOLO CLÍNICO: Down Regulation ──────────────────────── */}
+          <div className={`mt-5 rounded-2xl p-5 border-2 transition-all ${
+            activePillar === 'downreg'
+              ? 'border-orange-400 bg-gradient-to-r from-orange-50 to-amber-50 shadow-lg'
+              : 'border-gray-200 bg-white hover:border-orange-300'
+          }`}>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🏥</span>
+                <div>
+                  <h3 className="font-bold text-gray-800">Protocolo Down Regulation <span className="text-xs font-normal bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full ml-1">8 min</span></h3>
+                  <p className="text-xs text-gray-500">Rampa BPM 80→72→64→58 · Grounding 174 Hz · Descompressão simpática</p>
+                </div>
+              </div>
+              {activePillar === 'downreg' ? (
+                <div className="flex items-center gap-4">
+                  <div className="text-center">
+                    <span className="text-2xl font-bold text-orange-600">{downRegBpm}</span>
+                    <p className="text-xs text-gray-500">BPM atual</p>
+                  </div>
+                  <button
+                    onClick={stopZenSession}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600"
+                  >
+                    <Square className="w-4 h-4" /> Parar
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={toggleDownReg}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-semibold hover:bg-orange-600 transition-colors"
+                >
+                  <Play className="w-4 h-4" /> Iniciar Protocolo
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Category Filter */}

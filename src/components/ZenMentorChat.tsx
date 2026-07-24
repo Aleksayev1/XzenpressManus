@@ -977,6 +977,7 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
           <button
             onClick={(e) => {
               e.stopPropagation();
+              stopZenSom();
               // Princípio da Retomada — salva contexto da sessão antes de fechar
               saveSessionContext(messages.map(m => ({ role: m.role, content: m.content })));
               setIsOpen(false);
@@ -1003,6 +1004,7 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
               </span>
               <button 
                 onClick={() => {
+                  stopZenSom();
                   setIsOpen(false);
                   if (onNavigate) onNavigate('anamnese');
                 }}
@@ -1160,6 +1162,7 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                                 summary: lastMsgs,
                                 timestamp: Date.now(),
                               }));
+                              stopZenSom();
                               setIsOpen(false);
                               onNavigate?.('triad-session');
                             }}
@@ -1196,6 +1199,7 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                           </p>
                           <button
                             onClick={() => {
+                              stopZenSom();
                               setIsOpen(false);
                               onNavigate?.('triad-session');
                             }}

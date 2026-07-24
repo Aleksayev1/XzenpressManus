@@ -93,6 +93,31 @@ export function computeCoherenceResult(
   before: CoherenceSnapshot,
   after: CoherenceSnapshot
 ): CoherenceResult {
+  // Caso de usuário sem wearable: calcula ICX 100% baseado no relaxamento subjetivo (redução de ansiedade)
+  if (before.rmssd === 0 && after.rmssd === 0) {
+    const anxietyDelta = before.anxietyScore - after.anxietyScore;
+    const icx = Math.min(100, Math.max(0, (anxietyDelta / 10) * 100 + 50));
+    
+    let coherenceLevel: CoherenceResult['coherenceLevel'] = 'moderado';
+    let coherenceColor = '#eab308';
+    if (anxietyDelta >= 4) { coherenceLevel = 'ótimo'; coherenceColor = '#06b6d4'; }
+    else if (anxietyDelta >= 2) { coherenceLevel = 'alto'; coherenceColor = '#22c55e'; }
+    else if (anxietyDelta < 0) { coherenceLevel = 'crítico'; coherenceColor = '#ef4444'; }
+    
+    return {
+      icx,
+      rmssdDelta: 0,
+      anxietyDelta,
+      rmssdImprovementPct: 0,
+      coherenceLevel,
+      coherenceColor,
+      clinicalMessage: anxietyDelta > 0
+        ? `Melhora subjetiva de ${anxietyDelta} pontos. A redução da tensão e ansiedade mostra que a prática acionou respostas de relaxamento voluntário.`
+        : `Sistema emocional estabilizado. A consistência diária ajudará seu corpo a registrar respostas de alívio cada vez mais rápidas.`,
+      epigeneticMessage: `Práticas reflexivas e respiratórias acionam vias neurais parassimpáticas que sinalizam bem-estar e reduzem estressores psicológicos.`,
+    };
+  }
+
   // Normalizar RMSSD final (10ms = 0%, 100ms = 100%)
   const rmssdScore = Math.min(100, Math.max(0, ((after.rmssd - 10) / 90) * 100));
 

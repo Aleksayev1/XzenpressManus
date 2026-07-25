@@ -1564,7 +1564,7 @@ const ImageZoomModal: React.FC<{
                     onLoad={() => setImageLoaded(true)}
                     onError={(e) => {
                         console.error('Erro ao carregar imagem:', imageUrl);
-                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.src = '/mtc_exhn3_yintang.jpg';
                         setImageLoaded(true);
                     }}
                 />

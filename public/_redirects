@@ -1,2 +1,7 @@
 /.well-known/assetlinks.json /.well-known/assetlinks.json 200
+/*.png /*.png 404
+/*.jpg /*.jpg 404
+/*.jpeg /*.jpeg 404
+/*.svg /*.svg 404
+/*.webp /*.webp 404
 /* /index.html 200

@@ -88,7 +88,7 @@ export const YNSAStudyPage = () => {
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 group">
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10"></div>
                                 <img
-                                    src="/ynsa_study_invitation_1770126730762.png"
+                                    src="/YNSA/ynsa-frontal-complete.png"
                                     alt="YNSA ZS Point Visualization"
                                     className="w-full h-auto transform group-hover:scale-105 transition-transform duration-700"
                                 />

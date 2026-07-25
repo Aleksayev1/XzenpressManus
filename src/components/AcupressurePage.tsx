@@ -931,10 +931,10 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                     <img
                       src={selectedPointData.image}
                       alt={selectedPointData.imageAlt || getTranslatedField(selectedPointData, 'name')}
-                      className="w-full h-56 object-contain bg-gray-50 rounded-xl shadow-lg border border-gray-200"
+                      className="w-full h-56 object-contain bg-gray-900 rounded-xl shadow-lg border border-gray-800"
                       style={selectedPointData.isPremium && !user?.isPremium ? { filter: 'blur(12px)' } : {}}
                       onError={(e) => {
-                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.src = '/mtc_exhn3_yintang.jpg';
                       }}
                     />
                     {selectedPointData.isPremium && !user?.isPremium ? (
@@ -1147,10 +1147,10 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                             <img
                               src={point.image}
                               alt={point.imageAlt || point.name}
-                              className="w-20 h-20 object-contain bg-gray-50 rounded-lg border border-gray-200"
+                              className="w-20 h-20 object-contain bg-gray-900 rounded-lg border border-gray-800"
                               style={point.isPremium && !user?.isPremium ? { filter: 'blur(8px)' } : {}}
                               onError={(e) => {
-                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.src = '/mtc_exhn3_yintang.jpg';
                               }}
                             />
                             {point.isPremium && !user?.isPremium ? (
@@ -1360,10 +1360,10 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                         <img
                           src={viewingPointData.image ? encodeURI(viewingPointData.image) : ''}
                           alt={viewingPointData.imageAlt || getTranslatedField(viewingPointData, 'name')}
-                          className="w-full h-56 object-contain bg-gray-50 rounded-xl shadow-lg border border-gray-200"
+                          className="w-full h-56 object-contain bg-gray-900 rounded-xl shadow-lg border border-gray-800"
                           style={viewingPointData.isPremium && !user?.isPremium ? { filter: 'blur(12px)' } : {}}
                           onError={(e) => {
-                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.src = '/mtc_exhn3_yintang.jpg';
                           }}
                         />
                         {viewingPointData.isPremium && !user?.isPremium ? (

@@ -59,8 +59,8 @@ export const NutrimingNotificationService = {
             const registration = await navigator.serviceWorker.ready;
             await registration.showNotification(title, {
                 body,
-                icon: icon || '/logo192.png',
-                badge: '/logo192.png',
+                icon: icon || '/Logo Xzenpress oficial.png',
+                badge: '/Logo Xzenpress oficial.png',
                 tag: 'nutriming-reminder',
                 requireInteraction: false
             });

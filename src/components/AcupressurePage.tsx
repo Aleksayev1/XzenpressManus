@@ -47,9 +47,12 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
           if (found) {
             setSelectedPoint(found.id);
             setViewingPoint(found.id);
-            // Auto switch category if needed to make it visible
-            if (found.category) {
+            // Auto switch category if valid, or default to 'all' to ensure visibility
+            const validCategories = ['general', 'cranio', 'septicemia', 'immunity', 'avc', 'neuro', 'cardio', 'atm', 'zoster'];
+            if (found.category && validCategories.includes(found.category)) {
               setSelectedCategory(found.category);
+            } else {
+              setSelectedCategory('all');
             }
           }
           localStorage.removeItem('preselected_acupressure_point');
@@ -175,16 +178,16 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
     console.log('🎭 Estado do Modal:', { showZoomModal, zoomImageUrl });
   }, [showZoomModal, zoomImageUrl]);
 
-  // Scroll to details on mobile when point is selected
+  // Scroll to details when point is selected
   useEffect(() => {
     if (viewingPoint && !isTimerActive) {
       // Small timeout to ensure DOM is ready
       setTimeout(() => {
         const detailsElement = document.getElementById('point-details-panel');
-        if (detailsElement && window.innerWidth < 1024) {
-          detailsElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (detailsElement) {
+          detailsElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-      }, 100);
+      }, 150);
     }
   }, [viewingPoint, isTimerActive]);
 

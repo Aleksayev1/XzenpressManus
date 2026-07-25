@@ -1314,6 +1314,9 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     {/* 5 ─ Self Oracle (Aprofundamento) */}
                                     <button
                                         onClick={() => {
+                                            const recPoints = getRecommendedPoints();
+                                            const pointToPreselect = (recPoints && recPoints.length > 0) ? recPoints[0].id : 'yintang-ex-hn3';
+                                            localStorage.setItem('preselected_acupressure_point', pointToPreselect);
                                             onBack();
                                             window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'acupressure' }));
                                         }}

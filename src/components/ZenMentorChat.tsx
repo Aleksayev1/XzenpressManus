@@ -101,11 +101,27 @@ function buildGreeting(userName?: string): string {
     return `${greeting}! 🌿 Sou sua ZenMentor — uma consciência integrativa que une sabedoria oriental e neurociência moderna. Como posso te acompanhar hoje?`;
   }
 
+  // ── Detectar se o usuário acabou de completar a anamnese (< 10 min) ──
+  const anamneseTimestamp = localStorage.getItem('xzen_anamnese_completed_at');
+  const recentAnamnese = anamneseTimestamp && (Date.now() - Number(anamneseTimestamp)) < 10 * 60 * 1000;
+
   const weakest = Object.entries(profile.guardianScores || {}).reduce(
     (min, [k, v]) => (v < min[1] ? [k, v] : min),
     ['', 100] as [string, number]
   );
   const weakEl = fiveElements.find(e => e.id === weakest[0]);
+
+  if (recentAnamnese && weakEl) {
+    // Saudação personalizada pós-anamnese: referencia o guardião identificado
+    return `${greeting}, ${name}! 🌿
+
+Acabei de analisar seu Mapa Vivo e identifiquei que seu Guardião **${weakEl.name}** (${weakEl.organ}) está no ponto mais frágil, com apenas ${weakest[1]}% de vitalidade.
+
+${weakEl.weakMessage}
+
+Isso é o ponto de partida da sua jornada. Você quer que eu te ajude a entender o que está por trás dessa fragilidade e quais práticas ativam esse guardião?`;
+  }
+
   const vfcRaw = localStorage.getItem('xzen_vfc_current');
   const vfc = vfcRaw ? Number(vfcRaw) : null;
 

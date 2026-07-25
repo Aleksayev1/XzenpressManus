@@ -601,13 +601,14 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         </p>
                         <div className="space-y-3">
                             <button
-                                onClick={() => { /* Navigate to Premium - handled by parent usually, or we show a toast */
-                                    alert("Redirecionando para Premium...");
-                                    /* In a real scenario, we might trigger a navigation callback here */
+                                onClick={() => {
+                                    setShowLimitModal(false);
+                                    onBack();
+                                    window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'pricing' }));
                                 }}
                                 className="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 rounded-xl font-bold text-black hover:scale-105 transition-transform"
                             >
-                                Ser Premium Agora
+                                👑 Ver Planos Premium
                             </button>
                             <button
                                 onClick={() => setShowLimitModal(false)}
@@ -908,9 +909,20 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 <Zap className="w-5 h-5" />
                                 {breathState === 'done' ? 'Estou Pronto para os Pontos' : 'Faça a Respiração para Desbloquear'}
                             </button>
+                            {breathState !== 'done' && (
+                                <button
+                                    onClick={() => {
+                                        setBreathState('done');
+                                        setPhase('acupressure');
+                                    }}
+                                    className="w-full mt-1 py-2 text-xs text-gray-600 hover:text-gray-400 transition-colors"
+                                >
+                                    Pular respiração e ir direto para os pontos →
+                                </button>
+                            )}
                             <button
                                 onClick={onBack}
-                                className="w-full mt-4 py-4 border border-gray-700 bg-transparent rounded-xl font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+                                className="w-full mt-2 py-4 border border-gray-700 bg-transparent rounded-xl font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
                             >
                                 <ArrowLeft className="w-5 h-5" />
                                 <span>Cancelar e Voltar</span>

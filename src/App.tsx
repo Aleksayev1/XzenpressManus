@@ -297,6 +297,8 @@ function AppContent() {
           <ConversationalOnboarding
             onComplete={async (profile) => {
               setAnamneseProfile(profile);
+              // Salva timestamp de conclusão para personalizar saudação do ZenMentor
+              localStorage.setItem('xzen_anamnese_completed_at', Date.now().toString());
               if (user?.id) {
                 const { MapaVivoStorageService } = await import('./services/mapaVivoStorageService');
                 await MapaVivoStorageService.saveAnamneseProfile(user.id, profile);

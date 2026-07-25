@@ -262,18 +262,25 @@ export const GuardianDisplay: React.FC<GuardianDisplayProps> = ({
         </div>
       </div>
 
-      {/* Weekly Check-in CTA */}
-      {weeklyCheckinDue && onStartCheckin && (
+      {/* Weekly Check-in CTA — always visible */}
+      {onStartCheckin && (
         <button
           onClick={onStartCheckin}
           className="w-full py-4 rounded-2xl font-semibold text-white text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
-          style={{
-            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-            boxShadow: '0 4px 20px rgba(99,102,241,0.4)'
-          }}
+          style={
+            weeklyCheckinDue
+              ? {
+                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                  boxShadow: '0 4px 20px rgba(99,102,241,0.4)'
+                }
+              : {
+                  background: 'rgba(99,102,241,0.12)',
+                  border: '1px solid rgba(99,102,241,0.3)'
+                }
+          }
         >
-          <span>✨</span>
-          Check-in Semanal — 30 segundos
+          <span>{weeklyCheckinDue ? '✨' : '📋'}</span>
+          {weeklyCheckinDue ? 'Check-in Semanal — 30 segundos' : 'Registrar como estou hoje'}
           <ChevronDown className="w-4 h-4" />
         </button>
       )}

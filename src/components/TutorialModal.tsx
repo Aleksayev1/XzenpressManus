@@ -166,7 +166,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
         '🌳 Madeira: "Grito Silencioso" — liberar raiva contida com expiração "Shhhhh"',
         '🌍 Terra: "Enraizamento" — estabilizar com som vibratório "Whooooo"',
         '💧 Água: "Raízes Profundas" — aterrar medo com respiração "Wuuuuu"',
-        '🪨 Metal: "Soltar" — renovação com expiração suave "Sssss"',
+        '⚙️ Metal: "Soltar" — renovação com expiração suave "Sssss"',
         'Timer e gongo de Tigela Tibetana sinalizam cada transição de fase',
       ],
       gradient: 'from-teal-500 via-cyan-500 to-sky-600',

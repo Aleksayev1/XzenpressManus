@@ -526,6 +526,48 @@ export const MapaVivoPage: React.FC<MapaVivoPageProps> = ({ onPageChange, anamne
           onStartCheckin={() => setView('checkin')}
         />
 
+        {/* ── PRÓXIMO PASSO: Sessão Mestra CTA ─────────────────────────────────── */}
+        <div className="px-4 pt-2 pb-2 max-w-lg mx-auto">
+          <div
+            className="rounded-2xl p-5 text-center"
+            style={{
+              background: 'linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(168,85,247,0.15) 100%)',
+              border: '1px solid rgba(99,102,241,0.4)',
+              boxShadow: '0 4px 24px rgba(99,102,241,0.1)'
+            }}
+          >
+            <div className="text-xs text-gray-400 uppercase tracking-widest mb-2">Continuar o Ciclo</div>
+            <p className="text-sm text-gray-300 leading-relaxed mb-4">
+              Sua sessão foi só o início. Cada setor da oficina cuida de uma parte do seu equilíbrio.
+            </p>
+            <button
+              onClick={() => onPageChange('triad-session')}
+              className="w-full py-3.5 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              style={{
+                background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+                boxShadow: '0 6px 20px rgba(99,102,241,0.35)'
+              }}
+            >
+              <Sparkles className="w-4 h-4 animate-pulse" />
+              ✨ Iniciar Sessão Mestra Integrativa
+            </button>
+            <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-gray-500">
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-lg">🧬</span>
+                <span>ZenMentor</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-lg">💆</span>
+                <span>Acupressão</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-lg">🌬️</span>
+                <span>ZenFlow</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* History summary */}
         {state.checkins.length > 0 && (
           <div className="px-4 pb-4 max-w-lg mx-auto">

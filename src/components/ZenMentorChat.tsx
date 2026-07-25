@@ -801,31 +801,32 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Erro ao processar mensagem');
 
-      setMessages(prev => {
-        const { cleanContent, actions, zenSomProtocols, candidateMemoryText } = parseActionButtons(data.reply);
-        
-        // Se a IA gerou uma memória candidata, registramos silenciosamente
-        if (candidateMemoryText && user?.id) {
-            ZenMemoryEngine.captureCandidateMemory({
-                user_id: user.id,
-                memory_type: 'episodic',
-                memory_category: 'general',
-                tags: ['ai_inference'],
-                memory_content: candidateMemoryText,
-                source_type: 'ai_inference',
-                privacy_level: 'personal_context',
-                influence_weight: 2,
-                confidence_score: 30 // baixa confiança inicial, aguarda usuário confirmar na próxima que aparecer
-            });
-        }
+      // Parse fora do callback para que cleanContent fique no escopo correto
+      const { cleanContent, actions, zenSomProtocols, candidateMemoryText } = parseActionButtons(data.reply);
 
+      // Se a IA gerou uma memória candidata, registramos silenciosamente
+      if (candidateMemoryText && user?.id) {
+        ZenMemoryEngine.captureCandidateMemory({
+          user_id: user.id,
+          memory_type: 'episodic',
+          memory_category: 'general',
+          tags: ['ai_inference'],
+          memory_content: candidateMemoryText,
+          source_type: 'ai_inference',
+          privacy_level: 'personal_context',
+          influence_weight: 2,
+          confidence_score: 30
+        });
+      }
+
+      setMessages(prev => {
         const updated = [...prev, {
           role: 'assistant' as const,
           content: cleanContent,
           timestamp: new Date(),
-          eurekaMemory: topMemories[0], // Salva a principal para o UI
-          zenSomProtocols,              // Salva protocolos sonoros para renderizar
-          actions,                      // Salva as ações detectadas para renderizar
+          eurekaMemory: topMemories[0],
+          zenSomProtocols,
+          actions,
         }];
         // Detect emotional context for Sessão Mestra handoff
         const emotionId = extractEmotionFromReply(cleanContent);
@@ -839,7 +840,8 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
         }
         return updated;
       });
-      // Auto-leitura se ativada
+
+      // Auto-leitura se ativada — cleanContent agora está no escopo correto
       if (autoRead) {
         speak(cleanContent, selectedVoice);
       }

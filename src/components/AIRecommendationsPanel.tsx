@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Send, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { X, Send, Loader2, AlertCircle, RefreshCw, Sparkles, ArrowRight } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
 import { useAuth } from '../contexts/AuthContext';
 import { acupressurePoints } from '../data/acupressurePoints';
@@ -542,6 +542,24 @@ Minha missão é decifrar a biologia e a alma através de uma **Análise Multi-D
                 <div className="whitespace-pre-wrap text-sm leading-relaxed">
                   {msg.role === 'assistant' ? renderMessageContent(msg.content) : msg.content}
                 </div>
+
+                {/* CTA Direct to Sessão Mestra Page when Diagnosis is generated */}
+                {msg.role === 'assistant' && (msg.content.includes('Diagnóstico do Oráculo') || msg.content.includes('Detectei:')) && (
+                  <div className="mt-4 pt-3 border-t border-purple-200/60 flex flex-col gap-2">
+                    <button
+                      onClick={() => {
+                        onClose();
+                        window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'triad-session' }));
+                      }}
+                      className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+                      <span>✨ Abrir Sessão Mestra Completa com este Diagnóstico</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
                 <div
                   className={`text-xs mt-2 ${msg.role === 'user' ? 'text-blue-100' : 'text-gray-400'
                     }`}

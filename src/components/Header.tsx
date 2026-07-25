@@ -38,8 +38,8 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
 
   const handlePageChange = (page: string) => {
     if (page === 'ai-assistant') {
-      setShowAIPanel(true);
-      trackPageView('ai-assistant', t('nav.ai-assistant'));
+      onPageChange('triad-session');
+      trackPageView('triad-session', 'Sessão Mestra');
       return;
     }
     onPageChange(page);

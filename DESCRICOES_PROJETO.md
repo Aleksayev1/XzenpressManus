@@ -31,18 +31,16 @@ Transforme sua rotina de saúde com uma abordagem integrativa e eficaz. Baixe o 
 
 ## 📄 **DESCRIÇÃO COMPLETA (4000 caracteres)**
 
-**XZenPress** é uma plataforma revolucionária de bem-estar integrativa que combina **Medicina Tradicional Chinesa (MTC)**, **Craniopuntura (YNSA)**, **Cronobiologia Nutricional (Nutriming)** e **Neurociência** em uma experiência digital única.
+**XZenPress** é uma plataforma revolucionária de bem-estar e integração humana que democratiza o acesso à **Medicina Tradicional Chinesa (MTC)**, **Craniopuntura (YNSA)**, **Cronobiologia Nutricional (Nutriming)** e **Neurociência**, colocando ferramentas científicas de autorregulação e prevenção ao alcance de todos.
 
 ### 🎯 **FUNCIONALIDADES PRINCIPAIS**
 
-**🫴 Acupressão MTC e YNSA Científica**
-Acesso a mais de **70 pontos terapêuticos** detalhados, incluindo protocolos exclusivos para **Ansiedade**, **Septicemia**, **ATM** e **Neurologia**.
-- **Visualização Clara:** Imagens de alta definição com marcações precisas.
-- **Timer Inteligente:** Guia de tempo para cada ponto.
-
-**🔮 Self Oracle (IA de Evolução Humana)**
-Seu oráculo pessoal de saúde. Uma **Inteligência Artificial** treinada em MTC e Biologia que decifra seus sintomas e emoções.
+**🤖 ZenMentor (IA & Guia de Evolução Pessoal)**
+Seu mentor inteligente de autoconsciência e saúde integrativa. Uma **Inteligência Artificial** treinada para decifrar seus ritmos biológicos, padrões emocionais e sinais somáticos.
+- **Democratização da Saúde:** Suporte contínuo, humanizado e acessível 24/7.
 - **Relógio Biológico:** Insights baseados na hora do dia e no órgão ativo.
+- **Análise Multidimensional:** Une ciência empírica, neurofenomenologia e medicina do estilo de vida.
+
 - **Análise Multidimensional:** Une ciência, metafísica e medicina integrativa.
 - **Interativo:** Converse e receba orientações personalizadas.
 

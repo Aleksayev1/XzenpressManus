@@ -127,3 +127,53 @@ Superando descrições reducionistas ou abordagens pseudocientíficas, o XZenPre
 
 - ✅ **Adotar (Linguagem Intelectualmente Honesta):**  
   *"Diversas tradições espiritualistas e filosóficas atribuem à glândula pineal um importante papel de ponte sutil ou intuição. Na ciência empírica, a pineal é reconhecida por suas funções neuroendócrinas fundamentais, especialmente na produção de melatonina e na regulação dos ritmos circadianos."*
+
+---
+
+## 7. Conformidade, Privacidade e Segurança dos Dados (Google Play Store)
+
+Para alinhamento com os requisitos de listagem da **Google Play Store** (categoria **Saúde e Fitness**, Classificação **Livre**):
+
+```
+ ┌────────────────────────────────────────────────────────────────────────────────────────┐
+ │                   DIRETRIZES DE PRIVACIDADE E SEGURANÇA DE DADOS                       │
+ ├────────────────────────────────────────────────────────────────────────────────────────┤
+ │ 🔒 Processamento 100% On-Device                                                       │
+ │    • Cálculo de VFC (HRV), ritmos respiratórios e biofeedback ocorrem localmente.       │
+ │ 🛡️ Conformidade LGPD (Art. 5º, II)                                                     │
+ │    • Nenhum dado sensível de saúde é vendido ou compartilhado com terceiros.           │
+ │ 🚫 Isenção de ID de Publicidade (AD_ID)                                                │
+ │    • Sem rastreamento comercial ou bibliotecas de anúncios integradas.                  │
+ └────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+- **Transparência na Loja:** A seção de *Segurança dos dados* esclarece ao usuário que as práticas de privacidade cumprem rigorosos padrões de proteção, garantindo que o aprendizado e a regulação somática ocorram em um ambiente digital seguro e ético.
+
+---
+
+## 8. Democratização da Evolução Humana e o Papel do ZenMentor
+
+A inclusão da **democratização** e do **protagonismo da evolução pessoal** é um pilar essencial para o propósito do XZenPress. Histórica e clinicamente, ferramentas avançadas de biofeedback, saúde integrativa e mentoria de bem-estar foram restritas a públicos de alto poder aquisitivo.
+
+O **XZenPress** e o **ZenMentor** redefinem essa dinâmica ao transformar a autorregulação e o desenvolvimento pessoal em um **direito acessível e inclusivo**:
+
+```
+ ┌────────────────────────────────────────────────────────────────────────────────────────┐
+ │                      O PILAR DA DEMOCRATIZAÇÃO E DA EVOLUÇÃO                           │
+ ├────────────────────────────────────────────────────────────────────────────────────────┤
+ │ 🌍 Acessibilidade Universal (Freemium Ético)                                           │
+ │    • Ferramentas de biofeedback, respiração e acupressão acessíveis no smartphone.      │
+ │ 🧠 ZenMentor: O Guia de Evolução Pessoal                                               │
+ │    • Conecta sinais somáticos, neurofenomenologia e reflexão narrativa individual.     │
+ │ 🌱 Emancipação & Autonomia Fisiológica                                                 │
+ │    • O usuário desenvolve consciência própria sem gerar dependência da plataforma.    │
+ └────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Por que esta visão é crucial:
+
+1. **Desmistificação e Inclusão:** Levar práticas validadas por neurociência e MTC para qualquer pessoa, eliminando barreiras financeiras ou geográficas para o cuidado com a saúde mental e estresse.
+2. **O ZenMentor como Catalisador:** Funciona como um mentor de autoconsciência 24/7, ajudando o usuário a compreender seus próprios ritmos biológicos, padrões emocionais e gatilhos alostáticos.
+3. **Evolução Ativa e Humana:** O foco não é apenas aliviar sintomas temporários, mas apoiar o ser humano na sua jornada contínua de amadurecimento, resiliência e busca de sentido de forma livre e autônoma.
+
+

@@ -7,7 +7,7 @@ import { ZenAvatar } from './ZenAvatar';
 import { emotionalStates } from '../data/emotionalMapping';
 import { ZenMemoryEngine, MemoryCategory, ZenMemory } from '../services/zenMemoryEngine';
 import {
-  playMtcElement, startBinauralBeats, startQigongRhythm, startDownRegulationProtocol,
+  playMtcElement, startBinauralBeats, startQigongRhythm, startDownRegulationProtocol, stopAllZenAudio,
   type MtcElement, type BinauralState, type ZenAudioSession
 } from '../services/zenAudioEngine';
 
@@ -862,6 +862,8 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
   };
 
   const handleReset = () => {
+    stopAllZenAudio();
+    try { stop(); } catch {}
     // Princípio da Retomada — salva contexto antes de resetar
     saveSessionContext(messages.map(m => ({ role: m.role, content: m.content })));
     setMessages([]);
@@ -969,7 +971,14 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
             {autoRead ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); setIsMinimized(m => !m); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMinimized(m => {
+                const next = !m;
+                if (next) { stopAllZenAudio(); try { stop(); } catch {} }
+                return next;
+              });
+            }}
             className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 transition-colors"
           >
             <ChevronDown className={`w-4 h-4 transition-transform ${isMinimized ? 'rotate-180' : ''}`} />

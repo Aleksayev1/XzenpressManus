@@ -100,6 +100,7 @@ function AppContent() {
   React.useEffect(() => {
     const handler = (e: Event) => {
       const page = (e as CustomEvent<string>).detail;
+      import('./services/zenAudioEngine').then(({ stopAllZenAudio }) => stopAllZenAudio());
       if (page) setCurrentPage(page);
     };
     window.addEventListener('xzen-navigate', handler);

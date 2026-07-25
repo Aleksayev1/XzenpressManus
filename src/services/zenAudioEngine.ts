@@ -21,13 +21,43 @@ export interface ZenAudioSession {
   setVolume: (v: number) => void;
 }
 
-// ─── Utilitários ──────────────────────────────────────────────────────────────
+// ─── Global Audio Registry & Safety Manager ──────────────────────────────────
+let activeContexts: AudioContext[] = [];
+
+/**
+ * Encerra IMEDIATAMENTE todos os AudioContexts e osciladores ativos no sistema.
+ * Impede zunidos contínuos ou acúmulo de áudio em segundo plano.
+ */
+export function stopAllZenAudio(): void {
+  activeContexts.forEach(ctx => {
+    try {
+      if (ctx.state !== 'closed') {
+        ctx.close();
+      }
+    } catch (e) {
+      console.warn('Erro ao fechar AudioContext:', e);
+    }
+  });
+  activeContexts = [];
+}
+
+// Expõe no objeto global window para permitir encerramento imediato via console ou botões globais
+if (typeof window !== 'undefined') {
+  (window as any).stopAllZenAudio = stopAllZenAudio;
+}
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
+  
+  // Para qualquer áudio prévio antes de instanciar um novo motor
+  stopAllZenAudio();
+
   const AC = window.AudioContext || (window as any).webkitAudioContext;
   if (!AC) return null;
-  return new AC();
+  
+  const ctx = new AC();
+  activeContexts.push(ctx);
+  return ctx;
 }
 
 function createFadeGain(ctx: AudioContext, targetGain: number, fadeDuration = 0.5): GainNode {

@@ -1200,7 +1200,6 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                                 zenFlowExerciseId: selectedEmotion?.zenFlowExerciseId,
                                                 source: 'triad-session',
                                             }));
-                                            onBack();
                                             window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'zenflow' }));
                                         }}
                                         className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
@@ -1238,7 +1237,6 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                                      organ: selectedEmotion?.mtcOrgan,
                                                      source: 'triad-session',
                                                  }));
-                                                 onBack();
                                                  window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'nutriming-ai' }));
                                              }
                                          }}
@@ -1284,7 +1282,6 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                                      organ: selectedEmotion?.mtcOrgan,
                                                      source: 'triad-session',
                                                  }));
-                                                 onBack();
                                                  window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'plantas-medicinais' }));
                                              }
                                          }}
@@ -1309,7 +1306,6 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     {/* 4 ─ VFC/HRV (Monitoramento) */}
                                     <button
                                         onClick={() => {
-                                            onBack();
                                             window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'device-sync' }));
                                         }}
                                         className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
@@ -1329,8 +1325,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                             const recPoints = getRecommendedPoints();
                                             const pointToPreselect = (recPoints && recPoints.length > 0) ? recPoints[0].id : 'yintang-ex-hn3';
                                             localStorage.setItem('preselected_acupressure_point', pointToPreselect);
-                                            onBack();
-                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'acupressure' }));
+                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'ai-assistant' }));
                                         }}
                                         className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
                                         style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.25)' }}

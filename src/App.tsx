@@ -284,6 +284,8 @@ function AppContent() {
         return <ZenFlowPage onBack={() => setCurrentPage('home')} />;
       case 'triad-session':
         return <SessaoMestraPage onBack={() => setCurrentPage('home')} />;
+      case 'ai-assistant':
+        return <ZenMentorChat onBack={() => setCurrentPage('home')} onNavigate={setCurrentPage} anamneseProfile={anamneseProfile} />;
       case 'zoster-map':
         return <ZosterMapPage onBack={() => setCurrentPage('home')} />;
       case 'herpes-hub':

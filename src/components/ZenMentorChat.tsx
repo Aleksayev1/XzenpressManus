@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles, ArrowRight, Mic, MicOff, Zap } from 'lucide-react';
+import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles, ArrowRight, ArrowLeft, Mic, MicOff, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { fiveElements } from '../data/fiveElements';
@@ -23,6 +23,8 @@ interface Message {
 
 interface ZenMentorChatProps {
   onNavigate?: (page: string) => void;
+  onBack?: () => void;
+  isFullPage?: boolean;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -542,9 +544,10 @@ function useTTS() {
 }
 
 
-export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate }) => {
+export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate, onBack, isFullPage = false }) => {
   const { user } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
+  const isPageMode = isFullPage || !!onBack;
+  const [isOpen, setIsOpen] = useState(isPageMode);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');

@@ -37,11 +37,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
   }, []);
 
   const handlePageChange = (page: string) => {
-    if (page === 'ai-assistant') {
-      onPageChange('triad-session');
-      trackPageView('triad-session', 'Sessão Mestra');
-      return;
-    }
     onPageChange(page);
     trackPageView(page, t(`nav.${page}`) || page);
   };

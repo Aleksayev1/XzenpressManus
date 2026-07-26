@@ -917,12 +917,12 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
   }
 
   // ── Chat Window ─────────────────────────────────────────────────────────────
-  return (
+  const content = (
     <div
-      className="fixed bottom-6 right-6 z-50 flex flex-col rounded-3xl overflow-hidden shadow-2xl transition-all duration-300"
+      className={isPageMode ? "w-full max-w-4xl mx-auto flex flex-col rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 relative z-30" : "fixed bottom-6 right-6 z-50 flex flex-col rounded-3xl overflow-hidden shadow-2xl transition-all duration-300"}
       style={{
-        width: isMinimized ? '260px' : '360px',
-        height: isMinimized ? 'auto' : '640px',
+        width: isPageMode ? '100%' : (isMinimized ? '260px' : '360px'),
+        height: isPageMode ? '740px' : (isMinimized ? 'auto' : '640px'),
         background: 'rgba(10, 10, 20, 0.97)',
         border: `1px solid ${accentColor}44`,
         boxShadow: `0 24px 64px rgba(0,0,0,0.8), 0 0 0 1px ${accentColor}22`,
@@ -933,9 +933,17 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
       <div
         className="flex items-center justify-between px-4 py-3 cursor-pointer"
         style={{ background: `linear-gradient(135deg, ${accentColor}22, rgba(99,102,241,0.15))`, borderBottom: `1px solid ${accentColor}33` }}
-        onClick={() => setIsMinimized(m => !m)}
+        onClick={() => !isPageMode && setIsMinimized(m => !m)}
       >
         <div className="flex items-center gap-2.5">
+          {isPageMode && onBack && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onBack(); }}
+              className="mr-2 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-medium text-xs transition-all flex items-center gap-1.5"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> Voltar
+            </button>
+          )}
           <div
             className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
             style={{ background: `linear-gradient(135deg, ${accentColor}44, #6366f133)`, border: `1px solid ${accentColor}55` }}
@@ -1427,4 +1435,14 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
       )}
     </div>
   );
+
+  if (isPageMode) {
+    return (
+      <div className="min-h-[85vh] py-6 px-4 flex flex-col items-center justify-center relative">
+        {content}
+      </div>
+    );
+  }
+
+  return content;
 };

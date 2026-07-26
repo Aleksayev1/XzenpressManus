@@ -1461,7 +1461,6 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 <button
                                     onClick={() => {
                                         setPremiumModal(prev => ({ ...prev, isOpen: false }));
-                                        onBack();
                                         window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'premium' }));
                                     }}
                                     className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-bold text-white text-xs hover:scale-105 transition-transform"
@@ -1470,20 +1469,28 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 </button>
                                 <button
                                     onClick={() => {
+                                        setPremiumModal(prev => ({ ...prev, isOpen: false }));
+                                        window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'ai-assistant' }));
+                                    }}
+                                    className="w-full py-3 bg-purple-500/20 border border-purple-500/30 rounded-xl text-purple-300 hover:text-white font-semibold text-xs transition-colors"
+                                >
+                                    🔮 Continuar no Básico (Ir para Self Oracle)
+                                </button>
+                                <button
+                                    onClick={() => {
                                         if (premiumModal.contextKey && premiumModal.contextData) {
                                             localStorage.setItem(premiumModal.contextKey, JSON.stringify(premiumModal.contextData));
                                         }
                                         setPremiumModal(prev => ({ ...prev, isOpen: false }));
-                                        onBack();
                                         window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: premiumModal.targetPage }));
                                     }}
-                                    className="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:text-white text-xs transition-colors"
+                                    className="w-full py-2.5 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white text-xs transition-colors"
                                 >
                                     Continuar na versão geral (sem indicação)
                                 </button>
                                 <button
                                     onClick={() => setPremiumModal(prev => ({ ...prev, isOpen: false }))}
-                                    className="w-full py-2.5 text-gray-500 hover:text-gray-400 text-xs transition-colors"
+                                    className="w-full py-2 text-gray-500 hover:text-gray-400 text-xs transition-colors"
                                 >
                                     Cancelar
                                 </button>

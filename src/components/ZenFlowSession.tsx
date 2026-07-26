@@ -446,32 +446,50 @@ export const ZenFlowSession: React.FC<ZenFlowSessionProps> = ({ sequence, onClos
                     </p>
 
                     {/* Navigation Buttons for therapeutic cycle */}
-                    <div className="flex flex-col gap-3.5 w-full">
+                    <div className="flex flex-col gap-3 w-full">
+                        {/* 1 ─ Continuar Básico (Self Oracle) */}
+                        <button
+                            onClick={() => {
+                                window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'ai-assistant' }));
+                                onClose();
+                            }}
+                            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white py-3.5 rounded-2xl font-bold text-base shadow-lg hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+                        >
+                            <span>🔮</span> Continuar Ciclo: Self Oracle (IA)
+                        </button>
+
+                        {/* 2 ─ Nutriming (Nutrição) */}
                         <button
                             onClick={() => {
                                 window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'nutriming-ai' }));
                                 onClose();
                             }}
-                            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+                            className="w-full bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 py-3 rounded-2xl font-semibold text-sm hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
                         >
-                            <span>🥗</span> Avançar para Nutrição (Nutriming)
+                            <span>🥗</span> Avançar para Nutriming (Nutrição)
+                            <span className="text-[9px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Premium</span>
                         </button>
 
+                        {/* 3 ─ VFC / HRV */}
+                        <button
+                            onClick={() => {
+                                window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'device-sync' }));
+                                onClose();
+                            }}
+                            className="w-full bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 py-3 rounded-2xl font-semibold text-sm hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+                        >
+                            <span>📊</span> Checar VFC / HRV (Monitoramento)
+                        </button>
+
+                        {/* 4 ─ Voltar */}
                         <button
                             onClick={() => {
                                 window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'home' }));
                                 onClose();
                             }}
-                            className="w-full bg-white/10 hover:bg-white/15 border border-white/20 text-white py-3.5 rounded-2xl font-bold text-base hover:scale-[1.02] active:scale-95 transition-all"
+                            className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white py-2.5 rounded-xl font-medium text-xs transition-all"
                         >
                             Voltar ao Menu Principal
-                        </button>
-
-                        <button
-                            onClick={onComplete}
-                            className="w-full text-white/50 hover:text-white text-sm font-semibold transition-colors py-2"
-                        >
-                            Voltar às Sequências de ZenFlow
                         </button>
                     </div>
                 </div>

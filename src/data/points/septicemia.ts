@@ -256,7 +256,7 @@ export const septicemiaPoints: AcupressurePoint[] = [
     description: 'Ponto mestre do Dai Mai (Vaso da Cintura). Trata dores em faixa, enxaquecas e herpes nas costelas/lateral.',
     descriptionEn: 'Master point of Dai Mai (Girdle Vessel). Treats girdle-like pain, migraines and lateral herpes.',
     position: { x: 60, y: 90 }, // Pé
-    image: '/VB_Leg_Points_Map.jpg',
+    image: '/VB41_Zulinqi.jpg',
     imageAlt: 'GB41 Zulinqi — Localização exata no dorso do pé (Diagrama VB34-44)',
     benefits: ['Trata dor que "cinta" o corpo', 'Enxaqueca lateral', 'Drena o Fogo da VB'],
     benefitsEn: ['Treats girdle pain', 'Lateral migraine', 'Drains GB Fire'],

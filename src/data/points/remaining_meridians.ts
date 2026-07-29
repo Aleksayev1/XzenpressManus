@@ -196,7 +196,7 @@ export const remainingMeridianPoints: AcupressurePoint[] = [
     description: 'Localizado na base do crânio, nas duas depressões abaixo do osso occipital, lateralmente ao músculo trapézio. É o ponto principal para afastar vento patogênico e tratar cefaleias e dores no pescoço.',
     descriptionEn: 'In the depression between the upper portion of SCM and trapezius muscles. Major point to expel wind-heat and treat headaches.',
     position: { x: 45, y: 15 },
-    image: '/mtc_5_elementos_ciclo.png',
+    image: '/du20-baihui-avc.jpg',
     imageAlt: 'Localização do ponto VB20 (Fengchi) na base do crânio',
     benefits: ['Alivia dores de cabeça temporais e na testa', 'Trata torcicolo e rigidez no pescoço', 'Combate tonturas e cansaço nos olhos', 'Alivia sintomas de gripes e sinusites'],
     benefitsEn: ['Relieves tension and temporal headaches', 'Treats stiff neck'],

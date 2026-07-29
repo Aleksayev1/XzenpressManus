@@ -531,7 +531,7 @@ export const generalPoints: AcupressurePoint[] = [
     descriptionEs: 'Punto de meridiano Pulmón para ira, miedo, pavor e inquietud mental. Ubicado en eminencia tenar de palma (base pulgar), donde piel cambia color. Trata calor en Pulmón, garganta seca/dolorida, inquietud mental, ira y comportamiento maníaco. Presión moderada 2-3 minutos bilateral.',
     descriptionFr: 'Point méridien Poumon pour colère, peur, terreur et agitation mentale. Situé sur éminence thénar de paume (base pouce), où peau change couleur. Traite chaleur Poumon, gorge sèche/douloureuse, agitation mentale, colère et comportement maniaque. Pression modérée 2-3 min bilatéral.',
     position: { x: 25, y: 60 },
-    image: '/uploaded_media_1770057087514.png',
+    image: '/P10_Yuji.jpg',
     imageAlt: 'Localização do ponto P10 (LU10) Yuji na base do polegar',
     benefits: [
       'Trata raiva e irrit abilidade',
@@ -588,7 +588,7 @@ export const generalPoints: AcupressurePoint[] = [
     descriptionEs: 'Punto meridiano Corazón para tristeza, ira, miedo y depresión. Ubicado 0.5 cun arriba pliegue muñeca, lado meñique (entre C4-C6). Trata inquietud mental, ira, miedo, depresión, agitación, afasia, tartamudeo, dolor ojos/cara, aftas, dolor cabeza y ardor al orinar. Presión leve 2-3 min bilateral.',
     descriptionFr: 'Point méridien Cœur pour tristesse, colère, peur et dépression. Situé 0.5 cun au-dessus pli poignet, côté auriculaire (entre C4-C6). Traite agitation mentale, colère, peur, dépression, agitation, aphasie, bégaiement, douleur yeux/visage, aphtes, céphalée et brûlure miction. Pression légère 2-3 min bilatéral.',
     position: { x: 30, y: 58 },
-    image: '/mtc_tongli_ht5.jpg',
+    image: '/C5_Tongli.jpg',
     imageAlt: 'Localização do ponto C5 (HT5) Tongli no punho',
     benefits: [
       'Trata tristeza e depressão',
@@ -711,7 +711,7 @@ export const generalPoints: AcupressurePoint[] = [
     descriptionEs: 'Punto Luo del Pulmón, fortalece Wei Qi (energía defensiva), trata conexión Pulmón-Piel-Tristeza. Esencial para erupciones cutáneas, tristeza/depresión y prevención de recurrencias virales. Ubicado 1,5 cun arriba del pliegue de muñeca (proceso estiloideo radial). Presionar 2 minutos, bilateral.',
     descriptionFr: 'Point Luo du Poumon, renforce Wei Qi (énergie défensive), traite connexion Poumon-Peau-Tristesse. Essentiel pour éruptions cutanées, tristesse/dépression et prévention récidives virales. Situé 1,5 cun au-dessus pli du poignet (processus styloïde radial). Presser 2 minutes, bilatéral.',
     position: { x: 25, y: 35 }, // Punho
-    image: '/mtc_p7_lieque.jpg',
+    image: '/P7_Lieque.jpg',
     imageAlt: 'Localização do ponto P7 Lieque no punho',
     benefits: ['Fortalece Wei Qi (defesa)', 'Trata tristeza/depressão', 'Previne recidivas virais', 'Erupções cutâneas', 'Rigidez cervical', 'Paralisia facial', 'Sinergia com IG4'],
     benefitsEn: ['Strengthens Wei Qi (defense)', 'Treats sadness/depression', 'Prevents viral recurrences', 'Skin eruptions', 'Cervical stiffness', 'Facial paralysis', 'Synergy with LI4'],

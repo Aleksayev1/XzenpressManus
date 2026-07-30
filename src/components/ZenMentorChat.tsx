@@ -575,6 +575,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate, onBack
   const zenSomRef = useRef<ZenAudioSession | null>(null);
 
   const stopZenSom = useCallback(() => {
+    stopAllZenAudio();
     zenSomRef.current?.stop();
     zenSomRef.current = null;
     setZenSomActive(null);
@@ -599,7 +600,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate, onBack
   }, [zenSomActive, stopZenSom]);
 
   // Cleanup on unmount
-  useEffect(() => () => { zenSomRef.current?.stop(); }, []);
+  useEffect(() => () => { stopAllZenAudio(); zenSomRef.current?.stop(); }, []);
 
   // ── Speech Recognition ─────────────────────────────────────────────────────
   const [isRecording, setIsRecording] = useState(false);
@@ -853,10 +854,7 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
           setDetectedEmotionId(emotionId);
           setSessionReadyMsgIndex(updated.length - 1);
         }
-        // Auto-launch ZenSom if protocol recommended
-        if (zenSomProtocols.length > 0) {
-          setTimeout(() => launchZenSom(zenSomProtocols[0]), 800);
-        }
+        // ZenSom protocols require explicit user action (no auto-play background noise)
         return updated;
       });
 
@@ -1016,6 +1014,8 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
             onClick={(e) => {
               e.stopPropagation();
               stopZenSom();
+              stopAllZenAudio();
+              try { stop(); } catch {}
               // Princípio da Retomada — salva contexto da sessão antes de fechar
               saveSessionContext(messages.map(m => ({ role: m.role, content: m.content })));
               setIsOpen(false);

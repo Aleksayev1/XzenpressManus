@@ -23,15 +23,28 @@ export interface ZenAudioSession {
 
 // ─── Global Audio Registry & Safety Manager ──────────────────────────────────
 let activeContexts: AudioContext[] = [];
+let activeSessions: (() => void)[] = [];
+
+export function registerSessionCleanup(cleanupFn: () => void): void {
+  activeSessions.push(cleanupFn);
+}
 
 /**
- * Encerra IMEDIATAMENTE todos os AudioContexts e osciladores ativos no sistema.
+ * Encerra IMEDIATAMENTE todos os AudioContexts, osciladores e intervalos ativos no sistema.
  * Impede zunidos contínuos ou acúmulo de áudio em segundo plano.
  */
 export function stopAllZenAudio(): void {
+  // Executa callbacks de limpeza registradas (intervalos, timeouts, osciladores)
+  activeSessions.forEach(cleanup => {
+    try { cleanup(); } catch (e) {}
+  });
+  activeSessions = [];
+
+  // Fecha instantaneamente todos os AudioContexts da Web Audio API
   activeContexts.forEach(ctx => {
     try {
       if (ctx.state !== 'closed') {
+        ctx.suspend();
         ctx.close();
       }
     } catch (e) {

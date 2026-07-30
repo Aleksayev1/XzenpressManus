@@ -632,6 +632,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         onNavigate={() => { }} // We handle nav internally
                         disableNavigation={true}
                         inline={true}
+                        customTitle="Iniciando Sessão Mestra - Passo 1"
+                        customSubtitle="Selecione o foco emocional do seu tratamento hoje para calibrarmos os pontos e a respiração ideais."
                     />
                 )}
 

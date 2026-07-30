@@ -8,9 +8,19 @@ interface EmotionalCheckInProps {
     onNavigate: (page: string) => void;
     disableNavigation?: boolean;
     inline?: boolean;
+    customTitle?: string;
+    customSubtitle?: string;
 }
 
-export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onSelect, onNavigate, disableNavigation = false, inline = false }) => {
+export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ 
+    onClose, 
+    onSelect, 
+    onNavigate, 
+    disableNavigation = false, 
+    inline = false,
+    customTitle,
+    customSubtitle
+}) => {
     const [selectedEmotion, setSelectedEmotion] = useState<EmotionalState | null>(null);
 
     // Safety check... (omitted for brevity in prompt, effectively same)
@@ -41,9 +51,9 @@ export const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ onClose, onS
                 <div className="relative bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-sm p-6 border-b border-purple-500/30 z-10">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h2 className="text-2xl font-bold text-white">😊 Como você está se sentindo?</h2>
+                            <h2 className="text-2xl font-bold text-white">{customTitle || "😊 Como você está se sentindo?"}</h2>
                             <p className="text-purple-200 text-sm mt-2 leading-relaxed">
-                                A acupressão <strong>otimiza e melhora suas emoções</strong>. Diga-nos o que você está sentindo agora para trabalharmos sua energia imediatamente.
+                                {customSubtitle || "A acupressão otimiza e melhora suas emoções. Diga-nos o que você está sentindo agora para trabalharmos sua energia imediatamente."}
                             </p>
                         </div>
                         <button

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Target, Crown, Lock, Clock, Play, Pause, RotateCcw, Volume2, X, ZoomIn, ArrowLeft, Loader2, Home, Activity } from 'lucide-react';
+import { Target, Crown, Lock, Clock, Play, Pause, RotateCcw, Volume2, X, ZoomIn, ArrowLeft, Loader2, Home, Activity, Search } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSessionHistory } from '../hooks/useSessionHistory';
@@ -512,6 +512,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
   };
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [appliedSearchQuery, setAppliedSearchQuery] = useState('');
 
   const zusanliPoint = points.find(p => p.id === 'st36' || p.name.toLowerCase().includes('zusanli') || p.id === 'zs');
 
@@ -525,7 +526,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
   };
 
   const filteredPoints = getFilteredPoints().filter(p => {
-    const queryNorm = normalizeForSearch(searchQuery);
+    const queryNorm = normalizeForSearch(appliedSearchQuery);
     if (!queryNorm) return true;
 
     // Search in current translation and standard name
@@ -615,18 +616,46 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
         {!isTimerActive && (
           <div className="max-w-4xl mx-auto space-y-6 mb-8">
             {/* Search Bar */}
-            <div className="relative group">
-               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Target className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
-               </div>
-               <input 
-                  type="text"
-                  placeholder="Pesquisar ponto (ex: ZS, Zusanli, Estresse)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl shadow-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-gray-700 font-medium"
-               />
-            </div>
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                setAppliedSearchQuery(searchQuery);
+              }}
+              className="relative flex items-center bg-white border border-gray-100 rounded-2xl shadow-lg overflow-hidden focus-within:ring-4 focus-within:ring-blue-100 focus-within:border-blue-500 transition-all"
+            >
+              <div className="pl-4 flex items-center pointer-events-none">
+                <Target className="h-5 w-5 text-gray-400" />
+              </div>
+              <input 
+                type="text"
+                placeholder="Pesquisar ponto (ex: ZS, Zusanli, Estresse)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 pl-3 pr-4 py-4 bg-transparent outline-none text-gray-700 font-medium placeholder-gray-400"
+              />
+              {/* Clear button if searchQuery is not empty */}
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setAppliedSearchQuery('');
+                  }}
+                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors mr-1"
+                  title="Limpar busca"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+              {/* Search Button (Magnifying Glass) */}
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 font-semibold flex items-center gap-2 transition-all active:scale-95"
+              >
+                <Search className="w-5 h-5" />
+                <span className="hidden sm:inline">Buscar</span>
+              </button>
+            </form>
 
             {/* Category Filter */}
             <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
@@ -634,7 +663,11 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                 {categories.map((category) => (
                   <button
                     key={category.id}
-                    onClick={() => { setSelectedCategory(category.id); setSearchQuery(''); }}
+                    onClick={() => { 
+                      setSelectedCategory(category.id); 
+                      setSearchQuery(''); 
+                      setAppliedSearchQuery(''); 
+                    }}
                     disabled={category.premium && !user?.isPremium}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${selectedCategory === category.id
                       ? 'bg-blue-600 text-white shadow-lg'
@@ -700,7 +733,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
             )}
 
             {/* ZS Highlight (if not searching) */}
-            {!searchQuery && selectedCategory === 'all' && zusanliPoint && (
+            {!appliedSearchQuery && selectedCategory === 'all' && zusanliPoint && (
               <div 
                 onClick={() => setViewingPoint(zusanliPoint.id)}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white shadow-xl cursor-pointer transform hover:scale-[1.01] transition-all flex flex-col md:flex-row items-center justify-between gap-6"
@@ -1107,139 +1140,144 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
 
               {/* Points Grid */}
               <div className="space-y-4">
-                {filteredPoints.map((point) => (
-                  <div
-                    key={point.id}
-                    onClick={() => {
-                      // Iniciar terapia integrada diretamente ao clicar no ponto
-                      if (!isTimerActive) {
-
-                        startIntegratedTherapy(point.id);
-                      }
-                    }}
-                    className={`bg-white rounded-xl shadow-lg transition-all duration-300 border-2 cursor-pointer p-4 ${selectedPoint === point.id
-                      ? 'border-green-500 shadow-xl bg-green-50'
-                      : viewingPoint === point.id
-                        ? 'border-blue-500 shadow-xl bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:shadow-xl'
-                      } ${point.isPremium && !user?.isPremium
-                        ? 'opacity-60'
-                        : ''
-                      }`}
-                  >
-                    <div className="flex items-center space-x-4">
-                      {/* Point Image */}
-                      {point.image && (
-                        <div className="relative flex-shrink-0">
-                          <div
-                            className="image-zoom-wrapper w-20 h-20 rounded-lg cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (point.isPremium && !user?.isPremium) {
-                                alert('🔒 Esta imagem é exclusiva para usuários Premium. Faça upgrade para visualizar!');
-                                onPageChange('premium');
-                                return;
-                              }
-                              setShowZoomModal(true);
-                              setZoomImageUrl(point.image || null);
-                            }}
-                          >
-                            <img
-                              src={point.image}
-                              alt={point.imageAlt || point.name}
-                              className="w-20 h-20 object-contain bg-gray-900 rounded-lg border border-gray-800"
-                              style={point.isPremium && !user?.isPremium ? { filter: 'blur(8px)' } : {}}
-                              onError={(e) => {
-                                e.currentTarget.src = '/mtc_exhn3_yintang.jpg';
+                {filteredPoints.length === 0 ? (
+                  <div className="bg-white rounded-2xl p-8 border border-gray-200 text-center text-gray-500 shadow-md">
+                    Nenhum ponto encontrado para "{appliedSearchQuery}".
+                  </div>
+                ) : (
+                  filteredPoints.map((point) => (
+                    <div
+                      key={point.id}
+                      onClick={() => {
+                        // Iniciar terapia integrada diretamente ao clicar no ponto
+                        if (!isTimerActive) {
+                          startIntegratedTherapy(point.id);
+                        }
+                      }}
+                      className={`bg-white rounded-xl shadow-lg transition-all duration-300 border-2 cursor-pointer p-4 ${selectedPoint === point.id
+                        ? 'border-green-500 shadow-xl bg-green-50'
+                        : viewingPoint === point.id
+                          ? 'border-blue-500 shadow-xl bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300 hover:shadow-xl'
+                        } ${point.isPremium && !user?.isPremium
+                          ? 'opacity-60'
+                          : ''
+                        }`}
+                    >
+                      <div className="flex items-center space-x-4">
+                        {/* Point Image */}
+                        {point.image && (
+                          <div className="relative flex-shrink-0">
+                            <div
+                              className="image-zoom-wrapper w-20 h-20 rounded-lg cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (point.isPremium && !user?.isPremium) {
+                                  alert('🔒 Esta imagem é exclusiva para usuários Premium. Faça upgrade para visualizar!');
+                                  onPageChange('premium');
+                                  return;
+                                }
+                                setShowZoomModal(true);
+                                setZoomImageUrl(point.image || null);
                               }}
-                            />
-                            {point.isPremium && !user?.isPremium ? (
-                              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 rounded-lg">
-                                <div className="flex flex-col items-center gap-1">
-                                  <Lock className="w-6 h-6 text-yellow-400 drop-shadow-lg" />
-                                  <span className="text-white text-xs font-bold drop-shadow-lg">Premium</span>
+                            >
+                              <img
+                                src={point.image}
+                                alt={point.imageAlt || point.name}
+                                className="w-20 h-20 object-contain bg-gray-900 rounded-lg border border-gray-800"
+                                style={point.isPremium && !user?.isPremium ? { filter: 'blur(8px)' } : {}}
+                                onError={(e) => {
+                                  e.currentTarget.src = '/mtc_exhn3_yintang.jpg';
+                                }}
+                              />
+                              {point.isPremium && !user?.isPremium ? (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 rounded-lg">
+                                  <div className="flex flex-col items-center gap-1">
+                                    <Lock className="w-6 h-6 text-yellow-400 drop-shadow-lg" />
+                                    <span className="text-white text-xs font-bold drop-shadow-lg">Premium</span>
+                                  </div>
                                 </div>
-                              </div>
-                            ) : (
-                              <div className="image-zoom-overlay rounded-lg">
-                                <div className="flex flex-col items-center gap-1">
-                                  <ZoomIn className="w-5 h-5 text-white drop-shadow-lg image-zoom-icon" />
-                                  <span className="text-white text-xs font-medium drop-shadow-lg image-zoom-text">Ampliar</span>
+                              ) : (
+                                <div className="image-zoom-overlay rounded-lg">
+                                  <div className="flex flex-col items-center gap-1">
+                                    <ZoomIn className="w-5 h-5 text-white drop-shadow-lg image-zoom-icon" />
+                                    <span className="text-white text-xs font-medium drop-shadow-lg image-zoom-text">Ampliar</span>
+                                  </div>
                                 </div>
-                              </div>
-                            )}
-                          </div>
-                          {point.isPremium && (
-                            <div className="absolute -top-2 -right-2 z-10">
-                              <div className="bg-yellow-500 text-white p-1 rounded-full">
-                                <Crown className="w-3 h-3" />
-                              </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Point Info */}
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-lg font-bold text-gray-800">{getTranslatedField(point, 'name')}</h3>
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center space-x-1 text-xs text-gray-500">
-                              <Clock className="w-3 h-3" />
-                              <span>{Math.floor((point.duration || 120) / 60)}:00</span>
-                            </div>
-                            <div className="text-xs text-gray-500 capitalize">
-                              {point.pressure || 'Leve'}
-                            </div>
-                          </div>
-                        </div>
-
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                          {getTranslatedField(point, 'benefits')[0]} • {getTranslatedField(point, 'benefits')[1]}
-                        </p>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center flex-wrap gap-2">
-                            <div className={`px-2 py-1 rounded-full text-xs font-medium ${point.category === 'general' ? 'bg-blue-100 text-blue-800' :
-                              point.category === 'cranio' ? 'bg-purple-100 text-purple-800' :
-                                point.category === 'septicemia' ? 'bg-red-100 text-red-800' :
-                                  point.category === 'atm' ? 'bg-orange-100 text-orange-800' :
-                                    point.category === 'neuro' ? 'bg-indigo-100 text-indigo-800' :
-                                      point.category === 'immunity' ? 'bg-teal-100 text-teal-800' :
-                                        point.category === 'cardio' ? 'bg-pink-100 text-pink-800' :
-                                          'bg-gray-100 text-gray-800'
-                              }`}>
-                              {point.category === 'general' ? 'MTC Geral' :
-                                point.category === 'cranio' ? 'Cranio/YNSA' :
-                                  point.category === 'septicemia' ? 'Septicemia' :
-                                    point.category === 'atm' ? 'ATM' :
-                                      point.category === 'neuro' ? 'Neurologia' :
-                                        point.category === 'immunity' ? 'Imunidade' :
-                                          point.category === 'cardio' ? 'Cardiologia' :
-                                            point.category}
-                            </div>
-                            {point.category === 'cranio' && point.subcategory && (
-                              <div className={`px-2 py-1 rounded-full text-xs font-semibold ${getSubcategoryBadge(point.subcategory).styles}`}>
-                                {getSubcategoryBadge(point.subcategory).name}
-                              </div>
-                            )}
                             {point.isPremium && (
-                              <div className="flex items-center space-x-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
-                                <Crown className="w-3 h-3" />
-                                <span>Premium</span>
+                              <div className="absolute -top-2 -right-2 z-10">
+                                <div className="bg-yellow-500 text-white p-1 rounded-full">
+                                  <Crown className="w-3 h-3" />
+                                </div>
                               </div>
                             )}
                           </div>
+                        )}
 
-                          <div className="text-green-600 text-sm font-medium flex items-center space-x-1">
-                            <Play className="w-4 h-4" />
-                            <span>Iniciar terapia →</span>
+                        {/* Point Info */}
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-lg font-bold text-gray-800">{getTranslatedField(point, 'name')}</h3>
+                            <div className="flex items-center space-x-2">
+                              <div className="flex items-center space-x-1 text-xs text-gray-500">
+                                <Clock className="w-3 h-3" />
+                                <span>{Math.floor((point.duration || 120) / 60)}:00</span>
+                              </div>
+                              <div className="text-xs text-gray-500 capitalize">
+                                {point.pressure || 'Leve'}
+                              </div>
+                            </div>
+                          </div>
+
+                          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                            {getTranslatedField(point, 'benefits')[0]} • {getTranslatedField(point, 'benefits')[1]}
+                          </p>
+
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center flex-wrap gap-2">
+                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${point.category === 'general' ? 'bg-blue-100 text-blue-800' :
+                                point.category === 'cranio' ? 'bg-purple-100 text-purple-800' :
+                                  point.category === 'septicemia' ? 'bg-red-100 text-red-800' :
+                                    point.category === 'atm' ? 'bg-orange-100 text-orange-800' :
+                                      point.category === 'neuro' ? 'bg-indigo-100 text-indigo-800' :
+                                        point.category === 'immunity' ? 'bg-teal-100 text-teal-800' :
+                                          point.category === 'cardio' ? 'bg-pink-100 text-pink-800' :
+                                            'bg-gray-100 text-gray-800'
+                                }`}>
+                                {point.category === 'general' ? 'MTC Geral' :
+                                  point.category === 'cranio' ? 'Cranio/YNSA' :
+                                    point.category === 'septicemia' ? 'Septicemia' :
+                                      point.category === 'atm' ? 'ATM' :
+                                        point.category === 'neuro' ? 'Neurologia' :
+                                          point.category === 'immunity' ? 'Imunidade' :
+                                            point.category === 'cardio' ? 'Cardiologia' :
+                                              point.category}
+                              </div>
+                              {point.category === 'cranio' && point.subcategory && (
+                                <div className={`px-2 py-1 rounded-full text-xs font-semibold ${getSubcategoryBadge(point.subcategory).styles}`}>
+                                  {getSubcategoryBadge(point.subcategory).name}
+                                </div>
+                              )}
+                              {point.isPremium && (
+                                <div className="flex items-center space-x-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
+                                  <Crown className="w-3 h-3" />
+                                  <span>Premium</span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="text-green-600 text-sm font-medium flex items-center space-x-1">
+                              <Play className="w-4 h-4" />
+                              <span>Iniciar terapia →</span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
 
               {/* Legend */}

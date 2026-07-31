@@ -191,12 +191,47 @@ exports.handler = async (event, context) => {
             return 'guest-fallback';
         };
 
-        const rateLimitKey = userEmail || getClientIp();
+        const rateLimitKey = userEmail || ("guest_ip_" + getClientIp());
         const limit = isPremium ? 100 : 3; // 100 para Premium, 3 para Gratuitos/Visitantes
-        const rateLimit = checkRateLimit(rateLimitKey, limit);
-        const remainingMessages = rateLimit.remaining;
 
-        if (!rateLimit.allowed) {
+        // 🔒 CONTROLE DE CUSTOS E LIMITES SEGURO (Supabase + Memory Fallback)
+        let isRateLimitAllowed = true;
+        let remainingMessages = limit;
+
+        if (supabase) {
+            try {
+                const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+                const { count, error: countError } = await supabase
+                    .from('ai_chat_logs')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_email', rateLimitKey)
+                    .gte('created_at', oneHourAgo);
+
+                if (!countError) {
+                    const currentCount = count || 0;
+                    if (currentCount >= limit) {
+                        isRateLimitAllowed = false;
+                    }
+                    remainingMessages = Math.max(0, limit - currentCount - 1);
+                } else {
+                    console.error('Supabase count error, falling back to memory rate limiting:', countError);
+                    const rateLimit = checkRateLimit(rateLimitKey, limit);
+                    isRateLimitAllowed = rateLimit.allowed;
+                    remainingMessages = rateLimit.remaining;
+                }
+            } catch (err) {
+                console.error('Supabase rate limiting query failed, falling back to memory:', err);
+                const rateLimit = checkRateLimit(rateLimitKey, limit);
+                isRateLimitAllowed = rateLimit.allowed;
+                remainingMessages = rateLimit.remaining;
+            }
+        } else {
+            const rateLimit = checkRateLimit(rateLimitKey, limit);
+            isRateLimitAllowed = rateLimit.allowed;
+            remainingMessages = rateLimit.remaining;
+        }
+
+        if (!isRateLimitAllowed) {
             let errorMessage = `Degustação diária concluída! 🌟\n\nVocê sabia que a consistência é a chave para moldar sua epigenética e calibrar seus Guardiões? Acessar o Zen Mentor diariamente ajuda você a se compreender, liberar tensões e otimizar sua vida de forma integral: física, mental e espiritualmente antes que as sobrecargas se transformem em sintomas.\n\nPara continuar este diálogo transformador e ter consultas ilimitadas, assine o plano Premium!`;
             if (!userEmail) {
                 errorMessage = `Degustação finalizada (3 mensagens)! 🌟\n\nO Zen Mentor (Self Oracle) é apenas o início. A verdadeira transformação acontece com a prática constante: um espaço seguro sempre disponível para escutar você, ajudar a decifrar a raiz das suas dores e otimizar sua vida física, mental e espiritualmente.\n\nPara dar continuidade ao seu tratamento e liberar consultas ilimitadas, faça o seu login ou assine o plano Premium!`;
@@ -826,7 +861,7 @@ A sua resposta inteira DEVE ser EXCLUSIVAMENTE um objeto JSON válido. NÃO incl
                     .from('ai_chat_logs')
                     .insert([
                         {
-                            user_email: userEmail || 'guest',
+                            user_email: rateLimitKey,
                             message: message,
                             response: finalReply,
                             tokens_used: usageData.totalTokens

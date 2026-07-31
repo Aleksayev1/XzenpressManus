@@ -251,6 +251,19 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
+    const registerSessionStart = () => {
+        if (!user || !user.isPremium) {
+            const isSessionCounted = sessionStorage.getItem('xzen_current_session_counted') === 'true';
+            if (!isSessionCounted) {
+                const currentCount = parseInt(localStorage.getItem('sessao_mestra_usage_count') || '0');
+                const newCount = currentCount + 1;
+                localStorage.setItem('sessao_mestra_usage_count', newCount.toString());
+                setUsageCount(newCount);
+                sessionStorage.setItem('xzen_current_session_counted', 'true');
+            }
+        }
+    };
+
     // Initialize from LocalStorage (if navigated from Home Check-In OR from ZenMentor)
     useEffect(() => {
         try {
@@ -275,6 +288,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         setSelectedEmotion(emotion);
                         setIntensity(handoff.intensity || 3);
                         setPhase('insight');
+                        registerSessionStart();
                         initiateChat(emotion, handoff.intensity || 3);
                         return; // handoff handled, skip the rest
                     }
@@ -296,6 +310,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         setSelectedEmotion(emotion);
                         setIntensity(data.intensity);
                         setPhase('insight');
+                        registerSessionStart();
                         initiateChat(emotion, data.intensity);
                     }
                 }
@@ -307,8 +322,9 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
     // Handle Check-in Selection
     const handleCheckInComplete = (emotionId: string, intensityValue: number) => {
-        // Check Limit for Free Users
-        if (!user?.isPremium && usageCount >= USAGE_LIMIT) {
+        // Refresh local usage counter
+        const currentCount = parseInt(localStorage.getItem('sessao_mestra_usage_count') || '0');
+        if (!user?.isPremium && currentCount >= USAGE_LIMIT) {
             setShowLimitModal(true);
             return;
         }
@@ -318,7 +334,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             setSelectedEmotion(emotion);
             setIntensity(intensityValue);
             setPhase('insight');
-
+            registerSessionStart();
             // Seed the chat with the context
             initiateChat(emotion, intensityValue);
         }
@@ -474,13 +490,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     };
 
     const handleCompleteSession = () => {
-        // Increment usage count for free users
-        if (user && !user.isPremium) {
-            const currentCount = parseInt(localStorage.getItem('sessao_mestra_usage_count') || '0');
-            const newCount = currentCount + 1;
-            localStorage.setItem('sessao_mestra_usage_count', newCount.toString());
-            setUsageCount(newCount);
-        }
+        // Clear counted session flag from sessionStorage so subsequent sessions are tracked
+        sessionStorage.removeItem('xzen_current_session_counted');
 
         // ── Capturar ansiedade pós-sessão e calcular Coherence Score ──────
         setShowAnxietyCapture(true);

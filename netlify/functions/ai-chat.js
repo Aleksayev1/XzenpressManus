@@ -17,9 +17,19 @@ const rateLimitStore = new Map();
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hora
 const MAX_REQUESTS_PER_HOUR = 100; // Aumentado de 20 para 100 para permitir melhor uso em produção e testes
 
-function checkRateLimit(userEmail, limit = MAX_REQUESTS_PER_HOUR) {
+// Read-only: checks count without registering. Used as fallback when Supabase counts are available.
+function peekRateLimit(key, limit = MAX_REQUESTS_PER_HOUR) {
     const now = Date.now();
-    const userRequests = rateLimitStore.get(userEmail) || [];
+    const userRequests = rateLimitStore.get(key) || [];
+    const recentRequests = userRequests.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
+    const allowed = recentRequests.length < limit;
+    return { allowed, remaining: Math.max(0, limit - recentRequests.length) };
+}
+
+// Write: checks count AND registers a new request (used only in full memory-only mode).
+function checkRateLimit(key, limit = MAX_REQUESTS_PER_HOUR) {
+    const now = Date.now();
+    const userRequests = rateLimitStore.get(key) || [];
 
     // Remove requisições antigas (fora da janela de 1 hora)
     const recentRequests = userRequests.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
@@ -30,7 +40,7 @@ function checkRateLimit(userEmail, limit = MAX_REQUESTS_PER_HOUR) {
 
     // Adiciona nova requisição
     recentRequests.push(now);
-    rateLimitStore.set(userEmail, recentRequests);
+    rateLimitStore.set(key, recentRequests);
 
     return {
         allowed: true,
@@ -214,14 +224,16 @@ exports.handler = async (event, context) => {
                     }
                     remainingMessages = Math.max(0, limit - currentCount - 1);
                 } else {
+                    // Supabase count query failed — use read-only memory peek as fallback
                     console.error('Supabase count error, falling back to memory rate limiting:', countError);
-                    const rateLimit = checkRateLimit(rateLimitKey, limit);
+                    const rateLimit = peekRateLimit(rateLimitKey, limit);
                     isRateLimitAllowed = rateLimit.allowed;
                     remainingMessages = rateLimit.remaining;
                 }
             } catch (err) {
+                // Supabase unavailable — use read-only memory peek as fallback
                 console.error('Supabase rate limiting query failed, falling back to memory:', err);
-                const rateLimit = checkRateLimit(rateLimitKey, limit);
+                const rateLimit = peekRateLimit(rateLimitKey, limit);
                 isRateLimitAllowed = rateLimit.allowed;
                 remainingMessages = rateLimit.remaining;
             }

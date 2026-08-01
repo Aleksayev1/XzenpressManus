@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZEN GROWTH HUB — Centro de Comando XZenPress</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #141c2e;
+      --border: #23314d;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --purple: #8b5cf6;
+      --blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #10b981, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .status-badge {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pillar-tag {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .pillar-medicina { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .pillar-acupressao { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .pillar-sessao-mestra { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .pillar-self-oracle { background: rgba(139, 92, 246, 0.2); color: #c084fc; }
+
+    .hook-box {
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 4px solid var(--accent);
+      padding: 12px;
+      font-weight: 600;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    textarea {
+      width: 100%;
+      background: #0d1321;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-approve {
+      background-color: var(--accent);
+      color: #000;
+    }
+
+    .btn-approve:hover { background-color: var(--accent-hover); }
+
+    .btn-copy {
+      background-color: #23314d;
+      color: var(--text);
+    }
+
+    .btn-copy:hover { background-color: #32446e; }
+
+    .utm-box {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      word-break: break-all;
+      background: #090d16;
+      padding: 8px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <div class="logo">ZEN GROWTH HUB</div>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Painel de Aprovação de Conteúdo e Vídeos IA (Aprovação Humana Obrigatória)</p>
+    </div>
+    <div class="status-badge">🟢 Conectado ao Supabase & MoneyPrinter</div>
+  </header>
+
+  <div class="grid" id="queueContainer">
+    <!-- Card 1: Acupressão -->
+    <div class="card">
+      <div class="card-header">
+        <span class="pillar-tag pillar-acupressao">Acupressão 60s</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Pendente</span>
+      </div>
+      <div class="hook-box">
+        "POV: Você acabou de descobrir o ponto de pressão no punho que reduz cortisol em minutos."
+      </div>
+      <div>
+        <div class="section-title">Roteiro MoneyPrinterTurbo</div>
+        <textarea readonly>Pressionar o ponto Shenmen por dois minutos sinaliza ao nervo vago para desacelerar seus batimentos. Faça agora e teste o alívio imediato no XZenPress.</textarea>
+      </div>
+      <div>
+        <div class="section-title">Copy Instagram / TikTok</div>
+        <textarea>Sente a mente acelerada? 🌿 Conheça a técnica bioacústica do XZenPress. Acesse o link da bio para testar sua Sessão Mestra! #acupressao #VFC #saudemental #xzenpress</textarea>
+      </div>
+      <div>
+        <div class="section-title">Link Rastreável (UTM Completo)</div>
+        <div class="utm-box">https://xzenpress.com/acupressao?utm_source=social&utm_medium=video&utm_campaign=acupressao&utm_content=hook-shenmen-v1</div>
+      </div>
+      <div class="actions">
+        <button class="btn-copy" onclick="navigator.clipboard.writeText('Pressionar o ponto Shenmen por dois minutos sinaliza ao nervo vago...')">Copiar Roteiro MPT</button>
+        <button class="btn-approve" onclick="alert('Post Aprovado! Fila atualizada no Supabase.')">Aprovar Post</button>
+      </div>
+    </div>
+
+    <!-- Card 2: Sessão Mestra -->
+    <div class="card">
+      <div class="card-header">
+        <span class="pillar-tag pillar-sessao-mestra">Sessão Mestra ✨</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Pendente</span>
+      </div>
+      <div class="hook-box">
+        "O que acontece no seu cérebro quando você combina frequência sonora binaural e biofeedback por 15 minutos?"
+      </div>
+      <div>
+        <div class="section-title">Roteiro MoneyPrinterTurbo</div>
+        <textarea>Nossos dados mostram que 84% dos usuários relatam redução perceptível de ansiedade após a primeira Sessão Mestra. Veja sua evolução em tempo real.</textarea>
+      </div>
+      <div>
+        <div class="section-title">Copy LinkedIn / WhatsApp</div>
+        <textarea>A inteligência artificial do XZenPress cria sessões personalizadas de autorregulação emocional baseadas no seu estado no momento. Teste gratuitamente.</textarea>
+      </div>
+      <div>
+        <div class="section-title">Link Rastreável (UTM Completo)</div>
+        <div class="utm-box">https://xzenpress.com/sessao-mestra?utm_source=social&utm_medium=video&utm_campaign=sessao-mestra&utm_content=hook-binaural-15m</div>
+      </div>
+      <div class="actions">
+        <button class="btn-copy" onclick="navigator.clipboard.writeText('Nossos dados mostram que 84% dos usuários...')">Copiar Roteiro MPT</button>
+        <button class="btn-approve" onclick="alert('Post Aprovado! Fila atualizada no Supabase.')">Aprovar Post</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

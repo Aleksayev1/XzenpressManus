@@ -16,6 +16,11 @@
   # Roda toda segunda-feira às 03:00 UTC (00:00 Brasília)
   # Atualiza o banco de suplementos, interações e deficiências via Gemini AI
 
+# ═══ Edge Functions para SEO e Pre-rendering (GEO) ═══
+[[edge_functions]]
+  path = "/*"
+  function = "seo-prerender"
+
 # ═══ Roteamento SPA Fallback no Netlify ═══
 [[redirects]]
   from = "/*"

@@ -40,12 +40,39 @@ Atualize as informações mais recentes sobre deficiências nutricionais no Bras
 Foque em: prevalências atuais, grupos de risco, regiões mais afetadas, e novas recomendações.
 
 Responda em JSON: { "updates": [ { "nutriente": "...", "prevalencia": "...", "gruposRisco": ["..."], "recomendacao": "...", "fonte": "..." } ] }`,
+    },
+    {
+        topic: 'zengrowth_social_scripts',
+        prompt: `Você é o ZenGrowth Engine do XZenPress.
+Gere 4 roteiros de vídeo curto (30-60s) e postagens para redes sociais com base nos 4 pilares:
+1. medicina (XZenPress Medicina Integrativa & VFC)
+2. acupressao (Acupressão em 60 segundos)
+3. sessao-mestra (Sessão Mestra de Biofeedback)
+4. self-oracle (Self Oracle IA de Saúde)
+
+Para cada pilar, inclua um gancho neurocientífico impactante de 3s, roteiro narrativo para o MoneyPrinterTurbo, copys formatadas com emojis/hashtags para Instagram, TikTok, LinkedIn e WhatsApp, e a tag utm_content recomendada.
+
+Responda em JSON rigoroso:
+{
+  "queue": [
+    {
+      "pillar": "medicina|acupressao|sessao-mestra|self-oracle",
+      "hook": "...",
+      "script_mpt": "Texto contínuo de narração para voz neural do MoneyPrinterTurbo...",
+      "copy_instagram": "...",
+      "copy_tiktok": "...",
+      "copy_linkedin": "...",
+      "copy_whatsapp": "...",
+      "utm_content_tag": "hook-..."
+    }
+  ]
+}`
     }
 ];
 
 async function callGemini(prompt) {
     const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
         {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -87,6 +114,27 @@ exports.handler = async (event) => {
         try {
             console.log(`📚 Pesquisando tópico: ${topic}`);
             const aiData = await callGemini(prompt);
+
+            if (topic === 'zengrowth_social_scripts' && aiData.queue) {
+                for (const item of aiData.queue) {
+                    const utmLink = `https://xzenpress.com/${item.pillar}?utm_source=social&utm_medium=video&utm_campaign=${item.pillar}&utm_content=${item.utm_content_tag || 'post'}`;
+                    await supabase.from('zen_content_queue').insert({
+                        topic: item.pillar,
+                        pillar: item.pillar,
+                        hook: item.hook || '',
+                        script_mpt: item.script_mpt || '',
+                        copy_instagram: item.copy_instagram || '',
+                        copy_tiktok: item.copy_tiktok || '',
+                        copy_linkedin: item.copy_linkedin || '',
+                        copy_whatsapp: item.copy_whatsapp || '',
+                        utm_link: utmLink,
+                        utm_content_tag: item.utm_content_tag || '',
+                        status: 'pending',
+                        auto_upload_ready: false
+                    });
+                }
+                console.log('✅ Roteiros ZenGrowth salvos na fila zen_content_queue com status PENDING');
+            }
 
             // Salvar no Supabase na tabela xzenpress_knowledge
             const { error } = await supabase

@@ -360,17 +360,57 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════════
-             🎯  PROTOCOLO CLÍNICO SONORO — 3 PILARES XZENPRESS
+             🎯  GUIA DE ORIENTAÇÃO & SONS BIOADAPTATIVOS
              Geradores nativos via Web Audio API · Zero arquivos externos
             ═══════════════════════════════════════════════════════════════════ */}
         <div className="mb-10">
+          
+          {/* GUIA DO CLIENTE: O QUE FAZER E COMO USAR */}
+          <div className="bg-gradient-to-r from-purple-900/90 via-indigo-900/90 to-blue-900/90 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-xl border border-purple-500/30">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-3xl">🧭</span>
+              <div>
+                <h2 className="text-xl md:text-2xl font-bold">Guia Rápido: Qual som escolher agora?</h2>
+                <p className="text-purple-200 text-xs md:text-sm">
+                  Escolha <strong>1 opção por vez</strong> de acordo com o seu objetivo no momento. Usar fones de ouvido enriquece a experiência.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div className="text-xs text-purple-300 font-bold uppercase tracking-wider mb-1">😰 Estresse ou Agitação</div>
+                <div className="text-sm font-semibold text-white">Down-Regulation ou Âncora Respiratória</div>
+                <div className="text-xs text-purple-200 mt-1">Conduz o ritmo respiratório para acalmar o sistema nervoso em minutos.</div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div className="text-xs text-purple-300 font-bold uppercase tracking-wider mb-1">😴 Relaxar ou Preparar o Sono</div>
+                <div className="text-sm font-semibold text-white">Paisagem Sonora Água ou Binaural Delta</div>
+                <div className="text-xs text-purple-200 mt-1">Frequências suaves para descompressão e indução ao descanso profundo.</div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div className="text-xs text-purple-300 font-bold uppercase tracking-wider mb-1">🎯 Foco no Trabalho / Estudo</div>
+                <div className="text-sm font-semibold text-white">Binaural Alpha / Gamma ou Elemento Madeira</div>
+                <div className="text-xs text-purple-200 mt-1">Sons que favorecem a concentração mantendo a mente calma e atenta.</div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div className="text-xs text-purple-300 font-bold uppercase tracking-wider mb-1">🌿 Equilíbrio do Dia a Dia</div>
+                <div className="text-sm font-semibold text-white">Paisagens Pentatônicas (432 Hz)</div>
+                <div className="text-xs text-purple-200 mt-1">Harmozações de 5 elementos inspiradas na tradição milenar oriental.</div>
+              </div>
+            </div>
+          </div>
+
           <div className="text-center mb-6">
-            <span className="inline-block bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-3">
-              🔬 Protocolo Clínico Exclusivo
+            <span className="inline-block bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-2">
+              🔬 Motor de Síntese Bioadaptativo Nativo
             </span>
-            <h2 className="text-2xl font-bold text-gray-800">Sons Terapêuticos Nativos</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Sons de Síntese em Tempo Real</h2>
             <p className="text-gray-500 text-sm mt-1 max-w-xl mx-auto">
-              Gerados em tempo real pelo seu dispositivo · Requer fones de ouvido para Binaural
+              Gerados diretamente no seu dispositivo sem consumo de internet · Ative apenas um som por vez
             </p>
           </div>
 
@@ -385,33 +425,34 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-2xl">☯️</span>
                 <div>
-                  <h3 className="font-bold text-gray-800 text-sm">MTC Pentatônica</h3>
-                  <p className="text-xs text-gray-500">5 Tons · 5 Elementos · 432 Hz puro</p>
+                  <h3 className="font-bold text-gray-800 text-sm">Paisagens Pentatônicas</h3>
+                  <p className="text-xs text-gray-500">5 Elementos · Afinação em 432 Hz</p>
                 </div>
               </div>
               <p className="text-xs text-gray-600 mb-4 leading-relaxed">
-                Cada tom ressoa com um par de órgãos via meridianos da medicina milenar chinesa.
+                Arranjos em afinação estética de 432 Hz inspirados nos elementos da Medicina Tradicional Chinesa.
               </p>
               <div className="grid grid-cols-5 gap-1.5 mb-3">
                 {([
-                  { el: 'wood' as MtcElement, label: '🌿', name: 'Mad.' },
-                  { el: 'fire' as MtcElement, label: '🔥', name: 'Fog.' },
-                  { el: 'earth' as MtcElement, label: '🌍', name: 'Ter.' },
-                  { el: 'metal' as MtcElement, label: '⚙️', name: 'Met.' },
-                  { el: 'water' as MtcElement, label: '💧', name: 'Águ.' },
-                ]).map(({ el, label, name }) => (
+                  { el: 'wood' as MtcElement, label: '🌿', name: 'Madeira', tip: 'Foco' },
+                  { el: 'fire' as MtcElement, label: '🔥', name: 'Fogo', tip: 'Conexão' },
+                  { el: 'earth' as MtcElement, label: '🌍', name: 'Terra', tip: 'Centro' },
+                  { el: 'metal' as MtcElement, label: '⚙️', name: 'Metal', tip: 'Respirar' },
+                  { el: 'water' as MtcElement, label: '💧', name: 'Água', tip: 'Calma' },
+                ]).map(({ el, label, name, tip }) => (
                   <button
                     key={el}
                     onClick={() => toggleMtc(el)}
-                    title={MTC_ELEMENT_NAMES[el]}
-                    className={`flex flex-col items-center p-2 rounded-xl text-xs font-semibold transition-all ${
+                    title={`${MTC_ELEMENT_NAMES[el]} — ${tip}`}
+                    className={`flex flex-col items-center p-2 rounded-xl text-[11px] font-semibold transition-all ${
                       activePillar === 'mtc' && activeMtc === el
                         ? 'bg-emerald-500 text-white shadow-md scale-105'
                         : 'bg-gray-100 text-gray-600 hover:bg-emerald-100'
                     }`}
                   >
-                    <span>{label}</span>
-                    <span className="mt-0.5">{name}</span>
+                    <span className="text-sm">{label}</span>
+                    <span className="mt-0.5 font-bold">{name}</span>
+                    <span className="text-[9px] opacity-75 font-normal">{tip}</span>
                   </button>
                 ))}
               </div>
@@ -421,7 +462,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
                     🔊 {MTC_ELEMENT_NAMES[activeMtc]}
                   </p>
                   <button onClick={stopZenSession} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 mx-auto">
-                    <Square className="w-3 h-3" /> Parar
+                    <Square className="w-3 h-3" /> Parar Som
                   </button>
                 </div>
               )}
@@ -436,12 +477,12 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-2xl">🌬️</span>
                 <div>
-                  <h3 className="font-bold text-gray-800 text-sm">Qigong Rhythm</h3>
-                  <p className="text-xs text-gray-500">Âncora Respiratória · 5.5s/fase</p>
+                  <h3 className="font-bold text-gray-800 text-sm">Âncora Respiratória</h3>
+                  <p className="text-xs text-gray-500">Qigong Rhythm · 5,5s por fase</p>
                 </div>
               </div>
               <p className="text-xs text-gray-600 mb-4 leading-relaxed">
-                Metrônomo sonoro sincronizado com a respiração de coerência cardíaca (11s/ciclo).
+                Guia sonoro suave para conduzir sua respiração na frequência de coerência cardiorrespiratória.
               </p>
               {activePillar === 'qigong' ? (
                 <div className="text-center">
@@ -453,10 +494,10 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
                   <p className={`text-sm font-bold mb-1 ${
                     qigongPhase === 'inspire' ? 'text-sky-600' : 'text-blue-800'
                   }`}>
-                    {qigongPhase === 'inspire' ? '↑ Inspire' : '↓ Expire'}
+                    {qigongPhase === 'inspire' ? '↑ Inspire profundamente' : '↓ Expire devagar'}
                   </p>
                   <button onClick={stopZenSession} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 mx-auto mt-2">
-                    <Square className="w-3 h-3" /> Parar
+                    <Square className="w-3 h-3" /> Parar Âncora
                   </button>
                 </div>
               ) : (
@@ -464,7 +505,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
                   onClick={toggleQigong}
                   className="w-full py-2.5 rounded-xl bg-sky-500 text-white text-sm font-semibold hover:bg-sky-600 transition-colors flex items-center justify-center gap-2"
                 >
-                  <Play className="w-4 h-4" /> Iniciar Qigong
+                  <Play className="w-4 h-4" /> Iniciar Âncora (5,5s)
                 </button>
               )}
             </div>
@@ -478,12 +519,12 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-2xl">🧠</span>
                 <div>
-                  <h3 className="font-bold text-gray-800 text-sm">Binaural Beats</h3>
-                  <p className="text-xs text-gray-500">Neurociência · Arrastamento Neural</p>
+                  <h3 className="font-bold text-gray-800 text-sm">Faixas Binaurais</h3>
+                  <p className="text-xs text-gray-500">Uso com fones recomendado</p>
                 </div>
               </div>
               <p className="text-xs text-gray-600 mb-3 leading-relaxed">
-                Dois tons em L/R que forçam o cérebro a sincronizar no estado desejado.
+                Padrões estéreo opcionais associados a relaxamento e foco. Os efeitos variam entre indivíduos.
               </p>
               <div className="space-y-1.5 mb-3">
                 {([

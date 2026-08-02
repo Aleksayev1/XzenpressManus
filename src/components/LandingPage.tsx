@@ -1,10 +1,84 @@
-import React, { useRef } from 'react';
-import { Play, CheckCircle2, Star, ChevronRight, Dna } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Play, CheckCircle2, Star, ChevronRight, Dna, Volume2, VolumeX, Wind } from 'lucide-react';
+import { startQigongRhythm, stopAllZenAudio } from '../services/zenAudioEngine';
 
 interface LandingPageProps {
   onStart: () => void;
   onStartGuest?: () => void;
 }
+
+const HeroAudioPreview: React.FC = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(15);
+  const [phase, setPhase] = useState<'inspire' | 'expire'>('inspire');
+
+  useEffect(() => {
+    let session: any = null;
+    let timer: any = null;
+
+    if (isPlaying) {
+      setTimeLeft(15);
+      session = startQigongRhythm((currentPhase) => {
+        setPhase(currentPhase);
+      }, 0.2);
+
+      timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setIsPlaying(false);
+            stopAllZenAudio();
+            return 15;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      stopAllZenAudio();
+    }
+
+    return () => {
+      if (timer) clearInterval(timer);
+      stopAllZenAudio();
+    };
+  }, [isPlaying]);
+
+  return (
+    <div className="w-full sm:w-auto flex flex-col items-center gap-2">
+      <button
+        onClick={() => setIsPlaying(!isPlaying)}
+        className={`px-8 py-3.5 rounded-xl font-semibold text-sm w-full sm:w-auto flex items-center justify-center gap-3 transition-all duration-300 ${
+          isPlaying
+            ? 'bg-emerald-500/20 border-2 border-emerald-400 text-emerald-300 shadow-[0_0_25px_rgba(16,185,129,0.3)] animate-pulse'
+            : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white'
+        }`}
+      >
+        {isPlaying ? (
+          <>
+            <VolumeX className="w-4 h-4 text-emerald-400 animate-spin" />
+            <span>
+              {phase === 'inspire' ? '🌬️ Inspire...' : '🌬️ Expire...'} ({timeLeft}s)
+            </span>
+          </>
+        ) : (
+          <>
+            <Wind className="w-4 h-4 text-emerald-400" />
+            <span>Ouça 15 segundos de som que respira com você</span>
+          </>
+        )}
+      </button>
+
+      {isPlaying && (
+        <div className="w-full max-w-xs bg-gray-800 h-1.5 rounded-full overflow-hidden">
+          <div
+            className="bg-emerald-400 h-full transition-all duration-1000 ease-linear"
+            style={{ width: `${((15 - timeLeft) / 15) * 100}%` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
 
 const LandingPage: React.FC<LandingPageProps> = ({ onStart, onStartGuest }) => {
   const scrollRef1 = useRef<HTMLDivElement>(null);
@@ -53,6 +127,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onStartGuest }) => {
                 <span className="text-purple-300 font-bold"> para acompanhamento futuro</span>
               </span>
             </button>
+
+            {/* ISCA IMERSIVA 15S — Som de Coerência Cardiorrespiratória */}
+            <HeroAudioPreview />
 
             {/* Ghost — Ver como funciona */}
             <button

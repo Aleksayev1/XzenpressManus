@@ -1,13 +1,17 @@
 /**
  * ============================================================
- *  ZenAudioEngine — Motor de Áudio Terapêutico Nativo
+ *  ZenAudioEngine 2.0 — Motor de Áudio Bioadaptativo Nativo
  *  XZenPress | Web Audio API | Zero arquivos externos
  * ============================================================
  *
- *  3 Pilares implementados:
- *  1. ☯️  MTC Pentatônica  — 5 tons dos 5 Elementos em 432 Hz puro
- *  2. 🌬️  Qigong Rhythm     — Metrônomo que ancora a respiração 5.5s
- *  3. 🧠  Binaural Beats    — Theta, Alfa, Delta e Gamma adaptativos
+ *  3 Pilares Científicos e Culturais:
+ *  1. ☯️  MTC Pentatônica (Afinação Cultural em 432 Hz) — 5 paisagens sonoras inspiradas na tradição dos 5 Elementos
+ *  2. 🌬️  Qigong Rhythm — Âncora sonora que conduz o ritmo respiratório de 5,5s (Respiração de Coerência Cardiorrespiratória)
+ *  3. 🧠  Binaural Beats — Arrastamento estéreo associado a estados de relaxamento e foco (Uso com fones recomendado)
+ *
+ *  Nota Científica & Regulatória:
+ *  - As frequências e arranjos MTC em 432 Hz entram como camada cultural e estética de relaxamento.
+ *  - A âncora de 5,5s é o mecanismo fisiológico principal (frequência de ressonância de VFC).
  */
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -81,34 +85,33 @@ function createFadeGain(ctx: AudioContext, targetGain: number, fadeDuration = 0.
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  PILAR 1: ☯️  MTC PENTATÔNICA (Medicina Tradicional Chinesa)
+//  PILAR 1: ☯️  MTC PENTATÔNICA (Tradição dos 5 Elementos)
 //
-//  Escala pentatônica dos 5 Elementos em afinação de 432 Hz pura
-//  (sem o temperamento igual ocidental de 440 Hz).
+//  Escala pentatônica inspirada na tradição oriental em afinação alternativa de 432 Hz.
 //
-//  Elemento  | Nota MTC | Órgão alvo     | Frequência (432 Hz base)
-//  ----------|----------|----------------|-------------------------
-//  Madeira   | Jiao     | Fígado/Vesícula| 288 Hz  (Ré em 432)
-//  Fogo      | Zhi      | Coração        | 384 Hz  (Sol em 432)
-//  Terra     | Gong     | Baço/Estômago  | 432 Hz  (Lá em 432)
-//  Metal     | Shang    | Pulmão/Cólon   | 480 Hz  (Si em 432)
-//  Água      | Yu       | Rim/Bexiga     | 324 Hz  (Mi em 432)
+//  Elemento  | Nota MTC | Paisagem Sonora     | Frequência Fundamental
+//  ----------|----------|---------------------|-----------------------
+//  Madeira   | Jiao     | Elemento Madeira    | 288 Hz (Ré)
+//  Fogo      | Zhi      | Elemento Fogo       | 384 Hz (Sol)
+//  Terra     | Gong     | Elemento Terra      | 432 Hz (Lá)
+//  Metal     | Shang    | Elemento Metal      | 480 Hz (Si)
+//  Água      | Yu       | Elemento Água       | 324 Hz (Mi)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const MTC_FREQUENCIES: Record<MtcElement, number[]> = {
-  wood:  [288, 576, 144],       // Jiao — Fígado / Vesícula Biliar
-  fire:  [384, 768, 192],       // Zhi  — Coração / Intestino Delgado
-  earth: [432, 864, 216],       // Gong — Baço / Estômago
-  metal: [480, 960, 240],       // Shang— Pulmão / Intestino Grosso
-  water: [324, 648, 162],       // Yu   — Rim / Bexiga
+  wood:  [288, 576, 144],       // Jiao — Paisagem Sonora Elemento Madeira
+  fire:  [384, 768, 192],       // Zhi  — Paisagem Sonora Elemento Fogo
+  earth: [432, 864, 216],       // Gong — Paisagem Sonora Elemento Terra
+  metal: [480, 960, 240],       // Shang— Paisagem Sonora Elemento Metal
+  water: [324, 648, 162],       // Yu   — Paisagem Sonora Elemento Água
 };
 
 const MTC_ELEMENT_NAMES: Record<MtcElement, string> = {
-  wood:  '🌿 Madeira (Jiao) — Fígado',
-  fire:  '🔥 Fogo (Zhi) — Coração',
-  earth: '🌍 Terra (Gong) — Baço',
-  metal: '⚙️ Metal (Shang) — Pulmão',
-  water: '💧 Água (Yu) — Rim',
+  wood:  '🌿 Paisagem Sonora Madeira (Jiao)',
+  fire:  '🔥 Paisagem Sonora Fogo (Zhi)',
+  earth: '🌍 Paisagem Sonora Terra (Gong)',
+  metal: '⚙️ Paisagem Sonora Metal (Shang)',
+  water: '💧 Paisagem Sonora Água (Yu)',
 };
 
 /**

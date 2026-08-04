@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZEN GROWTH HUB — Centro de Comando XZenPress</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #141c2e;
+      --border: #23314d;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --purple: #8b5cf6;
+      --blue: #3b82f6;
+      --amber: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #10b981, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pillar-tag {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .pillar-acupressao { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .pillar-sessao-mestra { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .pillar-neuro { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .pillar-fitoterapia { background: rgba(139, 92, 246, 0.2); color: #c084fc; }
+
+    .hook-box {
+      background: rgba(0, 0, 0, 0.4);
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      font-weight: 600;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      color: #fff;
+      line-height: 1.4;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    textarea {
+      width: 100%;
+      background: #0d1321;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      resize: vertical;
+      min-height: 85px;
+      line-height: 1.5;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.85rem;
+    }
+
+    .btn-approve {
+      background-color: var(--accent);
+      color: #000;
+    }
+
+    .btn-approve:hover { background-color: var(--accent-hover); }
+
+    .btn-copy {
+      background-color: #23314d;
+      color: var(--text);
+    }
+
+    .btn-copy:hover { background-color: #32446e; }
+
+    .utm-box {
+      font-size: 0.75rem;
+      color: #34d399;
+      word-break: break-all;
+      background: #090d16;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px dashed var(--border);
+      font-family: monospace;
+    }
+
+    .badge-status {
+      font-size: 0.75rem;
+      color: var(--amber);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <div class="logo">ZEN GROWTH HUB</div>
+      <p class="subtitle">Painel de Aprovação de Conteúdo e Vídeos IA — Produção de Mídia de Alta Conversão</p>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      Conectado ao Supabase, ZenAudio & MoneyPrinter
+    </div>
+  </header>
+
+  <div class="grid" id="queueContainer">
+
+    <!-- Card 1: Acupressão SOS (Shenmen & Neiguan) -->
+    <div class="card">
+      <div class="card-header">
+        <span class="pillar-tag pillar-acupressao">Acupressão SOS 30s</span>
+        <span class="badge-status">🟢 Aprovado / Pronto p/ Gravar</span>
+      </div>
+      <div class="hook-box">
+        "POV: Aperte este ponto no pulso por 15 segundos se você está sentindo o peito apertado de ansiedade."
+      </div>
+      <div>
+        <div class="section-title">Roteiro MoneyPrinterTurbo (Narração IA)</div>
+        <textarea readonly id="mpt-1">Pressionar o ponto Shenmen por 15 segundos sinaliza diretamente ao nervo vago para desacelerar seus batimentos cardíacos. Teste agora mesmo a regulação fisiológica gratuita de 15 segundos no XZenPress. O link está fixado no primeiro comentário.</textarea>
+      </div>
+      <div>
+        <div class="section-title">Copy Instagram / TikTok / Shorts</div>
+        <textarea id="copy-1">Sente a mente acelerada e o peito apertado? 🌿 A acupressão anatômica estimula a resposta parassimpática imediata. Acesse o link do primeiro comentário para experimentar os 15s de som bioadaptativo gratuitos! #acupressao #VFC #saudemental #regulaçaofisiologica #xzenpress</textarea>
+      </div>
+      <div>
+        <div class="section-title">Link Rastreável (UTM Isca 15s)</div>
+        <div class="utm-box">https://xzenpress.com/?utm_source=shorts&utm_medium=video&utm_campaign=hero15s&utm_content=hook-shenmen-peito</div>
+      </div>
+      <div class="actions">
+        <button class="btn-copy" onclick="copyToClipboard('mpt-1')">Copiar Roteiro MPT</button>
+        <button class="btn-approve" onclick="alert('Roteiro e Link copiados! Envie para o MoneyPrinterTurbo.')">🚀 Gerar Vídeo IA</button>
+      </div>
+    </div>
+
+    <!-- Card 2: Sessão Mestra (Som Bioadaptativo 432 Hz) -->
+    <div class="card">
+      <div class="card-header">
+        <span class="pillar-tag pillar-sessao-mestra">Sessão Mestra 432Hz</span>
+        <span class="badge-status">🟢 Aprovado / Pronto p/ Gravar</span>
+      </div>
+      <div class="hook-box">
+        "Você sabia que 15 segundos desta frequência sonora bioadaptativa conseguem desacelerar sua frequência cardíaca?"
+      </div>
+      <div>
+        <div class="section-title">Roteiro MoneyPrinterTurbo (Narração IA)</div>
+        <textarea readonly id="mpt-2">Seu cérebro não consegue desligar para dormir? O tom de 432 Hertz com frequência de grounding em 174 Hertz desativa o modo sobrevivência do seu corpo. Experimente agora o player gratuito de 15 segundos no link do primeiro comentário.</textarea>
+      </div>
+      <div>
+        <div class="section-title">Copy Instagram / TikTok / Shorts</div>
+        <textarea id="copy-2">O seu sistema nervoso precisa de um sinal sonoro para desativar o estresse acumulado. 🎧 Teste os 15 segundos do ZenAudio Engine em tempo real! Link fixado no primeiro comentário. #binaural #432hz #downregulation #sono #xzenpress</textarea>
+      </div>
+      <div>
+        <div class="section-title">Link Rastreável (UTM Isca 15s)</div>
+        <div class="utm-box">https://xzenpress.com/?utm_source=shorts&utm_medium=video&utm_campaign=hero15s&utm_content=hook-432hz-sono</div>
+      </div>
+      <div class="actions">
+        <button class="btn-copy" onclick="copyToClipboard('mpt-2')">Copiar Roteiro MPT</button>
+        <button class="btn-approve" onclick="alert('Roteiro e Link copiados! Envie para o MoneyPrinterTurbo.')">🚀 Gerar Vídeo IA</button>
+      </div>
+    </div>
+
+    <!-- Card 3: Neurociência (Nervo Vago & Modo Sobrevivência) -->
+    <div class="card">
+      <div class="card-header">
+        <span class="pillar-tag pillar-neuro">Neurociência Aplicada</span>
+        <span class="badge-status">🟡 Pendente de Aprovação</span>
+      </div>
+      <div class="hook-box">
+        "Seu sistema nervoso está preso no modo sobrevivência — e existe uma explicação fisiológica para isso."
+      </div>
+      <div>
+        <div class="section-title">Roteiro MoneyPrinterTurbo (Narração IA)</div>
+        <textarea readonly id="mpt-3">A ansiedade constante não é fraqueza mental. É o seu sistema simpático hiperativo. Ao alinhar a respiração no ritmo de 5,5 segundos com o estímulo tátil de acupressão, você recalibra sua Variabilidade Cardíaca em minutos. Teste na plataforma XZenPress.</textarea>
+      </div>
+      <div>
+        <div class="section-title">Copy LinkedIn / Instagram</div>
+        <textarea id="copy-3">Saúde mental de alta performance exige tecnologia de regulação fisiológica. Conheça a plataforma integrativa XZenPress e faça seu teste gratuito de 15 segundos. #neurociencia #nervovago #coerenciacardiaca #autonomiafisiologica</textarea>
+      </div>
+      <div>
+        <div class="section-title">Link Rastreável (UTM Isca 15s)</div>
+        <div class="utm-box">https://xzenpress.com/?utm_source=linkedin&utm_medium=video&utm_campaign=hero15s&utm_content=hook-nervovago-fisiologia</div>
+      </div>
+      <div class="actions">
+        <button class="btn-copy" onclick="copyToClipboard('mpt-3')">Copiar Roteiro MPT</button>
+        <button class="btn-approve" onclick="alert('Post Aprovado! Adicionado à fila de produção.')">Aprovar Post</button>
+      </div>
+    </div>
+
+    <!-- Card 4: Fitoterapia & Plantas MTC -->
+    <div class="card">
+      <div class="card-header">
+        <span class="pillar-tag pillar-fitoterapia">Fitoterapia MTC 360</span>
+        <span class="badge-status">🟡 Pendente de Aprovação</span>
+      </div>
+      <div class="hook-box">
+        "Conheça o chá tradicional de Camomila e Passiflora alinhado ao Elemento Terra para acalmar o estômago ansioso."
+      </div>
+      <div>
+        <div class="section-title">Roteiro MoneyPrinterTurbo (Narração IA)</div>
+        <textarea readonly id="mpt-4">Na Medicina Tradicional Chinesa, a ansiedade e a preocupação excessiva afetam diretamente o elemento Terra e o sistema digestivo. Descubra a fitoterapia integrativa recomendada para o seu elemento no Plano XZenPress 360.</textarea>
+      </div>
+      <div>
+        <div class="section-title">Copy Instagram / TikTok</div>
+        <textarea id="copy-4">Saiba como potencializar sua sessão de acupressão e áudio 432Hz com as plantas medicinais recomendadas para o seu tipo emocional. Acesse o XZenPress! #fitoterapia #mtc #plantasmedicinais #bemestar</textarea>
+      </div>
+      <div>
+        <div class="section-title">Link Rastreável (UTM Isca 15s)</div>
+        <div class="utm-box">https://xzenpress.com/?utm_source=social&utm_medium=video&utm_campaign=fitoterapia360&utm_content=hook-plantas-terra</div>
+      </div>
+      <div class="actions">
+        <button class="btn-copy" onclick="copyToClipboard('mpt-4')">Copiar Roteiro MPT</button>
+        <button class="btn-approve" onclick="alert('Post Aprovado! Adicionado à fila de produção.')">Aprovar Post</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function copyToClipboard(id) {
+      const textarea = document.getElementById(id);
+      textarea.select();
+      document.execCommand('copy');
+      alert('Roteiro copiado com sucesso para a área de transferência!');
+    }
+  </script>
+
+</body>
+</html>

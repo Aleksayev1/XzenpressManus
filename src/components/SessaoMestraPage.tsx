@@ -122,157 +122,60 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [postSessionAnxiety, setPostSessionAnxiety] = useState<number>(5);
     const [showAnxietyCapture, setShowAnxietyCapture] = useState(false);
 
-    // Usage Limit State
+    // Usage Limit State & Tier Helper
     const [usageCount, setUsageCount] = useState(0);
     const [showLimitModal, setShowLimitModal] = useState(false);
-    const USAGE_LIMIT = 2;
 
-    // Premium Features Modal State
-    const [premiumModal, setPremiumModal] = useState<{
-        isOpen: boolean;
-        moduleName: string;
-        detail: string;
-        targetPage: string;
-        contextKey: string;
-        contextData: any;
-    }>({
-        isOpen: false,
-        moduleName: '',
-        detail: '',
-        targetPage: '',
-        contextKey: '',
-        contextData: null
-    });
-
-    // Timer State
-    const [timeLeft, setTimeLeft] = useState(60);
-    const [isTimerActive, setIsTimerActive] = useState(false);
-    const [zenFlowStepIndex, setZenFlowStepIndex] = useState(0);
-
-    // Breathing Phase States
-    const [breathState, setBreathState] = useState<'idle' | 'inhale' | 'hold' | 'exhale' | 'done'>('idle');
-    const [breathCount, setBreathCount] = useState(0);
-    const [breathSeconds, setBreathSeconds] = useState(0);
-
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-        if (isTimerActive && timeLeft > 0) {
-            interval = setInterval(() => {
-                setTimeLeft((prev) => prev - 1);
-            }, 1000);
-        } else if (timeLeft === 0) {
-            playGong();
-            if (phase === 'zenflow') {
-                const exercise = selectedEmotion?.zenFlowExerciseId
-                    ? zenFlowExercises.find(z => z.id === selectedEmotion?.zenFlowExerciseId)
-                    : zenFlowExercises[0];
-
-                if (exercise && zenFlowStepIndex < exercise.steps.length - 1) {
-                    const nextStep = zenFlowStepIndex + 1;
-                    setZenFlowStepIndex(nextStep);
-                    setTimeLeft(exercise.steps[nextStep].durationSeconds);
-                } else {
-                    setIsTimerActive(false);
-                }
-            } else {
-                setIsTimerActive(false);
-            }
-        }
-        return () => clearInterval(interval);
-    }, [isTimerActive, timeLeft, phase, zenFlowStepIndex, selectedEmotion]);
-
-    // Reset Timer on Phase/Step Change
-    useEffect(() => {
-        if (phase === 'acupressure') {
-            setTimeLeft(60); // 1 minute per point
-            setIsTimerActive(true);
-        } else if (phase === 'zenflow') {
-            const exercise = selectedEmotion?.zenFlowExerciseId
-                ? zenFlowExercises.find(z => z.id === selectedEmotion?.zenFlowExerciseId)
-                : zenFlowExercises[0];
-            if (exercise) {
-                setZenFlowStepIndex(0);
-                setTimeLeft(exercise.steps[0].durationSeconds);
-                setIsTimerActive(true);
-            }
-        } else {
-            setIsTimerActive(false);
-        }
-    }, [phase, currentPointIndex]);
-
-    const toggleTimer = () => setIsTimerActive(!isTimerActive);
-
-    const formatTime = (seconds: number) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    const getDailyMaxLimit = () => {
+        if (user?.isPremium) return Infinity;
+        if (user) return 2; // Usuário gratuito logado: 2 por dia
+        return 1; // Visitante sem login: 1 por dia
     };
 
-    // Guided breathing loop: 4s inhale, 2s hold, 6s exhale
-    useEffect(() => {
-        if (phase !== 'preparation' || breathState === 'idle' || breathState === 'done') return;
-
-        const interval = setInterval(() => {
-            setBreathSeconds((prev) => {
-                const next = prev + 1;
-                
-                if (breathState === 'inhale' && next >= 4) {
-                    setBreathState('hold');
-                    return 0;
-                } else if (breathState === 'hold' && next >= 2) {
-                    setBreathState('exhale');
-                    return 0;
-                } else if (breathState === 'exhale' && next >= 6) {
-                    const nextCount = breathCount + 1;
-                    setBreathCount(nextCount);
-                    if (nextCount >= 3) {
-                        setBreathState('done');
-                    } else {
-                        setBreathState('inhale');
-                    }
-                    return 0;
-                }
-                
-                return next;
-            });
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, [phase, breathState, breathCount]);
-
-    // Chat State
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-
-    // Auto-scroll chat
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+    const getDailyUsageCount = () => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const savedDate = localStorage.getItem('xzen_sessao_mestra_daily_date');
+        if (savedDate !== todayStr) {
+            localStorage.setItem('xzen_sessao_mestra_daily_date', todayStr);
+            localStorage.setItem('xzen_sessao_mestra_daily_count', '0');
+            return 0;
+        }
+        return parseInt(localStorage.getItem('xzen_sessao_mestra_daily_count') || '0', 10);
+    };
 
     const registerSessionStart = () => {
-        if (!user || !user.isPremium) {
-            const isSessionCounted = sessionStorage.getItem('xzen_current_session_counted') === 'true';
-            if (!isSessionCounted) {
-                const currentCount = parseInt(localStorage.getItem('sessao_mestra_usage_count') || '0');
-                const newCount = currentCount + 1;
-                localStorage.setItem('sessao_mestra_usage_count', newCount.toString());
-                setUsageCount(newCount);
-                sessionStorage.setItem('xzen_current_session_counted', 'true');
-            }
+        if (user?.isPremium) return;
+
+        const isSessionCounted = sessionStorage.getItem('xzen_current_session_counted') === 'true';
+        if (!isSessionCounted) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const currentCount = getDailyUsageCount();
+            const newCount = currentCount + 1;
+            localStorage.setItem('xzen_sessao_mestra_daily_date', todayStr);
+            localStorage.setItem('xzen_sessao_mestra_daily_count', newCount.toString());
+            setUsageCount(newCount);
+            sessionStorage.setItem('xzen_current_session_counted', 'true');
         }
+    };
+
+    const checkDailyLimit = () => {
+        if (user?.isPremium) return false;
+        const count = getDailyUsageCount();
+        const maxLimit = getDailyMaxLimit();
+        if (count >= maxLimit) {
+            setShowLimitModal(true);
+            return true;
+        }
+        return false;
     };
 
     // Initialize from LocalStorage (if navigated from Home Check-In OR from ZenMentor)
     useEffect(() => {
         try {
-            // Check usage limit first
-            const count = parseInt(localStorage.getItem('sessao_mestra_usage_count') || '0');
+            const count = getDailyUsageCount();
             setUsageCount(count);
             
-            if (!user?.isPremium && count >= USAGE_LIMIT) {
-                setShowLimitModal(true);
+            if (checkDailyLimit()) {
                 return;
             }
 
@@ -322,10 +225,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
     // Handle Check-in Selection
     const handleCheckInComplete = (emotionId: string, intensityValue: number) => {
-        // Refresh local usage counter
-        const currentCount = parseInt(localStorage.getItem('sessao_mestra_usage_count') || '0');
-        if (!user?.isPremium && currentCount >= USAGE_LIMIT) {
-            setShowLimitModal(true);
+        if (checkDailyLimit()) {
             return;
         }
 
@@ -338,6 +238,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             // Seed the chat with the context
             initiateChat(emotion, intensityValue);
         }
+    };
     };
 
     const initiateChat = async (emotion: EmotionalState, intensity: number) => {
@@ -564,17 +465,20 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
                 <div className="flex items-center space-x-2 md:space-x-6">
                     {/* Free Usage Counter */}
+                    {/* Free Usage Counter */}
                     {!user?.isPremium && (
                         <div className="flex items-center gap-2 bg-gray-800/80 px-3 py-1 rounded-full border border-gray-700">
                             <div className="flex gap-1">
-                                {[...Array(USAGE_LIMIT)].map((_, i) => (
+                                {[...Array(getDailyMaxLimit())].map((_, i) => (
                                     <div
                                         key={i}
-                                        className={`w-2 h-2 rounded-full ${i < usageCount ? 'bg-red-500' : 'bg-green-500'} ${i === usageCount ? 'animate-pulse' : ''}`}
+                                        className={`w-2 h-2 rounded-full ${i < usageCount ? 'bg-amber-500' : 'bg-emerald-500'} ${i === usageCount ? 'animate-pulse' : ''}`}
                                     />
                                 ))}
                             </div>
-                            <span className="text-xs text-gray-400 hidden sm:inline">{usageCount}/{USAGE_LIMIT}</span>
+                            <span className="text-xs text-gray-300 font-medium hidden sm:inline">
+                                {usageCount}/{getDailyMaxLimit()} hoje {!user ? '(Visitante)' : '(Gratuito)'}
+                            </span>
                         </div>
                     )}
 
@@ -599,35 +503,84 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
             {/* Limit Reached Modal */}
             {showLimitModal && (
-                <div className="absolute inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in">
-                    <div className="bg-gray-800 border border-yellow-500/30 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-b from-yellow-500/10 to-transparent pointer-events-none"></div>
-                        <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Crown className="w-8 h-8 text-yellow-400" />
+                <div className="absolute inset-0 z-[60] bg-black/85 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in">
+                    <div className="bg-gray-900 border border-amber-500/30 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent pointer-events-none"></div>
+                        <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Crown className="w-8 h-8 text-amber-400" />
                         </div>
-                        <h2 className="text-2xl font-bold text-white mb-2">Limite Gratuito Atingido</h2>
-                        <p className="text-gray-400 mb-6">
-                            Você já utilizou suas <strong>{USAGE_LIMIT} sessoes de degustação</strong> da Sessão Mestra.
-                            Para continuar harmonizando sua energia e ter acesso ilimitado, torne-se Premium.
-                        </p>
-                        <div className="space-y-3">
-                            <button
-                                onClick={() => {
-                                    setShowLimitModal(false);
-                                    onBack();
-                                    window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'pricing' }));
-                                }}
-                                className="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 rounded-xl font-bold text-black hover:scale-105 transition-transform"
-                            >
-                                👑 Ver Planos Premium
-                            </button>
-                            <button
-                                onClick={() => setShowLimitModal(false)}
-                                className="w-full py-3 border border-gray-700 rounded-xl text-gray-400 hover:text-white transition-colors"
-                            >
-                                Voltar
-                            </button>
-                        </div>
+
+                        {!user ? (
+                            <>
+                                <h2 className="text-2xl font-bold text-white mb-2">Limite Diário de Visitante (1/1)</h2>
+                                <p className="text-gray-300 text-sm mb-6 leading-relaxed">
+                                    Você já concluiu sua <strong>1 Sessão Mestra gratuita de hoje</strong> como visitante.
+                                    <br /><br />
+                                    🔑 <strong>Faça seu cadastro/login gratuito</strong> para liberar até <strong>2 sessões diárias</strong> ou torne-se <strong>Premium</strong> para acesso ilimitado!
+                                </p>
+                                <div className="space-y-3">
+                                    <button
+                                        onClick={() => {
+                                            setShowLimitModal(false);
+                                            onBack();
+                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'login' }));
+                                        }}
+                                        className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-bold text-white shadow-lg hover:scale-105 transition-all text-xs sm:text-sm"
+                                    >
+                                        🔑 Criar Conta / Fazer Login Grátis (+1 Sessão)
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setShowLimitModal(false);
+                                            onBack();
+                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'premium' }));
+                                        }}
+                                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl font-bold text-black hover:scale-105 transition-all text-xs sm:text-sm"
+                                    >
+                                        👑 Ver Assinatura Premium (Ilimitado)
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setShowLimitModal(false);
+                                            onBack();
+                                        }}
+                                        className="w-full py-2.5 border border-gray-700 rounded-xl text-gray-400 hover:text-white transition-colors text-xs"
+                                    >
+                                        Voltar ao Menu
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <h2 className="text-2xl font-bold text-white mb-2">Limite Diário Gratuito (2/2)</h2>
+                                <p className="text-gray-300 text-sm mb-6 leading-relaxed">
+                                    Você concluiu suas <strong>2 Sessões Mestras gratuitas de hoje</strong>!
+                                    <br /><br />
+                                    Para manter a eficácia terapêutica e a assimilação integrativa, aguarde o próximo ciclo diário ou faça upgrade para o **Plano Premium** para uso ilimitado.
+                                </p>
+                                <div className="space-y-3">
+                                    <button
+                                        onClick={() => {
+                                            setShowLimitModal(false);
+                                            onBack();
+                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'premium' }));
+                                        }}
+                                        className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl font-bold text-black shadow-lg hover:scale-105 transition-all text-xs sm:text-sm"
+                                    >
+                                        👑 Tornar-se Premium (Acesso Ilimitado)
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setShowLimitModal(false);
+                                            onBack();
+                                        }}
+                                        className="w-full py-2.5 border border-gray-700 rounded-xl text-gray-400 hover:text-white transition-colors text-xs"
+                                    >
+                                        Voltar ao Menu
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

@@ -286,11 +286,11 @@ const ZEN_SOM_PROTOCOLS: Record<string, {
     description: 'Cognição máxima · Foco',
     type: 'binaural', param: 'gamma' as BinauralState
   },
-  'mtc-wood':  { label: 'MTC Madeira', emoji: '🌿', description: 'Fígado/Vesícula · Jiao 288Hz', type: 'mtc', param: 'wood' as MtcElement },
-  'mtc-fire':  { label: 'MTC Fogo',    emoji: '🔥', description: 'Coração · Zhi 384Hz',        type: 'mtc', param: 'fire' as MtcElement },
-  'mtc-earth': { label: 'MTC Terra',   emoji: '🌍', description: 'Baço/Estômago · Gong 432Hz', type: 'mtc', param: 'earth' as MtcElement },
-  'mtc-metal': { label: 'MTC Metal',   emoji: '⚙️', description: 'Pulmão · Shang 480Hz',       type: 'mtc', param: 'metal' as MtcElement },
-  'mtc-water': { label: 'MTC Água',    emoji: '💧', description: 'Rim/Bexiga · Yu 324Hz',      type: 'mtc', param: 'water' as MtcElement },
+  'mtc-wood':  { label: 'MTC Madeira', emoji: '🌿', description: 'Paisagem sonora Madeira · Jiao 288Hz', type: 'mtc', param: 'wood' as MtcElement },
+  'mtc-fire':  { label: 'MTC Fogo',    emoji: '🔥', description: 'Paisagem sonora Fogo · Zhi 384Hz',    type: 'mtc', param: 'fire' as MtcElement },
+  'mtc-earth': { label: 'MTC Terra',   emoji: '🌍', description: 'Paisagem sonora Terra · Gong 432Hz', type: 'mtc', param: 'earth' as MtcElement },
+  'mtc-metal': { label: 'MTC Metal',   emoji: '⚙️', description: 'Paisagem sonora Metal · Shang 480Hz', type: 'mtc', param: 'metal' as MtcElement },
+  'mtc-water': { label: 'MTC Água',    emoji: '💧', description: 'Paisagem sonora Água · Yu 324Hz',  type: 'mtc', param: 'water' as MtcElement },
   'qigong':    { label: 'Qigong',      emoji: '🌬️', description: 'Âncora respiratória 5.5s/fase', type: 'qigong' },
 };
 
@@ -713,6 +713,42 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate, onBack
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
+    // 🔒 Controle de Custos: Rate Limit no Frontend para usuários gratuitos
+    const isUserPremium = user?.isPremium || false;
+    if (!isUserPremium) {
+      const now = Date.now();
+      const usageRaw = localStorage.getItem('zenmentor_usage_timestamps');
+      let timestamps: number[] = [];
+      if (usageRaw) {
+        try {
+          timestamps = JSON.parse(usageRaw);
+        } catch (e) {}
+      }
+      // Filtra requisições das últimas 1 hora
+      timestamps = timestamps.filter(t => now - t < 60 * 60 * 1000);
+
+      if (timestamps.length >= 3) {
+        const limitMessage = user ? 
+          `Degustação diária concluída! 🌟\n\nVocê sabia que a consistência é a chave para moldar sua epigenética e calibrar seus Guardiões? Acessar o Zen Mentor diariamente ajuda você a se compreender de forma integral.\n\nPara continuar este diálogo transformador e ter consultas ilimitadas, assine o plano Premium!` :
+          `Degustação finalizada (3 mensagens)! 🌟\n\nO Zen Mentor é apenas o início. Para dar continuidade ao seu tratamento e liberar consultas ilimitadas, faça o seu login ou assine o plano Premium!`;
+
+        setMessages(prev => [...prev, 
+          { role: 'user', content: input.trim(), timestamp: new Date() },
+          { 
+            role: 'assistant', 
+            content: limitMessage, 
+            timestamp: new Date() 
+          }
+        ]);
+        setInput('');
+        return;
+      }
+
+      // Salva novo timestamp
+      timestamps.push(now);
+      localStorage.setItem('zenmentor_usage_timestamps', JSON.stringify(timestamps));
+    }
+
     const userMessage: Message = {
       role: 'user',
       content: input.trim(),
@@ -761,11 +797,11 @@ Protocolos disponíveis:
 • [ZENSOM:binaural-delta] → Insônia, sono fragmentado, exaustão. Delta 2Hz — indução ao sono.
 • [ZENSOM:binaural-gamma] → Baixo desempenho cognitivo, falta de foco para trabalho intelectual. Gamma 40Hz.
 • [ZENSOM:qigong] → Dificuldade com respiração, ansiedade leve, tensão muscular. Âncora respiratória 5.5s.
-• [ZENSOM:mtc-wood] → Irritabilidade, raiva, tensão no pescoço/ombros, problemas de fígado. MTC Madeira 288Hz.
-• [ZENSOM:mtc-fire] → Palpitações, excesso de calor, ansiedade cardíaca. MTC Fogo 384Hz.
-• [ZENSOM:mtc-earth] → Preocupação excessiva, ruminação, problemas digestivos. MTC Terra 432Hz.
-• [ZENSOM:mtc-metal] → Tristeza, luto, problemas respiratórios, aperto no peito. MTC Metal 480Hz.
-• [ZENSOM:mtc-water] → Medo, insegurança, fadiga renal, dores lombares. MTC Água 324Hz.
+• [ZENSOM:mtc-wood] → Irritabilidade, raiva, tensão no pescoço/ombros. MTC Madeira 288Hz.
+• [ZENSOM:mtc-fire] → Sensação de agitação, excesso de calor, ansiedade. MTC Fogo 384Hz.
+• [ZENSOM:mtc-earth] → Preocupação excessiva, ruminação, pensamentos repetitivos. MTC Terra 432Hz.
+• [ZENSOM:mtc-metal] → Tristeza, desânimo, sensação de aperto no peito. MTC Metal 480Hz.
+• [ZENSOM:mtc-water] → Insegurança, fadiga acumulada, tensão na região lombar. MTC Água 324Hz.
 EXEMPLO: Se o usuário relatar alta ansiedade: responda normalmente e adicione [ZENSOM:down-regulation] no final.
 Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por resposta.`;
 

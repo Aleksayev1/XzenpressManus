@@ -217,6 +217,46 @@ function createPinkNoiseBuffer(ctx: AudioContext, durationSec = 4): AudioBuffer 
   return buffer;
 }
 
+// Helper para manter áudio ativo com tela bloqueada/desligada (iOS Safari PWA & Android)
+function enableBackgroundAudioMode(title = 'XZenPress — Sessão Mestra 432 Hz'): { stop: () => void } {
+  if (typeof window === 'undefined') return { stop: () => {} };
+
+  let silentAudio: HTMLAudioElement | null = null;
+  try {
+    silentAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==');
+    silentAudio.loop = true;
+    silentAudio.volume = 0.01;
+    silentAudio.play().catch(() => {});
+  } catch (e) {}
+
+  if ('mediaSession' in navigator) {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: title,
+        artist: 'XZenPress',
+        album: 'Regulação Fisiológica 432 Hz',
+      });
+      navigator.mediaSession.setActionHandler('play', () => {
+        if (silentAudio) silentAudio.play();
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        if (silentAudio) silentAudio.pause();
+      });
+    } catch (e) {}
+  }
+
+  return {
+    stop: () => {
+      try {
+        if (silentAudio) {
+          silentAudio.pause();
+          silentAudio.src = '';
+        }
+      } catch (e) {}
+    }
+  };
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  MOTOR BIOADAPTATIVO DE 7 CAMADAS (ZenAudioEngine 2.0)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -224,6 +264,8 @@ function createPinkNoiseBuffer(ctx: AudioContext, durationSec = 4): AudioBuffer 
 export function createZenSession(config: ZenSessionConfig): ZenAudioSession | null {
   const ctx = getAudioContext();
   if (!ctx) return null;
+
+  const bgAudio = enableBackgroundAudioMode();
 
   const masterCompressor = createMasterCompressor(ctx);
   const masterGain = ctx.createGain();
@@ -475,6 +517,7 @@ export function createZenSession(config: ZenSessionConfig): ZenAudioSession | nu
   // Registra a limpeza completa para o stopAllZenAudio
   const cleanupAll = () => {
     isStopped = true;
+    try { bgAudio.stop(); } catch {}
     activeNodes.forEach(node => node.stop());
   };
   registerSessionCleanup(cleanupAll);

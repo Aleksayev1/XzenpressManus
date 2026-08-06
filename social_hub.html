@@ -17,6 +17,7 @@
       --purple: #8b5cf6;
       --blue: #3b82f6;
       --amber: #f59e0b;
+      --red: #ef4444;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
@@ -94,6 +95,11 @@
       border-color: rgba(16, 185, 129, 0.4);
     }
 
+    .card-featured {
+      border: 2px solid #ef4444;
+      background: linear-gradient(180deg, #1e1329 0%, #141c2e 100%);
+    }
+
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -112,6 +118,7 @@
     .pillar-sessao-mestra { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
     .pillar-neuro { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
     .pillar-fitoterapia { background: rgba(139, 92, 246, 0.2); color: #c084fc; }
+    .pillar-doacao { background: rgba(239, 68, 68, 0.25); color: #fca5a5; }
 
     .hook-box {
       background: rgba(0, 0, 0, 0.4);
@@ -122,6 +129,10 @@
       font-size: 0.95rem;
       color: #fff;
       line-height: 1.4;
+    }
+
+    .hook-box-doacao {
+      border-left-color: #ef4444;
     }
 
     .section-title {
@@ -209,11 +220,38 @@
     </div>
     <div class="status-badge">
       <div class="status-dot"></div>
-      Conectado ao Supabase, ZenAudio & MoneyPrinter
+      Conectado ao Supabase, ZenAudio & MoneyPrinter (4 Vídeos na Fila)
     </div>
   </header>
 
   <div class="grid" id="queueContainer">
+
+    <!-- Card 5: CAMPANHA DE DOAÇÃO VFC & TERRA API (DESTAQUE) -->
+    <div class="card card-featured">
+      <div class="card-header">
+        <span class="pillar-tag pillar-doacao">❤️ CAMPANHA VFC & TERRA API</span>
+        <span class="badge-status" style="color: #fca5a5;">🔥 PRIORIDADE MÁXIMA / Pronto p/ Gravar</span>
+      </div>
+      <div class="hook-box hook-box-doacao">
+        "Ajude milhares de pessoas a monitorarem seu sistema nervoso autônomo em tempo real."
+      </div>
+      <div>
+        <div class="section-title">Roteiro MoneyPrinterTurbo (Narração IA)</div>
+        <textarea readonly id="mpt-5">O estresse e a ansiedade crônica travam o sistema nervoso em modo de sobrevivência. O XZenPress já ajuda milhares de pessoas a desativarem o estresse através de protocolos integrativos. Nosso próximo passo é integrar o monitoramento contínuo da Variabilidade da Frequência Cardíaca, a VFC. Medir e equilibrar a homeostase em tempo real otimiza o corpo humano em todas as áreas. Para integrar os maiores relógios do mundo via Terra API e manter essa ferramenta acessível, precisamos de uma infraestrutura de aproximadamente mil dólares mensais. Você pode fazer parte desta missão pela saúde humana. Faça sua doação e ajude a transformar vidas.</textarea>
+      </div>
+      <div>
+        <div class="section-title">Copy Instagram / Shorts / Vaquinha</div>
+        <textarea id="copy-5">Ajude milhares de pessoas a monitorarem seu sistema nervoso! 🫀✨ O XZenPress está integrando o monitoramento contínuo da Variabilidade da Frequência Cardíaca (VFC) via Terra API. Apoie nossa missão de infraestrutura ou faça sua doação voluntária no link da bio! #vfc #hrv #nervovago #saudemental #xzenpress #doacao #homeostase</textarea>
+      </div>
+      <div>
+        <div class="section-title">Link Rastreável (UTM Campanha VFC)</div>
+        <div class="utm-box">https://xzenpress.com/?utm_source=campanha&utm_medium=video&utm_campaign=doacao_vfc&utm_content=terra_api</div>
+      </div>
+      <div class="actions">
+        <button class="btn-copy" onclick="copyToClipboard('mpt-5')">Copiar Roteiro MPT</button>
+        <button class="btn-approve" style="background-color: #ef4444; color: #fff;" onclick="alert('Roteiro da Campanha VFC copiado! Cole no MoneyPrinterTurbo para gerar.')">🚀 Gerar Vídeo VFC</button>
+      </div>
+    </div>
 
     <!-- Card 1: Acupressão SOS (Shenmen & Neiguan) -->
     <div class="card">
@@ -292,33 +330,6 @@
       </div>
       <div class="actions">
         <button class="btn-copy" onclick="copyToClipboard('mpt-3')">Copiar Roteiro MPT</button>
-        <button class="btn-approve" onclick="alert('Post Aprovado! Adicionado à fila de produção.')">Aprovar Post</button>
-      </div>
-    </div>
-
-    <!-- Card 4: Fitoterapia & Plantas MTC -->
-    <div class="card">
-      <div class="card-header">
-        <span class="pillar-tag pillar-fitoterapia">Fitoterapia MTC 360</span>
-        <span class="badge-status">🟡 Pendente de Aprovação</span>
-      </div>
-      <div class="hook-box">
-        "Conheça o chá tradicional de Camomila e Passiflora alinhado ao Elemento Terra para acalmar o estômago ansioso."
-      </div>
-      <div>
-        <div class="section-title">Roteiro MoneyPrinterTurbo (Narração IA)</div>
-        <textarea readonly id="mpt-4">Na Medicina Tradicional Chinesa, a ansiedade e a preocupação excessiva afetam diretamente o elemento Terra e o sistema digestivo. Descubra a fitoterapia integrativa recomendada para o seu elemento no Plano XZenPress 360.</textarea>
-      </div>
-      <div>
-        <div class="section-title">Copy Instagram / TikTok</div>
-        <textarea id="copy-4">Saiba como potencializar sua sessão de acupressão e áudio 432Hz com as plantas medicinais recomendadas para o seu tipo emocional. Acesse o XZenPress! #fitoterapia #mtc #plantasmedicinais #bemestar</textarea>
-      </div>
-      <div>
-        <div class="section-title">Link Rastreável (UTM Isca 15s)</div>
-        <div class="utm-box">https://xzenpress.com/?utm_source=social&utm_medium=video&utm_campaign=fitoterapia360&utm_content=hook-plantas-terra</div>
-      </div>
-      <div class="actions">
-        <button class="btn-copy" onclick="copyToClipboard('mpt-4')">Copiar Roteiro MPT</button>
         <button class="btn-approve" onclick="alert('Post Aprovado! Adicionado à fila de produção.')">Aprovar Post</button>
       </div>
     </div>

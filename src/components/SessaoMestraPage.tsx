@@ -239,7 +239,6 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             initiateChat(emotion, intensityValue);
         }
     };
-    };
 
     const initiateChat = async (emotion: EmotionalState, intensity: number) => {
         setIsLoading(true);

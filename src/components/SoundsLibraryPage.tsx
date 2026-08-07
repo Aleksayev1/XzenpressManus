@@ -46,7 +46,6 @@ interface Sound extends Omit<Track, 'name'> {
 export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChange }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const { user } = useAuth();
   const { currentTrack, isPlaying, togglePlay, playTrack, volume, setVolume } = useAudioPlayer();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -344,30 +343,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
                   {Math.round(volume * 100)}%
                 </span>
               </div>
-            ) : currentSoundData.spotifyEmbedUrl ? (
-              // Spotify Player Message with Login Tip
-              <div className="w-full space-y-3">
-                <div className="text-center p-4 bg-green-50 rounded-xl border border-green-200">
-                  <p className="text-green-800 font-medium mb-2">
-                    🎵 Tocando via Spotify
-                  </p>
-                  <p className="text-sm text-green-700">
-                    O player aparecerá na parte inferior da tela.
-                  </p>
-                  <p className="text-xs text-green-600 mt-2">
-                    Continue navegando - o som não vai parar!
-                  </p>
-                </div>
-
-                {/* Login Optimization Tip */}
-                <div className="text-center p-3 bg-yellow-50 rounded-xl border border-yellow-200">
-                  <p className="text-xs text-yellow-800">
-                    💡 <strong>Dica:</strong> Para melhor qualidade e experiência completa,
-                    faça <a href="https://accounts.spotify.com/login" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-yellow-900">login no Spotify</a>
-                  </p>
-                </div>
-              </div>
-            ) : null}
+            </div>
           </div>
         )}
 

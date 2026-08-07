@@ -121,6 +121,13 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [preSessionAnxiety, setPreSessionAnxiety] = useState<number>(5);
     const [postSessionAnxiety, setPostSessionAnxiety] = useState<number>(5);
     const [showAnxietyCapture, setShowAnxietyCapture] = useState(false);
+    const [premiumModal, setPremiumModal] = useState<{
+        isOpen: boolean;
+        detail?: string;
+        targetPage?: string;
+        contextKey?: string;
+        contextData?: any;
+    }>({ isOpen: false });
 
     // Usage Limit State & Tier Helper
     const [usageCount, setUsageCount] = useState(0);

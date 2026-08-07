@@ -44,8 +44,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
     trackPageView(page, t(`nav.${page}`) || page);
   };
 
-<<<<<<< Updated upstream
-=======
   const navItems = [
     { id: 'home' },
     { id: 'acupressure' },
@@ -72,7 +70,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
     ? [...navItems.slice(0, 5), ...premiumNavItems, ...navItems.slice(5)]
     : navItems;
 
->>>>>>> Stashed changes
   const handleLogout = () => {
     logout();
     onPageChange('home');
@@ -140,74 +137,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
             </div>
 
             {/* Desktop Navigation */}
-<<<<<<< Updated upstream
-            <nav className="hidden lg:flex space-x-2 items-center">
-              {headerNavItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => handlePageChange(item.id)}
-                  className={`px-3 py-2 rounded-md text-sm font-bold transition-all whitespace-nowrap ${
-                    currentPage === item.id ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-
-              {/* Biblioteca Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => toggleDropdown('library')}
-                  className={`px-3 py-2 rounded-md text-sm font-bold flex items-center gap-1 transition-all ${
-                    activeDropdown === 'library' ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <span>Biblioteca</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'library' ? 'rotate-180' : ''}`} />
-                </button>
-                {activeDropdown === 'library' && (
-                  <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 z-[60]">
-                    {libraryItems.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => { handlePageChange(item.id); setActiveDropdown(null); }}
-                        className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                      >
-                        <span className="text-blue-400">{item.icon}</span>
-                        <span className="font-medium">{item.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Explorar Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => toggleDropdown('community')}
-                  className={`px-3 py-2 rounded-md text-sm font-bold flex items-center gap-1 transition-all ${
-                    activeDropdown === 'community' ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <span>Explorar</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'community' ? 'rotate-180' : ''}`} />
-                </button>
-                {activeDropdown === 'community' && (
-                  <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 z-[60]">
-                    {communityItems.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => { handlePageChange(item.id); setActiveDropdown(null); }}
-                        className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                      >
-                        <span className="text-purple-400">{item.icon}</span>
-                        <span className="font-medium">{item.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-=======
             <nav className="hidden md:flex space-x-8">
               {allNavItems.map((item) => {
                 let label = t(`nav.${item.id}`);
@@ -239,7 +168,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                   </button>
                 );
               })}
->>>>>>> Stashed changes
             </nav>
 
             {/* Desktop Actions */}
@@ -295,38 +223,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
 
           {/* Mobile Navigation */}
           {isMenuOpen && (
-<<<<<<< Updated upstream
-            <div className="lg:hidden pb-6 animate-in fade-in slide-in-from-top-4 max-h-[calc(100vh-140px)] overflow-y-auto">
-              <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-50 rounded-2xl mt-2 border border-gray-100 shadow-inner">
-                {([...headerNavItems, ...libraryItems, ...communityItems] as NavItem[]).map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => { handlePageChange(item.id); setIsMenuOpen(false); }}
-                    className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-base font-bold transition-all ${
-                      currentPage === item.id ? 'text-blue-600 bg-blue-100/50' : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    {item.icon && <span className="text-gray-400">{item.icon}</span>}
-                    <span>{item.label}</span>
-                  </button>
-                ))}
-                {user ? (
-                  <div className="pt-4 mt-4 border-t border-gray-100">
-                    <button onClick={() => { handlePageChange('dashboard'); setIsMenuOpen(false); }} className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold text-gray-700">
-                      <User className="w-4 h-4" /> <span>Painel</span>
-                    </button>
-                    <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold text-red-600">
-                      <LogOut className="w-4 h-4" /> <span>Sair</span>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="pt-4">
-                    <button onClick={() => { handlePageChange('login'); setIsMenuOpen(false); }} className="w-full bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">
-                      {t('nav.login')}
-                    </button>
-                  </div>
-                )}
-=======
             <div className="md:hidden">
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 rounded-lg mt-2">
                 {allNavItems.map((item) => {
@@ -466,7 +362,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                     </div>
                   )}
                 </div>
->>>>>>> Stashed changes
               </div>
             </div>
           )}

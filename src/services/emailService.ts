@@ -33,10 +33,6 @@ export class EmailService {
       console.log('📧 Email PIX preparado para:', customerEmail);
       console.log('📄 Conteúdo:', emailHtml);
 
-<<<<<<< Updated upstream
-      // TODO: Implementar envio real via Supabase Edge Function ou SMTP
-      // Por enquanto, apenas log para desenvolvimento
-=======
       // Salvar log de email no Supabase (já que não temos SMTP configurado ainda)
       await supabase!.from('email_logs').insert([{
         recipient_email: customerEmail,
@@ -53,7 +49,6 @@ export class EmailService {
       }]);
 
       console.log('✅ Email PIX registrado no banco de dados (email_logs)');
->>>>>>> Stashed changes
 
       return true;
     } catch (error) {
@@ -72,20 +67,6 @@ export class EmailService {
     try {
       const emailHtml = this.generateWelcomeEmail(customerName);
 
-<<<<<<< Updated upstream
-      console.log('📧 Email de boas-vindas preparado para:', customerEmail);
-      console.log('📄 Conteúdo:', emailHtml);
-
-      // TODO: Implementar envio real
-
-      return true;
-    } catch (error) {
-      console.error('❌ Erro ao enviar email de boas-vindas:', error);
-      return false;
-    }
-  }
-
-=======
       if (!supabase) {
         console.warn('Supabase não configurado. Logs de email não serão salvos.');
         return true;
@@ -116,7 +97,6 @@ export class EmailService {
     }
   }
 
->>>>>>> Stashed changes
   /**
    * Template de email de confirmação PIX
    */

@@ -158,15 +158,6 @@ class MonitoringService {
         if (!supabase) return;
 
         try {
-<<<<<<< Updated upstream
-            await fetch(`${getBaseApiUrl()}/.netlify/functions/log-error`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(errorLog),
-            });
-=======
             await supabase.from('system_logs').insert([{
                 level: errorLog.level,
                 message: errorLog.message,
@@ -176,7 +167,6 @@ class MonitoringService {
                 user_agent: errorLog.userAgent,
                 timestamp: errorLog.timestamp
             }]);
->>>>>>> Stashed changes
         } catch (error) {
             console.error('Failed to send error to Supabase:', error);
         }

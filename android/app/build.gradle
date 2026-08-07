@@ -7,13 +7,8 @@ android {
         applicationId "com.xzenpress.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-<<<<<<< Updated upstream
-        versionCode 3005
-        versionName "2.7.0"
-=======
         versionCode 301
         versionName "2.5.5"
->>>>>>> Stashed changes
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

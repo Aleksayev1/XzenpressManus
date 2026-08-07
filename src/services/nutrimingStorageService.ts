@@ -113,76 +113,67 @@ export const NutrimingStorageService = {
     /**
      * Salvar perfil do usuário no Supabase
      */
-    async saveProfile(userId: string, profile: { age: number; gender?: 'male' | 'female' | 'other'; symptoms: string[] }): Promise<boolean> {
+    async saveProfile(userId: string, profile: { age: number; gender: string; symptoms: string[] }): Promise<void> {
         try {
-            // 1. Tentar salvar no Supabase
+            // Tentar atualizar primeiro (upsert)
             const { error } = await supabase
                 .from('nutriming_profiles')
-                .upsert({
+                .upsert({ 
                     user_id: userId,
                     age: profile.age,
                     gender: profile.gender,
                     symptoms: profile.symptoms,
                     updated_at: new Date().toISOString()
-                });
+                }, { onConflict: 'user_id' });
 
             if (error) {
                 console.error('Erro ao salvar perfil no Supabase:', error);
                 // Fallback para localStorage
                 localStorage.setItem(`nutriming_profile_${userId}`, JSON.stringify(profile));
-                return false;
+            } else {
+                console.log('✅ Perfil salvo no Supabase');
             }
-
-            // Manter backup no localStorage por segurança
-            localStorage.setItem(`nutriming_profile_${userId}`, JSON.stringify(profile));
-            console.log('✅ Perfil salvo no Supabase com sucesso');
-            return true;
         } catch (error) {
-            console.error('❌ Erro inesperado ao salvar perfil:', error);
-            return false;
+            console.error('Erro crítico ao salvar perfil:', error);
         }
     },
 
     /**
-     * Carregar perfil do usuário (Supabase > LocalStorage)
+     * Carregar perfil do usuário do Supabase (com fallback para localStorage se vazio)
      */
-    async loadProfile(userId: string): Promise<{ age: number; gender?: 'male' | 'female' | 'other'; symptoms: string[] }> {
+    async loadProfile(userId: string): Promise<{ age: number; gender: string; symptoms: string[] }> {
         try {
-            // 1. Tentar carregar do Supabase
             const { data, error } = await supabase
                 .from('nutriming_profiles')
-                .select('*')
+                .select('age, gender, symptoms')
                 .eq('user_id', userId)
                 .single();
 
-            if (data && !error) {
+            if (error && error.code !== 'PGRST116') { // PGRST116 = não encontrado
+                console.error('Erro ao carregar perfil do Supabase:', error);
+            }
+
+            if (data) {
                 console.log('✅ Perfil carregado do Supabase');
-                // Atualizar cache local
-                const profile = {
-                    age: data.age,
-                    gender: data.gender as 'male' | 'female' | 'other',
+                return {
+                    age: data.age || 35,
+                    gender: data.gender || 'other',
                     symptoms: data.symptoms || []
                 };
-                localStorage.setItem(`nutriming_profile_${userId}`, JSON.stringify(profile));
-                return profile;
             }
-
-            // 2. Se falhar ou não existir, tentar LocalStorage (migração)
-            console.log('⚠️ Perfil não encontrado no Supabase, tentando local...');
-            const savedLocal = localStorage.getItem(`nutriming_profile_${userId}`);
-            if (savedLocal) {
-                const profile = JSON.parse(savedLocal);
-                // Tenta migrar para nuvem silenciosamente
-                this.saveProfile(userId, profile);
-                return profile;
+            
+            // Tentar localStorage se não achar no banco (migração suave)
+            const saved = localStorage.getItem(`nutriming_profile_${userId}`);
+            if (saved) {
+                const localProfile = JSON.parse(saved);
+                // Salvar no banco para migrar
+                await this.saveProfile(userId, localProfile);
+                return localProfile;
             }
-
-            return { age: 35, symptoms: [] };
         } catch (error) {
-            console.error('❌ Erro ao carregar perfil:', error);
-            // Fallback final
-            const savedLocal = localStorage.getItem(`nutriming_profile_${userId}`);
-            return savedLocal ? JSON.parse(savedLocal) : { age: 35, symptoms: [] };
+            console.error('Erro crítico ao carregar perfil:', error);
         }
+
+        return { age: 35, gender: 'other', symptoms: [] };
     }
 };

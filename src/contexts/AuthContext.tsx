@@ -2,6 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
 import { supabase } from '../lib/supabase';
 
+// Re-export User type for external use
+export type { User };
+
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;

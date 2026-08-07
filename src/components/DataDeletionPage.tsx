@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Trash2, Shield, AlertTriangle, CheckCircle, Mail, FileText, Clock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { supabase } from '../lib/supabase';
 
 interface DataDeletionPageProps {
   onPageChange: (page: string) => void;
@@ -21,24 +22,24 @@ export const DataDeletionPage: React.FC<DataDeletionPageProps> = ({ onPageChange
     setSubmitStatus('idle');
 
     try {
-      // Simular envio da solicitação
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
       const requestData = {
-        userId: user?.id,
-        userEmail: user?.email,
-        requestType,
+        user_id: user?.id,
+        user_email: user?.email,
+        request_type: requestType,
         reason,
-        timestamp: new Date().toISOString()
+        status: 'pending'
       };
 
-      console.log('Solicitação de exclusão enviada:', requestData);
-      
-      // Em produção, aqui seria enviado para o backend/Supabase
-      // await supabase.from('deletion_requests').insert([requestData]);
-      
+      console.log('Enviando solicitação de exclusão:', requestData);
+
+      const { error } = await supabase!
+        .from('deletion_requests')
+        .insert([requestData]);
+
+      if (error) throw error;
+
       setSubmitStatus('success');
-      
+
       // Se for exclusão de conta, fazer logout após 3 segundos
       if (requestType === 'account' || requestType === 'both') {
         setTimeout(() => {
@@ -46,7 +47,7 @@ export const DataDeletionPage: React.FC<DataDeletionPageProps> = ({ onPageChange
           onPageChange('home');
         }, 3000);
       }
-      
+
     } catch (error) {
       console.error('Erro ao enviar solicitação:', error);
       setSubmitStatus('error');
@@ -81,7 +82,7 @@ export const DataDeletionPage: React.FC<DataDeletionPageProps> = ({ onPageChange
               Exclusão de Dados e Conta
             </h1>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Conforme a LGPD (Lei Geral de Proteção de Dados), você tem o direito de solicitar 
+              Conforme a LGPD (Lei Geral de Proteção de Dados), você tem o direito de solicitar
               a exclusão dos seus dados pessoais e/ou conta do XZenPress.
             </p>
           </div>
@@ -155,7 +156,7 @@ export const DataDeletionPage: React.FC<DataDeletionPageProps> = ({ onPageChange
                     </div>
                   </div>
                 </label>
-                
+
                 <label className="flex items-start space-x-3 cursor-pointer">
                   <input
                     type="radio"
@@ -172,7 +173,7 @@ export const DataDeletionPage: React.FC<DataDeletionPageProps> = ({ onPageChange
                     </div>
                   </div>
                 </label>
-                
+
                 <label className="flex items-start space-x-3 cursor-pointer">
                   <input
                     type="radio"

@@ -369,7 +369,7 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
             // Carregar suplementos do Supabase
             const { NutrimingStorageService } = await import('../services/nutrimingStorageService');
             const savedSupplements = await NutrimingStorageService.loadSupplements(user.id);
-            const savedProfile = await NutrimingStorageService.loadProfile(user.id);
+            const savedProfile = await NutrimingStorageService.loadProfile(user.id); // Agora é async
 
             setSupplements(savedSupplements);
 
@@ -428,8 +428,8 @@ export const NutrimingPage: React.FC<NutrimingPageProps> = ({ onPageChange }) =>
             // Garantir que profile tenha todos os campos
             setUserProfile({
                 age: savedProfile.age || 35,
-                gender: (savedProfile.gender as any) || 'other',
-                symptoms: savedProfile.symptoms || []
+                gender: savedProfile.gender || 'other',
+                symptoms: updatedSymptoms
             });
         };
 

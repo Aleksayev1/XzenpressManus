@@ -36,39 +36,10 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Boolean único para garantir consistência
-  const isPremiumUser = !!(user && user.isPremium);
-
   const handlePageChange = (page: string) => {
     onPageChange(page);
     trackPageView(page, t(`nav.${page}`) || page);
   };
-
-  const navItems = [
-    { id: 'home' },
-    { id: 'acupressure' },
-    { id: 'protocols' },
-    { id: 'breathing' },
-    { id: 'nutriming-ai' }, // ⚠️ TEMPORÁRIO: Liberado para testes (sem Premium)
-    { id: 'premium' },
-    { id: 'corporate' },
-    { id: 'blog' },
-  ];
-
-  // Adicionar itens premium apenas para usuários premium
-  const premiumNavItems = [
-    { id: 'dashboard' },
-    { id: 'sounds' },
-    { id: 'progress' },
-    { id: 'personalization' },
-  ];
-
-  /* DEBUG: Verificar estado REAL */
-  console.log('Header Render - isPremiumUser:', isPremiumUser);
-
-  const allNavItems = isPremiumUser
-    ? [...navItems.slice(0, 5), ...premiumNavItems, ...navItems.slice(5)]
-    : navItems;
 
   const handleLogout = () => {
     logout();
@@ -137,37 +108,72 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              {allNavItems.map((item) => {
-                let label = t(`nav.${item.id}`);
-                if (item.id === 'nutriming-ai') label = 'Nutriming AI';
+            <nav className="hidden lg:flex space-x-2 items-center">
+              {headerNavItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => handlePageChange(item.id)}
+                  className={`px-3 py-2 rounded-md text-sm font-bold transition-all whitespace-nowrap ${
+                    currentPage === item.id ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
 
-                // CONDICIONAL: Se for Premium, renomeia o botão "Premium" para "Mentor IA"
-                if (item.id === 'premium' && isPremiumUser) {
-                  label = '✨ Mentor IA';
-                }
+              {/* Biblioteca Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => toggleDropdown('library')}
+                  className={`px-3 py-2 rounded-md text-sm font-bold flex items-center gap-1 transition-all ${
+                    activeDropdown === 'library' ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <span>Biblioteca</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'library' ? 'rotate-180' : ''}`} />
+                </button>
+                {activeDropdown === 'library' && (
+                  <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 z-[60]">
+                    {libraryItems.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => { handlePageChange(item.id); setActiveDropdown(null); }}
+                        className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      >
+                        <span className="text-blue-400">{item.icon}</span>
+                        <span className="font-medium">{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handlePageChange(item.id)}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${currentPage === item.id
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                      }`}
-                  >
-                    <span>{label}</span>
-                    {/* Mostrar coroa apenas se NÃO for premium (para vender) ou se quisermos destacar */}
-                    {premiumNavItems.some(p => p.id === item.id) && (
-                      <Crown className="w-3 h-3 text-yellow-500" />
-                    )}
-                    {/* Se for o botão Premium/Mentor IA, mostrar ícone especial se for Premium */}
-                    {item.id === 'premium' && !isPremiumUser && (
-                      <Crown className="w-3 h-3 text-yellow-500" />
-                    )}
-                  </button>
-                );
-              })}
+              {/* Explorar Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => toggleDropdown('community')}
+                  className={`px-3 py-2 rounded-md text-sm font-bold flex items-center gap-1 transition-all ${
+                    activeDropdown === 'community' ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <span>Explorar</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'community' ? 'rotate-180' : ''}`} />
+                </button>
+                {activeDropdown === 'community' && (
+                  <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 z-[60]">
+                    {communityItems.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => { handlePageChange(item.id); setActiveDropdown(null); }}
+                        className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                      >
+                        <span className="text-purple-400">{item.icon}</span>
+                        <span className="font-medium">{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </nav>
 
             {/* Desktop Actions */}
@@ -223,145 +229,36 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
 
           {/* Mobile Navigation */}
           {isMenuOpen && (
-            <div className="md:hidden">
-              <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 rounded-lg mt-2">
-                {allNavItems.map((item) => {
-                  let label = t(`nav.${item.id}`);
-                  if (item.id === 'nutriming-ai') label = 'Nutriming AI';
-
-                  // CONDICIONAL: Se for Premium, renomeia o botão "Premium" para "Mentor IA"
-                  if (item.id === 'premium' && isPremiumUser) {
-                    label = '✨ Mentor IA';
-                  }
-
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        onPageChange(item.id);
-                        setIsMenuOpen(false);
-                      }}
-                      className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${currentPage === item.id
-                        ? 'text-blue-600 bg-blue-50'
-                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                        }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{label}</span>
-                        {premiumNavItems.some(p => p.id === item.id) && (
-                          <Crown className="w-4 h-4 text-yellow-500" />
-                        )}
-                        {/* Se for o botão Premium/Mentor IA, mostrar ícone especial se for Premium */}
-                        {item.id === 'premium' && !isPremiumUser && (
-                          <Crown className="w-4 h-4 text-yellow-500" />
-                        )}
-                      </div>
+            <div className="lg:hidden pb-6 animate-in fade-in slide-in-from-top-4 max-h-[calc(100vh-140px)] overflow-y-auto">
+              <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-50 rounded-2xl mt-2 border border-gray-100 shadow-inner">
+                {([...headerNavItems, ...libraryItems, ...communityItems] as NavItem[]).map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => { handlePageChange(item.id); setIsMenuOpen(false); }}
+                    className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-base font-bold transition-all ${
+                      currentPage === item.id ? 'text-blue-600 bg-blue-100/50' : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {item.icon && <span className="text-gray-400">{item.icon}</span>}
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+                {user ? (
+                  <div className="pt-4 mt-4 border-t border-gray-100">
+                    <button onClick={() => { handlePageChange('dashboard'); setIsMenuOpen(false); }} className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold text-gray-700">
+                      <User className="w-4 h-4" /> <span>Painel</span>
                     </button>
-                  );
-                })}
-
-                <div className="border-t border-gray-200 mt-4 pt-4">
-                  {user ? (
-                    <>
-                      <div className="flex items-center px-3 mb-4">
-                        <User className="w-5 h-5 text-gray-600 mr-2" />
-                        <span className="text-gray-700 font-medium">{user.name}</span>
-                      </div>
-
-                      <button
-                        onClick={() => {
-                          handleTutorialClick();
-                          setIsMenuOpen(false);
-                        }}
-                        className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-blue-600 hover:bg-blue-50"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <Play className="w-4 h-4" />
-                          <span>Rever Tutorial</span>
-                        </div>
-                      </button>
-
-                      {/* Blog Admin Link - Only for admin users (Mobile) */}
-                      {user.isAdmin && (
-                        <button
-                          onClick={() => {
-                            onPageChange('blog-admin');
-                            setIsMenuOpen(false);
-                          }}
-                          className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-green-600 hover:bg-green-50"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <BookOpen className="w-4 h-4" />
-                            <span>Admin Blog</span>
-                          </div>
-                        </button>
-                      )}
-
-                      {/* WhatsApp Button for users who paid Premium (Mobile) */}
-                      {user.isPremium && user.hasPaidPremium && (
-                        <button
-                          onClick={() => {
-                            onPageChange('whatsapp-consultation');
-                            setIsMenuOpen(false);
-                          }}
-                          className="flex items-center space-x-2 w-full px-3 py-2 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 mb-2"
-                        >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
-                          </svg>
-                          <span>Assistente IA</span>
-                        </button>
-                      )}
-
-                      <div className="flex items-center space-x-2 mb-2">
-                        <User className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm text-gray-700">{user.name}</span>
-                        {user.isPremium && (
-                          <Crown className="w-4 h-4 text-yellow-500" />
-                        )}
-                        {user.isAdmin && (
-                          <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full ml-2">ADMIN</span>
-                        )}
-                      </div>
-
-                      {/* Data Deletion Link - Mobile */}
-                      <button
-                        onClick={() => {
-                          onPageChange('data-deletion');
-                          setIsMenuOpen(false);
-                        }}
-                        className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md mb-2"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        <span>Excluir Dados</span>
-                      </button>
-
-                      {/* Logout Button */}
-                      <button
-                        onClick={() => {
-                          handleLogout();
-                          setIsMenuOpen(false);
-                        }}
-                        className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>{t('nav.logout')}</span>
-                      </button>
-                    </>
-                  ) : (
-                    <div className="px-3 py-2 border-t border-gray-200">
-                      <button
-                        onClick={() => {
-                          handlePageChange('login');
-                          setIsMenuOpen(false);
-                        }}
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium"
-                      >
-                        {t('nav.login')}
-                      </button>
-                    </div>
-                  )}
-                </div>
+                    <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold text-red-600">
+                      <LogOut className="w-4 h-4" /> <span>Sair</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="pt-4">
+                    <button onClick={() => { handlePageChange('login'); setIsMenuOpen(false); }} className="w-full bg-blue-600 text-white px-4 py-3 rounded-xl font-bold">
+                      {t('nav.login')}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}

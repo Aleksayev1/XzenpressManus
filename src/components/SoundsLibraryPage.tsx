@@ -1,42 +1,24 @@
-import React, { useState, useMemo } from 'react';
-import { Play, Pause, Volume2, VolumeX, Music, Sparkles, Waves, CloudRain, Wind, Flame, Star, Crown, Zap, Cloud, ArrowLeft } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Play, Pause, Volume2, VolumeX, Music, Heart, Waves, CloudRain, Wind, Flame, Leaf, Star, Lock, Crown, ExternalLink, Zap, Cloud, ArrowLeft, Home, Activity, Square } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { createSpotifyService } from '../services/spotifyService';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useAudioPlayer, Track } from '../contexts/AudioPlayerContext';
-import { startGuidedMeditation, getUpgradeMessage, getAllSessions } from '../services/audioDecisionService';
+import {
+  playMtcElement, startBinauralBeats, startQigongRhythm, startDownRegulationProtocol,
+  MTC_ELEMENT_NAMES, BINAURAL_LABELS,
+  type MtcElement, type BinauralState, type ZenAudioSession
+} from '../services/zenAudioEngine';
 
 interface SoundsLibraryPageProps {
   onPageChange: (page: string) => void;
 }
 
-// Mapping SESSION_MAP categories to UI categories
-const categoryMapping: Record<string, string> = {
-  'sleep': 'nature',
-  'stress': 'mantras',
-  'focus': 'binaural',
-  'meditation': 'mantras'
-};
-
-// Icon mapping for sessions
-const iconMapping: Record<string, React.ReactNode> = {
-  'ocean-waves': <Waves className="w-6 h-6 text-blue-500" />,
-  'gentle-rain': <CloudRain className="w-6 h-6 text-blue-400" />,
-  'fireplace-ambience': <Flame className="w-6 h-6 text-orange-500" />,
-  'sistema-nervoso-reset': <Zap className="w-6 h-6 text-purple-500" />,
-  'craniopuntura-ansiedade': <Sparkles className="w-6 h-6 text-pink-500" />,
-  'binaural-focus-40hz': <Star className="w-6 h-6 text-yellow-500" />,
-  'foco-corporativo': <Zap className="w-6 h-6 text-indigo-500" />,
-  'tigelas-tibetanas': <span className="text-2xl">🎌</span>,
-  'meditacao-mindfulness': <Sparkles className="w-6 h-6 text-purple-400" />
-};
-
-// Extending local Sound interface to match Track logic
-interface Sound extends Omit<Track, 'name'> {
+interface Sound {
+  id: string;
   name: string;
   description: string;
   icon: React.ReactNode;
-  category: string;
+  category: 'nature' | 'ambient' | 'binaural' | 'mantras';
   duration: string;
   isPremium: boolean;
   src?: string;
@@ -46,10 +28,70 @@ interface Sound extends Omit<Track, 'name'> {
 export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChange }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const { currentTrack, isPlaying, togglePlay, playTrack, volume, setVolume } = useAudioPlayer();
-
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [showUpgradeHint, setShowUpgradeHint] = useState(false);
+  const [fromMapaVivo, setFromMapaVivo] = useState(false);
+  useEffect(() => {
+    setFromMapaVivo(localStorage.getItem('phyto_from_mapa_vivo') === 'true');
+  }, []);
+  const [currentSound, setCurrentSound] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.3);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // ── Native ZenAudioEngine state ──────────────────────────────────────────
+  const [activePillar, setActivePillar] = useState<'mtc' | 'qigong' | 'binaural' | 'downreg' | null>(null);
+  const [activeMtc, setActiveMtc] = useState<MtcElement>('wood');
+  const [activeBinaural, setActiveBinaural] = useState<BinauralState>('alpha');
+  const [qigongPhase, setQigongPhase] = useState<'inspire' | 'expire'>('inspire');
+  const [downRegBpm, setDownRegBpm] = useState<number>(80);
+  const zenSessionRef = useRef<ZenAudioSession | null>(null);
+
+  const stopZenSession = useCallback(() => {
+    if (zenSessionRef.current) {
+      zenSessionRef.current.stop();
+      zenSessionRef.current = null;
+    }
+    setActivePillar(null);
+  }, []);
+
+  const toggleMtc = useCallback((element: MtcElement) => {
+    if (activePillar === 'mtc' && activeMtc === element) { stopZenSession(); return; }
+    stopZenSession();
+    const session = playMtcElement(element, 0.22);
+    if (session) { zenSessionRef.current = session; setActiveMtc(element); setActivePillar('mtc'); }
+  }, [activePillar, activeMtc, stopZenSession]);
+
+  const toggleBinaural = useCallback((state: BinauralState) => {
+    if (activePillar === 'binaural' && activeBinaural === state) { stopZenSession(); return; }
+    stopZenSession();
+    const session = startBinauralBeats(state, 0.18);
+    if (session) { zenSessionRef.current = session; setActiveBinaural(state); setActivePillar('binaural'); }
+  }, [activePillar, activeBinaural, stopZenSession]);
+
+  const toggleQigong = useCallback(() => {
+    if (activePillar === 'qigong') { stopZenSession(); return; }
+    stopZenSession();
+    const session = startQigongRhythm((phase) => setQigongPhase(phase), 0.15);
+    if (session) { zenSessionRef.current = session; setActivePillar('qigong'); }
+  }, [activePillar, stopZenSession]);
+
+  const toggleDownReg = useCallback(() => {
+    if (activePillar === 'downreg') { stopZenSession(); return; }
+    stopZenSession();
+    const session = startDownRegulationProtocol((bpm) => setDownRegBpm(bpm), 0.2);
+    if (session) { zenSessionRef.current = session; setActivePillar('downreg'); }
+  }, [activePillar, stopZenSession]);
+
+  // Cleanup on unmount
+  useEffect(() => () => { zenSessionRef.current?.stop(); }, []);
+
+  // Spotify sempre disponível via links diretos
+  useEffect(() => {
+    console.log('🎵 Spotify: Links diretos sempre ativos');
+    console.log('✅ Playlists oficiais do Spotify funcionando');
+  }, []);
 
   const categories = [
     { id: 'all', name: t('sounds.category.all'), icon: <Volume2 className="w-4 h-4" /> },
@@ -59,20 +101,143 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
     { id: 'mantras', name: t('sounds.category.mantras'), icon: <Music className="w-4 h-4" />, premium: true },
   ];
 
-  // ✅ SINGLE SOURCE OF TRUTH - Derive from SESSION_MAP
-  const sounds: Sound[] = useMemo(() => {
-    return getAllSessions().map(session => ({
-      id: session.id,
-      name: session.title,
-      description: session.description,
-      icon: iconMapping[session.id] || <Music className="w-6 h-6 text-gray-500" />,
-      category: categoryMapping[session.category] || 'nature',
-      duration: `${session.durationMinutes}:00`,
-      isPremium: session.premium.audioUrl !== null, // Premium if has hosted audio
-      src: session.premium.audioUrl || undefined,
-      spotifyEmbedUrl: session.free.spotifyPlaylistUrl
-    }));
-  }, []);
+  const sounds: Sound[] = [
+    // Sons Gratuitos
+    {
+      id: 'ocean-waves',
+      name: 'Ondas do Oceano',
+      description: 'Som relaxante das ondas do mar para meditação profunda',
+      icon: <Waves className="w-6 h-6 text-blue-500" />,
+      category: 'nature',
+      duration: '30:00',
+      isPremium: false,
+      src: '/sounds/ocean.mp3',
+      spotifyUrl: 'https://open.spotify.com/search/ocean%20waves%20sounds'
+    },
+    {
+      id: 'gentle-rain',
+      name: 'Chuva Suave',
+      description: 'Som calmante de chuva para relaxamento e sono',
+      icon: <CloudRain className="w-6 h-6 text-blue-400" />,
+      category: 'nature',
+      duration: '45:00',
+      isPremium: false,
+      src: '/sounds/rain.mp3',
+      spotifyUrl: 'https://open.spotify.com/search/rain%20sounds%20sleep'
+    },
+
+    // Sons Premium
+    {
+      id: 'forest-ambience',
+      name: 'Floresta Encantada',
+      description: 'Sons da floresta com pássaros e vento suave',
+      icon: <Leaf className="w-6 h-6 text-green-500" />,
+      category: 'nature',
+      duration: '60:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/forest%20sounds%20meditation'
+    },
+    {
+      id: 'fireplace-crackle',
+      name: 'Lareira Aconchegante',
+      description: 'Som de lareira crepitando para ambiente acolhedor',
+      icon: <Flame className="w-6 h-6 text-orange-500" />,
+      category: 'ambient',
+      duration: '120:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/fireplace%20sounds'
+    },
+    {
+      id: 'wind-chimes',
+      name: 'Sinos do Vento',
+      description: 'Melodia suave de sinos de vento para harmonização',
+      icon: <Wind className="w-6 h-6 text-purple-400" />,
+      category: 'ambient',
+      duration: '40:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/wind%20chimes%20meditation'
+    },
+    {
+      id: 'binaural-focus',
+      name: 'Foco Binaural 40Hz',
+      description: 'Frequência binaural para concentração e foco mental',
+      icon: <Star className="w-6 h-6 text-yellow-500" />,
+      category: 'binaural',
+      duration: '30:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/binaural%20beats%2040hz%20focus'
+    },
+    {
+      id: 'binaural-sleep',
+      name: 'Sono Profundo 2Hz',
+      description: 'Frequência delta para induzir sono reparador',
+      icon: <Heart className="w-6 h-6 text-indigo-500" />,
+      category: 'binaural',
+      duration: '480:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/delta%20waves%20sleep%20meditation'
+    },
+    {
+      id: 'om-mantra',
+      name: 'Mantra OM Sagrado',
+      description: 'Vibração primordial para meditação transcendental',
+      icon: <span className="text-2xl">🕉️</span>,
+      category: 'mantras',
+      duration: '21:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/om%20mantra%20meditation'
+    },
+    {
+      id: 'tibetan-bowls',
+      name: 'Tigelas Tibetanas',
+      description: 'Sons de tigelas tibetanas para limpeza energética',
+      icon: <span className="text-2xl">🎌</span>,
+      category: 'mantras',
+      duration: '35:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/tibetan%20singing%20bowls'
+    },
+    {
+      id: 'reset-nervous-system',
+      name: 'Reset do Sistema Nervoso',
+      description: 'Respiração 4-7-8 guiada para ativação parassimpática e redução do cortisol.',
+      icon: <Zap className="w-6 h-6 text-purple-500" />,
+      category: 'mantras',
+      duration: '12:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/4-7-8%20breathing%20guided%20meditation'
+    },
+    {
+      id: 'cranio-anxiety',
+      name: 'Craniopuntura para Ansiedade',
+      description: 'Prática guiada Yamamoto para redução de ansiedade clínica e tensão muscular.',
+      icon: <Star className="w-6 h-6 text-pink-500" />,
+      category: 'mantras',
+      duration: '15:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/binaural%20beats%2040hz%20focus'
+    },
+    {
+      id: 'corporate-focus',
+      name: 'Foco Corporativo Profundo',
+      description: 'Ambiente sonoro otimizado para trabalho de alta demanda cognitiva e fluxo contínuo.',
+      icon: <Zap className="w-6 h-6 text-blue-600" />,
+      category: 'binaural',
+      duration: '25:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/foco%20corporativo%20profundo'
+    },
+    {
+      id: 'mindfulness-guided',
+      name: 'Meditação Mindfulness Guiada',
+      description: 'Jornada de atenção plena para redução de ansiedade e clareza mental.',
+      icon: <Star className="w-6 h-6 text-purple-400" />,
+      category: 'mantras',
+      duration: '20:00',
+      isPremium: true,
+      spotifyUrl: 'https://open.spotify.com/search/guided%20mindfulness%20meditation'
+    }
+  ];
 
   const filteredSounds = sounds.filter(sound => {
     const categoryMatch = selectedCategory === 'all' || sound.category === selectedCategory;
@@ -109,39 +274,16 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
   }, [currentSound]);
 
   const handleSoundSelect = (sound: Sound) => {
-    try {
-      // ✅ CENTRALIZADO - Uma função, um ponto de verdade
-      const decision = startGuidedMeditation(user, sound.id);
+    if (sound.isPremium && !user?.isPremium) {
+      return;
+    }
 
-      // Mostrar hint se necessário
-      if (decision.showUpgradeHint) {
-        setShowUpgradeHint(true);
-        setTimeout(() => setShowUpgradeHint(false), 4000);
-      }
-
-      // Play via AudioPlayer (que decidirá entre src ou spotifyEmbedUrl)
-      if (currentTrack?.id === sound.id) {
-        togglePlay();
-      } else {
-        playTrack({
-          id: sound.id,
-          name: sound.name,
-          src: decision.type === 'internal' ? decision.url : sound.src,
-          spotifyEmbedUrl: decision.type === 'spotify' ? decision.url : sound.spotifyEmbedUrl
-        });
-      }
-    } catch (error) {
-      console.error('Erro ao iniciar sessão:', error);
-      // Fallback: toca Spotify mesmo se decision falhar
-      if (currentTrack?.id === sound.id) {
-        togglePlay();
-      } else {
-        playTrack({
-          id: sound.id,
-          name: sound.name,
-          src: sound.src,
-          spotifyEmbedUrl: sound.spotifyEmbedUrl
-        });
+    if (currentSound === sound.id) {
+      togglePlayback();
+    } else {
+      setCurrentSound(sound.id);
+      if (sound.src) {
+        setIsPlaying(true);
       }
     }
   };
@@ -217,25 +359,237 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
           </p>
         </div>
 
-        {/* Spotify Login Info Banner */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 mb-8 max-w-4xl mx-auto shadow-md">
-          <div className="flex items-start space-x-4">
-            <div className="flex-shrink-0">
-              <div className="p-3 bg-green-100 rounded-full">
-                <Sparkles className="w-6 h-6 text-green-600" />
+        {/* ═══════════════════════════════════════════════════════════════════
+             🎯  GUIA DE ORIENTAÇÃO & SONS BIOADAPTATIVOS
+             Geradores nativos via Web Audio API · Zero arquivos externos
+            ═══════════════════════════════════════════════════════════════════ */}
+        <div className="mb-10">
+          
+          {/* GUIA DO CLIENTE: O QUE FAZER E COMO USAR */}
+          <div className="bg-gradient-to-r from-purple-900/90 via-indigo-900/90 to-blue-900/90 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-xl border border-purple-500/30">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-3xl">🧭</span>
+              <div>
+                <h2 className="text-xl md:text-2xl font-bold">Guia Rápido: Qual som escolher agora?</h2>
+                <p className="text-purple-200 text-xs md:text-sm">
+                  Escolha <strong>1 opção por vez</strong> de acordo com o seu objetivo no momento. Usar fones de ouvido enriquece a experiência.
+                </p>
               </div>
             </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-bold text-green-900 mb-2">
-                💡 Dica: Para Melhor Experiência
-              </h3>
-              <p className="text-green-800 leading-relaxed">
-                Todas as jornadas sonoras foram <strong>cuidadosamente curadas</strong> para máxima eficácia terapêutica.
-                Para resultados otimizados, recomendamos <strong>fazer login no Spotify</strong> antes de iniciar sua sessão.
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div className="text-xs text-purple-300 font-bold uppercase tracking-wider mb-1">😰 Estresse ou Agitação</div>
+                <div className="text-sm font-semibold text-white">Down-Regulation ou Âncora Respiratória</div>
+                <div className="text-xs text-purple-200 mt-1">Conduz o ritmo respiratório para acalmar o sistema nervoso em minutos.</div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div className="text-xs text-purple-300 font-bold uppercase tracking-wider mb-1">😴 Relaxar ou Preparar o Sono</div>
+                <div className="text-sm font-semibold text-white">Paisagem Sonora Água ou Binaural Delta</div>
+                <div className="text-xs text-purple-200 mt-1">Frequências suaves para descompressão e indução ao descanso profundo.</div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div className="text-xs text-purple-300 font-bold uppercase tracking-wider mb-1">🎯 Foco no Trabalho / Estudo</div>
+                <div className="text-sm font-semibold text-white">Binaural Alpha / Gamma ou Elemento Madeira</div>
+                <div className="text-xs text-purple-200 mt-1">Sons que favorecem a concentração mantendo a mente calma e atenta.</div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div className="text-xs text-purple-300 font-bold uppercase tracking-wider mb-1">🌿 Equilíbrio do Dia a Dia</div>
+                <div className="text-sm font-semibold text-white">Paisagens Pentatônicas (432 Hz)</div>
+                <div className="text-xs text-purple-200 mt-1">Harmozações de 5 elementos inspiradas na tradição milenar oriental.</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mb-6">
+            <span className="inline-block bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-2">
+              🔬 Motor de Síntese Bioadaptativo Nativo
+            </span>
+            <h2 className="text-2xl font-bold text-gray-800">Sons de Síntese em Tempo Real</h2>
+            <p className="text-gray-500 text-sm mt-1 max-w-xl mx-auto">
+              Gerados diretamente no seu dispositivo sem consumo de internet · Ative apenas um som por vez
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+            {/* ── PILAR 1: MTC PENTATÔNICA ──────────────────────────────── */}
+            <div className={`rounded-2xl p-5 border-2 transition-all ${
+              activePillar === 'mtc'
+                ? 'border-emerald-400 bg-gradient-to-br from-emerald-50 to-green-50 shadow-lg'
+                : 'border-gray-200 bg-white hover:border-emerald-300'
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-2xl">☯️</span>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-sm">Paisagens Pentatônicas</h3>
+                  <p className="text-xs text-gray-500">5 Elementos · Afinação em 432 Hz</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mb-4 leading-relaxed">
+                Arranjos em afinação estética de 432 Hz inspirados nos elementos da Medicina Tradicional Chinesa.
               </p>
-              <p className="text-sm text-green-700 mt-2">
-                ✓ Login gratuito • ✓ Playlists exclusivas XZenPress • ✓ 100% de reciprocidade clínica
+              <div className="grid grid-cols-5 gap-1.5 mb-3">
+                {([
+                  { el: 'wood' as MtcElement, label: '🌿', name: 'Madeira', tip: 'Foco' },
+                  { el: 'fire' as MtcElement, label: '🔥', name: 'Fogo', tip: 'Conexão' },
+                  { el: 'earth' as MtcElement, label: '🌍', name: 'Terra', tip: 'Centro' },
+                  { el: 'metal' as MtcElement, label: '⚙️', name: 'Metal', tip: 'Respirar' },
+                  { el: 'water' as MtcElement, label: '💧', name: 'Água', tip: 'Calma' },
+                ]).map(({ el, label, name, tip }) => (
+                  <button
+                    key={el}
+                    onClick={() => toggleMtc(el)}
+                    title={`${MTC_ELEMENT_NAMES[el]} — ${tip}`}
+                    className={`flex flex-col items-center p-2 rounded-xl text-[11px] font-semibold transition-all ${
+                      activePillar === 'mtc' && activeMtc === el
+                        ? 'bg-emerald-500 text-white shadow-md scale-105'
+                        : 'bg-gray-100 text-gray-600 hover:bg-emerald-100'
+                    }`}
+                  >
+                    <span className="text-sm">{label}</span>
+                    <span className="mt-0.5 font-bold">{name}</span>
+                    <span className="text-[9px] opacity-75 font-normal">{tip}</span>
+                  </button>
+                ))}
+              </div>
+              {activePillar === 'mtc' && (
+                <div className="text-center">
+                  <p className="text-xs text-emerald-700 font-semibold animate-pulse mb-2">
+                    🔊 {MTC_ELEMENT_NAMES[activeMtc]}
+                  </p>
+                  <button onClick={stopZenSession} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 mx-auto">
+                    <Square className="w-3 h-3" /> Parar Som
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* ── PILAR 2: QIGONG RHYTHM ────────────────────────────────── */}
+            <div className={`rounded-2xl p-5 border-2 transition-all ${
+              activePillar === 'qigong'
+                ? 'border-sky-400 bg-gradient-to-br from-sky-50 to-blue-50 shadow-lg'
+                : 'border-gray-200 bg-white hover:border-sky-300'
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-2xl">🌬️</span>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-sm">Âncora Respiratória</h3>
+                  <p className="text-xs text-gray-500">Qigong Rhythm · 5,5s por fase</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mb-4 leading-relaxed">
+                Guia sonoro suave para conduzir sua respiração na frequência de coerência cardiorrespiratória.
               </p>
+              {activePillar === 'qigong' ? (
+                <div className="text-center">
+                  <div className={`text-4xl mb-2 transition-all duration-500 ${
+                    qigongPhase === 'inspire' ? 'scale-110' : 'scale-90'
+                  }`}>
+                    {qigongPhase === 'inspire' ? '🫧' : '🍃'}
+                  </div>
+                  <p className={`text-sm font-bold mb-1 ${
+                    qigongPhase === 'inspire' ? 'text-sky-600' : 'text-blue-800'
+                  }`}>
+                    {qigongPhase === 'inspire' ? '↑ Inspire profundamente' : '↓ Expire devagar'}
+                  </p>
+                  <button onClick={stopZenSession} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 mx-auto mt-2">
+                    <Square className="w-3 h-3" /> Parar Âncora
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={toggleQigong}
+                  className="w-full py-2.5 rounded-xl bg-sky-500 text-white text-sm font-semibold hover:bg-sky-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Play className="w-4 h-4" /> Iniciar Âncora (5,5s)
+                </button>
+              )}
+            </div>
+
+            {/* ── PILAR 3: BINAURAL / NEUROCIÊNCIA ─────────────────────── */}
+            <div className={`rounded-2xl p-5 border-2 transition-all ${
+              activePillar === 'binaural'
+                ? 'border-violet-400 bg-gradient-to-br from-violet-50 to-purple-50 shadow-lg'
+                : 'border-gray-200 bg-white hover:border-violet-300'
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-2xl">🧠</span>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-sm">Faixas Binaurais</h3>
+                  <p className="text-xs text-gray-500">Uso com fones recomendado</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mb-3 leading-relaxed">
+                Padrões estéreo opcionais associados a relaxamento e foco. Os efeitos variam entre indivíduos.
+              </p>
+              <div className="space-y-1.5 mb-3">
+                {([
+                  { state: 'alpha' as BinauralState, color: 'bg-violet-500' },
+                  { state: 'theta' as BinauralState, color: 'bg-purple-600' },
+                  { state: 'delta' as BinauralState, color: 'bg-indigo-700' },
+                  { state: 'beta'  as BinauralState, color: 'bg-blue-500' },
+                  { state: 'gamma' as BinauralState, color: 'bg-pink-500' },
+                ]).map(({ state, color }) => (
+                  <button
+                    key={state}
+                    onClick={() => toggleBinaural(state)}
+                    className={`w-full px-3 py-1.5 rounded-lg text-xs font-semibold text-left transition-all ${
+                      activePillar === 'binaural' && activeBinaural === state
+                        ? `${color} text-white shadow-md`
+                        : 'bg-gray-100 text-gray-600 hover:bg-violet-100'
+                    }`}
+                  >
+                    {BINAURAL_LABELS[state]}
+                  </button>
+                ))}
+              </div>
+              {activePillar === 'binaural' && (
+                <button onClick={stopZenSession} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 mx-auto mt-1">
+                  <Square className="w-3 h-3" /> Parar
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ── PROTOCOLO CLÍNICO: Down Regulation ──────────────────────── */}
+          <div className={`mt-5 rounded-2xl p-5 border-2 transition-all ${
+            activePillar === 'downreg'
+              ? 'border-orange-400 bg-gradient-to-r from-orange-50 to-amber-50 shadow-lg'
+              : 'border-gray-200 bg-white hover:border-orange-300'
+          }`}>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🏥</span>
+                <div>
+                  <h3 className="font-bold text-gray-800">Protocolo Down Regulation <span className="text-xs font-normal bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full ml-1">8 min</span></h3>
+                  <p className="text-xs text-gray-500">Rampa BPM 80→72→64→58 · Grounding 174 Hz · Descompressão simpática</p>
+                </div>
+              </div>
+              {activePillar === 'downreg' ? (
+                <div className="flex items-center gap-4">
+                  <div className="text-center">
+                    <span className="text-2xl font-bold text-orange-600">{downRegBpm}</span>
+                    <p className="text-xs text-gray-500">BPM atual</p>
+                  </div>
+                  <button
+                    onClick={stopZenSession}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600"
+                  >
+                    <Square className="w-4 h-4" /> Parar
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={toggleDownReg}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-semibold hover:bg-orange-600 transition-colors"
+                >
+                  <Play className="w-4 h-4" /> Iniciar Protocolo
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -513,37 +867,6 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
           )}
         </div>
       </div>
-
-      {/* Premium Upgrade Hint (for Free users) */}
-      {showUpgradeHint && !user?.isPremium && (
-        <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 mb-8 max-w-4xl mx-auto border-2 border-purple-200 shadow-lg animate-fade-in">
-          <div className="flex items-start space-x-4">
-            <div className="p-3 bg-purple-100 rounded-xl">
-              <Crown className="w-6 h-6 text-purple-600" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 mb-2">
-                💎 Sessões terapêuticas completas
-              </h3>
-              <p className="text-gray-700 mb-3">
-                {getUpgradeMessage()}
-              </p>
-              <button
-                onClick={() => onPageChange('premium')}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full font-medium hover:shadow-lg transition-all"
-              >
-                Conhecer Premium
-              </button>
-            </div>
-            <button
-              onClick={() => setShowUpgradeHint(false)}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -33,22 +33,8 @@ export class EmailService {
       console.log('📧 Email PIX preparado para:', customerEmail);
       console.log('📄 Conteúdo:', emailHtml);
 
-      // Salvar log de email no Supabase (já que não temos SMTP configurado ainda)
-      await supabase!.from('email_logs').insert([{
-        recipient_email: customerEmail,
-        subject: 'Pagamento Confirmado - XZenPress',
-        content_html: emailHtml,
-        status: 'simulated', // Marcado como simulado para diferenciar de envio real
-        metadata: {
-          customerName,
-          amount,
-          orderId,
-          type: 'pix_confirmation',
-          original_action: 'sendPixPaymentConfirmation'
-        }
-      }]);
-
-      console.log('✅ Email PIX registrado no banco de dados (email_logs)');
+      // TODO: Implementar envio real via Supabase Edge Function ou SMTP
+      // Por enquanto, apenas log para desenvolvimento
 
       return true;
     } catch (error) {
@@ -67,28 +53,10 @@ export class EmailService {
     try {
       const emailHtml = this.generateWelcomeEmail(customerName);
 
-      if (!supabase) {
-        console.warn('Supabase não configurado. Logs de email não serão salvos.');
-        return true;
-      }
-
       console.log('📧 Email de boas-vindas preparado para:', customerEmail);
       console.log('📄 Conteúdo:', emailHtml);
 
-      // Salvar log de email no Supabase
-      await supabase!.from('email_logs').insert([{
-        recipient_email: customerEmail,
-        subject: 'Bem-vindo ao XZenPress Premium',
-        content_html: emailHtml,
-        status: 'simulated',
-        metadata: {
-          customerName,
-          type: 'welcome_premium',
-          original_action: 'sendWelcomePremiumEmail'
-        }
-      }]);
-
-      console.log('✅ Email de boas-vindas registrado no banco de dados (email_logs)');
+      // TODO: Implementar envio real
 
       return true;
     } catch (error) {

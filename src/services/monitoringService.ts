@@ -1,5 +1,3 @@
-import { supabase } from '../lib/supabase';
-
 /**
  * Error Monitoring and Logging Service
  * Centralized error tracking and monitoring
@@ -151,24 +149,17 @@ class MonitoringService {
     /**
      * Send error to server for persistence
      */
-    /**
-     * Send error to server for persistence (Supabase)
-     */
     private async sendToServer(errorLog: ErrorLog) {
-        if (!supabase) return;
-
         try {
-            await supabase.from('system_logs').insert([{
-                level: errorLog.level,
-                message: errorLog.message,
-                context: errorLog.context || {},
-                user_id: errorLog.userId || null,
-                url: errorLog.url,
-                user_agent: errorLog.userAgent,
-                timestamp: errorLog.timestamp
-            }]);
+            await fetch(`${getBaseApiUrl()}/.netlify/functions/log-error`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(errorLog),
+            });
         } catch (error) {
-            console.error('Failed to send error to Supabase:', error);
+            console.error('Failed to send error to server:', error);
         }
     }
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2, Volume2, Sparkles } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { PartnershipModal } from './PartnershipModal';
-import ChristmasEffects from './ChristmasEffects';
+
 import { startQigongRhythm, stopAllZenAudio, ZenAudioSession } from '../services/zenAudioEngine';
 
 interface HomePageProps {
@@ -247,17 +247,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-24">
-      {/* Christmas Effects - Snow & Banner */}
-      <ChristmasEffects />
+
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
           <div className="text-center">
-            {/* Logo XZenPress - Christmas Edition */}
+            {/* Logo XZenPress Oficial */}
             <div className="flex justify-center mb-8">
               <img
-                src="/Logo Xzenpress Natal.png"
-                alt="XZenPress - Feliz Natal!"
+                src="/Logo Xzenpress oficial.png"
+                alt="XZenPress"
                 className="w-32 h-32 md:w-40 md:h-40 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300"
               />
             </div>

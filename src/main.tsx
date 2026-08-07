@@ -5,6 +5,11 @@ import './index.css'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import * as serviceWorkerRegistration from './registerServiceWorker';
 
+import { monitoring } from './services/monitoringService';
+
+// Initialize monitoring (automatically setup on import)
+console.log('Monitoring service initialized');
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>

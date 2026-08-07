@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { User, Target, Clock, Brain, Heart, Zap, Save, RefreshCw, Palette, Volume2, Bell, Dna } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+<<<<<<< Updated upstream
 import { PreferencesService } from '../services/preferencesService';
 import { MapaVivoStorageService } from '../services/mapaVivoStorageService';
 import { type AnamneseProfile, type GeneticMarkers } from '../data/anamneseProfile';
+=======
+import { supabase } from '../lib/supabase';
+>>>>>>> Stashed changes
 
 interface PersonalizationPageProps {
   onPageChange: (page: string) => void;
@@ -239,6 +243,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
     setIsSaving(true);
     setSaveStatus('idle');
 
+<<<<<<< Updated upstream
     try {
       const success = await PreferencesService.saveUserPreferences(user.id, preferences);
 
@@ -275,10 +280,44 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
       } else {
         throw new Error('Failed to save to Supabase');
       }
+=======
+    if (!user) return;
+
+    try {
+      // Mapear para formato do banco (snake_case)
+      const dbPreferences = {
+        user_id: user.id,
+        stress_level: preferences.stressLevel,
+        sleep_quality: preferences.sleepQuality,
+        main_concerns: preferences.mainConcerns,
+        preferred_time: preferences.preferredTime,
+        experience_level: preferences.experienceLevel,
+        goals: preferences.goals,
+        session_duration: preferences.sessionDuration,
+        reminder_frequency: preferences.reminderFrequency,
+        preferred_colors: preferences.preferredColors,
+        sound_preferences: preferences.soundPreferences,
+        breathing_pace: preferences.breathingPace,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase!
+        .from('user_preferences')
+        .upsert(dbPreferences, { onConflict: 'user_id' });
+
+      if (error) throw error;
+
+      // Salvar no localStorage como backup/cache
+      localStorage.setItem('userPreferences', JSON.stringify(preferences));
+>>>>>>> Stashed changes
 
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
+<<<<<<< Updated upstream
       console.error('Save error:', error);
+=======
+      console.error('Erro ao salvar preferências:', error);
+>>>>>>> Stashed changes
       setSaveStatus('error');
     } finally {
       setIsSaving(false);
@@ -304,6 +343,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
   useEffect(() => {
     const loadPreferences = async () => {
       if (!user) return;
+<<<<<<< Updated upstream
       const saved = await PreferencesService.getUserPreferences(user.id);
       if (saved) {
         setPreferences(saved);
@@ -317,6 +357,45 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ onPage
         }
       }
     };
+=======
+
+      try {
+        const { data, error } = await supabase!
+          .from('user_preferences')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (data) {
+          // Mapear de volta para camelCase
+          setPreferences({
+            stressLevel: data.stress_level,
+            sleepQuality: data.sleep_quality,
+            mainConcerns: data.main_concerns || [],
+            preferredTime: data.preferred_time,
+            experienceLevel: data.experience_level,
+            goals: data.goals || [],
+            sessionDuration: data.session_duration,
+            reminderFrequency: data.reminder_frequency,
+            preferredColors: data.preferred_colors || [],
+            soundPreferences: data.sound_preferences || [],
+            breathingPace: data.breathing_pace
+          });
+        } else if (error && error.code !== 'PGRST116') {
+          console.error('Erro ao carregar do Supabase:', error);
+        } else {
+          // Tentar localStorage se não tiver no banco (migração)
+          const saved = localStorage.getItem('userPreferences');
+          if (saved) {
+            setPreferences(JSON.parse(saved));
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao carregar preferências:', err);
+      }
+    };
+
+>>>>>>> Stashed changes
     loadPreferences();
   }, [user]);
 

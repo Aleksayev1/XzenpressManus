@@ -27,13 +27,19 @@ export const GlobalPlayer: React.FC = () => {
 
     return (
         <div className="fixed bottom-0 left-0 right-0 z-[99999]">
-            {/* LOCAL AUDIO PLAYER (Hidden but functional) */}
+            {/* LOCAL AUDIO PLAYER (Hidden but functional) - PREMIUM CONTENT */}
             {currentTrack.src && (
                 <audio
                     ref={audioRef}
                     src={currentTrack.src}
                     onEnded={() => togglePlay()}
+                    onError={(e) => {
+                        console.error('Premium audio failed, logging internally:', e);
+                        // Silent fallback: player just stops, user can retry
+                        // Future: could auto-redirect to Spotify playlist
+                    }}
                     loop
+                    preload="metadata"  // ✅ Enterprise: reduce latency without loading full file
                     className="hidden"
                 />
             )}

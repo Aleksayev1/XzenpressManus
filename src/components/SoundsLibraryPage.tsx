@@ -1,24 +1,60 @@
+<<<<<<< Updated upstream
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Music, Heart, Waves, CloudRain, Wind, Flame, Leaf, Star, Lock, Crown, ExternalLink, Zap, Cloud, ArrowLeft, Home, Activity, Square } from 'lucide-react';
+=======
+import React, { useState, useMemo } from 'react';
+import { Play, Pause, Volume2, VolumeX, Music, Sparkles, Waves, CloudRain, Wind, Flame, Star, Crown, Zap, Cloud, ArrowLeft } from 'lucide-react';
+>>>>>>> Stashed changes
 import { useAuth } from '../contexts/AuthContext';
 import { createSpotifyService } from '../services/spotifyService';
 import { useLanguage } from '../contexts/LanguageContext';
+<<<<<<< Updated upstream
 import {
   playMtcElement, startBinauralBeats, startQigongRhythm, startDownRegulationProtocol,
   MTC_ELEMENT_NAMES, BINAURAL_LABELS,
   type MtcElement, type BinauralState, type ZenAudioSession
 } from '../services/zenAudioEngine';
+=======
+import { useAudioPlayer, Track } from '../contexts/AudioPlayerContext';
+import { startGuidedMeditation, getUpgradeMessage, getAllSessions } from '../services/audioDecisionService';
+>>>>>>> Stashed changes
 
 interface SoundsLibraryPageProps {
   onPageChange: (page: string) => void;
 }
 
+<<<<<<< Updated upstream
 interface Sound {
   id: string;
+=======
+// Mapping SESSION_MAP categories to UI categories
+const categoryMapping: Record<string, string> = {
+  'sleep': 'nature',
+  'stress': 'mantras',
+  'focus': 'binaural',
+  'meditation': 'mantras'
+};
+
+// Icon mapping for sessions
+const iconMapping: Record<string, React.ReactNode> = {
+  'ocean-waves': <Waves className="w-6 h-6 text-blue-500" />,
+  'gentle-rain': <CloudRain className="w-6 h-6 text-blue-400" />,
+  'fireplace-ambience': <Flame className="w-6 h-6 text-orange-500" />,
+  'sistema-nervoso-reset': <Zap className="w-6 h-6 text-purple-500" />,
+  'craniopuntura-ansiedade': <Sparkles className="w-6 h-6 text-pink-500" />,
+  'binaural-focus-40hz': <Star className="w-6 h-6 text-yellow-500" />,
+  'foco-corporativo': <Zap className="w-6 h-6 text-indigo-500" />,
+  'tigelas-tibetanas': <span className="text-2xl">🎌</span>,
+  'meditacao-mindfulness': <Sparkles className="w-6 h-6 text-purple-400" />
+};
+
+// Extending local Sound interface to match Track logic
+interface Sound extends Omit<Track, 'name'> {
+>>>>>>> Stashed changes
   name: string;
   description: string;
   icon: React.ReactNode;
-  category: 'nature' | 'ambient' | 'binaural' | 'mantras';
+  category: string;
   duration: string;
   isPremium: boolean;
   src?: string;
@@ -28,6 +64,7 @@ interface Sound {
 export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChange }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
+<<<<<<< Updated upstream
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [fromMapaVivo, setFromMapaVivo] = useState(false);
   useEffect(() => {
@@ -92,6 +129,13 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
     console.log('🎵 Spotify: Links diretos sempre ativos');
     console.log('✅ Playlists oficiais do Spotify funcionando');
   }, []);
+=======
+  const { user } = useAuth();
+  const { currentTrack, isPlaying, togglePlay, playTrack, volume, setVolume } = useAudioPlayer();
+
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [showUpgradeHint, setShowUpgradeHint] = useState(false);
+>>>>>>> Stashed changes
 
   const categories = [
     { id: 'all', name: t('sounds.category.all'), icon: <Volume2 className="w-4 h-4" /> },
@@ -101,6 +145,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
     { id: 'mantras', name: t('sounds.category.mantras'), icon: <Music className="w-4 h-4" />, premium: true },
   ];
 
+<<<<<<< Updated upstream
   const sounds: Sound[] = [
     // Sons Gratuitos
     {
@@ -238,6 +283,22 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
       spotifyUrl: 'https://open.spotify.com/search/guided%20mindfulness%20meditation'
     }
   ];
+=======
+  // ✅ SINGLE SOURCE OF TRUTH - Derive from SESSION_MAP
+  const sounds: Sound[] = useMemo(() => {
+    return getAllSessions().map(session => ({
+      id: session.id,
+      name: session.title,
+      description: session.description,
+      icon: iconMapping[session.id] || <Music className="w-6 h-6 text-gray-500" />,
+      category: categoryMapping[session.category] || 'nature',
+      duration: `${session.durationMinutes}:00`,
+      isPremium: session.premium.audioUrl !== null, // Premium if has hosted audio
+      src: session.premium.audioUrl || undefined,
+      spotifyEmbedUrl: session.free.spotifyPlaylistUrl
+    }));
+  }, []);
+>>>>>>> Stashed changes
 
   const filteredSounds = sounds.filter(sound => {
     const categoryMatch = selectedCategory === 'all' || sound.category === selectedCategory;
@@ -274,6 +335,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
   }, [currentSound]);
 
   const handleSoundSelect = (sound: Sound) => {
+<<<<<<< Updated upstream
     if (sound.isPremium && !user?.isPremium) {
       return;
     }
@@ -284,6 +346,41 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
       setCurrentSound(sound.id);
       if (sound.src) {
         setIsPlaying(true);
+=======
+    try {
+      // ✅ CENTRALIZADO - Uma função, um ponto de verdade
+      const decision = startGuidedMeditation(user, sound.id);
+
+      // Mostrar hint se necessário
+      if (decision.showUpgradeHint) {
+        setShowUpgradeHint(true);
+        setTimeout(() => setShowUpgradeHint(false), 4000);
+      }
+
+      // Play via AudioPlayer (que decidirá entre src ou spotifyEmbedUrl)
+      if (currentTrack?.id === sound.id) {
+        togglePlay();
+      } else {
+        playTrack({
+          id: sound.id,
+          name: sound.name,
+          src: decision.type === 'internal' ? decision.url : sound.src,
+          spotifyEmbedUrl: decision.type === 'spotify' ? decision.url : sound.spotifyEmbedUrl
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao iniciar sessão:', error);
+      // Fallback: toca Spotify mesmo se decision falhar
+      if (currentTrack?.id === sound.id) {
+        togglePlay();
+      } else {
+        playTrack({
+          id: sound.id,
+          name: sound.name,
+          src: sound.src,
+          spotifyEmbedUrl: sound.spotifyEmbedUrl
+        });
+>>>>>>> Stashed changes
       }
     }
   };
@@ -359,6 +456,7 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
           </p>
         </div>
 
+<<<<<<< Updated upstream
         {/* ═══════════════════════════════════════════════════════════════════
              🎯  GUIA DE ORIENTAÇÃO & SONS BIOADAPTATIVOS
              Geradores nativos via Web Audio API · Zero arquivos externos
@@ -590,6 +688,27 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
                   <Play className="w-4 h-4" /> Iniciar Protocolo
                 </button>
               )}
+=======
+        {/* Spotify Login Info Banner */}
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 mb-8 max-w-4xl mx-auto shadow-md">
+          <div className="flex items-start space-x-4">
+            <div className="flex-shrink-0">
+              <div className="p-3 bg-green-100 rounded-full">
+                <Sparkles className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-green-900 mb-2">
+                💡 Dica: Para Melhor Experiência
+              </h3>
+              <p className="text-green-800 leading-relaxed">
+                Todas as jornadas sonoras foram <strong>cuidadosamente curadas</strong> para máxima eficácia terapêutica.
+                Para resultados otimizados, recomendamos <strong>fazer login no Spotify</strong> antes de iniciar sua sessão.
+              </p>
+              <p className="text-sm text-green-700 mt-2">
+                ✓ Login gratuito • ✓ Playlists exclusivas XZenPress • ✓ 100% de reciprocidade clínica
+              </p>
+>>>>>>> Stashed changes
             </div>
           </div>
         </div>
@@ -697,7 +816,34 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
                   {Math.round(volume * 100)}%
                 </span>
               </div>
+<<<<<<< Updated upstream
             </div>
+=======
+            ) : currentSoundData.spotifyEmbedUrl ? (
+              // Spotify Player Message with Login Tip
+              <div className="w-full space-y-3">
+                <div className="text-center p-4 bg-green-50 rounded-xl border border-green-200">
+                  <p className="text-green-800 font-medium mb-2">
+                    🎵 Tocando via Spotify
+                  </p>
+                  <p className="text-sm text-green-700">
+                    O player aparecerá na parte inferior da tela.
+                  </p>
+                  <p className="text-xs text-green-600 mt-2">
+                    Continue navegando - o som não vai parar!
+                  </p>
+                </div>
+
+                {/* Login Optimization Tip */}
+                <div className="text-center p-3 bg-yellow-50 rounded-xl border border-yellow-200">
+                  <p className="text-xs text-yellow-800">
+                    💡 <strong>Dica:</strong> Para melhor qualidade e experiência completa,
+                    faça <a href="https://accounts.spotify.com/login" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-yellow-900">login no Spotify</a>
+                  </p>
+                </div>
+              </div>
+            ) : null}
+>>>>>>> Stashed changes
           </div>
         )}
 
@@ -867,6 +1013,37 @@ export const SoundsLibraryPage: React.FC<SoundsLibraryPageProps> = ({ onPageChan
           )}
         </div>
       </div>
+
+      {/* Premium Upgrade Hint (for Free users) */}
+      {showUpgradeHint && !user?.isPremium && (
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 mb-8 max-w-4xl mx-auto border-2 border-purple-200 shadow-lg animate-fade-in">
+          <div className="flex items-start space-x-4">
+            <div className="p-3 bg-purple-100 rounded-xl">
+              <Crown className="w-6 h-6 text-purple-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-gray-900 mb-2">
+                💎 Sessões terapêuticas completas
+              </h3>
+              <p className="text-gray-700 mb-3">
+                {getUpgradeMessage()}
+              </p>
+              <button
+                onClick={() => onPageChange('premium')}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full font-medium hover:shadow-lg transition-all"
+              >
+                Conhecer Premium
+              </button>
+            </div>
+            <button
+              onClick={() => setShowUpgradeHint(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

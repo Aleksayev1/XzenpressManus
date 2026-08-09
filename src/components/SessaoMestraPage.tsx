@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowRight, Brain, Zap, Activity, Send, Loader2, Sparkles, X, Crown, CheckCircle } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
@@ -123,11 +123,40 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [showAnxietyCapture, setShowAnxietyCapture] = useState(false);
     const [premiumModal, setPremiumModal] = useState<{
         isOpen: boolean;
+        moduleName?: string;
         detail?: string;
         targetPage?: string;
         contextKey?: string;
         contextData?: any;
     }>({ isOpen: false });
+
+    // ── Chat State ──────────────────────────────────────────────────────────
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [input, setInput] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // ── Breathing State ──────────────────────────────────────────────────────
+    const [breathState, setBreathState] = useState<'idle' | 'inhale' | 'hold' | 'exhale' | 'done'>('idle');
+    const [breathCount, setBreathCount] = useState(0);
+    const [breathSeconds, setBreathSeconds] = useState(0);
+
+    // ── Acupressure Timer ────────────────────────────────────────────────────
+    const [timeLeft, setTimeLeft] = useState(60);
+    const [isTimerActive, setIsTimerActive] = useState(false);
+    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    const toggleTimer = useCallback(() => {
+        setIsTimerActive(prev => !prev);
+    }, []);
+
+    const formatTime = useCallback((seconds: number) => {
+        if (seconds <= 0) return '✓ Pronto';
+        return `${seconds}s`;
+    }, []);
+
+    // ── ZenFlow State ────────────────────────────────────────────────────────
+    const [zenFlowStepIndex, setZenFlowStepIndex] = useState(0);
 
     // Usage Limit State & Tier Helper
     const [usageCount, setUsageCount] = useState(0);
@@ -175,6 +204,51 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         }
         return false;
     };
+
+    // ── Timer Effect ─────────────────────────────────────────────────────────
+    useEffect(() => {
+        if (isTimerActive && timeLeft > 0) {
+            timerRef.current = setInterval(() => {
+                setTimeLeft(prev => {
+                    if (prev <= 1) {
+                        setIsTimerActive(false);
+                        if (timerRef.current) clearInterval(timerRef.current);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        } else if (!isTimerActive && timerRef.current) {
+            clearInterval(timerRef.current);
+        }
+        return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    }, [isTimerActive, timeLeft]);
+
+    // ── Breathing Effect ─────────────────────────────────────────────────────
+    useEffect(() => {
+        if (breathState === 'idle' || breathState === 'done') return;
+        const durations: Record<string, number> = { inhale: 4, hold: 2, exhale: 6 };
+        const totalSeconds = durations[breathState] || 4;
+        if (breathSeconds >= totalSeconds - 1) {
+            // Transition to next state
+            setBreathSeconds(0);
+            if (breathState === 'inhale') { setBreathState('hold'); }
+            else if (breathState === 'hold') { setBreathState('exhale'); }
+            else if (breathState === 'exhale') {
+                const next = breathCount + 1;
+                if (next >= 3) { setBreathState('done'); setBreathCount(0); }
+                else { setBreathCount(next); setBreathState('inhale'); }
+            }
+        } else {
+            const timer = setTimeout(() => setBreathSeconds(s => s + 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [breathState, breathSeconds, breathCount]);
+
+    // ── Auto-scroll chat messages ────────────────────────────────────────────
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
 
     // Initialize from LocalStorage (if navigated from Home Check-In OR from ZenMentor)
     useEffect(() => {
@@ -447,7 +521,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 memory_type: 'episodic',
                 memory_category: 'emotion',
                 tags: [selectedEmotion.id, 'sessao_mestra', ...getRecommendedPoints().map(p => p.id)],
-                memory_content: `Sessão Mestra concluída para ${selectedEmotion.namePortuguese}. Ansiedade relatada de ${preSessionAnxiety}/10 para ${postAnxiety}/10. ${result.improved ? 'Houve melhora.' : 'Sem melhora fisiológica imediata.'}`,
+                memory_content: `Sessão Mestra concluída para ${selectedEmotion.namePortuguese}. Ansiedade relatada de ${preSessionAnxiety}/10 para ${postAnxiety}/10. ${(result as any).improved ? 'Houve melhora.' : 'Sem melhora fisiológica imediata.'}`,
                 source_type: 'session_result',
                 privacy_level: 'personal_context',
                 influence_weight: 3,

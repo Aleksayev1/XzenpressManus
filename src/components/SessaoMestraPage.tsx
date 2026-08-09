@@ -134,7 +134,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [showLimitModal, setShowLimitModal] = useState(false);
 
     const getDailyMaxLimit = () => {
-        if (user?.isPremium) return Infinity;
+        if (user?.isPremium) return 999;
         if (user) return 2; // Usuário gratuito logado: 2 por dia
         return 1; // Visitante sem login: 1 por dia
     };
@@ -472,18 +472,18 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 <div className="flex items-center space-x-2 md:space-x-6">
                     {/* Free Usage Counter */}
                     {/* Free Usage Counter */}
-                    {!user?.isPremium && (
+                    {!user?.isPremium && getDailyMaxLimit() < 100 && (
                         <div className="flex items-center gap-2 bg-gray-800/80 px-3 py-1 rounded-full border border-gray-700">
                             <div className="flex gap-1">
-                                {[...Array(getDailyMaxLimit())].map((_, i) => (
+                                {Array.from({ length: Math.max(0, getDailyMaxLimit()) }).map((_, i) => (
                                     <div
                                         key={i}
-                                        className={`w-2 h-2 rounded-full ${i < usageCount ? 'bg-amber-500' : 'bg-emerald-500'} ${i === usageCount ? 'animate-pulse' : ''}`}
+                                        className={`w-2 h-2 rounded-full ${i < (usageCount || 0) ? 'bg-amber-500' : 'bg-emerald-500'} ${i === usageCount ? 'animate-pulse' : ''}`}
                                     />
                                 ))}
                             </div>
                             <span className="text-xs text-gray-300 font-medium hidden sm:inline">
-                                {usageCount}/{getDailyMaxLimit()} hoje {!user ? '(Visitante)' : '(Gratuito)'}
+                                {usageCount || 0}/{getDailyMaxLimit()} hoje {!user ? '(Visitante)' : '(Gratuito)'}
                             </span>
                         </div>
                     )}
@@ -518,11 +518,15 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
                         {!user ? (
                             <>
-                                <h2 className="text-2xl font-bold text-white mb-2">Limite Diário de Visitante (1/1)</h2>
+                                <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200 mb-3">
+                                    Desperte seu Potencial
+                                </h2>
                                 <p className="text-gray-300 text-sm mb-6 leading-relaxed">
-                                    Você já concluiu sua <strong>1 Sessão Mestra gratuita de hoje</strong> como visitante.
+                                    Sua primeira degustação da Sessão Mestra foi concluída.
                                     <br /><br />
-                                    🔑 <strong>Faça seu cadastro/login gratuito</strong> para liberar até <strong>2 sessões diárias</strong> ou torne-se <strong>Premium</strong> para acesso ilimitado!
+                                    ✨ <strong>Crie sua conta gratuita agora</strong> para ganhar mais uma sessão hoje e salvar seu histórico.
+                                    <br />
+                                    👑 Ou vá além: assine o <strong>Premium</strong> para ter <strong>acesso espetacular</strong> e ilimitado a todos os protocolos e inteligência artificial da XZenPress!
                                 </p>
                                 <div className="space-y-3">
                                     <button
@@ -543,7 +547,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         }}
                                         className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl font-bold text-black hover:scale-105 transition-all text-xs sm:text-sm"
                                     >
-                                        👑 Ver Assinatura Premium (Ilimitado)
+                                        👑 Assinar Premium (Acesso Espetacular)
                                     </button>
                                     <button
                                         onClick={() => {
@@ -558,11 +562,13 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             </>
                         ) : (
                             <>
-                                <h2 className="text-2xl font-bold text-white mb-2">Limite Diário Gratuito (2/2)</h2>
+                                <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200 mb-3">
+                                    A Jornada Apenas Começou
+                                </h2>
                                 <p className="text-gray-300 text-sm mb-6 leading-relaxed">
-                                    Você concluiu suas <strong>2 Sessões Mestras gratuitas de hoje</strong>!
+                                    Você atingiu o limite de 2 sessões diárias do plano gratuito.
                                     <br /><br />
-                                    Para manter a eficácia terapêutica e a assimilação integrativa, aguarde o próximo ciclo diário ou faça upgrade para o **Plano Premium** para uso ilimitado.
+                                    Liberte todo o poder da medicina integrativa. Obtenha <strong>acesso espetacular</strong> ao nosso ZenMentor IA, protocolos ilimitados e personalização clínica profunda fazendo o upgrade para o <strong>Premium</strong>.
                                 </p>
                                 <div className="space-y-3">
                                     <button
@@ -573,7 +579,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         }}
                                         className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl font-bold text-black shadow-lg hover:scale-105 transition-all text-xs sm:text-sm"
                                     >
-                                        👑 Tornar-se Premium (Acesso Ilimitado)
+                                        👑 Assinar Premium (Acesso Espetacular)
                                     </button>
                                     <button
                                         onClick={() => {

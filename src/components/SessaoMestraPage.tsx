@@ -74,6 +74,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const anamneseProfile = React.useMemo(() => loadAnamneseProfile(), []);
     const oracleContext = React.useMemo(() => anamneseProfile ? generateOracleContext(anamneseProfile) : null, [anamneseProfile]);
     const [selectedEmotion, setSelectedEmotion] = useState<EmotionalState | null>(null);
+    const [, setIntensity] = useState<number>(0);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [currentPointIndex, setCurrentPointIndex] = useState(0);
 

@@ -171,9 +171,17 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         return false;
     };
 
+    // ── Auto-start Timer on New Point ────────────────────────────────────────
+    useEffect(() => {
+        if (phase === 'acupressure') {
+            setTimeLeft(60);
+            setIsTimerActive(true);
+        }
+    }, [currentPointIndex, phase]);
+
     // ── Timer Effect ─────────────────────────────────────────────────────────
     useEffect(() => {
-        if (isTimerActive && timeLeft > 0) {
+        if (isTimerActive) {
             timerRef.current = setInterval(() => {
                 setTimeLeft(prev => {
                     if (prev <= 1) {
@@ -188,7 +196,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             clearInterval(timerRef.current);
         }
         return () => { if (timerRef.current) clearInterval(timerRef.current); };
-    }, [isTimerActive, timeLeft]);
+    }, [isTimerActive]);
 
     // ── Breathing Effect ─────────────────────────────────────────────────────
     useEffect(() => {

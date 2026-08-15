@@ -466,15 +466,17 @@ function useTTS() {
           throw new Error('SpeechSynthesis não suportado neste ambiente');
         }
 
+        // Detecta idioma automaticamente pelo navegador do usuário
+        const browserLang = navigator.language || navigator.languages?.[0] || 'pt-BR';
+        const baseLang = browserLang.split('-')[0];
+
         const utter = new SpeechSynthesisUtterance(clean);
-        utter.lang = 'pt-BR';
+        utter.lang = browserLang; // ← usa o idioma real do navegador
         utter.rate = 0.95;
         utter.pitch = 1.05;
 
-        // Procura a melhor voz pt-BR disponível
+        // Procura a melhor voz disponível no idioma do navegador
         const voices = window.speechSynthesis.getVoices();
-        const browserLang = navigator.language || 'pt-BR';
-        const baseLang = browserLang.split('-')[0];
         const langVoices = voices.filter(v => v.lang.startsWith(baseLang));
         const premiumKeywords = ['google', 'natural', 'premium', 'neural', 'microsoft'];
         
@@ -611,7 +613,7 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate, onBack
     if (SpeechRecognition) {
       const rec = new SpeechRecognition();
       rec.continuous = false;
-      rec.lang = 'pt-BR';
+      rec.lang = navigator.language || navigator.languages?.[0] || 'pt-BR'; // ← idioma do navegador
       rec.interimResults = true;
 
       rec.onresult = (event: any) => {

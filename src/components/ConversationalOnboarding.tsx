@@ -89,7 +89,7 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
     if (SpeechRecognition) {
       const rec = new SpeechRecognition();
       rec.continuous = false;
-      rec.lang = 'pt-BR';
+      rec.lang = navigator.language || navigator.languages?.[0] || 'pt-BR'; // ← idioma do navegador
       rec.interimResults = true;
 
       rec.onresult = (event: any) => {
@@ -158,7 +158,7 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
       if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = 'pt-BR';
+        utter.lang = navigator.language || navigator.languages?.[0] || 'pt-BR'; // ← idioma do navegador
         utter.onend = () => setIsSpeaking(false);
         window.speechSynthesis.speak(utter);
       } else {

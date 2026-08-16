@@ -1,14 +1,12 @@
-// XZenPress Service Worker - CSP Fix Optimized
-// VERSÃO 3.1.0 - Navigation Fix
-const CACHE_NAME = 'xzenpress-v3.1.0-nav-fix';
-const STATIC_CACHE = 'xzenpress-static-v3.1.0';
-const DYNAMIC_CACHE = 'xzenpress-dynamic-v3.1.0';
-const SOUNDS_CACHE = 'xzenpress-sounds-v3.1.0';
+// XZenPress Service Worker - CSP & Deploy Cache Fix
+// VERSÃO 3.2.0 - Navigation Network-First
+const CACHE_NAME = 'xzenpress-v3.2.0-nav-fix';
+const STATIC_CACHE = 'xzenpress-static-v3.2.0';
+const DYNAMIC_CACHE = 'xzenpress-dynamic-v3.2.0';
+const SOUNDS_CACHE = 'xzenpress-sounds-v3.2.0';
 
-// Static assets to cache immediately
+// Static assets to cache (exceto index.html para garantir atualizações pós-deploy)
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/Logo Xzenpress oficial.png',
   '/sounds/ocean.mp3',
@@ -34,7 +32,7 @@ const SOUNDS_PATTERNS = [
 // Install event - cache static assets
 self.addEventListener('install', event => {
   self.skipWaiting(); // Forçar nova versão imediatamente!
-  console.log('XZenPress SW 3.0.1: Installing...');
+  console.log('XZenPress SW 3.2.0: Installing...');
   event.waitUntil(
     Promise.all([
       caches.open(STATIC_CACHE).then(cache => {
@@ -48,7 +46,7 @@ self.addEventListener('install', event => {
 
 // Activate event - clean ALL old caches aggressively
 self.addEventListener('activate', event => {
-  console.log('XZenPress SW 3.0.1: Activating & Cleaning...');
+  console.log('XZenPress SW 3.2.0: Activating & Cleaning...');
   const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE, SOUNDS_CACHE];
 
   event.waitUntil(
@@ -86,6 +84,21 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(
     (async () => {
+      // 1. Network-first para requisições de navegação HTML (evita index.html com JS antigo pós-deploy)
+      if (request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html')) {
+        try {
+          const networkResponse = await fetch(request);
+          if (networkResponse && networkResponse.ok) {
+            const cache = await caches.open(STATIC_CACHE);
+            cache.put('/index.html', networkResponse.clone());
+            return networkResponse;
+          }
+        } catch (err) {
+          const cachedHtml = await caches.match('/index.html');
+          if (cachedHtml) return cachedHtml;
+        }
+      }
+
       // Cache first for sounds (large files)
       if (SOUNDS_PATTERNS.some(pattern => pattern.test(url.pathname))) {
         const cachedResponse = await caches.match(request);

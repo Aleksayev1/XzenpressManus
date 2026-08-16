@@ -1,8 +1,32 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" translate="no">
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="google" content="notranslate" />
+  
+  <!-- Recuperação Automática de Cache/Assets Pós-Deploy -->
+  <script>
+    window.addEventListener('error', function(e) {
+      var target = e.target;
+      if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
+        if (!sessionStorage.getItem('xzen_asset_fix_applied')) {
+          sessionStorage.setItem('xzen_asset_fix_applied', '1');
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+              for (var r of regs) r.unregister();
+              if ('caches' in window) {
+                caches.keys().then(function(keys) {
+                  for (var k of keys) caches.delete(k);
+                  window.location.reload(true);
+                });
+              } else { window.location.reload(true); }
+            });
+          } else { window.location.reload(true); }
+        }
+      }
+    }, true);
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

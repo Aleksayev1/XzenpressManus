@@ -23,6 +23,11 @@
 
 # ═══ Roteamento SPA Fallback no Netlify ═══
 [[redirects]]
+  from = "/assets/*"
+  to = "/assets/*"
+  status = 404
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

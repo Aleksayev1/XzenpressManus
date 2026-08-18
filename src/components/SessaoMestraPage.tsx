@@ -190,7 +190,12 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const toggleTimer = useCallback(() => {
-        setIsTimerActive(prev => !prev);
+        setIsTimerActive(prev => {
+            if (!prev) {
+                playGong();
+            }
+            return !prev;
+        });
     }, []);
 
     const formatTime = useCallback((seconds: number) => {
@@ -198,8 +203,32 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         return `${seconds}s`;
     }, []);
 
+    // Timer Countdown Effect with Gong Sound on finish
+    useEffect(() => {
+        if (!isTimerActive) return;
+
+        timerRef.current = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev <= 1) {
+                    setIsTimerActive(false);
+                    playGong();
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => {
+            if (timerRef.current) clearInterval(timerRef.current);
+        };
+    }, [isTimerActive]);
+
     // ── ZenFlow State ────────────────────────────────────────────────────────
     const [zenFlowStepIndex, setZenFlowStepIndex] = useState(0);
+
+    const nextZenFlowStep = useCallback(() => {
+        setZenFlowStepIndex(prev => prev + 1);
+    }, []);
 
     // Usage Limit State & Tier Helper
     const [usageCount, setUsageCount] = useState(0);

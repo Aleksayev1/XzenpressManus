@@ -10,7 +10,8 @@ export const MatrixRain: React.FC<{ className?: string }> = ({ className = '' })
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Configuração inicial
+        let animationFrameId: number;
+
         const resize = () => {
             if (canvas.parentElement) {
                 canvas.width = canvas.parentElement.clientWidth;
@@ -20,25 +21,31 @@ export const MatrixRain: React.FC<{ className?: string }> = ({ className = '' })
         resize();
         window.addEventListener('resize', resize);
 
-        // Caracteres (Katakana + Latin)
-        const chars = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const fontSize = 10;
-        const columns = Math.floor(canvas.width / fontSize);
+        const chars = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポ0123456789';
+        const fontSize = window.innerWidth < 768 ? 14 : 12;
+        const columns = Math.max(10, Math.floor(canvas.width / fontSize));
         const drops: number[] = new Array(columns).fill(1);
 
-        const draw = () => {
-            // Fundo translúcido para rastro
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        let lastTime = 0;
+        const fps = 20;
+        const fpsInterval = 1000 / fps;
+
+        const draw = (currentTime: number) => {
+            animationFrameId = requestAnimationFrame(draw);
+
+            const elapsed = currentTime - lastTime;
+            if (elapsed < fpsInterval) return;
+
+            lastTime = currentTime - (elapsed % fpsInterval);
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Texto verde Matrix
-            ctx.fillStyle = '#0F0';
             ctx.font = `${fontSize}px monospace`;
 
             for (let i = 0; i < drops.length; i++) {
                 const text = chars.charAt(Math.floor(Math.random() * chars.length));
 
-                // Variação de brilho (alguns caracteres brancos como "glitch")
                 if (Math.random() > 0.98) {
                     ctx.fillStyle = '#FFF';
                 } else {
@@ -47,7 +54,6 @@ export const MatrixRain: React.FC<{ className?: string }> = ({ className = '' })
 
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-                // Resetar gota randomicamente ou quando sair da tela
                 if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) {
                     drops[i] = 0;
                 }
@@ -55,10 +61,10 @@ export const MatrixRain: React.FC<{ className?: string }> = ({ className = '' })
             }
         };
 
-        const interval = setInterval(draw, 50);
+        animationFrameId = requestAnimationFrame(draw);
 
         return () => {
-            clearInterval(interval);
+            cancelAnimationFrame(animationFrameId);
             window.removeEventListener('resize', resize);
         };
     }, []);

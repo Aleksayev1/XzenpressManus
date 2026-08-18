@@ -66,6 +66,83 @@ function renderMarkdown(text: string): React.ReactNode {
   });
 }
 
+// Global AudioContext singleton unlocked on user interaction
+let globalAudioCtx: AudioContext | null = null;
+
+function getUnlockedAudioContext(): AudioContext | null {
+  try {
+    const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return null;
+    if (!globalAudioCtx || globalAudioCtx.state === 'closed') {
+      globalAudioCtx = new AudioContextClass();
+    }
+    if (globalAudioCtx && globalAudioCtx.state === 'suspended') {
+      globalAudioCtx.resume().catch(() => {});
+    }
+    return globalAudioCtx;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Unlock audio context on first user click/touch
+if (typeof window !== 'undefined') {
+  const unlockAudio = () => {
+    getUnlockedAudioContext();
+    window.removeEventListener('click', unlockAudio);
+    window.removeEventListener('touchstart', unlockAudio);
+  };
+  window.addEventListener('click', unlockAudio, { once: true });
+  window.addEventListener('touchstart', unlockAudio, { once: true });
+}
+
+function renderGongTones(ctx: AudioContext) {
+  try {
+    const now = ctx.currentTime;
+    const freqs = [180, 271, 410, 544, 811, 1085];
+    const gains = [0.6, 0.4, 0.25, 0.15, 0.08, 0.04];
+
+    freqs.forEach((f, idx) => {
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f, now);
+
+      gainNode.gain.setValueAtTime(gains[idx], now);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 4.0);
+
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 4.0);
+    });
+  } catch (e) {
+    console.warn("Error rendering gong tones:", e);
+  }
+}
+
+// Synthesizes a Zen Gong/Tibetan Bell sound using Web Audio API with Haptic Vibration
+function playGong() {
+  try {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([300, 150, 300]);
+    }
+
+    const ctx = getUnlockedAudioContext();
+    if (!ctx) return;
+
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(() => renderGongTones(ctx)).catch(() => renderGongTones(ctx));
+    } else {
+      renderGongTones(ctx);
+    }
+  } catch (e) {
+    console.warn("Web Audio Gong failed:", e);
+  }
+}
+
 export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { user } = useAuth();
     const { recordSession } = useSessionHistory();
@@ -122,7 +199,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     }, []);
 
     // ── ZenFlow State ────────────────────────────────────────────────────────
-    const [zenFlowStepIndex] = useState(0);
+    const [zenFlowStepIndex, setZenFlowStepIndex] = useState(0);
 
     // Usage Limit State & Tier Helper
     const [usageCount, setUsageCount] = useState(0);

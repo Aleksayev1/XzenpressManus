@@ -1326,10 +1326,11 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     {/* 1 ─ ZenFlow (Movimento) */}
                                     <button
                                         onClick={() => {
+                                            nextZenFlowStep();
                                             localStorage.setItem('zenflow_context', JSON.stringify({
                                                 emotionId: selectedEmotion?.id,
                                                 element: selectedEmotion?.mtcElement,
-                                                zenFlowExerciseId: selectedEmotion?.zenFlowExerciseId,
+                                                zenFlowStepIndex: zenFlowStepIndex + 1,
                                                 source: 'triad-session',
                                             }));
                                             window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'zenflow' }));

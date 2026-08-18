@@ -189,13 +189,9 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [isTimerActive, setIsTimerActive] = useState(false);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+    // toggleTimer: starts or stops the timer. Gong plays ONLY on finish (not on start).
     const toggleTimer = useCallback(() => {
-        setIsTimerActive(prev => {
-            if (!prev) {
-                playGong();
-            }
-            return !prev;
-        });
+        setIsTimerActive(prev => !prev);
     }, []);
 
     const formatTime = useCallback((seconds: number) => {
@@ -203,15 +199,33 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         return `${seconds}s`;
     }, []);
 
-    // Timer Countdown Effect with Gong Sound on finish
+    // Timer Countdown Effect — gong fires exactly once when timer reaches zero
     useEffect(() => {
-        if (!isTimerActive) return;
+        if (!isTimerActive) {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+            return;
+        }
+
+        // Clear any previous interval before creating a new one
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
 
         timerRef.current = setInterval(() => {
             setTimeLeft(prev => {
                 if (prev <= 1) {
+                    // Stop interval immediately to prevent re-fire
+                    if (timerRef.current) {
+                        clearInterval(timerRef.current);
+                        timerRef.current = null;
+                    }
                     setIsTimerActive(false);
-                    playGong();
+                    // Schedule gong outside of setState to avoid double-fire
+                    setTimeout(() => playGong(), 0);
                     return 0;
                 }
                 return prev - 1;
@@ -219,7 +233,10 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         }, 1000);
 
         return () => {
-            if (timerRef.current) clearInterval(timerRef.current);
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
         };
     }, [isTimerActive]);
 
@@ -277,32 +294,25 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         return false;
     };
 
-    // ── Auto-start Timer on New Point ────────────────────────────────────────
+    // ── Auto-start Timer on New Point (silent — gong only plays when timer ends) ──
     useEffect(() => {
         if (phase === 'acupressure') {
+            // Stop any running timer first, then restart silently
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
             setTimeLeft(60);
             setIsTimerActive(true);
+        } else {
+            // Leaving acupressure phase — stop the timer silently
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+            setIsTimerActive(false);
         }
     }, [currentPointIndex, phase]);
-
-    // ── Timer Effect ─────────────────────────────────────────────────────────
-    useEffect(() => {
-        if (isTimerActive) {
-            timerRef.current = setInterval(() => {
-                setTimeLeft(prev => {
-                    if (prev <= 1) {
-                        setIsTimerActive(false);
-                        if (timerRef.current) clearInterval(timerRef.current);
-                        return 0;
-                    }
-                    return prev - 1;
-                });
-            }, 1000);
-        } else if (!isTimerActive && timerRef.current) {
-            clearInterval(timerRef.current);
-        }
-        return () => { if (timerRef.current) clearInterval(timerRef.current); };
-    }, [isTimerActive]);
 
     // ── Breathing Effect ─────────────────────────────────────────────────────
     useEffect(() => {

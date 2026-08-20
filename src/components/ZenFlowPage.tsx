@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Wind, Activity, Zap, Play, Info, Sparkles } from 'lucide-react';
 import { ZenFlowSession } from './ZenFlowSession';
 import { ZenFlowSequence, zenFlowExercises } from '../data/zenFlowExercises';
 import { emotionalStates } from '../data/emotionalMapping';
+import { getZenFlowByEmotion } from '../data/zenFlowExercises';
 
 interface ZenFlowPageProps {
     onBack: () => void;
@@ -19,29 +20,44 @@ export const ZenFlowPage: React.FC<ZenFlowPageProps> = ({ onBack }) => {
 
     useEffect(() => {
         try {
+            // Prioridade 1: Veio da Sessão Mestra (tem zenflow_context)
             const raw = localStorage.getItem('zenflow_context');
             if (raw) {
                 const context = JSON.parse(raw);
-                localStorage.removeItem('zenflow_context'); // Clear it immediately
+                localStorage.removeItem('zenflow_context');
 
                 const seq = zenFlowExercises.find(s => s.id === context.zenFlowExerciseId) || null;
                 const emotionObj = emotionalStates.find(e => e.id === context.emotionId);
                 const emotionName = emotionObj?.namePortuguese || context.emotionId || '';
 
-                setContextBanner({
-                    emotionName,
-                    element: context.element || '',
-                    recommendedExercise: seq?.title || null,
-                    seq
-                });
+                setContextBanner({ emotionName, element: context.element || '', recommendedExercise: seq?.title || null, seq });
+                if (seq) setActiveSession(seq);
+                return;
+            }
 
-                // Auto-initiate the sequence if found
-                if (seq) {
-                    setActiveSession(seq);
+            // Prioridade 2: Check-in recente (até 2h) — IA seleciona o melhor exercício
+            const savedCheckin = localStorage.getItem('last_emotional_checkin');
+            if (savedCheckin) {
+                const checkin = JSON.parse(savedCheckin);
+                const checkinTime = new Date(checkin.timestamp).getTime();
+                if ((Date.now() - checkinTime) < 2 * 60 * 60 * 1000 && checkin.emotionId) {
+                    const emotionObj = emotionalStates.find(e => e.id === checkin.emotionId);
+                    if (emotionObj) {
+                        const aiSelected = getZenFlowByEmotion(
+                            `${emotionObj.namePortuguese} ${emotionObj.mtcElement} ${emotionObj.mtcOrgan}`
+                        );
+                        setContextBanner({
+                            emotionName: emotionObj.namePortuguese,
+                            element: emotionObj.mtcElement,
+                            recommendedExercise: aiSelected?.title || null,
+                            seq: aiSelected || null
+                        });
+                        if (aiSelected) setActiveSession(aiSelected);
+                    }
                 }
             }
         } catch (e) {
-            console.error("Error reading zenflow_context:", e);
+            console.error('Erro ao ler contexto ZenFlow:', e);
         }
     }, []);
 
@@ -120,9 +136,9 @@ export const ZenFlowPage: React.FC<ZenFlowPageProps> = ({ onBack }) => {
                             ✨
                         </div>
                         <div className="text-left">
-                            <h4 className="font-bold text-purple-900 text-sm">Oficina Terapêutica — Conexão Ativa</h4>
+                            <h4 className="font-bold text-purple-900 text-sm">✨ Indicação da IA — Sequência Personalizada</h4>
                             <p className="text-xs text-gray-650 mt-0.5">
-                                Identificamos que você concluiu o trabalho de <strong>{contextBanner.emotionName}</strong> (Elemento {contextBanner.element}).
+                                Com base no seu estado emocional, <strong>{contextBanner.emotionName}</strong> (Elemento {contextBanner.element}), a IA selecionou a melhor sequência para você.
                             </p>
                         </div>
                     </div>
@@ -131,7 +147,7 @@ export const ZenFlowPage: React.FC<ZenFlowPageProps> = ({ onBack }) => {
                             onClick={() => setActiveSession(contextBanner.seq)}
                             className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl shadow-md transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
                         >
-                            Refazer Sequência Recomendada →
+                            Iniciar Sequência Indicada pela IA →
                         </button>
                     )}
                 </div>

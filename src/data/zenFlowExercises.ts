@@ -63,7 +63,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '6 min',
         targetEmotion: ['medo', 'insegurança', 'água', 'terra'],
         intention: 'Estou seguro e sustentado pela terra.',
-        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWXLeA8Omikj7', // Brain Food (Focus/Grounding/Water)
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWoMTcAERtU', // Nature Sounds for Meditation (Grounding/Water/Earth)
         steps: [
             {
                 id: 'stomp',
@@ -87,7 +87,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '4 min',
         targetEmotion: ['preocupação', 'compulsão', 'ruminação', 'terra', 'baço', 'anxiety'],
         intention: 'Estou centrado, equilibrado e em paz com o presente.',
-        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWXLeA8Omikj7',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u', // Peaceful Piano - calming & centering (Earth/Regulation)
         steps: [
             {
                 id: 'belly-rub',

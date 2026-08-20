@@ -183,6 +183,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [breathState, setBreathState] = useState<'idle' | 'inhale' | 'hold' | 'exhale' | 'done'>('idle');
     const [breathCount, setBreathCount] = useState(0);
     const [breathSeconds, setBreathSeconds] = useState(0);
+    const breathPhaseStartTime = useRef(Date.now());
 
     // ── Acupressure Timer ────────────────────────────────────────────────────
     const [timeLeft, setTimeLeft] = useState(60);
@@ -294,46 +295,93 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         return false;
     };
 
-    // ── Auto-start Timer on New Point (silent — gong only plays when timer ends) ──
+    // ── Auto-start Timer on New Point or ZenFlow ──
     useEffect(() => {
         if (phase === 'acupressure') {
-            // Stop any running timer first, then restart silently
             if (timerRef.current) {
                 clearInterval(timerRef.current);
                 timerRef.current = null;
             }
             setTimeLeft(60);
             setIsTimerActive(true);
+        } else if (phase === 'zenflow') {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+            const exercise = selectedEmotion?.zenFlowExerciseId
+                ? zenFlowExercises.find(z => z.id === selectedEmotion.zenFlowExerciseId)
+                : zenFlowExercises[0];
+            const currentDuration = exercise?.steps[zenFlowStepIndex]?.durationSeconds || 60;
+            setTimeLeft(currentDuration);
+            setIsTimerActive(true);
         } else {
-            // Leaving acupressure phase — stop the timer silently
             if (timerRef.current) {
                 clearInterval(timerRef.current);
                 timerRef.current = null;
             }
             setIsTimerActive(false);
         }
-    }, [currentPointIndex, phase]);
+    }, [currentPointIndex, phase, zenFlowStepIndex, selectedEmotion]);
+
+    // ── Auto-advance ZenFlow steps when timer reaches zero ──
+    useEffect(() => {
+        if (phase === 'zenflow' && timeLeft === 0 && !isTimerActive) {
+            const exercise = selectedEmotion?.zenFlowExerciseId
+                ? zenFlowExercises.find(z => z.id === selectedEmotion.zenFlowExerciseId)
+                : zenFlowExercises[0];
+            
+            if (exercise && zenFlowStepIndex < exercise.steps.length - 1) {
+                const timeout = setTimeout(() => {
+                    setZenFlowStepIndex(prev => prev + 1);
+                }, 1500); // Wait 1.5s after gong before moving to the next step
+                return () => clearTimeout(timeout);
+            }
+        }
+    }, [phase, timeLeft, isTimerActive, zenFlowStepIndex, selectedEmotion]);
 
     // ── Breathing Effect ─────────────────────────────────────────────────────
     useEffect(() => {
         if (breathState === 'idle' || breathState === 'done') return;
-        const durations: Record<string, number> = { inhale: 4, hold: 2, exhale: 6 };
-        const totalSeconds = durations[breathState] || 4;
-        if (breathSeconds >= totalSeconds - 1) {
-            // Transition to next state
-            setBreathSeconds(0);
-            if (breathState === 'inhale') { setBreathState('hold'); }
-            else if (breathState === 'hold') { setBreathState('exhale'); }
+
+        breathPhaseStartTime.current = Date.now();
+        setBreathSeconds(0);
+
+        let phaseDuration = 0;
+        if (breathState === 'inhale') phaseDuration = 4000;
+        else if (breathState === 'hold') phaseDuration = 2000;
+        else if (breathState === 'exhale') phaseDuration = 6000;
+
+        const timer = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - breathPhaseStartTime.current) / 1000);
+            const target = phaseDuration / 1000;
+            setBreathSeconds(prev => {
+                const newVal = Math.min(elapsed, target - 1);
+                return prev !== newVal ? newVal : prev;
+            });
+        }, 100);
+
+        const transitionTimer = setTimeout(() => {
+            if (breathState === 'inhale') setBreathState('hold');
+            else if (breathState === 'hold') setBreathState('exhale');
             else if (breathState === 'exhale') {
-                const next = breathCount + 1;
-                if (next >= 3) { setBreathState('done'); setBreathCount(0); }
-                else { setBreathCount(next); setBreathState('inhale'); }
+                setBreathCount(c => {
+                    if (c + 1 >= 3) {
+                        setBreathState('done');
+                        playGong();
+                        return 3;
+                    }
+                    setBreathState('inhale');
+                    return c + 1;
+                });
             }
-        } else {
-            const timer = setTimeout(() => setBreathSeconds(s => s + 1), 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [breathState, breathSeconds, breathCount]);
+        }, phaseDuration);
+
+        return () => {
+            clearInterval(timer);
+            clearTimeout(transitionTimer);
+        };
+    }, [breathState]);
 
     // ── Auto-scroll chat messages ────────────────────────────────────────────
     useEffect(() => {
@@ -1246,7 +1294,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                                 {exercise?.steps.map((step, idx) => (
                                                     <div
                                                         key={step.id}
-                                                        className={`relative pl-6 border-l-2 transition-all duration-500 ${idx === zenFlowStepIndex ? 'border-blue-500 bg-blue-500/10 p-4 rounded-r-xl' : 'border-blue-500/30 opacity-50'}`}
+                                                        onClick={() => setZenFlowStepIndex(idx)}
+                                                        className={`relative pl-6 border-l-2 transition-all duration-500 cursor-pointer ${idx === zenFlowStepIndex ? 'border-blue-500 bg-blue-500/10 p-4 rounded-r-xl' : 'border-blue-500/30 opacity-50 hover:opacity-80'}`}
                                                     >
                                                         <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gray-900 border-2 transition-colors ${idx === zenFlowStepIndex ? 'border-blue-500 scale-125' : 'border-blue-500/30'} flex items-center justify-center`}>
                                                             {idx === zenFlowStepIndex && <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></div>}

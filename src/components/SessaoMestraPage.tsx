@@ -13,6 +13,7 @@ import { useCoherenceScore, computeCoherenceResult, type CoherenceSnapshot } fro
 import { ZenMemoryEngine } from '../services/zenMemoryEngine';
 // Internal components for the phases
 import { EmotionalCheckIn } from './EmotionalCheckIn';
+import { ZenStoriesCaptureModal } from './ZenStoriesCaptureModal';
 
 type SessionPhase = 'checkin' | 'insight' | 'preparation' | 'acupressure' | 'zenflow' | 'summary';
 
@@ -164,6 +165,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [preSessionAnxiety] = useState<number>(5);
     const [postSessionAnxiety, setPostSessionAnxiety] = useState<number>(5);
     const [showAnxietyCapture, setShowAnxietyCapture] = useState(false);
+    const [showStoriesCaptureModal, setShowStoriesCaptureModal] = useState(false);
     const [premiumModal, setPremiumModal] = useState<{
         isOpen: boolean;
         moduleName?: string;
@@ -1529,6 +1531,25 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         </div>
                                         <ArrowRight className="w-4 h-4 text-purple-400 flex-shrink-0" />
                                     </button>
+
+                                    {/* 6 ─ XZenPress Stories (Compartilhar Alívio) */}
+                                    <button
+                                        onClick={() => setShowStoriesCaptureModal(true)}
+                                        className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95 shadow-lg border"
+                                        style={{ background: 'rgba(244,63,94,0.12)', borderColor: 'rgba(244,63,94,0.3)' }}
+                                    >
+                                        <span className="text-2xl animate-pulse">💬</span>
+                                        <div className="flex-1">
+                                            <div className="text-white font-bold text-sm flex items-center gap-2">
+                                                XZenPress Stories — Compartilhe seu Alívio
+                                                <span className="text-[9px] bg-rose-500/20 text-rose-300 border border-rose-500/30 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Inspirar</span>
+                                            </div>
+                                            <div className="text-rose-300 text-xs mt-0.5">
+                                                Grave 30s de áudio, vídeo ou texto sobre o que sentiu
+                                            </div>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                                    </button>
                                 </div>
 
                                 <button
@@ -1635,6 +1656,23 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     isVisible={!!selectedImage}
                     imageUrl={selectedImage}
                     onClose={() => setSelectedImage(null)}
+                />
+
+                {/* XZenPress Stories Capture Modal */}
+                <ZenStoriesCaptureModal
+                    isOpen={showStoriesCaptureModal}
+                    onClose={() => setShowStoriesCaptureModal(false)}
+                    defaultAuthorName={user?.name || ''}
+                    context={{
+                        sessionName: selectedEmotion ? `Alívio ${selectedEmotion.label}` : 'Reset do Sistema Nervoso',
+                        beforeScore: preSessionAnxiety,
+                        afterScore: postSessionAnxiety,
+                        coherenceGainMs: (postSessionRmssd && preSessionRmssd && postSessionRmssd > preSessionRmssd) 
+                            ? (postSessionRmssd - preSessionRmssd) 
+                            : 16,
+                        guardianElement: selectedEmotion?.mtcElement || 'Fogo',
+                        organAffected: selectedEmotion?.mtcOrgan || 'Coração'
+                    }}
                 />
 
                 {/* Premium Features Upgrade Modal */}

@@ -1,6 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
+﻿import React, { useRef, useState, useEffect } from 'react';
 import { Play, CheckCircle2, Star, ChevronRight, Dna, Volume2, VolumeX, Wind } from 'lucide-react';
 import { startQigongRhythm, stopAllZenAudio } from '../services/zenAudioEngine';
+import { ZenStoriesWall } from './ZenStoriesWall';
+import { ZenStoriesCaptureModal } from './ZenStoriesCaptureModal';
 
 interface LandingPageProps {
   onStart: () => void;
@@ -82,6 +84,7 @@ const HeroAudioPreview: React.FC = () => {
 
 const LandingPage: React.FC<LandingPageProps> = ({ onStart, onStartGuest }) => {
   const scrollRef1 = useRef<HTMLDivElement>(null);
+  const [showStoriesModal, setShowStoriesModal] = useState(false);
 
   return (
     <div className="min-h-screen bg-netflix-dark text-white selection:bg-blue-500/30 font-outfit overflow-x-hidden">
@@ -205,33 +208,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onStartGuest }) => {
           </div>
         </section>
 
-        {/* 3. "RESULTADOS RÁPIDOS" - REAL TESTIMONIALS */}
-        <section className="px-6 md:px-12 max-w-[1600px] mx-auto">
-          <h2 className="text-3xl font-bold mb-10 tracking-tight">Resultados rápidos</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { title: "Alívio Imediato ZS", author: "Maria, SP", time: "3:00", rating: 5, color: "border-blue-500/30 bg-blue-500/5 text-blue-400" },
-              { title: "Reset de Ansiedade", author: "João, RG", time: "2:30", rating: 5, color: "border-green-500/30 bg-green-500/5 text-green-400" },
-              { title: "Sono Profundo ZenFlow", author: "Helena, SC", time: "5:00", rating: 5, color: "border-purple-500/30 bg-purple-500/5 text-purple-400" },
-              { title: "Foco 3min Binaural", author: "Ricardo, PR", time: "3:00", rating: 5, color: "border-pink-500/30 bg-pink-500/5 text-pink-400" }
-            ].map((item, i) => (
-              <div 
-                key={i} 
-                onClick={onStart}
-                className={`p-8 rounded-2xl border transition-all cursor-pointer group hover:scale-[1.02] ${item.color}`}
-              >
-                <h3 className="font-bold text-2xl mb-1 italic tracking-tight">{item.title}</h3>
-                <div className="text-sm opacity-60 mb-8 font-medium">{item.author}</div>
-                <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/10">
-                  <div className="flex text-yellow-400 gap-1">
-                    {[...Array(item.rating)].map((_, j) => <Star key={j} className="w-4 h-4 fill-current" />)}
-                  </div>
-                  <div className="font-bold text-sm tracking-widest">{item.time} MIN</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* 3. XZENPRESS STORIES — MURAL VIVO DE TRANSFORMAÇÃO */}
+        <ZenStoriesWall onOpenCaptureModal={() => setShowStoriesModal(true)} />
 
         {/* 4. FINAL CTA - HIGH CONTRAST */}
         <section className="px-6 md:px-12 py-20">
@@ -270,6 +248,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onStartGuest }) => {
         </p>
       </footer>
 
+      <ZenStoriesCaptureModal
+        isOpen={showStoriesModal}
+        onClose={() => setShowStoriesModal(false)}
+        context={{
+          sessionName: 'Sessão Mestra XZen',
+          beforeScore: 8,
+          afterScore: 2,
+          guardianElement: 'Fogo',
+          organAffected: 'Coração'
+        }}
+      />
     </div>
   );
 };

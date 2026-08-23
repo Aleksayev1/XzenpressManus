@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2, Volume2, Sparkles } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { PartnershipModal } from './PartnershipModal';
+import { ZenStoriesWall } from './ZenStoriesWall';
+import { ZenStoriesCaptureModal } from './ZenStoriesCaptureModal';
 
 import { startQigongRhythm, stopAllZenAudio, ZenAudioSession } from '../services/zenAudioEngine';
 
@@ -14,6 +16,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
   const [showTherapySelection, setShowTherapySelection] = useState(false);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
   const [showPartnershipModal, setShowPartnershipModal] = useState(false);
+  const [showStoriesCaptureModal, setShowStoriesCaptureModal] = useState(false);
 
   // ── Isca Imersiva 15s (ZenAudio Engine 2.0 Hero Teaser) ─────────────────────
   const [isTeaserActive, setIsTeaserActive] = useState(false);
@@ -489,6 +492,24 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
           </div>
         </div>
       </section>
+
+      {/* XZenPress Stories — Mural Vivo de Prova Social */}
+      <div className="bg-slate-950 py-8">
+        <ZenStoriesWall onOpenCaptureModal={() => setShowStoriesCaptureModal(true)} />
+      </div>
+
+      {/* XZenPress Stories Capture Modal */}
+      <ZenStoriesCaptureModal
+        isOpen={showStoriesCaptureModal}
+        onClose={() => setShowStoriesCaptureModal(false)}
+        context={{
+          sessionName: "Sessão Mestra XZen",
+          beforeScore: 8,
+          afterScore: 2,
+          guardianElement: "Fogo",
+          organAffected: "Coração"
+        }}
+      />
 
       {/* Footer with Partnership Link */}
       <footer className="bg-gray-900 text-white py-12">

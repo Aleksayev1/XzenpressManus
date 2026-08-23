@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { Menu, X, User, LogOut, Crown, BookOpen, Globe, ChevronDown, Zap, Activity, Waves, Database, MessageSquare, Briefcase, Brain, Wind, TrendingUp, Music } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -53,6 +53,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
   // Nav configuration
   const headerNavItems: NavItem[] = [
     { id: 'home', label: t('nav.home') },
+    { id: 'stories', label: '🌟 Stories' },
     { id: 'ai-assistant', label: 'Self Oracle' },
     { id: 'triad-session', label: t('nav.triad-session') },
   ];
@@ -77,6 +78,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
     { id: 'blog', label: 'Blog', icon: <BookOpen className="w-4 h-4" /> },
     { id: 'corporate', label: 'Corporativo', icon: <Briefcase className="w-4 h-4" /> },
     { id: 'pricing', label: 'Planos', icon: <Globe className="w-4 h-4" /> },
+    { id: 'stories', label: 'XZenPress Stories', icon: <Sparkles className="w-4 h-4 text-purple-500" /> },
     { id: 'feedback', label: 'Feedback', icon: <MessageSquare className="w-4 h-4 text-blue-500" /> },
   ];
 

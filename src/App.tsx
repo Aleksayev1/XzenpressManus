@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Globe } from 'lucide-react';
 import { Header } from './components/Header';
 import { HomePage } from './components/HomePage';
@@ -44,6 +44,7 @@ import { HerpesHubPage } from './pages/HerpesHubPage';
 import { PhytoLibraryPage } from './pages/PhytoLibraryPage';
 import LandingPage from './components/LandingPage';
 import { FeedbackPage } from './components/FeedbackPage';
+import { ZenStoriesWall } from './components/ZenStoriesWall';
 import { MapaVivoPage } from './components/MapaVivoPage';
 import { ConversationalOnboarding } from './components/ConversationalOnboarding';
 import { hasCompletedAnamnese, loadAnamneseProfile, saveAnamneseProfile, type AnamneseProfile } from './data/anamneseProfile';

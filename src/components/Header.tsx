@@ -1,5 +1,5 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, User, LogOut, Crown, BookOpen, Globe, ChevronDown, Zap, Activity, Waves, Database, MessageSquare, Briefcase, Brain, Wind, TrendingUp, Music } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Menu, X, User, LogOut, Crown, BookOpen, Globe, ChevronDown, Zap, Activity, Waves, Database, MessageSquare, Briefcase, Brain, Wind, TrendingUp, Music, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { trackPageView } from './GoogleAnalytics';

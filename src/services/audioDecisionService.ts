@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Audio Decision Service - Diamond Standard
  * 
  * REGRA-MÃE:
@@ -83,7 +83,7 @@ export const SESSION_MAP: Record<string, SessionConfig> = {
             loop: true
         },
         free: {
-            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX8ymr6UES7vc'
+            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZd79rJ6a7lp'
         }
     },
 
@@ -100,7 +100,7 @@ export const SESSION_MAP: Record<string, SessionConfig> = {
             loop: false
         },
         free: {
-            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWYcDQ1hSjOpY'
+            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO'
         }
     },
 
@@ -115,7 +115,7 @@ export const SESSION_MAP: Record<string, SessionConfig> = {
             loop: false
         },
         free: {
-            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX3Ogo9pFvBkY'
+            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWoMTcAERtU'
         }
     },
 
@@ -132,7 +132,7 @@ export const SESSION_MAP: Record<string, SessionConfig> = {
             loop: true
         },
         free: {
-            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX0r3x8OtiwEM'
+            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX7EF893kO26A'
         }
     },
 
@@ -196,7 +196,7 @@ export const SESSION_MAP: Record<string, SessionConfig> = {
             loop: true
         },
         free: {
-            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX8QCb8iK37iM'
+            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u'
         }
     }
 };

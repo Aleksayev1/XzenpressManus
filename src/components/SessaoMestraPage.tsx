@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+﻿import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowRight, Brain, Zap, Activity, Send, Loader2, Sparkles, X, Crown, CheckCircle } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
@@ -599,14 +599,14 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     // Helper for Spotify
     const getSpotifyUrl = () => {
         // Map elements to playlists
-        if (!selectedEmotion) return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4WYPdgoIcn6?utm_source=generator"; // Chill default
+        if (!selectedEmotion) return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO?utm_source=generator"; // Chill default
         switch (selectedEmotion.mtcElement) {
-            case 'fire': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4WYPdgoIcn6"; // Chill/Piano (Calm Anxiety)
+            case 'fire': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO"; // Chill/Piano (Calm Anxiety)
             case 'wood': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO"; // Nature Sounds (Wood/Forest Relaxation)
-            case 'earth': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX6VdMW310YC7"; // Chill Vibes (Grounding)
-            case 'metal': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX3qCx5yEZkcJ"; // Jazz (Comfort Sadness)
+            case 'earth': return "https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ"; // Chill Vibes (Grounding)
+            case 'metal': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX9B1hu03ZXWZ"; // Jazz (Comfort Sadness)
             case 'water': return "https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u"; // Peaceful Piano (Safety for Fear)
-            default: return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4WYPdgoIcn6";
+            default: return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO";
         }
     };
 

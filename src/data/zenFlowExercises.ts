@@ -1,4 +1,4 @@
-// ZenFlow - Farmácia de Movimentos
+﻿// ZenFlow - Farmácia de Movimentos
 // Estrutura Mínima Viável (MVP): 9 Sequências Mestras
 // Foco: Regulação, Liberação, Integração
 
@@ -117,7 +117,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '4 min',
         targetEmotion: ['medo', 'insegurança', 'fadiga', 'rim', 'água', 'lack_of_purpose'],
         intention: 'Minha energia vital é profunda e inesgotável.',
-        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX889U0CL85jj',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ',
         steps: [
             {
                 id: 'kidney-warm',
@@ -149,7 +149,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '4 min',
         targetEmotion: ['raiva', 'frustração', 'madeira', 'fígado'],
         intention: 'Eu solto o que não preciso carregar.',
-        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX9uKNf5jGX6m', // Global Groove/Drums (Active/Wood)
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWoMTcAERtU', // Global Groove/Drums (Active/Wood)
         steps: [
             {
                 id: 'fists',
@@ -179,7 +179,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '4 min',
         targetEmotion: ['raiva', 'frustração', 'mágoa', 'madeira', 'fígado', 'resentment'],
         intention: 'Eu me flexibilizo diante dos ventos da vida.',
-        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX889U0CL85jj',
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ',
         steps: [
             {
                 id: 'bamboo-sway',
@@ -253,7 +253,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '5 min',
         targetEmotion: ['controle', 'rigidez', 'madeira', 'terra'],
         intention: 'Eu fluo com a vida, sem resistir.',
-        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX889U0CL85jj', // Focus Flow (Water/Harmony)
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ', // Focus Flow (Water/Harmony)
         steps: [
             {
                 id: 'water-hands',

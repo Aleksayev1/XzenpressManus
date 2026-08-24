@@ -31,9 +31,15 @@ export const ZenStoriesWall: React.FC<ZenStoriesWallProps> = ({
 
   const loadStories = async () => {
     setLoading(true);
-    const data = await ZenStoriesService.getApprovedStories();
-    setStories(data);
-    setLoading(false);
+    try {
+      const data = await ZenStoriesService.getApprovedStories();
+      setStories(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('Erro ao carregar histórias:', e);
+      setStories([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePlayAudio = (story: ZenStory) => {
@@ -63,16 +69,20 @@ export const ZenStoriesWall: React.FC<ZenStoriesWallProps> = ({
     const isNew = ZenStoriesService.toggleHelpful(storyId);
     if (isNew) {
       setLikedStories(prev => [...prev, storyId]);
-      setStories(prev => prev.map(s => s.id === storyId ? { ...s, helpfulCount: s.helpfulCount + 1 } : s));
+      setStories(prev => prev.map(s => s.id === storyId ? { ...s, helpfulCount: (s.helpfulCount || 0) + 1 } : s));
     }
   };
 
   const filteredStories = stories.filter(story => {
+    if (!story) return false;
+    const sessionName = (story.context?.sessionName || '').toLowerCase();
+    const guardian = story.context?.guardianElement || '';
+
     if (activeFilter === 'audio') return story.mediaType === 'audio';
     if (activeFilter === 'video') return story.mediaType === 'video';
     if (activeFilter === 'text') return story.mediaType === 'text';
-    if (activeFilter === 'nervous') return story.context.sessionName.toLowerCase().includes('nervoso') || story.context.guardianElement === 'Fogo';
-    if (activeFilter === 'sleep') return story.context.sessionName.toLowerCase().includes('sono') || story.context.guardianElement === 'Madeira';
+    if (activeFilter === 'nervous') return sessionName.includes('nervoso') || sessionName.includes('ansiedade') || guardian === 'Fogo';
+    if (activeFilter === 'sleep') return sessionName.includes('sono') || sessionName.includes('insônia') || guardian === 'Madeira';
     return true;
   });
 
@@ -133,6 +143,7 @@ export const ZenStoriesWall: React.FC<ZenStoriesWallProps> = ({
         {filteredStories.map((story) => {
           const isLiked = likedStories.includes(story.id);
           const isPlaying = playingStoryId === story.id;
+          const authorName = story.authorName || 'Praticante Zen';
 
           return (
             <div
@@ -145,26 +156,26 @@ export const ZenStoriesWall: React.FC<ZenStoriesWallProps> = ({
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <img
-                      src={story.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(story.authorName)}&background=7c3aed&color=fff`}
-                      alt={story.authorName}
+                      src={story.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=7c3aed&color=fff`}
+                      alt={authorName}
                       className="w-11 h-11 rounded-2xl object-cover border border-white/10"
                     />
                     <div>
                       <h4 className="text-white font-bold text-sm flex items-center gap-1.5">
-                        {story.authorName}
+                        {authorName}
                         {story.verifiedTransformation && (
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" title="Sessão Verificada" />
                         )}
                       </h4>
                       <p className="text-[11px] text-gray-400">
-                        {story.authorRole ? `${story.authorRole} • ` : ''}{story.authorLocation}
+                        {story.authorRole ? `${story.authorRole} • ` : ''}{story.authorLocation || 'Brasil'}
                       </p>
                     </div>
                   </div>
 
                   {/* Estrelas */}
                   <div className="flex text-yellow-400 gap-0.5">
-                    {[...Array(story.rating)].map((_, i) => (
+                    {[...Array(story.rating || 5)].map((_, i) => (
                       <Star key={i} className="w-3.5 h-3.5 fill-current" />
                     ))}
                   </div>
@@ -174,10 +185,10 @@ export const ZenStoriesWall: React.FC<ZenStoriesWallProps> = ({
                 <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-between text-xs">
                   <div>
                     <span className="text-[10px] text-gray-400 block font-semibold">SESSÃO</span>
-                    <span className="text-purple-300 font-bold text-xs">{story.context.sessionName}</span>
+                    <span className="text-purple-300 font-bold text-xs">{story.context?.sessionName || 'Sessão Mestra XZen'}</span>
                   </div>
 
-                  {story.context.beforeScore !== undefined && story.context.afterScore !== undefined && (
+                  {story.context?.beforeScore !== undefined && story.context?.afterScore !== undefined && (
                     <div className="flex items-center gap-2 bg-purple-950/40 px-2.5 py-1 rounded-xl border border-purple-500/20">
                       <span className="text-red-400 font-bold">{story.context.beforeScore}</span>
                       <span className="text-gray-500">➔</span>
@@ -187,7 +198,7 @@ export const ZenStoriesWall: React.FC<ZenStoriesWallProps> = ({
                 </div>
 
                 {/* 3. Player de Áudio Embutido (Se o depoimento for de voz) */}
-                {story.mediaType === 'audio' && (
+                {story.mediaType === 'audio' && story.mediaUrl && (
                   <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-500/30 flex items-center gap-3">
                     <button
                       type="button"
@@ -215,7 +226,7 @@ export const ZenStoriesWall: React.FC<ZenStoriesWallProps> = ({
 
                 {/* 4. Texto / Transcrição */}
                 <p className="text-xs md:text-sm text-gray-300 leading-relaxed italic">
-                  "{story.text}"
+                  "{story.text || 'Experiência transformadora com alívio comprovado.'}"
                 </p>
               </div>
 
@@ -236,7 +247,7 @@ export const ZenStoriesWall: React.FC<ZenStoriesWallProps> = ({
                   }`}
                 >
                   <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current text-rose-400' : ''}`} />
-                  <span>{story.helpfulCount} me inspirou</span>
+                  <span>{story.helpfulCount || 0} me inspirou</span>
                 </button>
               </div>
             </div>

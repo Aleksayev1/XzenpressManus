@@ -248,89 +248,80 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-24">
+    return (
+    <div className="min-h-screen bg-slate-950 pt-16">
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
-          <div className="text-center">
-            {/* Logo XZenPress Oficial */}
-            <div className="flex justify-center mb-8">
+      <section className="relative overflow-hidden min-h-[90vh] flex items-center justify-center">
+        {/* Fundo Estrelado Escuro */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 w-full flex flex-col items-center">
+          
+          {/* Top Logo - Discreto no canto */}
+          <div className="absolute top-0 left-4 opacity-60 hover:opacity-100 transition-opacity flex items-center gap-2">
+            <img src="/logo_zp.jpg" alt="XZenPress" className="w-12 h-12 rounded-full border border-white/20 shadow-lg object-cover bg-white p-1" />
+            <span className="text-white/60 font-medium text-sm tracking-widest uppercase">Wellness</span>
+          </div>
+
+          <div className="text-center w-full mt-12 md:mt-0">
+            {/* Imagem Conceito Ampulheta */}
+            <div className="flex justify-center mb-8 relative">
+              <div className="absolute inset-0 bg-cyan-500/20 blur-3xl rounded-full scale-75"></div>
               <img
-                src="/Logo Xzenpress oficial.png"
-                alt="XZenPress"
-                className="w-32 h-32 md:w-40 md:h-40 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+                src="/hero_hourglass.jpg"
+                alt="Equilíbrio Universal XZenPress"
+                className="w-64 h-64 md:w-96 md:h-96 object-cover rounded-[3rem] border border-cyan-500/30 shadow-[0_0_60px_rgba(6,182,212,0.2)] hover:shadow-[0_0_80px_rgba(6,182,212,0.4)] transition-all duration-700 hover:scale-105"
               />
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 bg-clip-text text-transparent">
-                {t('home.hero.title').split(' ')[0]}
-              </span>
-              <div className="mt-2">
-                <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent text-3xl md:text-4xl">
-                  {t('home.hero.title').split(' ')[1] || 'Wellness'}
-                </span>
-              </div>
+            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
+              Mais <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">equilíbrio</span>
+              <br/> para o seu dia
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Plataforma completa de bem-estar integrativa com acupressão MTC, Craniopuntura, respiração 4-7-8 e cromoterapia avançada
+            <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-2xl mx-auto font-light">
+              Tecnologia, ciência e sabedoria milenar em harmonia para o seu bem-estar.
             </p>
 
-            {/* 🌬️ ZenAudio 15s Immersive Teaser (Fase 1 Hero CTA) */}
-            <div className="mb-8">
-              <button
-                onClick={startHeroTeaser}
-                className={`inline-flex items-center space-x-3 px-6 py-3.5 rounded-full font-semibold transition-all duration-300 shadow-md ${
-                  isTeaserActive
-                    ? 'bg-emerald-600 text-white animate-pulse ring-4 ring-emerald-300'
-                    : 'bg-gradient-to-r from-teal-500 via-emerald-600 to-cyan-600 text-white hover:opacity-95 hover:scale-105'
-                }`}
-              >
-                {isTeaserActive ? <Pause className="w-5 h-5" /> : <Volume2 className="w-5 h-5 animate-bounce" />}
-                <span>
-                  {isTeaserActive
-                    ? `Âncora Respiratória (${teaserTimeLeft}s) — ${teaserPhase === 'inspire' ? '↑ INSPIRE' : '↓ EXPIRE'}`
-                    : 'Ouça 15 segundos de som que respira com você →'}
-                </span>
-                <Sparkles className="w-4 h-4" />
-              </button>
-              {isTeaserActive && (
-                <div className="mt-2 text-xs font-medium text-emerald-700 animate-fade-in">
-                  🌿 5,5s Ritmo de Coerência Cardiorrespiratória (Sem MP3 — Gerado em tempo real no seu dispositivo)
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* Botoes em Glassmorfismo e CTA Vibrante */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
                 onClick={() => setShowTherapySelection(true)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-blue-500 hover:to-purple-500 transform hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(79,70,229,0.4)]"
               >
-                {t('home.hero.startNow')}
-                <ArrowRight className="w-5 h-5 ml-2 inline" />
+                Comece Agora
               </button>
+              
               <button
-                onClick={() => onPageChange('blog')}
-                className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-600 hover:text-white transition-all duration-200"
+                onClick={startHeroTeaser}
+                className={`flex items-center justify-center space-x-2 px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 border backdrop-blur-md ${
+                  isTeaserActive
+                    ? 'bg-cyan-900/40 text-cyan-200 border-cyan-500/50 animate-pulse'
+                    : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10 hover:text-white'
+                }`}
               >
-                📚 Ler Blog
+                {isTeaserActive ? <Pause className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                <span>
+                  {isTeaserActive
+                    ? `Respirando... (${teaserTimeLeft}s)`
+                    : 'Ouça 15 segundos'}
+                </span>
               </button>
+
               <button
                 onClick={() => onPageChange('login')}
-                className="border-2 border-purple-600 text-purple-600 px-6 py-4 rounded-full text-lg font-semibold hover:bg-purple-600 hover:text-white transition-all duration-200"
+                className="text-slate-400 px-6 py-4 rounded-full font-medium hover:text-white transition-all duration-200 underline decoration-white/20 underline-offset-4"
               >
-                {t('home.hero.createAccount')}
+                Saiba Mais
               </button>
             </div>
+            {isTeaserActive && (
+              <div className="mt-4 text-sm font-medium text-cyan-400 animate-fade-in">
+                🌿 5,5s Ritmo de Coerência Cardiorrespiratória 
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Floating Elements */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-16 h-16 bg-purple-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-20 w-24 h-24 bg-green-200 rounded-full opacity-20 animate-pulse delay-2000"></div>
       </section>
 
       {/* Features Section */}

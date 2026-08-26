@@ -3,6 +3,28 @@
 
 <head>
   <meta charset="UTF-8" />
+  <!-- Corre��o para o Crash do React com Google Translate -->
+  <script>
+    if (typeof Node === 'function' && Node.prototype) {
+      const originalRemoveChild = Node.prototype.removeChild;
+      Node.prototype.removeChild = function(child) {
+        if (child.parentNode !== this) {
+          if (console) console.warn('Evitado crash do React (removeChild)', child, this);
+          return child;
+        }
+        return originalRemoveChild.apply(this, arguments);
+      };
+
+      const originalInsertBefore = Node.prototype.insertBefore;
+      Node.prototype.insertBefore = function(newNode, referenceNode) {
+        if (referenceNode && referenceNode.parentNode !== this) {
+          if (console) console.warn('Evitado crash do React (insertBefore)', referenceNode, this);
+          return newNode;
+        }
+        return originalInsertBefore.apply(this, arguments);
+      };
+    }
+  </script>
   <!-- Recuperação Automática de Cache/Assets Pós-Deploy -->
   <script>
     window.addEventListener('error', function(e) {
@@ -174,3 +196,4 @@
 </html>
 
 <meta property="twitter:url" content="https://xzenpress.com/" />
+

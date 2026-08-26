@@ -1108,11 +1108,11 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                         }}
                       >
                         {speaking && playingIndex === i ? (
-                          <><Square className="w-3 h-3" /> Parar áudio</>
+                          <><Square className="w-3 h-3" /> <span>Parar áudio</span></>
                         ) : ttsLoading && playingIndex === i ? (
-                          <><Loader2 className="w-3 h-3 animate-spin" /> Carregando...</>
+                          <><Loader2 className="w-3 h-3 animate-spin" /> <span>Carregando...</span></>
                         ) : (
-                          <><Play className="w-3 h-3" /> 🔊 Ouvir resposta</>
+                          <><Play className="w-3 h-3" /> <span>🔊 Ouvir resposta</span></>
                         )}
                       </button>
                     )}

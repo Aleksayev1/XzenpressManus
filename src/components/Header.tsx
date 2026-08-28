@@ -37,6 +37,10 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
   }, []);
 
   const handlePageChange = (page: string) => {
+    if (page === 'zencheckin') {
+      window.dispatchEvent(new CustomEvent('xzen-open-checkin'));
+      return;
+    }
     onPageChange(page);
     trackPageView(page, t(`nav.${page}`) || page);
   };
@@ -59,6 +63,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
   ];
 
   const libraryItems: NavItem[] = [
+    { id: 'zencheckin', label: '⚡ ZenCheckin (<30s)', icon: <span className="text-base">👅</span> },
     { id: 'mapa-vivo', label: '🗺️ Mapa Vivo', icon: <span className="text-base">🌳</span> },
     { id: 'acupressure', label: t('nav.acupressure'), icon: <Zap className="w-4 h-4" /> },
     { id: 'breathing', label: t('nav.breathing'), icon: <Activity className="w-4 h-4" /> },
@@ -180,6 +185,15 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center space-x-3">
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('xzen-open-checkin'))}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500/15 to-teal-500/15 border border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/25 transition-all shadow-sm active:scale-95"
+                title="Check-in fenotípico rápido (< 30s)"
+              >
+                <span>👅</span>
+                <span>ZenCheckin</span>
+              </button>
+
               {user ? (
                 <div className="relative">
                   <button

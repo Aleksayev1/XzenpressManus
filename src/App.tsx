@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Globe } from 'lucide-react';
 import { Header } from './components/Header';
 import { HomePage } from './components/HomePage';
@@ -52,10 +52,13 @@ import { hasCompletedAnamnese, loadAnamneseProfile, saveAnamneseProfile, type An
 import { PremiumPartnerPitch } from './pages/PremiumPartnerPitch';
 import { DeviceSyncPage } from './components/DeviceSyncPage';
 import { ZenMentorChat } from './components/ZenMentorChat';
+import { ZenCheckinModal } from './components/ZenCheckinModal';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('landing');
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showZenCheckin, setShowZenCheckin] = useState(false);
+  const [checkinMeal, setCheckinMeal] = useState<{ id: string; name: string; timestamp: string } | undefined>(undefined);
   const [anamneseProfile, setAnamneseProfile] = useState<AnamneseProfile | null>(loadAnamneseProfile());
   const { user } = useAuth();
   console.log('App Loaded vZenFlow'); // Debug loading
@@ -106,6 +109,21 @@ function AppContent() {
     };
     window.addEventListener('xzen-navigate', handler);
     return () => window.removeEventListener('xzen-navigate', handler);
+  }, []);
+
+  // Escuta evento global 'xzen-open-checkin' para abrir modal rápido de fenotipagem
+  React.useEffect(() => {
+    const checkinHandler = (e: Event) => {
+      const detail = (e as CustomEvent<{ meal?: { id: string; name: string; timestamp: string } }>).detail;
+      if (detail?.meal) {
+        setCheckinMeal(detail.meal);
+      } else {
+        setCheckinMeal(undefined);
+      }
+      setShowZenCheckin(true);
+    };
+    window.addEventListener('xzen-open-checkin', checkinHandler);
+    return () => window.removeEventListener('xzen-open-checkin', checkinHandler);
   }, []);
 
   // Detectar callbacks OAuth e Spotify
@@ -400,6 +418,13 @@ function AppContent() {
         {currentPage !== 'landing' && (
           <ZenMentorChat onNavigate={setCurrentPage} />
         )}
+
+        {/* ZenCheckin Modal — Fenotipagem Temporal Rápida (<30s) */}
+        <ZenCheckinModal
+          isOpen={showZenCheckin}
+          onClose={() => setShowZenCheckin(false)}
+          linkedMeal={checkinMeal}
+        />
       </div>
     </AudioPlayerProvider>
   );

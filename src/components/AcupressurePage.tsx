@@ -512,50 +512,168 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
   };
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [appliedSearchQuery, setAppliedSearchQuery] = useState('');
 
   const zusanliPoint = points.find(p => p.id === 'st36' || p.name.toLowerCase().includes('zusanli') || p.id === 'zs');
 
-  const normalizeForSearch = (str: string) => {
+  const cleanText = (str: string) => {
     if (!str) return '';
     return str
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remove accents
-      .replace(/[^a-z0-9]/g, ''); // Remove spaces, punctuation, etc.
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   };
 
-  const filteredPoints = getFilteredPoints().filter(p => {
-    const queryNorm = normalizeForSearch(appliedSearchQuery);
-    if (!queryNorm) return true;
+  const STOP_WORDS = new Set([
+    'de', 'do', 'da', 'dos', 'das', 'no', 'na', 'nos', 'nas', 'em', 'para',
+    'com', 'e', 'o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas', 'por',
+    'pelo', 'pela', 'pelos', 'pelas', 'que', 'se', 'me', 'meu', 'minha',
+    'ponto', 'pontos', 'terapia', 'terapeutico', 'terapeuticos'
+  ]);
 
-    // Search in current translation and standard name
-    const nameNorm = normalizeForSearch(getTranslatedField(p, 'name'));
-    const nameEnNorm = p.nameEn ? normalizeForSearch(p.nameEn) : '';
-    const nameEsNorm = p.nameEs ? normalizeForSearch(p.nameEs) : '';
+  const GENERIC_WORDS = new Set(['dor', 'dores', 'alivio', 'trata', 'tratar', 'cura', 'bom', 'melhor', 'ajuda', 'forte']);
 
-    // Search in ID
-    const idNorm = normalizeForSearch(p.id);
+  const SYNONYMS: Record<string, string[]> = {
+    costa: ['costas', 'lombar', 'lombares', 'lombalgia', 'dorsal', 'coluna', 'ciatico', 'ciatica', 'espinha', 'vertebra', 'escapula', 'escapulas', 'escapular', 'trapezio', 'sacro'],
+    costas: ['costa', 'lombar', 'lombares', 'lombalgia', 'dorsal', 'coluna', 'ciatico', 'ciatica', 'espinha', 'vertebra', 'escapula', 'escapulas', 'escapular', 'trapezio', 'sacro'],
+    lombar: ['lombares', 'lombalgia', 'costa', 'costas', 'coluna', 'ciatico', 'ciatica', 'hernia', 'l1', 'l2', 'l3', 'l4', 'l5', 'sacro'],
+    lombares: ['lombar', 'lombalgia', 'costa', 'costas', 'coluna', 'ciatico', 'ciatica'],
+    lombalgia: ['lombar', 'lombares', 'costa', 'costas', 'coluna', 'ciatico', 'ciatica'],
+    coluna: ['costa', 'costas', 'lombar', 'lombares', 'dorsal', 'cervical', 'vertebra', 'espinha', 'sacro', 'ciatico'],
+    cabeca: ['cabecas', 'enxaqueca', 'enxaquecas', 'cefaleia', 'cefaleias', 'temporal', 'frontal', 'nuca', 'cranio', 'craniopuntura', 'ynsa'],
+    enxaqueca: ['enxaquecas', 'cabeca', 'cefaleia', 'tensaocranial', 'tempora', 'olhos'],
+    cefaleia: ['enxaqueca', 'cabeca', 'cefaleias', 'tensaocranial', 'nuca'],
+    pescoco: ['pescocos', 'cervical', 'cervicais', 'torcicolo', 'torcicolos', 'nuca', 'trapezio', 'ombro', 'ombros'],
+    cervical: ['pescoco', 'torcicolo', 'nuca', 'trapezio'],
+    ombro: ['ombros', 'pescoco', 'cervical', 'trapezio', 'braco', 'escapula'],
+    estomago: ['estomagos', 'digestao', 'digestivo', 'azia', 'refluxo', 'nausea', 'nauseas', 'vomito', 'gastrite', 'barriga', 'abdome', 'abdomen', 'abdominal', 'intestino', 'estufamento', 'inchaco'],
+    digestao: ['estomago', 'digestivo', 'azia', 'refluxo', 'nausea', 'gastrite', 'intestino', 'estufamento', 'diarreia', 'constipacao', 'fezes'],
+    ansiedade: ['estresse', 'stress', 'nervosismo', 'insonia', 'sono', 'panico', 'calma', 'acalmar', 'relaxamento', 'shen', 'depressao', 'angustia', 'mente', 'emocional'],
+    estresse: ['stress', 'ansiedade', 'nervosismo', 'tensao', 'insonia', 'sono', 'calma', 'relaxar', 'relaxamento', 'burnout'],
+    sono: ['insonia', 'dormir', 'noite', 'descanso', 'pesadelo', 'sonolencia', 'ansiedade', 'relaxamento'],
+    insonia: ['sono', 'dormir', 'noite', 'ansiedade', 'estresse', 'mente'],
+    imunidade: ['resfriado', 'resfriados', 'gripe', 'gripes', 'tosse', 'tosses', 'febre', 'defesa', 'pulmao', 'respiratorio', 'sinusite', 'rinite', 'alergia'],
+    gripe: ['resfriado', 'tosse', 'febre', 'imunidade', 'pulmao', 'catarro', 'garganta', 'coriza'],
+    cansaco: ['fadiga', 'energia', 'vitalidade', 'disposicao', 'esgotamento', 'adrenal', 'rim'],
+    fadiga: ['cansaco', 'energia', 'vitalidade', 'fraqueza', 'desanimo', 'adrenal'],
+    dente: ['dentes', 'dentaria', 'dentario', 'atm', 'mandibula', 'maxilar', 'boca', 'bruxismo'],
+    atm: ['mandibula', 'maxilar', 'bruxismo', 'mordida', 'dente', 'mastigacao', 'rosto', 'facial'],
+    pressao: ['hipertensao', 'coracao', 'cardio', 'palpitacao', 'circulacao', 'vascular'],
+    coracao: ['cardio', 'pressao', 'palpitacao', 'arritmia', 'circulacao', 'peito', 'ansiedade'],
+    articulacao: ['articulacoes', 'artrite', 'artrose', 'joelho', 'joelhos', 'cotovelo', 'punho', 'tornozelo', 'tendao', 'tendoes', 'reumatismo'],
+    joelho: ['joelhos', 'perna', 'pernas', 'articulacao', 'menisco', 'patela'],
+    perna: ['pernas', 'joelho', 'pe', 'pes', 'tornozelo', 'panturrilha', 'ciatico', 'varizes'],
+    braco: ['bracos', 'ombro', 'cotovelo', 'punho', 'mao', 'maos', 'dedos'],
+    zoster: ['herpes', 'neuralgia', 'nevralgia', 'dor nervosa', 'queimacao', 'pele', 'intercostal'],
+    avc: ['stroke', 'paralisia', 'sequela', 'neurologia', 'neuro', 'hemiplegia', 'paresia', 'fala'],
+    septicemia: ['sepse', 'infeccao', 'sangue', 'febre', 'toxina', 'inflamacao']
+  };
 
-    // Search in current translation and standard description
-    const descNorm = normalizeForSearch(getTranslatedField(p, 'description'));
-    const descEnNorm = p.descriptionEn ? normalizeForSearch(p.descriptionEn) : '';
+  const getSmartFilteredPoints = () => {
+    const rawQuery = searchQuery.trim();
+    if (!rawQuery) {
+      return getFilteredPoints();
+    }
 
-    // Search in benefits
-    const benefitsNorm = p.benefits ? p.benefits.map((b: string) => normalizeForSearch(b)) : [];
-    const benefitsEnNorm = p.benefitsEn ? p.benefitsEn.map((b: string) => normalizeForSearch(b)) : [];
+    const cleaned = cleanText(rawQuery);
+    const rawTokens = cleaned.split(' ').filter(t => t.length > 0);
+    const significantTokens = rawTokens.filter(t => !STOP_WORDS.has(t));
+    const tokens = significantTokens.length > 0 ? significantTokens : rawTokens;
 
-    return (
-      nameNorm.includes(queryNorm) ||
-      nameEnNorm.includes(queryNorm) ||
-      nameEsNorm.includes(queryNorm) ||
-      idNorm.includes(queryNorm) ||
-      descNorm.includes(queryNorm) ||
-      descEnNorm.includes(queryNorm) ||
-      benefitsNorm.some((b: string) => b.includes(queryNorm)) ||
-      benefitsEnNorm.some((b: string) => b.includes(queryNorm))
-    );
-  });
+    const specificTokens = tokens.filter(t => !GENERIC_WORDS.has(t));
+    const hasSpecificTokens = specificTokens.length > 0;
+
+    const tokenGroups = tokens.map(token => {
+      const isSpecific = !GENERIC_WORDS.has(token);
+      const expansions = new Set<string>([token]);
+      if (SYNONYMS[token]) {
+        SYNONYMS[token].forEach(s => expansions.add(cleanText(s)));
+      }
+      if (token.endsWith('s') && token.length > 3) {
+        const singular = token.slice(0, -1);
+        expansions.add(singular);
+        if (SYNONYMS[singular]) SYNONYMS[singular].forEach(s => expansions.add(cleanText(s)));
+      }
+      if (token.endsWith('es') && token.length > 4) {
+        const singular = token.slice(0, -2);
+        expansions.add(singular);
+        if (SYNONYMS[singular]) SYNONYMS[singular].forEach(s => expansions.add(cleanText(s)));
+      }
+      return { token, isSpecific, list: Array.from(expansions) };
+    });
+
+    const scoredPoints: { point: AcupressurePoint; score: number }[] = [];
+
+    for (const point of points) {
+      const idClean = cleanText(point.id);
+      const nameClean = cleanText(getTranslatedField(point, 'name') || point.name || '');
+      const nameEnClean = cleanText(point.nameEn || '');
+      const descClean = cleanText(getTranslatedField(point, 'description') || point.description || '');
+      const descEnClean = cleanText(point.descriptionEn || '');
+      const benefitsClean = (getTranslatedField(point, 'benefits') || point.benefits || []).map(cleanText).join(' ');
+      const benefitsEnClean = (point.benefitsEn || []).map(cleanText).join(' ');
+      const instructionsClean = cleanText(point.instructions || '');
+      const catClean = cleanText(point.category || '') + ' ' + (point.additionalCategories || []).map(cleanText).join(' ');
+      const subcatClean = cleanText(point.subcategory || '') + ' ' + cleanText(point.groupLabel || '');
+
+      const fullPointText = `${nameClean} ${nameEnClean} ${idClean} ${benefitsClean} ${benefitsEnClean} ${descClean} ${descEnClean} ${instructionsClean} ${catClean} ${subcatClean}`;
+
+      let totalScore = 0;
+      let matchedSpecificGroups = 0;
+      let matchedAnyGroup = 0;
+
+      for (const group of tokenGroups) {
+        let groupMatched = false;
+        let groupMaxScore = 0;
+
+        for (const t of group.list) {
+          let tokenScore = 0;
+
+          if (idClean === t || idClean.split('-').includes(t) || idClean.split('_').includes(t)) tokenScore += 100;
+          else if (idClean.includes(t)) tokenScore += 60;
+
+          if (nameClean.includes(t)) tokenScore += 50;
+          if (nameEnClean.includes(t)) tokenScore += 35;
+          if (benefitsClean.includes(t) || benefitsEnClean.includes(t)) tokenScore += 45;
+          if (catClean.includes(t) || subcatClean.includes(t)) tokenScore += 30;
+          if (descClean.includes(t) || descEnClean.includes(t)) tokenScore += 25;
+          if (instructionsClean.includes(t)) tokenScore += 15;
+
+          if (tokenScore > groupMaxScore) {
+            groupMaxScore = tokenScore;
+            groupMatched = true;
+          }
+        }
+
+        if (groupMatched) {
+          matchedAnyGroup++;
+          if (group.isSpecific) matchedSpecificGroups++;
+          totalScore += groupMaxScore;
+        }
+      }
+
+      if (hasSpecificTokens && matchedSpecificGroups === 0) {
+        continue;
+      }
+
+      if (matchedAnyGroup > 0) {
+        if (fullPointText.includes(cleaned)) {
+          totalScore += 80;
+        }
+        if (matchedAnyGroup === tokenGroups.length) {
+          totalScore += 100;
+        }
+        scoredPoints.push({ point, score: totalScore });
+      }
+    }
+
+    scoredPoints.sort((a, b) => b.score - a.score);
+    return scoredPoints.map(sp => sp.point);
+  };
+
+  const filteredPoints = getSmartFilteredPoints();
 
   return (
     <div
@@ -614,48 +732,94 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
 
         {/* Search & Categories - Only show when not in active therapy */}
         {!isTimerActive && (
-          <div className="max-w-4xl mx-auto space-y-6 mb-8">
+          <div className="max-w-4xl mx-auto space-y-4 mb-8">
             {/* Search Bar */}
             <form 
               onSubmit={(e) => {
                 e.preventDefault();
-                setAppliedSearchQuery(searchQuery);
               }}
-              className="relative flex items-center bg-white border border-gray-100 rounded-2xl shadow-lg overflow-hidden focus-within:ring-4 focus-within:ring-blue-100 focus-within:border-blue-500 transition-all"
+              className="relative flex items-center bg-white border border-blue-100 rounded-2xl shadow-lg overflow-hidden focus-within:ring-4 focus-within:ring-blue-100 focus-within:border-blue-500 transition-all"
             >
               <div className="pl-4 flex items-center pointer-events-none">
-                <Target className="h-5 w-5 text-gray-400" />
+                <Search className="h-5 w-5 text-blue-500" />
               </div>
               <input 
                 type="text"
-                placeholder="Pesquisar ponto (ex: ZS, Zusanli, Estresse)..."
+                placeholder="Pesquisar sintomas ou pontos (ex: dor nas costas, cabeça, ansiedade, E36, ZS)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 pl-3 pr-4 py-4 bg-transparent outline-none text-gray-700 font-medium placeholder-gray-400"
+                className="flex-1 pl-3 pr-4 py-4 bg-transparent outline-none text-gray-800 font-medium placeholder-gray-400 text-sm md:text-base"
               />
               {/* Clear button if searchQuery is not empty */}
               {searchQuery && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setAppliedSearchQuery('');
-                  }}
+                  onClick={() => setSearchQuery('')}
                   className="p-2 text-gray-400 hover:text-gray-600 transition-colors mr-1"
                   title="Limpar busca"
                 >
                   <X className="w-5 h-5" />
                 </button>
               )}
-              {/* Search Button (Magnifying Glass) */}
+              {/* Search Action Button */}
               <button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 font-semibold flex items-center gap-2 transition-all active:scale-95"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm"
               >
                 <Search className="w-5 h-5" />
                 <span className="hidden sm:inline">Buscar</span>
               </button>
             </form>
+
+            {/* Quick Search Chips */}
+            <div className="flex items-center gap-1.5 flex-wrap text-xs">
+              <span className="text-gray-500 font-medium mr-1 flex items-center gap-1">
+                💡 Sugestões:
+              </span>
+              {[
+                { label: '⚡ Dor nas Costas', term: 'dor nas costas' },
+                { label: '💆 Dor de Cabeça', term: 'dor de cabeca' },
+                { label: '🧘 Ansiedade & Estresse', term: 'ansiedade' },
+                { label: '🌙 Insônia & Sono', term: 'insonia' },
+                { label: '🍵 Digestão & Estômago', term: 'estomago' },
+                { label: '🛡️ Imunidade', term: 'imunidade' },
+                { label: '🦴 Cervical / Torcicolo', term: 'cervical' },
+                { label: '🫴 Zusanli (E36)', term: 'zusanli' },
+                { label: '💎 Hegu (IG4)', term: 'hegu' }
+              ].map((chip) => (
+                <button
+                  key={chip.term}
+                  type="button"
+                  onClick={() => setSearchQuery(chip.term)}
+                  className={`px-2.5 py-1 rounded-lg border transition-all ${
+                    searchQuery.toLowerCase().includes(chip.term.toLowerCase())
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                      : 'bg-white/80 hover:bg-blue-50 text-gray-700 border-gray-200 hover:border-blue-300'
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Active Search Result Feedback */}
+            {searchQuery.trim() && (
+              <div className="flex items-center justify-between text-xs text-blue-900 bg-blue-50/90 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-blue-200 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">🎯</span>
+                  <span>
+                    Exibindo <strong>{filteredPoints.length}</strong> {filteredPoints.length === 1 ? 'ponto terapêutico' : 'pontos terapêuticos'} para "<strong>{searchQuery}</strong>" em todo o acervo.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="font-bold text-blue-700 hover:text-blue-900 underline ml-3 flex-shrink-0"
+                >
+                  Limpar busca
+                </button>
+              </div>
+            )}
 
             {/* Category Filter */}
             <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
@@ -666,10 +830,9 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
                     onClick={() => { 
                       setSelectedCategory(category.id); 
                       setSearchQuery(''); 
-                      setAppliedSearchQuery(''); 
                     }}
                     disabled={category.premium && !user?.isPremium}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${selectedCategory === category.id
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${selectedCategory === category.id && !searchQuery.trim()
                       ? 'bg-blue-600 text-white shadow-lg'
                       : category.premium && !user?.isPremium
                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -687,7 +850,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
             </div>
 
             {/* Subcategory Filter for Yamamoto Craniopuntura */}
-            {selectedCategory === 'cranio' && (
+            {selectedCategory === 'cranio' && !searchQuery.trim() && (
               <div className="bg-white/70 backdrop-blur-md rounded-2xl p-5 border border-purple-100 shadow-sm space-y-4 transition-all duration-300">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-purple-50 pb-3">
                   <div>
@@ -733,7 +896,7 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
             )}
 
             {/* ZS Highlight (if not searching) */}
-            {!appliedSearchQuery && selectedCategory === 'all' && zusanliPoint && (
+            {!searchQuery.trim() && selectedCategory === 'all' && zusanliPoint && (
               <div 
                 onClick={() => setViewingPoint(zusanliPoint.id)}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white shadow-xl cursor-pointer transform hover:scale-[1.01] transition-all flex flex-col md:flex-row items-center justify-between gap-6"
@@ -1141,8 +1304,34 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
               {/* Points Grid */}
               <div className="space-y-4">
                 {filteredPoints.length === 0 ? (
-                  <div className="bg-white rounded-2xl p-8 border border-gray-200 text-center text-gray-500 shadow-md">
-                    Nenhum ponto encontrado para "{appliedSearchQuery}".
+                  <div className="bg-white rounded-2xl p-8 border border-gray-200 text-center shadow-md space-y-4">
+                    <div className="text-4xl">🔍</div>
+                    <h3 className="text-lg font-bold text-gray-800">
+                      Nenhum ponto encontrado para "{searchQuery}"
+                    </h3>
+                    <p className="text-sm text-gray-500 max-w-md mx-auto">
+                      Tente buscar por sintomas como <em>"dor nas costas"</em>, <em>"lombar"</em>, <em>"dor de cabeça"</em>, <em>"estresse"</em>, <em>"sono"</em> ou pelo código do ponto (ex: <em>B40</em>, <em>IG4</em>, <em>E36</em>).
+                    </p>
+                    <div className="pt-2 flex justify-center gap-2 flex-wrap">
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-all shadow-sm"
+                      >
+                        Ver Todos os Pontos
+                      </button>
+                      <button
+                        onClick={() => setSearchQuery('dor nas costas')}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold px-4 py-2 rounded-xl text-xs transition-all"
+                      >
+                        ⚡ Dor nas Costas
+                      </button>
+                      <button
+                        onClick={() => setSearchQuery('ansiedade')}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold px-4 py-2 rounded-xl text-xs transition-all"
+                      >
+                        🧘 Ansiedade
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   filteredPoints.map((point) => (

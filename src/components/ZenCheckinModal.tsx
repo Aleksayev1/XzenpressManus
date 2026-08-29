@@ -205,37 +205,61 @@ export const ZenCheckinModal: React.FC<ZenCheckinModalProps> = ({
           </button>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="grid grid-cols-3 bg-slate-950 p-1.5 border-b border-slate-800 text-xs font-semibold">
+        {/* Module Navigation */}
+        <div className="flex gap-3 p-4 bg-slate-950/80 border-b border-slate-800 overflow-x-auto snap-x hide-scrollbar">
+          
+          {/* Módulo 01: ZenTongue */}
           <button
             onClick={() => setActiveTab('tongue')}
-            className={`py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 min-w-[130px] p-3.5 rounded-2xl transition-all border text-left snap-start relative overflow-hidden group ${
               activeTab === 'tongue' 
-                ? 'bg-slate-800 text-emerald-400 shadow-md border border-slate-700' 
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-gradient-to-br from-slate-800 to-slate-900 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20' 
+                : 'bg-slate-900/50 border-slate-800/80 hover:bg-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
             }`}
           >
-            <span>👅</span> ZenTongue
+            {activeTab === 'tongue' && <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-full -mr-4 -mt-4" />}
+            <div className="flex items-center justify-between mb-2 relative z-10">
+              <span className="text-2xl drop-shadow-sm">👅</span>
+              <span className={`text-[10px] font-black tracking-wider px-2 py-1 rounded-lg ${activeTab === 'tongue' ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-500 group-hover:text-slate-400'}`}>01</span>
+            </div>
+            <h3 className={`font-bold text-sm tracking-tight relative z-10 ${activeTab === 'tongue' ? 'text-emerald-400' : 'text-slate-300'}`}>ZenTongue</h3>
+            <p className={`text-[10px] mt-1 relative z-10 ${activeTab === 'tongue' ? 'text-emerald-200/70' : 'text-slate-500'}`}>Língua & MTC</p>
           </button>
+
+          {/* Módulo 02: ZenGut */}
           <button
             onClick={() => setActiveTab('stool')}
-            className={`py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 min-w-[130px] p-3.5 rounded-2xl transition-all border text-left snap-start relative overflow-hidden group ${
               activeTab === 'stool' 
-                ? 'bg-slate-800 text-emerald-400 shadow-md border border-slate-700' 
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-gradient-to-br from-slate-800 to-slate-900 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20' 
+                : 'bg-slate-900/50 border-slate-800/80 hover:bg-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
             }`}
           >
-            <span>💩</span> ZenGut
+            {activeTab === 'stool' && <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-full -mr-4 -mt-4" />}
+            <div className="flex items-center justify-between mb-2 relative z-10">
+              <span className="text-2xl drop-shadow-sm">💩</span>
+              <span className={`text-[10px] font-black tracking-wider px-2 py-1 rounded-lg ${activeTab === 'stool' ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-500 group-hover:text-slate-400'}`}>02</span>
+            </div>
+            <h3 className={`font-bold text-sm tracking-tight relative z-10 ${activeTab === 'stool' ? 'text-emerald-400' : 'text-slate-300'}`}>ZenGut</h3>
+            <p className={`text-[10px] mt-1 relative z-10 ${activeTab === 'stool' ? 'text-emerald-200/70' : 'text-slate-500'}`}>Digestão & Fezes</p>
           </button>
+
+          {/* Módulo 03: MealResponse */}
           <button
             onClick={() => setActiveTab('meal')}
-            className={`py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 min-w-[130px] p-3.5 rounded-2xl transition-all border text-left snap-start relative overflow-hidden group ${
               activeTab === 'meal' 
-                ? 'bg-slate-800 text-emerald-400 shadow-md border border-slate-700' 
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-gradient-to-br from-slate-800 to-slate-900 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20' 
+                : 'bg-slate-900/50 border-slate-800/80 hover:bg-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
             }`}
           >
-            <span>🍽️</span> MealResponse
+            {activeTab === 'meal' && <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-full -mr-4 -mt-4" />}
+            <div className="flex items-center justify-between mb-2 relative z-10">
+              <span className="text-2xl drop-shadow-sm">🍽️</span>
+              <span className={`text-[10px] font-black tracking-wider px-2 py-1 rounded-lg ${activeTab === 'meal' ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-500 group-hover:text-slate-400'}`}>03</span>
+            </div>
+            <h3 className={`font-bold text-sm tracking-tight relative z-10 ${activeTab === 'meal' ? 'text-emerald-400' : 'text-slate-300'}`}>Refeição</h3>
+            <p className={`text-[10px] mt-1 relative z-10 ${activeTab === 'meal' ? 'text-emerald-200/70' : 'text-slate-500'}`}>Resposta Corporal</p>
           </button>
         </div>
 

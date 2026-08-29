@@ -557,65 +557,52 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
   ]);
 
   const CROSS_LANGUAGE_SYNONYMS: Record<string, string[]> = {
-    // Back / Costas / Espalda / Dos / Schiena / Rücken / Lombar
-    costa: ['costas', 'lombar', 'lombares', 'lombalgia', 'coluna', 'ciatico', 'espinha', 'vertebra', 'escapula', 'back', 'lower back', 'spine', 'spinal', 'lumbar', 'espalda', 'dos', 'lombaire', 'schiena', 'rucken', 'ruckenschmerzen'],
-    costas: ['costa', 'lombar', 'lombares', 'lombalgia', 'coluna', 'ciatico', 'back', 'lower back', 'spine', 'lumbar', 'espalda', 'dos', 'schiena', 'rucken', 'ruckenschmerzen'],
-    back: ['costas', 'costa', 'lombar', 'lumbar', 'lower back', 'spine', 'spinal', 'espalda', 'dos', 'schiena', 'rucken', 'ruckenschmerzen', 'sciatica', 'ciatico'],
-    espalda: ['costas', 'lombar', 'lumbar', 'back', 'lower back', 'columna', 'dos', 'schiena', 'rucken', 'ciatica', 'ciatico'],
-    dos: ['costas', 'lombar', 'back', 'espalda', 'schiena', 'rucken', 'lombaire'],
-    schiena: ['costas', 'lombar', 'back', 'espalda', 'dos', 'rucken', 'lombare'],
-    rucken: ['costas', 'lombar', 'back', 'espalda', 'dos', 'schiena', 'lumbar'],
+    // Back / Costas / Espalda / Lombar
+    costa: ['costas', 'lombar', 'lombares', 'lombalgia', 'coluna', 'ciatico', 'espinha', 'vertebra', 'escapula', 'back', 'lower back', 'spine', 'spinal', 'lumbar', 'espalda', 'lombaire', 'schiena', 'rucken', 'ruckenschmerzen'],
+    costas: ['costa', 'lombar', 'lombares', 'lombalgia', 'coluna', 'ciatico', 'espinha', 'vertebra', 'escapula', 'back', 'lower back', 'spine', 'spinal', 'lumbar', 'espalda', 'lombaire', 'schiena', 'rucken', 'ruckenschmerzen'],
+    lombar: ['lombares', 'lombalgia', 'costas', 'lumbar', 'lower back', 'lombaire', 'lombare', 'coluna', 'ciatico'],
+    lumbar: ['lombar', 'lombalgia', 'costas', 'back', 'lower back', 'lombaire', 'coluna'],
+    back: ['costas', 'lombar', 'lumbar', 'lower back', 'spine', 'spinal', 'espalda', 'schiena', 'rucken', 'ruckenschmerzen', 'sciatica', 'ciatico'],
+    espalda: ['costas', 'lombar', 'lumbar', 'back', 'lower back', 'columna', 'schiena', 'rucken', 'ciatica', 'ciatico'],
+    schiena: ['costas', 'lombar', 'back', 'espalda', 'rucken', 'lombare'],
+    rucken: ['costas', 'lombar', 'back', 'espalda', 'schiena', 'lumbar', 'ruckenschmerzen'],
     ruckenschmerzen: ['rucken', 'costas', 'back', 'espalda', 'lombar', 'lumbar'],
-    lombar: ['lombares', 'lombalgia', 'costas', 'lumbar', 'lower back', 'lombaire', 'lombare', 'coluna'],
-    lumbar: ['lombar', 'lombalgia', 'costas', 'back', 'lower back', 'lombaire'],
 
-    // Head / Cabeça / Cabeza / Tête / Testa / Kopf
-    cabeca: ['enxaqueca', 'cefaleia', 'temporal', 'frontal', 'nuca', 'cranio', 'head', 'headache', 'migraine', 'cabeza', 'cefalea', 'jaqueca', 'tete', 'testa', 'kopf', 'kopfschmerzen'],
-    head: ['headache', 'migraine', 'cabeca', 'enxaqueca', 'cabeza', 'tete', 'testa', 'kopf', 'temple', 'forehead'],
-    headache: ['head', 'migraine', 'cabeca', 'enxaqueca', 'cefaleia', 'cabeza', 'jaqueca', 'tete', 'testa', 'kopf', 'kopfschmerzen'],
+    // Head / Cabeça / Enxaqueca
+    cabeca: ['enxaqueca', 'cefaleia', 'head', 'headache', 'migraine', 'cabeza', 'cefalea', 'jaqueca', 'tete', 'mal de tete', 'testa', 'mal di testa', 'kopf', 'kopfschmerzen'],
+    head: ['headache', 'migraine', 'cabeca', 'enxaqueca', 'cabeza', 'cefalea'],
+    headache: ['head', 'migraine', 'cabeca', 'enxaqueca', 'cefaleia', 'cabeza', 'jaqueca', 'mal de tete', 'mal di testa', 'kopfschmerzen'],
     cabeza: ['jaqueca', 'enxaqueca', 'cabeca', 'head', 'headache', 'migraine', 'cefalea'],
-    tete: ['cabeca', 'head', 'headache', 'migraine', 'cabeza'],
-    testa: ['cabeca', 'head', 'headache', 'migraine', 'cabeza'],
-    kopf: ['cabeca', 'head', 'headache', 'migraine', 'kopfschmerzen'],
-    kopfschmerzen: ['kopf', 'cabeca', 'head', 'headache', 'migraine', 'enxaqueca', 'cabeza'],
-    migraine: ['enxaqueca', 'cabeca', 'headache', 'jaqueca', 'cefalea'],
-    enxaqueca: ['migraine', 'cabeca', 'headache', 'jaqueca', 'cefaleia'],
+    enxaqueca: ['migraine', 'cabeca', 'headache', 'jaqueca', 'cefaleia', 'cefalea'],
+    migraine: ['enxaqueca', 'cabeca', 'headache', 'jaqueca', 'cefaleia'],
 
-    // Stomach / Estômago / Estómago / Estomac / Stomaco / Magen
-    estomago: ['digestao', 'azia', 'refluxo', 'nausea', 'gastrite', 'abdomen', 'stomach', 'digestion', 'heartburn', 'acid reflux', 'estomago', 'estomac', 'stomaco', 'magen', 'verdauung'],
+    // Stomach / Estômago / Digestão
+    estomago: ['digestao', 'azia', 'refluxo', 'nausea', 'gastrite', 'abdomen', 'stomach', 'digestion', 'heartburn', 'acid reflux', 'estomac', 'stomaco', 'magen', 'verdauung'],
     stomach: ['estomago', 'digestao', 'digestion', 'nausea', 'gastric', 'belly', 'abdomen', 'bellyache', 'estomac', 'magen', 'gastrite'],
-    digestion: ['digestao', 'estomago', 'stomach', 'digestive', 'verdauung', 'digestione'],
     digestao: ['estomago', 'stomach', 'digestion', 'verdauung', 'digestione'],
-    estomac: ['estomago', 'stomach', 'digestion', 'magen'],
-    magen: ['estomago', 'stomach', 'digestion', 'verdauung'],
-    magenschmerzen: ['magen', 'stomach', 'estomago', 'digestion'],
+    digestion: ['digestao', 'estomago', 'stomach', 'digestive', 'verdauung', 'digestione'],
 
-    // Sleep / Insomnia / Sono / Insônia / Sueño / Sommeil / Sonno / Schlaf
-    sono: ['insonia', 'dormir', 'sleep', 'insomnia', 'sueno', 'insomnio', 'sommeil', 'insomnie', 'sonno', 'insonnia', 'schlaf', 'schlafstorung'],
-    insonia: ['sono', 'dormir', 'sleep', 'insomnia', 'sueno', 'insomnio', 'sommeil', 'insomnie', 'sonno', 'insonnia', 'schlaf'],
-    sleep: ['insomnia', 'sono', 'insonia', 'sueno', 'insomnio', 'sommeil', 'schlaf', 'sleeplessness', 'rest'],
+    // Sleep / Sono / Insônia
+    sono: ['insonia', 'dormir', 'sleep', 'insomnia', 'sueno', 'insomnio', 'sommeil', 'insomnie', 'sonno', 'insonnia', 'schlaf', 'schlafstorung', 'anmian'],
+    insonia: ['sono', 'dormir', 'sleep', 'insomnia', 'sueno', 'insomnio', 'sommeil', 'insomnie', 'sonno', 'insonnia', 'schlaf', 'anmian'],
+    sleep: ['insomnia', 'sono', 'insonia', 'sueno', 'insomnio', 'sommeil', 'schlaf', 'sleeplessness', 'rest', 'anmian'],
     insomnia: ['sleep', 'sono', 'insonia', 'sueno', 'insomnio', 'sommeil', 'schlaf', 'anmian'],
-    insomnio: ['sueno', 'sleep', 'insomnia', 'sono', 'insonia'],
-    sueno: ['insomnio', 'sleep', 'insomnia', 'sono'],
-    schlaf: ['insomnia', 'sono', 'sleep', 'schlafstorung'],
-    schlafstorung: ['schlaf', 'insomnia', 'sono', 'insonia', 'sueno', 'insomnio'],
 
-    // Stress / Anxiety / Ansiedade / Estresse / Estrés / Ansiedad / Angst
-    ansiedade: ['estresse', 'stress', 'anxiety', 'calm', 'panic', 'nervousness', 'ansiedad', 'estres', 'angst', 'anxiete', 'ansia'],
-    estresse: ['stress', 'ansiedade', 'anxiety', 'burnout', 'tension', 'estres', 'ansiedad', 'angst'],
-    anxiety: ['stress', 'ansiedade', 'estresse', 'calm', 'relax', 'panic', 'ansiedad', 'angst', 'anxiete'],
+    // Stress / Anxiety / Ansiedade / Estresse
+    ansiedade: ['estresse', 'stress', 'anxiety', 'calm', 'panico', 'nervosismo', 'ansiedad', 'estres', 'angst', 'anxiete', 'ansia', 'shenmen', 'yintang'],
+    estresse: ['stress', 'ansiedade', 'anxiety', 'burnout', 'tension', 'estres', 'ansiedad', 'angst', 'shenmen'],
+    anxiety: ['stress', 'ansiedade', 'estresse', 'calm', 'relax', 'panic', 'ansiedad', 'angst', 'anxiete', 'shenmen', 'yintang'],
     stress: ['anxiety', 'ansiedade', 'estresse', 'tension', 'estres', 'angst'],
-    ansiedad: ['estres', 'ansiedade', 'anxiety', 'stress', 'angst'],
 
-    // Neck / Pescoço / Cervical / Cuello / Cou / Collo / Nacken
+    // Neck / Pescoço / Cervical / Torcicolo
     pescoco: ['cervical', 'torcicolo', 'nuca', 'trapezio', 'neck', 'stiff neck', 'cuello', 'cou', 'collo', 'nacken'],
-    neck: ['cervical', 'stiff neck', 'pescoco', 'cuello', 'cou', 'collo', 'nacken', 'trapezius', 'throat'],
-    cuello: ['cervical', 'pescoco', 'neck', 'torticolis', 'cou', 'collo', 'nacken'],
-    cervical: ['pescoco', 'neck', 'cuello', 'cou', 'collo', 'nacken', 'torcicolo'],
+    cervical: ['pescoco', 'neck', 'cuello', 'cou', 'collo', 'nacken', 'torcicolo', 'trapezio'],
+    neck: ['cervical', 'stiff neck', 'pescoco', 'cuello', 'cou', 'collo', 'nacken', 'trapezius'],
+    torcicolo: ['cervical', 'pescoco', 'neck', 'stiff neck', 'torticolis'],
 
-    // Immunity / Imunidade / Inmunidad / Immunité / Immunität / Flu / Gripe
-    imunidade: ['gripe', 'resfriado', 'tosse', 'febre', 'immunity', 'immune', 'cold', 'flu', 'cough', 'inmunidad', 'immunite', 'immunitat', 'immunità'],
-    immunity: ['immune', 'imunidade', 'cold', 'flu', 'cough', 'inmunidad', 'immunite', 'defense', 'lung'],
+    // Immunity / Imunidade
+    imunidade: ['gripe', 'resfriado', 'tosse', 'febre', 'immunity', 'immune', 'cold', 'flu', 'cough', 'inmunidad', 'immunite', 'immunitat', 'zusanli'],
+    immunity: ['immune', 'imunidade', 'cold', 'flu', 'cough', 'inmunidad', 'immunite', 'defense', 'lung', 'zusanli'],
     gripe: ['flu', 'cold', 'resfriado', 'tosse', 'febre', 'grippe', 'grippal', 'imunidade', 'immunity'],
     flu: ['gripe', 'cold', 'resfriado', 'cough', 'fever', 'immunity', 'grippe']
   };
@@ -650,21 +637,26 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
         expansions.add(singular);
         if (CROSS_LANGUAGE_SYNONYMS[singular]) CROSS_LANGUAGE_SYNONYMS[singular].forEach(s => expansions.add(cleanText(s)));
       }
-      return { token, isSpecific, list: Array.from(expansions) };
+      const filteredExp = Array.from(expansions).filter(e => !STOP_WORDS.has(e) && e.length > 1);
+      return { token, isSpecific, list: filteredExp };
     });
 
     const scoredPoints: { point: AcupressurePoint; score: number }[] = [];
 
     for (const point of points) {
       const idClean = cleanText(point.id);
+      const idParts = new Set(idClean.replace(/-/g, ' ').replace(/_/g, ' ').split(' '));
+
       const names = [
         point.name, point.nameEn, point.nameEs, (point as any).nameFr, (point as any).nameDe,
         (point as any).nameIt, (point as any).nameZh, (point as any).nameJa, (point as any).nameRu
       ].filter(Boolean).map(cleanText).join(' ');
+      const nameWords = new Set(names.split(' '));
 
       const descs = [
         point.description, point.descriptionEn, point.descriptionEs, (point as any).descriptionFr, (point as any).descriptionDe
       ].filter(Boolean).map(cleanText).join(' ');
+      const descWords = new Set(descs.split(' '));
 
       const benefits = [
         ...(point.benefits || []),
@@ -673,12 +665,14 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
         ...((point as any).benefitsFr || []),
         ...((point as any).benefitsDe || [])
       ].map(cleanText).join(' ');
+      const benefitsWords = new Set(benefits.split(' '));
 
       const instructions = cleanText(point.instructions || '');
       const categories = cleanText(point.category || '') + ' ' + (point.additionalCategories || []).map(cleanText).join(' ');
       const subcats = cleanText(point.subcategory || '') + ' ' + cleanText(point.groupLabel || '');
 
       const fullPointText = `${names} ${idClean} ${benefits} ${descs} ${instructions} ${categories} ${subcats}`;
+      const allWords = new Set(fullPointText.split(' '));
 
       let totalScore = 0;
       let matchedSpecificGroups = 0;
@@ -690,15 +684,44 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
 
         for (const t of group.list) {
           let tokenScore = 0;
+          const isMulti = t.includes(' ');
 
-          if (idClean === t || idClean.split('-').includes(t) || idClean.split('_').includes(t)) tokenScore += 100;
-          else if (idClean.includes(t)) tokenScore += 60;
+          // Match in ID / Point Code
+          if (idClean === t || idParts.has(t)) {
+            tokenScore += 200;
+          } else if (!isMulti && t.length >= 2 && Array.from(idParts).some(part => part.startsWith(t))) {
+            tokenScore += 120;
+          }
 
-          if (names.includes(t)) tokenScore += 50;
-          if (benefits.includes(t)) tokenScore += 45;
-          if (categories.includes(t) || subcats.includes(t)) tokenScore += 30;
-          if (descs.includes(t)) tokenScore += 25;
-          if (instructions.includes(t)) tokenScore += 15;
+          // Match in Point Name
+          if (isMulti) {
+            if (names.includes(t)) tokenScore += 100;
+          } else {
+            if (nameWords.has(t)) tokenScore += 100;
+          }
+
+          // Match in Benefits / Indications
+          if (isMulti) {
+            if (benefits.includes(t)) tokenScore += 80;
+          } else {
+            if (benefitsWords.has(t)) tokenScore += 80;
+          }
+
+          // Match in Description
+          if (isMulti) {
+            if (descs.includes(t)) tokenScore += 40;
+          } else {
+            if (descWords.has(t)) tokenScore += 40;
+          }
+
+          // Match in Category / Instructions / Full Text fallback
+          if (tokenScore === 0) {
+            if (isMulti) {
+              if (fullPointText.includes(t)) tokenScore += 20;
+            } else {
+              if (allWords.has(t)) tokenScore += 20;
+            }
+          }
 
           if (tokenScore > groupMaxScore) {
             groupMaxScore = tokenScore;
@@ -719,10 +742,10 @@ export const AcupressurePage: React.FC<AcupressurePageProps> = ({ onPageChange }
 
       if (matchedAnyGroup > 0) {
         if (fullPointText.includes(cleaned)) {
-          totalScore += 80;
+          totalScore += 100;
         }
         if (matchedAnyGroup === tokenGroups.length) {
-          totalScore += 100;
+          totalScore += 80;
         }
         scoredPoints.push({ point, score: totalScore });
       }

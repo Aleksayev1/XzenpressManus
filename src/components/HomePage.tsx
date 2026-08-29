@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2, Volume2, Sparkles, Activity, Search, MessageCircle, Compass, Leaf, Apple, LineChart, Zap } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { PartnershipModal } from './PartnershipModal';
@@ -370,8 +370,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all">
                   <Apple className="w-8 h-8 text-rose-500 mb-4" />
-                  <h5 className="font-bold text-slate-900 mb-2">Nutriming</h5>
-                  <p className="text-sm text-slate-600">Observe sua alimentação e como seu corpo responde ao longo do dia.</p>
+                  <h5 className="font-bold text-slate-900 mb-2">Nutriming Integrativo</h5>
+                  <p className="text-sm text-slate-600">Explore alimentos, registre suas refeições e observe como suas experiências se relacionam com seus padrões ao longo do tempo.</p>
                 </div>
               </div>
             </div>

@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2, Volume2, Sparkles } from 'lucide-react';
+import { Play, Pause, Heart, Brain, Palette, Music, Star, ArrowRight, BarChart3, User, Share2, Volume2, Sparkles, Activity, Search, MessageCircle, Compass, Leaf, Apple, LineChart, Zap } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { PartnershipModal } from './PartnershipModal';
 import { ZenStoriesWall } from './ZenStoriesWall';
@@ -324,48 +324,166 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              {t('home.features.title')}
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              {t('home.features.subtitle')}
+      {/* Ecosystem Journey Section */}
+      <section className="py-24 bg-slate-50 relative overflow-hidden">
+        {/* Background Decorative Elements */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-b from-blue-50 to-transparent rounded-full opacity-50 blur-3xl translate-x-1/3 -translate-y-1/2 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-t from-purple-50 to-transparent rounded-full opacity-50 blur-3xl -translate-x-1/3 translate-y-1/2 pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-24">
+            <h3 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight max-w-4xl mx-auto leading-tight">
+              Muito mais que uma experiência de bem-estar.<br />
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Um ecossistema que aprende com você.</span>
+            </h3>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto font-light leading-relaxed">
+              Do primeiro check-in ao acompanhamento dos seus padrões, o XZenPress conecta inteligência artificial, conhecimento integrativo, experiências sonoras e nutrição em uma jornada personalizada.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-purple-200 group"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center justify-center w-16 h-16 bg-gray-50 rounded-2xl group-hover:bg-purple-50 transition-colors">
-                    {feature.icon}
-                  </div>
-                  {feature.isPremium && (
-                    <div className="flex items-center space-x-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      <Star className="w-3 h-3" />
-                      <span>Premium</span>
-                    </div>
-                  )}
+          <div className="relative max-w-5xl mx-auto">
+            {/* Linha Vertical Conectora (Timeline Loop) */}
+            <div className="hidden md:block absolute left-8 top-10 bottom-10 w-0.5 bg-gradient-to-b from-emerald-400 via-blue-500 to-slate-400 rounded-full opacity-30"></div>
+
+            {/* FASE 1: PERCEBA */}
+            <div className="relative mb-20 md:pl-24">
+              <div className="hidden md:flex absolute left-4 top-6 w-8 h-8 rounded-full bg-emerald-100 border-4 border-white shadow-sm items-center justify-center z-10 -translate-x-1/2">
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+              </div>
+              <div className="mb-6">
+                <h4 className="text-xl font-bold text-emerald-600 flex items-center gap-2">
+                  <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg text-sm tracking-wider">01</span>
+                  🌱 PERCEBA
+                </h4>
+                <p className="text-slate-500 mt-2 font-medium">Registre sinais vitais e observe seu estado presente.</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all">
+                  <Activity className="w-8 h-8 text-emerald-500 mb-4" />
+                  <h5 className="font-bold text-slate-900 mb-2">Zen Check-in</h5>
+                  <p className="text-sm text-slate-600">Registro diário em menos de 30s. Observação de sinais vitais e referenciais MTC.</p>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {feature.description}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all">
+                  <Search className="w-8 h-8 text-pink-500 mb-4" />
+                  <h5 className="font-bold text-slate-900 mb-2">Busca Semântica</h5>
+                  <p className="text-sm text-slate-600">Pesquise pelo que sente e encontre recursos e conteúdos rapidamente.</p>
+                </div>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all">
+                  <Apple className="w-8 h-8 text-rose-500 mb-4" />
+                  <h5 className="font-bold text-slate-900 mb-2">Nutriming</h5>
+                  <p className="text-sm text-slate-600">Observe sua alimentação e como seu corpo responde ao longo do dia.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* FASE 2: COMPREENDA */}
+            <div className="relative mb-20 md:pl-24">
+              <div className="hidden md:flex absolute left-4 top-6 w-8 h-8 rounded-full bg-blue-100 border-4 border-white shadow-sm items-center justify-center z-10 -translate-x-1/2">
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+              </div>
+              <div className="mb-6">
+                <h4 className="text-xl font-bold text-blue-600 flex items-center gap-2">
+                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-sm tracking-wider">02</span>
+                  🧠 COMPREENDA
+                </h4>
+                <p className="text-slate-500 mt-2 font-medium">Observe seus padrões ao longo do tempo.</p>
+              </div>
+
+              {/* Temporal Engine Destaque Principal */}
+              <div className="bg-slate-900 p-8 rounded-3xl shadow-xl text-white hover:scale-[1.01] transition-transform mb-6 border border-slate-800">
+                <div className="flex items-center gap-4 mb-4">
+                  <LineChart className="w-10 h-10 text-blue-400" />
+                  <h5 className="text-2xl font-bold">Temporal Observation Engine</h5>
+                </div>
+                <p className="text-slate-300 leading-relaxed text-lg">
+                  O XZenPress organiza seus registros em uma linha temporal para identificar recorrências e associações entre experiências, hábitos e sinais observados.
                 </p>
               </div>
-            ))}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-200 transition-all">
+                  <MessageCircle className="w-8 h-8 text-violet-500 mb-4" />
+                  <h5 className="font-bold text-slate-900 mb-2">ZenMentor IA</h5>
+                  <p className="text-sm text-slate-600">Assistente 24/7 para explorar padrões e práticas personalizadas de bem-estar.</p>
+                </div>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-200 transition-all">
+                  <Leaf className="w-8 h-8 text-green-600 mb-4" />
+                  <h5 className="font-bold text-slate-900 mb-2">Mapa Vivo & Botânica</h5>
+                  <p className="text-sm text-slate-600">Explore visualmente o mapa corporal, plantas e conhecimento tradicional.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* FASE 3: PRATIQUE */}
+            <div className="relative mb-20 md:pl-24">
+              <div className="hidden md:flex absolute left-4 top-6 w-8 h-8 rounded-full bg-amber-100 border-4 border-white shadow-sm items-center justify-center z-10 -translate-x-1/2">
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+              </div>
+              <div className="mb-6">
+                <h4 className="text-xl font-bold text-amber-600 flex items-center gap-2">
+                  <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-lg text-sm tracking-wider">03</span>
+                  ☯️ PRATIQUE
+                </h4>
+                <p className="text-slate-500 mt-2 font-medium">Experimente práticas integrativas alinhadas aos seus dados.</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-amber-200 transition-all">
+                  <Compass className="w-8 h-8 text-amber-500 mb-4" />
+                  <h5 className="font-bold text-slate-900 mb-2">Sessão Mestra</h5>
+                  <p className="text-sm text-slate-600">Jornada guiada que conecta seus registros, padrões e objetivos.</p>
+                </div>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-amber-200 transition-all">
+                  <Volume2 className="w-8 h-8 text-orange-500 mb-4" />
+                  <h5 className="font-bold text-slate-900 mb-2">ZenAudio Engine</h5>
+                  <p className="text-sm text-slate-600">Experiências sonoras inteligentes, binaural beats e ritmos respiratórios.</p>
+                </div>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-amber-200 transition-all">
+                  <Heart className="w-8 h-8 text-red-500 mb-4" />
+                  <h5 className="font-bold text-slate-900 mb-2">Acupressão Clínica</h5>
+                  <p className="text-sm text-slate-600">Mapa interativo de pontos e craniopuntura com visualização avançada.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* FASE 4: ACOMPANHE */}
+            <div className="relative md:pl-24">
+              <div className="hidden md:flex absolute left-4 top-6 w-8 h-8 rounded-full bg-slate-200 border-4 border-white shadow-sm items-center justify-center z-10 -translate-x-1/2">
+                <div className="w-2.5 h-2.5 rounded-full bg-slate-500"></div>
+              </div>
+              <div className="mb-6">
+                <h4 className="text-xl font-bold text-slate-700 flex items-center gap-2">
+                  <span className="bg-slate-200 text-slate-700 px-3 py-1 rounded-lg text-sm tracking-wider">04</span>
+                  📈 ACOMPANHE
+                </h4>
+                <p className="text-slate-500 mt-2 font-medium">Observe sua evolução e a resposta do seu corpo ao longo do tempo.</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-300 transition-all">
+                  <BarChart3 className="w-8 h-8 text-indigo-500 mb-4" />
+                  <h5 className="font-bold text-slate-900 mb-2">Dashboard Integrado</h5>
+                  <p className="text-sm text-slate-600">Tenha visão unificada do seu histórico e evolução das suas práticas.</p>
+                </div>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-300 transition-all">
+                  <Heart className="w-8 h-8 text-rose-500 mb-4" />
+                  <h5 className="font-bold text-slate-900 mb-2">Coerência & HRV</h5>
+                  <p className="text-sm text-slate-600">Acompanhe métricas de coerência cardíaca e observe sua resposta biológica ao longo do tempo.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Retorno do Ciclo (Loop de Volta para Fase 1) */}
+            <div className="mt-16 flex flex-col items-center justify-center text-slate-400 group relative">
+              <div className="absolute w-0.5 h-16 bg-gradient-to-t from-transparent to-slate-300 bottom-full mb-4"></div>
+              <span className="bg-slate-100 px-4 py-2 rounded-full font-bold tracking-widest text-xs flex items-center gap-2 group-hover:text-emerald-500 group-hover:bg-emerald-50 transition-colors cursor-default shadow-sm border border-slate-200">
+                <ArrowRight className="w-4 h-4 -rotate-90" />
+                CICLO CONTÍNUO
+              </span>
+            </div>
+
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
+{/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">

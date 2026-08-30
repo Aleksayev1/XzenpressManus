@@ -53,6 +53,7 @@ import { PremiumPartnerPitch } from './pages/PremiumPartnerPitch';
 import { DeviceSyncPage } from './components/DeviceSyncPage';
 import { ZenMentorChat } from './components/ZenMentorChat';
 import { ZenCheckinModal } from './components/ZenCheckinModal';
+import { NutrimingDashboard } from './pages/NutrimingDashboard';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('landing');
@@ -265,6 +266,8 @@ function AppContent() {
         return <CorporatePlansPage onPageChange={setCurrentPage} />;
       case 'dashboard':
         return <DashboardPage onPageChange={setCurrentPage} />;
+      case 'nutriming':
+        return <NutrimingDashboard onBack={() => setCurrentPage('home')} />;
       case 'sounds':
         return <SoundsLibraryPage onPageChange={setCurrentPage} />;
       case 'progress':

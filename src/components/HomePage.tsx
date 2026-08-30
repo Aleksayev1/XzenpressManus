@@ -368,9 +368,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                   <h5 className="font-bold text-slate-900 mb-2">Busca Semântica</h5>
                   <p className="text-sm text-slate-600">Pesquise pelo que sente e encontre recursos e conteúdos rapidamente.</p>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all">
-                  <Apple className="w-8 h-8 text-rose-500 mb-4" />
-                  <h5 className="font-bold text-slate-900 mb-2">Nutriming Integrativo</h5>
+                <div 
+                  onClick={() => onPageChange('nutriming')}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group"
+                >
+                  <Apple className="w-8 h-8 text-rose-500 mb-4 group-hover:scale-110 transition-transform" />
+                  <h5 className="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    Nutriming Integrativo
+                    <ArrowRight className="w-4 h-4 text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </h5>
                   <p className="text-sm text-slate-600">Explore alimentos, registre suas refeições e observe como suas experiências se relacionam com seus padrões ao longo do tempo.</p>
                 </div>
               </div>

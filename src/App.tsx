@@ -54,6 +54,8 @@ import { DeviceSyncPage } from './components/DeviceSyncPage';
 import { ZenMentorChat } from './components/ZenMentorChat';
 import { ZenCheckinModal } from './components/ZenCheckinModal';
 import { NutrimingDashboard } from './pages/NutrimingDashboard';
+import { HumanEvolutionDashboard } from './pages/HumanEvolutionDashboard';
+
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('landing');

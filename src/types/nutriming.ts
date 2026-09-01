@@ -5,7 +5,9 @@ export type ZenEventType =
   | 'movement'
   | 'emotion'
   | 'biometric'
-  | 'practice'
+  | 'practice' // Micro: registro de prática isolada
+  | 'chapter_review' // Macro: reflexão de encerramento de rascunho
+  | 'choice' // Opcional: quando o usuário escolhe reagir diferente
   | 'intervention'
   | 'response'
   | 'pattern';

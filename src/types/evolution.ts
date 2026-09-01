@@ -193,3 +193,71 @@ export const INITIAL_MICRO_BEHAVIORS: MicroBehavior[] = [
 export function getMicroBehaviorsForVirtue(virtueId: string): MicroBehavior[] {
   return INITIAL_MICRO_BEHAVIORS.filter((mb) => mb.virtueId === virtueId);
 }
+
+
+export interface ChoiceRecord {
+  id: string;
+  chapterId: string;
+  userId: string;
+  occurredAt: string;
+  
+  // O que o usuário percebeu antes de escolher
+  trigger?: string;
+  
+  // O que ele escolheu fazer
+  choiceOutcome: 'acted_consciously' | 'continued_automatic' | 'paused' | 'uncertain';
+  
+  reflection?: string;
+  zenEventId?: string;
+}
+
+export type EvolutionObservationType = 'recurrence' | 'change' | 'persistence' | 'disappearance' | 'variation';
+export type EvolutionEvidenceStrength = 'low' | 'moderate' | 'high';
+
+export interface EvolutionEvidence {
+  chapterId: string;
+  eventIds: string[];
+}
+
+export interface EvolutionObservation {
+  id: string;
+  userId: string;
+  observationType: EvolutionObservationType;
+  domain: 'practice' | 'choice' | 'emotion' | 'sleep' | 'nutrition' | 'cross_data';
+  text: string;
+  epistemicStatus: 'observed' | 'interpretive';
+  evidenceStrength: EvolutionEvidenceStrength;
+  evidence: EvolutionEvidence[];
+  chapterCount: number;
+  structuredPattern: Record<string, any>;
+  createdAt: string;
+}
+
+export interface ChapterWithLogs {
+  chapter: Chapter;
+  logs: PracticeLog[];
+  choices: ChoiceRecord[];
+}
+
+// ---------------------------------------------------------------------------
+// S13.5 — Chapter Comparator
+// ---------------------------------------------------------------------------
+
+/**
+ * Representa a comparação entre dois ou mais capítulos que compartilham
+ * o mesmo microcomportamento. Não contém scores nem avaliações.
+ * Apenas organiza evidências já produzidas pelo EvolutionMirrorEngine.
+ */
+export interface ChapterComparison {
+  /** Microcomportamento que une os capítulos comparados */
+  microBehaviorId: string;
+
+  /** Capítulos deste grupo, ordenados por startedAt */
+  chapters: Chapter[];
+
+  /** Observações do EvolutionMirrorEngine que dizem respeito a este grupo */
+  relatedObservations: EvolutionObservation[];
+
+  /** IDs de todos os capítulos com evidência vinculada às observações */
+  evidenceChapterIds: string[];
+}

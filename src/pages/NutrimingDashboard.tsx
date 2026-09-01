@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NutrimingCapture } from '../components/nutriming/NutrimingCapture';
+import { NutrimingCaptureFlows, CaptureMethod } from '../components/nutriming/NutrimingCaptureFlows';
 import { NutrimingConfirmationModal } from '../components/nutriming/NutrimingConfirmationModal';
 import { ZenFoodBalance } from '../components/nutriming/ZenFoodBalance';
 import { ZenMentorInsight } from '../components/nutriming/ZenMentorInsight';
@@ -17,6 +18,7 @@ export const NutrimingDashboard: React.FC = () => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [extractedFoods, setExtractedFoods] = useState<string[]>([]);
+  const [activeCaptureMethod, setActiveCaptureMethod] = useState<CaptureMethod>(null);
   const [activePattern, setActivePattern] = useState<PatternEventData | null>(null);
   const [showSavedToast, setShowSavedToast] = useState(false);
   
@@ -25,11 +27,18 @@ export const NutrimingDashboard: React.FC = () => {
   const [activeIntervention, setActiveIntervention] = useState<ExplorationOption | null>(null);
   
   const handleCaptureInitiated = (method: 'photo' | 'voice' | 'search' | 'favorite') => {
-    // Sprint 2: Mocking the fast flow
-    if (method === 'photo' || method === 'voice') {
-      setExtractedFoods(['Café', 'Alimento X']);
+    if (method === 'favorite') {
+      setExtractedFoods(['Tapioca', 'Café coado']);
       setIsModalOpen(true);
+      return;
     }
+    setActiveCaptureMethod(method);
+  };
+
+  const handleCaptureComplete = (foods: string[]) => {
+    setActiveCaptureMethod(null);
+    setExtractedFoods(foods);
+    setIsModalOpen(true);
   };
 
   const handleConfirm = async () => {

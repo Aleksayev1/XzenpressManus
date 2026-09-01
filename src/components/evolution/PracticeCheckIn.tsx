@@ -4,21 +4,30 @@ import { CheckCircle2, CircleDashed, XCircle, HelpCircle } from 'lucide-react';
 
 interface PracticeCheckInProps {
   chapter: Chapter;
-  onLog: (outcome: PracticeOutcome, reflection: string) => Promise<void>;
+  onLog: (outcome: PracticeOutcome, reflection: string, meaningReflection?: { contribution?: boolean; feltMeaningful?: boolean; reflection?: string }) => Promise<void>;
 }
 
 export const PracticeCheckIn: React.FC<PracticeCheckInProps> = ({ chapter, onLog }) => {
   const [selectedOutcome, setSelectedOutcome] = useState<PracticeOutcome | null>(null);
   const [reflection, setReflection] = useState('');
+  
+  // Meaning Reflection States
+  const [contribution, setContribution] = useState<boolean | undefined>(undefined);
+  const [feltMeaningful, setFeltMeaningful] = useState<boolean | undefined>(undefined);
+  const [meaningText, setMeaningText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleConfirm = async () => {
     if (!selectedOutcome) return;
     setIsSubmitting(true);
     try {
-      await onLog(selectedOutcome, reflection);
+            const hasMeaning = contribution !== undefined || feltMeaningful !== undefined || meaningText.length > 0;
+      await onLog(selectedOutcome, reflection, hasMeaning ? { contribution, feltMeaningful, reflection: meaningText } : undefined);
       setSelectedOutcome(null);
       setReflection('');
+      setContribution(undefined);
+      setFeltMeaningful(undefined);
+      setMeaningText('');
     } catch (err) {
       console.error(err);
     } finally {
@@ -91,6 +100,37 @@ export const PracticeCheckIn: React.FC<PracticeCheckInProps> = ({ chapter, onLog
             placeholder="Alguma reflexão curta sobre esse momento..."
             className="w-full bg-[#0d1a16] border border-emerald-900/30 rounded-xl p-4 text-emerald-50 placeholder:text-emerald-900/50 focus:outline-none focus:border-emerald-500/50 min-h-[100px] resize-none mb-6"
           />
+
+          <div className="border-t border-emerald-900/30 pt-6 mb-6">
+            <h4 className="text-lg font-serif text-emerald-100/80 mb-4">
+              A dimensão de sentido <span className="text-emerald-100/40 text-sm font-sans italic">(Opcional)</span>
+            </h4>
+            
+            <div className="mb-4">
+              <p className="text-emerald-50 text-sm mb-2">Essa experiência envolveu ajudar, cuidar ou contribuir com outra pessoa?</p>
+              <div className="flex gap-2">
+                <button onClick={() => setContribution(true)} className={`px-4 py-2 rounded-lg text-sm transition-colors border ${contribution === true ? 'bg-emerald-600/20 border-emerald-500/50 text-emerald-400' : 'bg-[#0d1a16] border-emerald-900/30 text-emerald-100/60 hover:bg-[#11241e]'}`}>Sim</button>
+                <button onClick={() => setContribution(false)} className={`px-4 py-2 rounded-lg text-sm transition-colors border ${contribution === false ? 'bg-slate-800/40 border-slate-500/50 text-slate-300' : 'bg-[#0d1a16] border-emerald-900/30 text-emerald-100/60 hover:bg-[#11241e]'}`}>Não</button>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-emerald-50 text-sm mb-2">Algo nessa experiência teve significado para você?</p>
+              <div className="flex gap-2">
+                <button onClick={() => setFeltMeaningful(true)} className={`px-4 py-2 rounded-lg text-sm transition-colors border ${feltMeaningful === true ? 'bg-emerald-600/20 border-emerald-500/50 text-emerald-400' : 'bg-[#0d1a16] border-emerald-900/30 text-emerald-100/60 hover:bg-[#11241e]'}`}>Sim</button>
+                <button onClick={() => setFeltMeaningful(false)} className={`px-4 py-2 rounded-lg text-sm transition-colors border ${feltMeaningful === false ? 'bg-slate-800/40 border-slate-500/50 text-slate-300' : 'bg-[#0d1a16] border-emerald-900/30 text-emerald-100/60 hover:bg-[#11241e]'}`}>Não</button>
+              </div>
+            </div>
+            
+            {(feltMeaningful === true || contribution === true) && (
+              <textarea
+                value={meaningText}
+                onChange={(e) => setMeaningText(e.target.value)}
+                placeholder="Se quiser, conte o que foi significativo..."
+                className="w-full bg-[#0d1a16] border border-emerald-900/30 rounded-xl p-4 text-emerald-50 placeholder:text-emerald-900/50 focus:outline-none focus:border-emerald-500/50 min-h-[80px] resize-none mt-2"
+              />
+            )}
+          </div>
 
           <button 
             onClick={handleConfirm}

@@ -5,6 +5,7 @@ import { EvolutionObservation, ChapterWithLogs } from '../../types/evolution';
 import { EvolutionMirrorHeader } from './EvolutionMirrorHeader';
 import { ChapterComparator } from './ChapterComparator';
 import { ChapterComparatorEngine } from '../../services/evolution/chapterComparatorEngine';
+import { NarrativeSynthesis } from './NarrativeSynthesis';
 
 interface ChapterHistoryProps {
   chapters: Chapter[];
@@ -73,6 +74,8 @@ export const ChapterHistory: React.FC<ChapterHistoryProps> = ({ chapters, datase
       <ChapterComparator comparisons={comparisons} onViewEvidence={handleViewEvidence} />
 
       <EvolutionMirrorHeader observations={observations} onViewEvidence={handleViewEvidence} />
+
+      <NarrativeSynthesis observations={observations} comparisons={comparisons} onViewEvidence={handleViewEvidence} />
 
       <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-emerald-900/30 before:to-transparent">
         {chapters.length === 0 ? (

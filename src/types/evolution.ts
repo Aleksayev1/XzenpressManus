@@ -261,3 +261,24 @@ export interface ChapterComparison {
   /** IDs de todos os capítulos com evidência vinculada às observações */
   evidenceChapterIds: string[];
 }
+
+/**
+ * S13.6 - Narrative Engine Types
+ */
+export interface NarrativeClaim {
+  id: string;
+  text: string;
+  observationId: string;
+  evidenceChapterIds: string[];
+}
+
+export interface NarrativeQuestion {
+  question: string;
+  observationId: string;
+  evidenceChapterIds: string[];
+}
+
+export type NarrativeOutput = 
+  | { status: 'approved'; claims: NarrativeClaim[]; }
+  | { status: 'question'; question: NarrativeQuestion; }
+  | { status: 'rejected'; };

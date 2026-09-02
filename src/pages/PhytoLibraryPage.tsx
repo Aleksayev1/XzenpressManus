@@ -473,7 +473,12 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
             });
 
             if (!response.ok) {
-                throw new Error('Não foi possível se conectar com o Oráculo no momento.');
+                let errorMessage = 'Não foi possível se conectar com o Oráculo no momento.';
+                try {
+                    const errorData = await response.json();
+                    if (errorData.error) errorMessage = errorData.error;
+                } catch (e) {}
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();

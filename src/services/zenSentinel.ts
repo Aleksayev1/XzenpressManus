@@ -1,5 +1,5 @@
 // =============================================================================
-// ZenSentinel — Camada de Triagem de Segurança do XZenPress
+// ZenSentinel â€” Camada de Triagem de Seguranâ€”a do XZenPress
 // =============================================================================
 // PRINCIPIO INVIOLAVEL: Este modulo roda ANTES de qualquer engine.
 // Nunca pode ser bypassado.
@@ -19,7 +19,7 @@ export type SentinelLevel = 'CRITICAL' | 'CAUTION' | 'SAFE';
 export interface SentinelResult {
   level: SentinelLevel;
   categories: string[];
-  matchedRules: string[];         // auditabilidade — LGPD Art. 20
+  matchedRules: string[];         // auditabilidade â€” LGPD Art. 20
   blockEngines: boolean;          // true = CRITICAL: nenhum engine roda
   responseTemplate: string | null;
   restrictions: string[];         // ex: ['no_acupoints_SP6'] para gestante
@@ -31,7 +31,7 @@ interface Rule {
   category: string;
   level: SentinelLevel;
   patterns: RegExp[];
-  negationGuard?: RegExp;         // rebaixa um nivel — nunca libera para SAFE
+  negationGuard?: RegExp;         // rebaixa um nivel â€” nunca libera para SAFE
   weight: number;
 }
 
@@ -40,13 +40,13 @@ interface Rule {
 // =============================================================================
 
 const RULES: Rule[] = [
-  // CRITICO — Emergencia Cardiovascular
+  // CRITICO â€” Emergencia Cardiovascular
   {
     id: 'cardio_emergency_radiation',
     category: 'cardiovascular',
     level: 'CRITICAL',
     patterns: [
-      /dor (no |de )peito.{0,40}(bra[cç]o|costas|mand[ií]bula)/i,
+      /dor (no |de )peito.{0,40}(bra[cÃ§]o|costas|mand[iÃ­]bula)/i,
       /(aperto|pressao|aperta) (no )peito.{0,50}(falta de ar|suando|tontura)/i,
       /dor forte no peito/i,
     ],
@@ -64,20 +64,20 @@ const RULES: Rule[] = [
     weight: 10,
   },
 
-  // CRITICO — Emergencia Neurologica
+  // CRITICO â€” Emergencia Neurologica
   {
     id: 'neuro_emergency',
     category: 'neurological',
     level: 'CRITICAL',
     patterns: [
-      /pior dor de cabe[cç]a (da minha vida|que ja tive|de repente)/i,
+      /pior dor de cabe[cÃ§]a (da minha vida|que ja tive|de repente)/i,
       /(boca|rosto) (torto|caindo) de repente/i,
-      /(bra[cç]o|perna).{0,20}(dormeceu|sem forca) de repente/i,
+      /(bra[cÃ§]o|perna).{0,20}(dormeceu|sem forca) de repente/i,
     ],
     weight: 10,
   },
 
-  // CRITICO — Ideacao Suicida Ativa
+  // CRITICO â€” Ideacao Suicida Ativa
   {
     id: 'suicidal_active_direct',
     category: 'suicidal_ideation_active',
@@ -103,7 +103,7 @@ const RULES: Rule[] = [
     weight: 9,
   },
 
-  // CRITICO — Autolesao em Curso
+  // CRITICO â€” Autolesao em Curso
   {
     id: 'self_harm_active',
     category: 'self_harm_active',
@@ -115,7 +115,7 @@ const RULES: Rule[] = [
     weight: 10,
   },
 
-  // CRITICO — Violencia em Curso
+  // CRITICO â€” Violencia em Curso
   {
     id: 'domestic_violence_active',
     category: 'domestic_violence',
@@ -127,7 +127,7 @@ const RULES: Rule[] = [
     weight: 10,
   },
 
-  // ATENCAO — Ideacao Passiva
+  // ATENCAO â€” Ideacao Passiva
   {
     id: 'passive_ideation_wishful',
     category: 'suicidal_ideation_passive',
@@ -149,7 +149,7 @@ const RULES: Rule[] = [
     weight: 5,
   },
 
-  // ATENCAO — Gravidez
+  // ATENCAO â€” Gravidez
   {
     id: 'pregnancy',
     category: 'pregnancy',
@@ -163,7 +163,7 @@ const RULES: Rule[] = [
     weight: 5,
   },
 
-  // ATENCAO — Medicacao / Condicao Cronica
+  // ATENCAO â€” Medicacao / Condicao Cronica
   {
     id: 'anticoagulant',
     category: 'medication_interaction',
@@ -186,7 +186,7 @@ const RULES: Rule[] = [
     weight: 5,
   },
 
-  // ATENCAO — Sintoma Fisico Persistente
+  // ATENCAO â€” Sintoma Fisico Persistente
   {
     id: 'persistent_symptom',
     category: 'persistent_symptom',
@@ -215,7 +215,7 @@ const RESTRICTIONS: Record<string, string[]> = {
 };
 
 // =============================================================================
-// TEMPLATES DE RESPOSTA — linguagem juridicamente segura + acolhedora
+// TEMPLATES DE RESPOSTA â€” linguagem juridicamente segura + acolhedora
 // =============================================================================
 
 const TEMPLATES: Record<string, Record<string, string>> = {
@@ -239,16 +239,16 @@ const TEMPLATES: Record<string, Record<string, string>> = {
     hopelessness:
       'O cansaco que voce esta sentindo e real, e eu ouco isso. Se em algum momento sentir que precisa de um suporte diferente, o CVV (**188**) esta disponivel sem julgamento.',
     pregnancy:
-      'Vou adaptar as sugestoes considerando sua gestacao — alguns pontos e plantas precisam de cuidado extra durante a gravidez.',
+      'Vou adaptar as sugestoes considerando sua gestacao â€” alguns pontos e plantas precisam de cuidado extra durante a gravidez.',
     persistent_symptom:
       'Esse sintoma merece uma avaliacao medica antes de qualquer pratica complementar. Recomendo consultar um profissional.',
     default:
-      'O que voce descreveu merece cuidado — e as vezes esse cuidado envolve tambem o olhar de um profissional de saude.',
+      'O que voce descreveu merece cuidado â€” e as vezes esse cuidado envolve tambem o olhar de um profissional de saude.',
   },
 };
 
 // =============================================================================
-// FUNCAO PRINCIPAL — CAMADA 1
+// FUNCAO PRINCIPAL â€” CAMADA 1
 // =============================================================================
 
 export function sentinelLayer1(input: string): SentinelResult {
@@ -288,7 +288,7 @@ export function sentinelLayer1(input: string): SentinelResult {
     };
   } catch (error) {
     // FAIL-SAFE: erro no classificador NUNCA libera fluxo normal
-    console.error('[ZenSentinel] Erro na camada 1 — fail-safe ativado:', error);
+    console.error('[ZenSentinel] Erro na camada 1 â€” fail-safe ativado:', error);
     return {
       level: 'CAUTION',
       categories: ['classifier_error'],

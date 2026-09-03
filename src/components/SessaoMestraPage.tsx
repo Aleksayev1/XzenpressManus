@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+﻿import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowRight, Brain, Zap, Activity, Send, Loader2, Sparkles, X, Crown, CheckCircle } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
@@ -23,7 +23,7 @@ interface Message {
     timestamp: Date;
 }
 
-// Helper to parse and strip action tags in Sess�o Mestra chat
+// Helper to parse and strip action tags in Sessão Mestra chat
 function parseActionButtonsSM(content: string) {
   const actionRegex = /\[ABRIR:([\w-]+)\]/g;
   const zenflowRegex = /\[ZENFLOW:([\w]+)\]/g;
@@ -33,7 +33,7 @@ function parseActionButtonsSM(content: string) {
   const candidateMatch = candidataRegex.exec(content);
   if (candidateMatch) {
       // Remove any quotes (straight or curly) surrounding the text
-      candidateMemoryText = candidateMatch[1].replace(/^["��']|["��']$/g, '').trim();
+      candidateMemoryText = candidateMatch[1].replace(/^["“”']|["“”']$/g, '').trim();
   }
   
   // Reset lastIndex for the .replace call below
@@ -156,7 +156,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [currentPointIndex, setCurrentPointIndex] = useState(0);
 
-    // -- Coherence Score State -----------------------------------------------
+    // ── Coherence Score State ───────────────────────────────────────────────
     const { saveCoherenceResult, loadCumulativeStats, cumulativeStats } = useCoherenceScore(user?.id);
     const [coherenceResult, setCoherenceResult] = useState<ReturnType<typeof computeCoherenceResult> | null>(null);
     const [preSessionRmssd, setPreSessionRmssd] = useState<number>(0);
@@ -175,19 +175,19 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         contextData?: any;
     }>({ isOpen: false });
 
-    // -- Chat State ----------------------------------------------------------
+    // ── Chat State ──────────────────────────────────────────────────────────
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // -- Breathing State ------------------------------------------------------
+    // ── Breathing State ──────────────────────────────────────────────────────
     const [breathState, setBreathState] = useState<'idle' | 'inhale' | 'hold' | 'exhale' | 'done'>('idle');
     const [breathCount, setBreathCount] = useState(0);
     const [breathSeconds, setBreathSeconds] = useState(0);
     const breathPhaseStartTime = useRef(Date.now());
 
-    // -- Acupressure Timer ----------------------------------------------------
+    // ── Acupressure Timer ────────────────────────────────────────────────────
     const [timeLeft, setTimeLeft] = useState(60);
     const [isTimerActive, setIsTimerActive] = useState(false);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -198,11 +198,11 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     }, []);
 
     const formatTime = useCallback((seconds: number) => {
-        if (seconds <= 0) return '? Pronto';
+        if (seconds <= 0) return '✓ Pronto';
         return `${seconds}s`;
     }, []);
 
-    // Timer Countdown Effect � gong fires exactly once when timer reaches zero
+    // Timer Countdown Effect — gong fires exactly once when timer reaches zero
     useEffect(() => {
         if (!isTimerActive) {
             if (timerRef.current) {
@@ -243,7 +243,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         };
     }, [isTimerActive]);
 
-    // -- ZenFlow State --------------------------------------------------------
+    // ── ZenFlow State ────────────────────────────────────────────────────────
     const [zenFlowStepIndex, setZenFlowStepIndex] = useState(0);
 
     const nextZenFlowStep = useCallback(() => {
@@ -256,7 +256,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
     const getDailyMaxLimit = () => {
         if (user?.isPremium) return 999;
-        if (user) return 2; // Usu�rio gratuito logado: 2 por dia
+        if (user) return 2; // Usuário gratuito logado: 2 por dia
         return 1; // Visitante sem login: 1 por dia
     };
 
@@ -297,7 +297,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         return false;
     };
 
-    // -- Auto-start Timer on New Point or ZenFlow --
+    // ── Auto-start Timer on New Point or ZenFlow ──
     useEffect(() => {
         if (phase === 'acupressure') {
             if (timerRef.current) {
@@ -326,7 +326,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         }
     }, [currentPointIndex, phase, zenFlowStepIndex, selectedEmotion]);
 
-    // -- Auto-advance ZenFlow steps when timer reaches zero --
+    // ── Auto-advance ZenFlow steps when timer reaches zero ──
     useEffect(() => {
         if (phase === 'zenflow' && timeLeft === 0 && !isTimerActive) {
             const exercise = selectedEmotion?.zenFlowExerciseId
@@ -342,7 +342,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         }
     }, [phase, timeLeft, isTimerActive, zenFlowStepIndex, selectedEmotion]);
 
-    // -- Breathing Effect -----------------------------------------------------
+    // ── Breathing Effect ─────────────────────────────────────────────────────
     useEffect(() => {
         if (breathState === 'idle' || breathState === 'done') return;
 
@@ -385,7 +385,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         };
     }, [breathState]);
 
-    // -- Auto-scroll chat messages --------------------------------------------
+    // ── Auto-scroll chat messages ────────────────────────────────────────────
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
@@ -400,7 +400,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 return;
             }
 
-            // -- Priority 1: ZenMentor handoff (< 30 min) ----------------------------------
+            // ── Priority 1: ZenMentor handoff (< 30 min) ──────────────────────────────────
             const handoffRaw = localStorage.getItem('zenmentor_handoff');
             if (handoffRaw) {
                 const handoff = JSON.parse(handoffRaw);
@@ -417,11 +417,11 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         return; // handoff handled, skip the rest
                     }
                 }
-                // Expired or invalid ? clean up
+                // Expired or invalid → clean up
                 localStorage.removeItem('zenmentor_handoff');
             }
 
-            // -- Priority 2: Home check-in (< 1 hour) --------------------------------
+            // ── Priority 2: Home check-in (< 1 hour) ────────────────────────────────
             const saved = localStorage.getItem('last_emotional_checkin');
             if (saved) {
                 const data = JSON.parse(saved);
@@ -463,9 +463,9 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
     const initiateChat = async (emotion: EmotionalState, intensity: number) => {
         setIsLoading(true);
-        const seedMessage = `OL�. Identifiquei que estou sentindo **${emotion.namePortuguese}** (N�vel ${intensity}/5). 
-        Isso est� ligado energeticamente ao �rg�o **${emotion.mtcOrgan}** (${emotion.mtcElement}).
-        Por favor, me ajude a compreender a causa emocional e a metaf�sica por tr�s disso de forma acolhedora.`;
+        const seedMessage = `OLÁ. Identifiquei que estou sentindo **${emotion.namePortuguese}** (Nível ${intensity}/5). 
+        Isso está ligado energeticamente ao órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).
+        Por favor, me ajude a compreender a causa emocional e a metafísica por trás disso de forma acolhedora.`;
 
         // Add hidden user message to history (or just system context)
         // We simulate the AI greeting based on this context
@@ -515,7 +515,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             // Fallback generic greeting for offline mode
             setMessages([{
                 role: 'assistant',
-                content: `(Modo Offline) Ol�. Percebo que voc� est� sentindo **${emotion.namePortuguese}** (N�vel ${intensity}/5).\n\nComo estamos sem conex�o com o servidor de IA, vamos focar no que seu corpo diz. Como essa emo��o est� se manifestando fisicamente agora?`,
+                content: `(Modo Offline) Olá. Percebo que você está sentindo **${emotion.namePortuguese}** (Nível ${intensity}/5).\n\nComo estamos sem conexão com o servidor de IA, vamos focar no que seu corpo diz. Como essa emoção está se manifestando fisicamente agora?`,
                 timestamp: new Date()
             }]);
         } finally {
@@ -570,7 +570,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             console.warn("Offline/Localhost mode: AI unavailable. Using fallback.");
             // Fallback for Localhost/Offline
             setTimeout(() => {
-                const fallbackResponse = `(Modo Offline) Entendi. Como estamos sem conex�o com o servidor de IA agora, vamos focar no tratamento pr�tico.\n\nA acupress�o vai ajudar a liberar essa tens�o de **${selectedEmotion?.namePortuguese || 'sua emo��o'}** diretamente no corpo.\n\nClique no bot�o abaixo para iniciar os pontos.`;
+                const fallbackResponse = `(Modo Offline) Entendi. Como estamos sem conexão com o servidor de IA agora, vamos focar no tratamento prático.\n\nA acupressão vai ajudar a liberar essa tensão de **${selectedEmotion?.namePortuguese || 'sua emoção'}** diretamente no corpo.\n\nClique no botão abaixo para iniciar os pontos.`;
                 setMessages(prev => [...prev, { role: 'assistant', content: fallbackResponse, timestamp: new Date() }]);
             }, 1000);
         } finally {
@@ -614,7 +614,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         // Clear counted session flag from sessionStorage so subsequent sessions are tracked
         sessionStorage.removeItem('xzen_current_session_counted');
 
-        // -- Capturar ansiedade p�s-sess�o e calcular Coherence Score ------
+        // ── Capturar ansiedade pós-sessão e calcular Coherence Score ──────
         setShowAnxietyCapture(true);
     };
 
@@ -648,20 +648,20 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 completedAt: new Date().toISOString(),
                 pointsUsed: getRecommendedPoints().map(p => p.id),
                 sessionData: {
-                    protocolName: `Sess�o Mestra: ${selectedEmotion.namePortuguese}`,
+                    protocolName: `Sessão Mestra: ${selectedEmotion.namePortuguese}`,
                     originalProtocolId: 'sessao-mestra'
                 }
             });
             // Save with coherence data
             saveCoherenceResult(before, after, result, 'integrated', 600);
 
-            // ZenMemory: Captura de Mem�ria Epis�dica
+            // ZenMemory: Captura de Memória Episódica
             ZenMemoryEngine.captureCandidateMemory({
                 user_id: user.id,
                 memory_type: 'episodic',
                 memory_category: 'emotion',
                 tags: [selectedEmotion.id, 'sessao_mestra', ...getRecommendedPoints().map(p => p.id)],
-                memory_content: `Sess�o Mestra conclu�da para ${selectedEmotion.namePortuguese}. Ansiedade relatada de ${preSessionAnxiety}/10 para ${postAnxiety}/10. ${(result as any).improved ? 'Houve melhora.' : 'Sem melhora fisiol�gica imediata.'}`,
+                memory_content: `Sessão Mestra concluída para ${selectedEmotion.namePortuguese}. Ansiedade relatada de ${preSessionAnxiety}/10 para ${postAnxiety}/10. ${(result as any).improved ? 'Houve melhora.' : 'Sem melhora fisiológica imediata.'}`,
                 source_type: 'session_result',
                 privacy_level: 'personal_context',
                 influence_weight: 3,
@@ -680,7 +680,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             <div className="relative z-10 h-16 flex items-center justify-between px-4 border-b border-gray-800 bg-black/50 backdrop-blur-md">
                 <button onClick={onBack} className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center text-gray-300 gap-2">
                     <ArrowLeft className="w-5 h-5" />
-                    <span className="hidden md:inline text-sm">Sair da Sess�o</span>
+                    <span className="hidden md:inline text-sm">Sair da Sessão</span>
                 </button>
 
                 <div className="flex items-center space-x-2 md:space-x-6">
@@ -736,11 +736,11 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     Desperte seu Potencial
                                 </h2>
                                 <p className="text-gray-300 text-sm mb-6 leading-relaxed">
-                                    Sua primeira degusta��o da Sess�o Mestra foi conclu�da.
+                                    Sua primeira degustação da Sessão Mestra foi concluída.
                                     <br /><br />
-                                    ? <strong>Crie sua conta gratuita agora</strong> para ganhar mais uma sess�o hoje e salvar seu hist�rico.
+                                    ✨ <strong>Crie sua conta gratuita agora</strong> para ganhar mais uma sessão hoje e salvar seu histórico.
                                     <br />
-                                    ?? Ou v� al�m: assine o <strong>Premium</strong> para ter <strong>acesso espetacular</strong> e ilimitado a todos os protocolos e intelig�ncia artificial da XZenPress!
+                                    👑 Ou vá além: assine o <strong>Premium</strong> para ter <strong>acesso espetacular</strong> e ilimitado a todos os protocolos e inteligência artificial da XZenPress!
                                 </p>
                                 <div className="space-y-3">
                                     <button
@@ -751,7 +751,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         }}
                                         className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-bold text-white shadow-lg hover:scale-105 transition-all text-xs sm:text-sm"
                                     >
-                                        ?? Criar Conta / Fazer Login Gr�tis (+1 Sess�o)
+                                        🔑 Criar Conta / Fazer Login Grátis (+1 Sessão)
                                     </button>
                                     <button
                                         onClick={() => {
@@ -761,7 +761,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         }}
                                         className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl font-bold text-black hover:scale-105 transition-all text-xs sm:text-sm"
                                     >
-                                        ?? Assinar Premium (Acesso Espetacular)
+                                        👑 Assinar Premium (Acesso Espetacular)
                                     </button>
                                     <button
                                         onClick={() => {
@@ -777,12 +777,12 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         ) : (
                             <>
                                 <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200 mb-3">
-                                    A Jornada Apenas Come�ou
+                                    A Jornada Apenas Começou
                                 </h2>
                                 <p className="text-gray-300 text-sm mb-6 leading-relaxed">
-                                    Voc� atingiu o limite de 2 sess�es di�rias do plano gratuito.
+                                    Você atingiu o limite de 2 sessões diárias do plano gratuito.
                                     <br /><br />
-                                    Liberte todo o poder da medicina integrativa. Obtenha <strong>acesso espetacular</strong> ao nosso ZenMentor IA, protocolos ilimitados e personaliza��o cl�nica profunda fazendo o upgrade para o <strong>Premium</strong>.
+                                    Liberte todo o poder da medicina integrativa. Obtenha <strong>acesso espetacular</strong> ao nosso ZenMentor IA, protocolos ilimitados e personalização clínica profunda fazendo o upgrade para o <strong>Premium</strong>.
                                 </p>
                                 <div className="space-y-3">
                                     <button
@@ -793,7 +793,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         }}
                                         className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl font-bold text-black shadow-lg hover:scale-105 transition-all text-xs sm:text-sm"
                                     >
-                                        ?? Assinar Premium (Acesso Espetacular)
+                                        👑 Assinar Premium (Acesso Espetacular)
                                     </button>
                                     <button
                                         onClick={() => {
@@ -822,8 +822,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         onNavigate={() => { }} // We handle nav internally
                         disableNavigation={true}
                         inline={true}
-                        customTitle="Iniciando Sess�o Mestra - Passo 1"
-                        customSubtitle="Selecione o foco emocional do seu tratamento hoje para calibrarmos os pontos e a respira��o ideais."
+                        customTitle="Iniciando Sessão Mestra - Passo 1"
+                        customSubtitle="Selecione o foco emocional do seu tratamento hoje para calibrarmos os pontos e a respiração ideais."
                     />
                 )}
 
@@ -879,7 +879,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 }}
                                 className="w-full mt-3 py-3 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl font-bold text-white hover:opacity-90 transition-all flex items-center justify-center gap-2"
                             >
-                                <span>Entendi. Iniciar Prepara��o</span>
+                                <span>Entendi. Iniciar Preparação</span>
                                 <ArrowRight className="w-4 h-4" />
                             </button>
                             <button
@@ -899,28 +899,28 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         <div className="text-center mb-8 mt-4">
                             <h1 className="text-2xl font-bold text-purple-400 mb-2 flex items-center justify-center gap-2">
                                 <Activity className="w-6 h-6" />
-                                Prepara��o Sensorial
+                                Preparação Sensorial
                             </h1>
                             <p className="text-gray-300 max-w-md mx-auto">
-                                Antes de iniciarmos os pontos, vamos sintonizar sua frequ�ncia e respira��o.
+                                Antes de iniciarmos os pontos, vamos sintonizar sua frequência e respiração.
                             </p>
                         </div>
 
                         <div className="w-full max-w-md space-y-8">
-                            {/* Step 1: Checagem do Rel�gio (VFC Inicial) */}
+                            {/* Step 1: Checagem do Relógio (VFC Inicial) */}
                             <div className="bg-gray-800/50 p-6 rounded-2xl border border-emerald-500/20">
                                 <h3 className="text-white font-bold mb-3 flex items-center gap-2">
                                     <span className="bg-emerald-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
-                                    Checagem do Rel�gio (VFC Inicial)
+                                    Checagem do Relógio (VFC Inicial)
                                 </h3>
                                 <p className="text-gray-400 text-xs mb-4 leading-relaxed">
-                                    Verifique ou inicie a leitura de HRV/VFC no seu rel�gio agora. Em seguida, sincronize o valor abaixo como sua linha de base.
+                                    Verifique ou inicie a leitura de HRV/VFC no seu relógio agora. Em seguida, sincronize o valor abaixo como sua linha de base.
                                 </p>
                                 <div className="flex items-center justify-between bg-gray-950 p-4 rounded-xl border border-gray-700">
                                     <div>
                                         <p className="text-[10px] text-gray-500 uppercase font-semibold">VFC Inicial Lido</p>
                                         <p className="text-lg font-bold text-emerald-400">
-                                            {preSessionRmssd > 0 && isUsingWearable ? `${preSessionRmssd} ms` : 'N�o Sincronizado'}
+                                            {preSessionRmssd > 0 && isUsingWearable ? `${preSessionRmssd} ms` : 'Não Sincronizado'}
                                         </p>
                                     </div>
                                     <button
@@ -932,7 +932,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         }}
                                         className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5"
                                     >
-                                        ?? Sincronizar Rel�gio
+                                        🔄 Sincronizar Relógio
                                     </button>
                                 </div>
                                 <div className="mt-3 flex items-center justify-between text-xs">
@@ -953,7 +953,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     </div>
                                 </div>
                                 <div className="mt-4 pt-3 border-t border-gray-700/50 flex justify-between items-center text-xs">
-                                    <span className="text-gray-500">Sem rel�gio compat�vel?</span>
+                                    <span className="text-gray-500">Sem relógio compatível?</span>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -966,7 +966,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                                 : 'text-gray-400 hover:text-white underline'
                                         }`}
                                     >
-                                        {!isUsingWearable ? '? Continuando sem rel�gio' : 'Pular Checagem'}
+                                        {!isUsingWearable ? '✓ Continuando sem relógio' : 'Pular Checagem'}
                                     </button>
                                 </div>
                             </div>
@@ -975,10 +975,10 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             <div className="bg-gray-800/50 p-6 rounded-2xl border border-purple-500/20">
                                 <h3 className="text-white font-bold mb-4 flex items-center gap-2">
                                     <span className="bg-purple-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
-                                    Conex�o Sonora
+                                    Conexão Sonora
                                 </h3>
                                 <p className="text-gray-400 text-sm mb-4">
-                                    Coloque seus fones e d� play na frequ�ncia escolhida para o elemento <strong>{selectedEmotion?.mtcElement}</strong>. O som ir� guiar todo o processo.
+                                    Coloque seus fones e dê play na frequência escolhida para o elemento <strong>{selectedEmotion?.mtcElement}</strong>. O som irá guiar todo o processo.
                                 </p>
                                 <div className="h-20 bg-gray-900 rounded-xl overflow-hidden shadow-lg border border-gray-700">
                                     <iframe
@@ -997,10 +997,10 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             <div className="bg-gray-800/50 p-6 rounded-2xl border border-blue-500/20 flex flex-col items-center">
                                 <h3 className="text-white font-bold mb-4 w-full flex items-center gap-2">
                                     <span className="bg-blue-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
-                                    Respira��o de Aterrissagem (4-2-6)
+                                    Respiração de Aterrissagem (4-2-6)
                                 </h3>
                                 <p className="text-gray-400 text-sm mb-6 text-center">
-                                    A respira��o compassada reequilibra seu sistema nervoso em segundos.
+                                    A respiração compassada reequilibra seu sistema nervoso em segundos.
                                 </p>
 
                                 {/* Breathing Animation Pacer */}
@@ -1027,19 +1027,19 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         )}
                                         {breathState === 'inhale' && (
                                             <>
-                                                <span className="text-sm tracking-wider animate-pulse">?? INSPIRE</span>
+                                                <span className="text-sm tracking-wider animate-pulse">💨 INSPIRE</span>
                                                 <span className="text-xs font-mono opacity-85 mt-1">{breathSeconds + 1}/4s</span>
                                             </>
                                         )}
                                         {breathState === 'hold' && (
                                             <>
-                                                <span className="text-sm tracking-wider">? SEGURE</span>
+                                                <span className="text-sm tracking-wider">✋ SEGURE</span>
                                                 <span className="text-xs font-mono opacity-85 mt-1">{breathSeconds + 1}/2s</span>
                                             </>
                                         )}
                                         {breathState === 'exhale' && (
                                             <>
-                                                <span className="text-sm tracking-wider animate-pulse">?? SOLTE</span>
+                                                <span className="text-sm tracking-wider animate-pulse">🍃 SOLTE</span>
                                                 <span className="text-xs font-mono opacity-85 mt-1">{breathSeconds + 1}/6s</span>
                                             </>
                                         )}
@@ -1060,15 +1060,15 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         }}
                                         className="py-2.5 px-6 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-all shadow-md active:scale-95"
                                     >
-                                        Iniciar Respira��o Guiada
+                                        Iniciar Respiração Guiada
                                     </button>
                                 ) : (
                                     <div className="w-full text-center space-y-2">
                                         <div className="text-xs text-gray-400">
                                             {breathState === 'done' ? (
-                                                <span className="text-green-400 font-bold">? Exerc�cio de Respira��o Conclu�do!</span>
+                                                <span className="text-green-400 font-bold">✨ Exercício de Respiração Concluído!</span>
                                             ) : (
-                                                <span>Ciclo de Respira��o: <strong className="text-blue-400">{breathCount + 1} de 3</strong></span>
+                                                <span>Ciclo de Respiração: <strong className="text-blue-400">{breathCount + 1} de 3</strong></span>
                                             )}
                                         </div>
                                         {/* Simple reset button */}
@@ -1099,7 +1099,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 }`}
                             >
                                 <Zap className="w-5 h-5" />
-                                {breathState === 'done' ? 'Estou Pronto para os Pontos' : 'Fa�a a Respira��o para Desbloquear'}
+                                {breathState === 'done' ? 'Estou Pronto para os Pontos' : 'Faça a Respiração para Desbloquear'}
                             </button>
                             {breathState !== 'done' && (
                                 <button
@@ -1109,7 +1109,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     }}
                                     className="w-full mt-1 py-2 text-xs text-gray-600 hover:text-gray-400 transition-colors"
                                 >
-                                    Pular respira��o e ir direto para os pontos ?
+                                    Pular respiração e ir direto para os pontos →
                                 </button>
                             )}
                             <button
@@ -1129,9 +1129,9 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         <div className="text-center mb-4">
                             <h1 className="text-2xl font-bold text-yellow-400 mb-1 flex items-center justify-center gap-2">
                                 <Zap className="w-6 h-6" />
-                                Alinhamento Energ�tico
+                                Alinhamento Energético
                             </h1>
-                            <p className="text-gray-400 text-sm">Siga a respira��o e o som.</p>
+                            <p className="text-gray-400 text-sm">Siga a respiração e o som.</p>
                         </div>
 
                         {/* Audio Player for Focus */}
@@ -1226,7 +1226,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                             className="flex-1 py-4 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-black font-bold rounded-xl shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)] transition-all flex items-center justify-center gap-2"
                                         >
                                             {currentPointIndex < points.length - 1 ? (
-                                                <>Pr�ximo Ponto <ArrowRight className="w-5 h-5" /></>
+                                                <>Próximo Ponto <ArrowRight className="w-5 h-5" /></>
                                             ) : (
                                                 <>Concluir <Sparkles className="w-5 h-5" /></>
                                             )}
@@ -1261,10 +1261,10 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         </div>
                                         <h1 className="text-3xl font-bold text-white mb-2">
                                             {exercise?.type === 'regulation'
-                                                ? 'Movimento de Regula��o'
+                                                ? 'Movimento de Regulação'
                                                 : exercise?.type === 'integration'
-                                                ? 'Movimento de Integra��o'
-                                                : 'Movimento de Libera��o'}
+                                                ? 'Movimento de Integração'
+                                                : 'Movimento de Liberação'}
                                         </h1>
                                         <h2 className="text-xl text-blue-300 font-semibold mb-1">
                                             {exercise?.title}
@@ -1290,7 +1290,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         <div className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700 flex flex-col justify-center">
                                             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                                                 <span className="bg-blue-600 text-xs px-2 py-1 rounded-full">Qi Gong</span>
-                                                Instru��es do Movimento
+                                                Instruções do Movimento
                                             </h3>
                                             <div className="space-y-6">
                                                 {exercise?.steps.map((step, idx) => (
@@ -1326,7 +1326,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
                                     <div className="bg-blue-900/20 p-4 rounded-xl border border-blue-500/20 mb-8 max-w-2xl mx-auto">
                                         <p className="text-blue-200/80 text-sm">
-                                            "N�o controle o movimento. Deixe a m�sica guiar o corpo.
+                                            "Não controle o movimento. Deixe a música guiar o corpo.
                                             O que a mente entendeu e a agulha tocou, o corpo agora expulsa."
                                         </p>
                                     </div>
@@ -1336,7 +1336,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         className="px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl transition-all hover:scale-105 shadow-[0_0_30px_rgba(37,99,235,0.4)] flex items-center gap-2 mx-auto"
                                     >
                                         <Sparkles className="w-5 h-5" />
-                                        Concluir Sess�o Mestra
+                                        Concluir Sessão Mestra
                                     </button>
                                 </div>
                             );
@@ -1344,15 +1344,15 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     </div>
                 )}
 
-                {/* PHASE 4: SUMMARY � Coherence Score + Pr�ximos Passos */}
+                {/* PHASE 4: SUMMARY — Coherence Score + Próximos Passos */}
                 {phase === 'summary' && (
                     <div className="absolute inset-0 flex flex-col items-center p-6 pb-10 bg-slate-950 overflow-y-auto text-center animate-in zoom-in">
                         <div className="w-full max-w-sm mx-auto">
                             {/* Header */}
                             <div className="text-center mb-6 pt-2">
-                                <div className="text-4xl mb-2">?</div>
-                                <h1 className="text-2xl font-extrabold text-white">Tr�ade Alinhada</h1>
-                                <p className="text-gray-500 text-sm mt-1">{selectedEmotion?.namePortuguese} � {selectedEmotion?.mtcOrgan}</p>
+                                <div className="text-4xl mb-2">✨</div>
+                                <h1 className="text-2xl font-extrabold text-white">Tríade Alinhada</h1>
+                                <p className="text-gray-500 text-sm mt-1">{selectedEmotion?.namePortuguese} · {selectedEmotion?.mtcOrgan}</p>
                             </div>
 
                             {coherenceResult ? (
@@ -1366,13 +1366,13 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 </div>
                             ) : (
                                 <div className="bg-slate-900 border border-white/5 rounded-2xl p-5 text-center mb-4">
-                                    <p className="text-gray-400 text-sm">Voc� completou o ciclo Mente-Energia-Corpo.</p>
+                                    <p className="text-gray-400 text-sm">Você completou o ciclo Mente-Energia-Corpo.</p>
                                 </div>
                             )}
 
-                            {/* -------------------------------------------------------- */}
-                            {/* OFICINA TERAP�UTICA � Pr�ximos Setores                       */}
-                            {/* -------------------------------------------------------- */}
+                            {/* ──────────────────────────────────────────────────────── */}
+                            {/* OFICINA TERAPÊUTICA — Próximos Setores                       */}
+                            {/* ──────────────────────────────────────────────────────── */}
                             <div className="mt-6 mb-4">
                                 <div className="flex items-center gap-2 mb-3">
                                     <div className="flex-1 h-px bg-white/10"></div>
@@ -1380,11 +1380,11 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     <div className="flex-1 h-px bg-white/10"></div>
                                 </div>
                                 <p className="text-gray-600 text-xs text-center mb-4">
-                                    Sua sess�o foi s� o in�cio. Cada setor da oficina cuida de uma parte do seu equil�brio.
+                                    Sua sessão foi só o início. Cada setor da oficina cuida de uma parte do seu equilíbrio.
                                 </p>
 
                                 <div className="space-y-2.5">
-                                    {/* 1 - ZenFlow (Movimento) */}
+                                    {/* 1 ─ ZenFlow (Movimento) */}
                                     <button
                                         onClick={() => {
                                             nextZenFlowStep();
@@ -1399,22 +1399,22 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
                                         style={{ background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.25)' }}
                                     >
-                                        <span className="text-2xl">??</span>
+                                        <span className="text-2xl">🌊</span>
                                         <div className="flex-1">
-                                            <div className="text-white font-bold text-sm">ZenFlow � Corpo & Qi</div>
-                                            <div className="text-blue-400 text-xs mt-0.5">Movimento de libera��o para o elemento {selectedEmotion?.mtcElement}</div>
+                                            <div className="text-white font-bold text-sm">ZenFlow — Corpo & Qi</div>
+                                            <div className="text-blue-400 text-xs mt-0.5">Movimento de liberação para o elemento {selectedEmotion?.mtcElement}</div>
                                         </div>
                                         <ArrowRight className="w-4 h-4 text-blue-400 flex-shrink-0" />
                                     </button>
 
-                                    {/* 2 - Nutriming (Nutri��o) */}
+                                    {/* 2 ─ Nutriming (Nutrição) */}
                                      <button
                                          onClick={() => {
                                              if (!user?.isPremium) {
                                                  setPremiumModal({
                                                      isOpen: true,
-                                                     moduleName: 'Nutriming IA � Nutri��o',
-                                                     detail: `o protocolo alimentar espec�fico para o seu caso de desequil�brio no �rg�o ${selectedEmotion?.mtcOrgan || 'Ba�o'}`,
+                                                     moduleName: 'Nutriming IA — Nutrição',
+                                                     detail: `o protocolo alimentar específico para o seu caso de desequilíbrio no órgão ${selectedEmotion?.mtcOrgan || 'Baço'}`,
                                                      targetPage: 'nutriming-ai',
                                                      contextKey: 'nutriming_context',
                                                      contextData: {
@@ -1437,29 +1437,29 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
                                          style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)' }}
                                      >
-                                         <span className="text-2xl">??</span>
+                                         <span className="text-2xl">🥗</span>
                                          <div className="flex-1">
                                              <div className="text-white font-bold text-sm flex items-center gap-2">
-                                                 Nutriming IA � Nutri��o
+                                                 Nutriming IA — Nutrição
                                                  {!user?.isPremium && (
                                                      <span className="text-[9px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Premium</span>
                                                  )}
                                              </div>
                                              <div className="text-emerald-400 text-xs mt-0.5">
-                                                 {!user?.isPremium ? "?? Requer Premium para indica��o cl�nica personalizada" : `Protocolo alimentar para nutrir ${selectedEmotion?.mtcOrgan}`}
+                                                 {!user?.isPremium ? "🔓 Requer Premium para indicação clínica personalizada" : `Protocolo alimentar para nutrir ${selectedEmotion?.mtcOrgan}`}
                                              </div>
                                          </div>
                                          <ArrowRight className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                                      </button>
 
-                                    {/* 3 - Plantas Medicinais */}
+                                    {/* 3 ─ Plantas Medicinais */}
                                      <button
                                          onClick={() => {
                                              if (!user?.isPremium) {
                                                  setPremiumModal({
                                                      isOpen: true,
                                                      moduleName: 'Plantas Medicinais',
-                                                     detail: `a indica��o fitoter�pica espec�fica para o seu caso de desequil�brio no elemento ${selectedEmotion?.mtcElement || 'Terra'}`,
+                                                     detail: `a indicação fitoterápica específica para o seu caso de desequilíbrio no elemento ${selectedEmotion?.mtcElement || 'Terra'}`,
                                                      targetPage: 'plantas-medicinais',
                                                      contextKey: 'phyto_context',
                                                      contextData: {
@@ -1482,7 +1482,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
                                          style={{ background: 'rgba(132,204,22,0.12)', border: '1px solid rgba(132,204,22,0.25)' }}
                                      >
-                                         <span className="text-2xl">??</span>
+                                         <span className="text-2xl">🌿</span>
                                          <div className="flex-1">
                                              <div className="text-white font-bold text-sm flex items-center gap-2">
                                                  Plantas Medicinais
@@ -1491,13 +1491,13 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                                  )}
                                              </div>
                                              <div className="text-lime-400 text-xs mt-0.5">
-                                                 {!user?.isPremium ? "?? Requer Premium para indica��o cl�nica personalizada" : `Fitoterapia complementar para o elemento ${selectedEmotion?.mtcElement}`}
+                                                 {!user?.isPremium ? "🔓 Requer Premium para indicação clínica personalizada" : `Fitoterapia complementar para o elemento ${selectedEmotion?.mtcElement}`}
                                              </div>
                                          </div>
                                          <ArrowRight className="w-4 h-4 text-lime-400 flex-shrink-0" />
                                      </button>
 
-                                    {/* 4 - VFC/HRV (Monitoramento) */}
+                                    {/* 4 ─ VFC/HRV (Monitoramento) */}
                                     <button
                                         onClick={() => {
                                             window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'device-sync' }));
@@ -1505,15 +1505,15 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
                                         style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.25)' }}
                                     >
-                                        <span className="text-2xl">??</span>
+                                        <span className="text-2xl">📊</span>
                                         <div className="flex-1">
-                                            <div className="text-white font-bold text-sm">VFC / HRV � Monitoramento</div>
-                                            <div className="text-amber-400 text-xs mt-0.5">Acompanhe a recupera��o do seu sistema nervoso</div>
+                                            <div className="text-white font-bold text-sm">VFC / HRV — Monitoramento</div>
+                                            <div className="text-amber-400 text-xs mt-0.5">Acompanhe a recuperação do seu sistema nervoso</div>
                                         </div>
                                         <ArrowRight className="w-4 h-4 text-amber-400 flex-shrink-0" />
                                     </button>
 
-                                    {/* 5 - Self Oracle (Aprofundamento) */}
+                                    {/* 5 ─ Self Oracle (Aprofundamento) */}
                                     <button
                                         onClick={() => {
                                             const recPoints = getRecommendedPoints();
@@ -1524,28 +1524,28 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                         className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95"
                                         style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.25)' }}
                                     >
-                                        <span className="text-2xl">??</span>
+                                        <span className="text-2xl">🔮</span>
                                         <div className="flex-1">
-                                            <div className="text-white font-bold text-sm">Self Oracle � Aprofundamento</div>
-                                            <div className="text-purple-400 text-xs mt-0.5">Pontos espec�ficos com fotos e protocolo detalhado</div>
+                                            <div className="text-white font-bold text-sm">Self Oracle — Aprofundamento</div>
+                                            <div className="text-purple-400 text-xs mt-0.5">Pontos específicos com fotos e protocolo detalhado</div>
                                         </div>
                                         <ArrowRight className="w-4 h-4 text-purple-400 flex-shrink-0" />
                                     </button>
 
-                                    {/* 6 - XZenPress Stories (Compartilhar Al�vio) */}
+                                    {/* 6 ─ XZenPress Stories (Compartilhar Alívio) */}
                                     <button
                                         onClick={() => setShowStoriesCaptureModal(true)}
                                         className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95 shadow-lg border"
                                         style={{ background: 'rgba(244,63,94,0.12)', borderColor: 'rgba(244,63,94,0.3)' }}
                                     >
-                                        <span className="text-2xl animate-pulse">??</span>
+                                        <span className="text-2xl animate-pulse">💬</span>
                                         <div className="flex-1">
                                             <div className="text-white font-bold text-sm flex items-center gap-2">
-                                                XZenPress Stories � Compartilhe seu Al�vio
+                                                XZenPress Stories — Compartilhe seu Alívio
                                                 <span className="text-[9px] bg-rose-500/20 text-rose-300 border border-rose-500/30 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Inspirar</span>
                                             </div>
                                             <div className="text-rose-300 text-xs mt-0.5">
-                                                Grave 30s de �udio, v�deo ou texto sobre o que sentiu
+                                                Grave 30s de áudio, vídeo ou texto sobre o que sentiu
                                             </div>
                                         </div>
                                         <ArrowRight className="w-4 h-4 text-rose-400 flex-shrink-0" />
@@ -1563,24 +1563,24 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     </div>
                 )}
 
-                {/* Modal de captura de ansiedade p�s-sess�o */}
+                {/* Modal de captura de ansiedade pós-sessão */}
                 {showAnxietyCapture && (
                     <div className="absolute inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm">
                         <div className="w-full max-w-sm bg-slate-900 border border-white/10 rounded-t-3xl p-6 pb-10">
                             <div className="text-center mb-5">
-                                <div className="text-2xl mb-2">??</div>
-                                <h3 className="text-lg font-bold text-white">Como voc� est� agora?</h3>
+                                <div className="text-2xl mb-2">🧘</div>
+                                <h3 className="text-lg font-bold text-white">Como você está agora?</h3>
                                 <p className="text-gray-500 text-xs mt-1">
                                     {isUsingWearable 
-                                        ? 'Avalie seu n�vel de ansiedade e sincronize seu rel�gio p�s-sess�o' 
-                                        : 'Avalie seu n�vel de ansiedade para concluir o ciclo'}
+                                        ? 'Avalie seu nível de ansiedade e sincronize seu relógio pós-sessão' 
+                                        : 'Avalie seu nível de ansiedade para concluir o ciclo'}
                                 </p>
                             </div>
 
                             {/* VFC Post-Session Check (Watch Sync) - Only shown if they checked in with watch */}
                             {isUsingWearable ? (
                                 <div className="mb-5 bg-gray-950 p-4 rounded-xl border border-gray-800">
-                                    <p className="text-[10px] text-gray-500 uppercase font-semibold mb-1">Checagem de VFC Final (Rel�gio)</p>
+                                    <p className="text-[10px] text-gray-500 uppercase font-semibold mb-1">Checagem de VFC Final (Relógio)</p>
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className="text-xs text-gray-400">VFC Final Lido:</p>
@@ -1598,7 +1598,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                             }}
                                             className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold rounded-lg text-white transition-all active:scale-95"
                                         >
-                                            ?? Sincronizar Rel�gio
+                                            🔄 Sincronizar Relógio
                                         </button>
                                     </div>
                                     <div className="mt-3 flex items-center justify-between text-[11px]">
@@ -1618,7 +1618,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             ) : (
                                 <div className="mb-5 bg-indigo-950/20 p-4 rounded-xl border border-indigo-500/10 text-center">
                                     <p className="text-[11px] text-indigo-300">
-                                        ?? Sem rel�gio: seu �ndice de Coer�ncia ser� calculado com base na varia��o de ansiedade subjetiva.
+                                        ℹ️ Sem relógio: seu Índice de Coerência será calculado com base na variação de ansiedade subjetiva.
                                     </p>
                                 </div>
                             )}
@@ -1646,7 +1646,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     : 'bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed'
                                 }`}
                             >
-                                {(!isUsingWearable || postSessionRmssd > 0) ? 'Ver meu �ndice de Coer�ncia' : 'Sincronize o Rel�gio para Finalizar'}
+                                {(!isUsingWearable || postSessionRmssd > 0) ? 'Ver meu Índice de Coerência' : 'Sincronize o Relógio para Finalizar'}
                             </button>
                         </div>
                     </div>
@@ -1664,14 +1664,14 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     onClose={() => setShowStoriesCaptureModal(false)}
                     defaultAuthorName={user?.name || ''}
                     context={{
-                        sessionName: selectedEmotion ? `Al�vio ${selectedEmotion.namePortuguese}` : 'Reset do Sistema Nervoso',
+                        sessionName: selectedEmotion ? `Alívio ${selectedEmotion.label}` : 'Reset do Sistema Nervoso',
                         beforeScore: preSessionAnxiety,
                         afterScore: postSessionAnxiety,
                         coherenceGainMs: (postSessionRmssd && preSessionRmssd && postSessionRmssd > preSessionRmssd) 
                             ? (postSessionRmssd - preSessionRmssd) 
                             : 16,
                         guardianElement: selectedEmotion?.mtcElement || 'Fogo',
-                        organAffected: selectedEmotion?.mtcOrgan || 'Cora��o'
+                        organAffected: selectedEmotion?.mtcOrgan || 'Coração'
                     }}
                 />
 
@@ -1683,9 +1683,9 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Crown className="w-6 h-6 text-purple-400" />
                             </div>
-                            <h3 className="text-lg font-bold text-white mb-2">Recurso Premium ??</h3>
+                            <h3 className="text-lg font-bold text-white mb-2">Recurso Premium 🌟</h3>
                             <p className="text-gray-400 text-xs leading-relaxed mb-6">
-                                Para visualizar <strong>{premiumModal.detail}</strong> e ter acesso � indica��o personalizada do seu caso, voc� precisa fazer parte do plano Premium (incluso na assinatura 360).
+                                Para visualizar <strong>{premiumModal.detail}</strong> e ter acesso à indicação personalizada do seu caso, você precisa fazer parte do plano Premium (incluso na assinatura 360).
                             </p>
                             <div className="space-y-2.5">
                                 <button
@@ -1695,7 +1695,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     }}
                                     className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-bold text-white text-xs hover:scale-105 transition-transform"
                                 >
-                                    Ver Assinatura Premium / 360 ??
+                                    Ver Assinatura Premium / 360 👑
                                 </button>
                                 <button
                                     onClick={() => {
@@ -1704,7 +1704,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     }}
                                     className="w-full py-3 bg-purple-500/20 border border-purple-500/30 rounded-xl text-purple-300 hover:text-white font-semibold text-xs transition-colors"
                                 >
-                                    ?? Continuar no B�sico (Ir para Self Oracle)
+                                    🔮 Continuar no Básico (Ir para Self Oracle)
                                 </button>
                                 <button
                                     onClick={() => {
@@ -1716,7 +1716,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     }}
                                     className="w-full py-2.5 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white text-xs transition-colors"
                                 >
-                                    Continuar na vers�o geral (sem indica��o)
+                                    Continuar na versão geral (sem indicação)
                                 </button>
                                 <button
                                     onClick={() => setPremiumModal(prev => ({ ...prev, isOpen: false }))}
@@ -1788,7 +1788,7 @@ const ImageZoomModal: React.FC<{
 
                 <img
                     src={imageUrl}
-                    alt="Ponto de acupress�o ampliado"
+                    alt="Ponto de acupressão ampliado"
                     className={`max-w-full max-h-[95vh] object-contain rounded-xl shadow-2xl transition-opacity duration-300 cursor-pointer ${
                         imageLoaded ? 'opacity-100' : 'opacity-0'
                     }`}
@@ -1812,7 +1812,7 @@ const ImageZoomModal: React.FC<{
 
                 <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 px-6 py-3 rounded-full">
                     <div className="flex items-center gap-3 text-white text-sm">
-                        <span className="opacity-90">?? Clique na imagem ou pressione ESC para fechar</span>
+                        <span className="opacity-90">💡 Clique na imagem ou pressione ESC para fechar</span>
                     </div>
                 </div>
             </div>

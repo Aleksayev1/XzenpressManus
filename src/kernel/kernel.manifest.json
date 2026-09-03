@@ -1,0 +1,78 @@
+{
+    "__tests__/meaning/MeaningEngine.test.ts":  {
+                                                    "sha256":  "FFB31018D8530B810DD75E639A9D41758C2078214240506052D48A82A9ECFA4F",
+                                                    "size":  10970
+                                                },
+    "__tests__/reflection/ContaminationAttack.test.ts":  {
+                                                             "sha256":  "83B3599A6AD4192EAE44F4CCCEA6AD141FAC2CD8805069D890166B86529F7DEC",
+                                                             "size":  17035
+                                                         },
+    "__tests__/reflection/Guard.test.ts":  {
+                                               "sha256":  "3C32804A8560E1DDC6BC627938D4F9DBA05D6AB4DBE09439FDE7C97F34A36BFB",
+                                               "size":  13132
+                                           },
+    "__tests__/reflection/GuardTelemetry.test.ts":  {
+                                                        "sha256":  "201F365D10BBA995E741B71198B71FB3C90B240119903B0186C2C9DB096E1AE4",
+                                                        "size":  6138
+                                                    },
+    "__tests__/reflection/NegativeCapability.test.ts":  {
+                                                            "sha256":  "8A65291F76D2F5F5E755C1ECDA5B355DD04992853C731D341C37A33579059800",
+                                                            "size":  5784
+                                                        },
+    "__tests__/reflection/RedTeam.test.ts":  {
+                                                 "sha256":  "7FFC4188A08D25A6C0752385F0168E536C8849BF676DCEBD79FB8C71002107D4",
+                                                 "size":  11958
+                                             },
+    "__tests__/reflection/ReflectionE2E.test.ts":  {
+                                                       "sha256":  "865C9CFAC98B9CF168B18EDA7A24FB2360BB7B7189466FC76CE3F8F0A9E9E0A1",
+                                                       "size":  19509
+                                                   },
+    "lib/meaning/MeaningAssociationEngine.ts":  {
+                                                    "sha256":  "7C242C19C44FB83BF638A0694254434C27F671BABF750CA7E0D26DBB29DC4FBA",
+                                                    "size":  591
+                                                },
+    "lib/meaning/MeaningDivergenceEngine.ts":  {
+                                                   "sha256":  "C9D8555D78164E527932EC16E2A57E44F46B309A3F71ECF344139DAD824CB354",
+                                                   "size":  2043
+                                               },
+    "lib/meaning/MeaningRecurrenceEngine.ts":  {
+                                                   "sha256":  "DC5C82C14A40B9BDF65BB6ADA4534F77ED599D96AC0EE9C58368F708EF9FA53F",
+                                                   "size":  850
+                                               },
+    "lib/meaning/MeaningTemporalValidator.ts":  {
+                                                    "sha256":  "374C6AF3F8260A437D81CF5E4146EF05A84902C17851732273EA3F0798D65319",
+                                                    "size":  3942
+                                                },
+    "lib/reflection/EpistemicGuard.ts":  {
+                                             "sha256":  "E379F1CE796C4B7AA296BDC15D8BDA20DE92E35A34A6EDAD49AD24615286E1FF",
+                                             "size":  15524
+                                         },
+    "lib/reflection/ObservationFactory.ts":  {
+                                                 "sha256":  "6971EC7444F38D18507BA025FD44470C1EA19505157C8BEB953A0DFCA6C4F7D1",
+                                                 "size":  3101
+                                             },
+    "lib/reflection/RuntimeBoundary.ts":  {
+                                              "sha256":  "4C15AEC034811653A9734852AFE4695C4ACB9B5D11287BC2A9D09D3693122B5A",
+                                              "size":  2021
+                                          },
+    "lib/reflection/TelemetryUtils.ts":  {
+                                             "sha256":  "BC160B9B37823B41586D3CF2ECAA8B5EF617BAFC1D239017CDF7635336E60025",
+                                             "size":  327
+                                         },
+    "services/evolution/EvolutionMeaningPipeline.ts":  {
+                                                           "sha256":  "80B80F0D1A272780F50244C88D3C39252E1A3F7D8C7E2D2346AB4474DD37FB27",
+                                                           "size":  1982
+                                                       },
+    "services/reflection/ReflectionPipelineE2E.ts":  {
+                                                         "sha256":  "986C66CF89AF78FA56536E9322DC1AED9AC236BE83548C9F2FDB9A9FB695EC16",
+                                                         "size":  4069
+                                                     },
+    "types/meaning.ts":  {
+                             "sha256":  "F2D32227FAD60C15040DF21ABE686D31019FF423072255FB986075992D252AF3",
+                             "size":  2213
+                         },
+    "types/reflection.ts":  {
+                                "sha256":  "6C4CD6F1B5716E554B630ADCECC55A5B16BBD8162DCDB6A1FB10439F8E90FD37",
+                                "size":  4549
+                            }
+}

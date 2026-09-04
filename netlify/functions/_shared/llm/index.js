@@ -536,7 +536,8 @@ var GeminiAdapter = class {
     if (!this.apiKey) {
       throw new Error("GEMINI_API_KEY is not configured in server environment");
     }
-    const systemPrompt = `Voc\xEA \xE9 uma intelig\xEAncia integrativa rigorosa. Sua tarefa \xE9 acolher a reflex\xE3o humana e contextualiz\xE1-la estritamente em termos da observa\xE7\xE3o matem\xE1tica realizada. NUNCA fa\xE7a afirma\xE7\xF5es categ\xF3ricas de identidade (quem a pessoa \xE9), NUNCA imponha teleologia ou des\xEDgnio evolutivo, e NUNCA declare causalidade determin\xEDstica sem evid\xEAncia.`;
+    const systemPrompt = `Você é uma inteligência integrativa rigorosa. Sua tarefa é acolher a reflexão humana e contextualizá-la estritamente em termos da observação matemática realizada. NUNCA faça afirmações categóricas de identidade (quem a pessoa é), NUNCA imponha teleologia ou desígnio evolutivo, e NUNCA declare causalidade determinística sem evidência.
+REGRA DE IDIOMA MULTILÍNGUE: Responda SEMPRE e exclusivamente no mesmo idioma que o usuário utilizar na mensagem ou no idioma solicitado pelo locale (${context.locale || 'pt-BR'}). Se o usuário falar em inglês, responda nativamente em inglês. Se falar em espanhol, responda em espanhol. Adapte o seu tom terapêutico acolhedor nativamente para a língua do usuário.`;
     const userContent = JSON.stringify({
       humanReflection: context.humanReflection.text,
       observationMetric: {
@@ -592,7 +593,8 @@ var OpenAIAdapter = class {
     if (!this.apiKey) {
       throw new Error("OPENAI_API_KEY is not configured in server environment");
     }
-    const systemPrompt = `Voc\xEA \xE9 uma intelig\xEAncia integrativa rigorosa. Sua tarefa \xE9 acolher a reflex\xE3o humana e contextualiz\xE1-la estritamente em termos da observa\xE7\xE3o matem\xE1tica realizada. NUNCA fa\xE7a afirma\xE7\xF5es categ\xF3ricas de identidade (quem a pessoa \xE9), NUNCA imponha teleologia ou des\xEDgnio evolutivo, e NUNCA declare causalidade determin\xEDstica sem evid\xEAncia.`;
+    const systemPrompt = `Você é uma inteligência integrativa rigorosa. Sua tarefa é acolher a reflexão humana e contextualizá-la estritamente em termos da observação matemática realizada. NUNCA faça afirmações categóricas de identidade (quem a pessoa é), NUNCA imponha teleologia ou desígnio evolutivo, e NUNCA declare causalidade determinística sem evidência.
+REGRA DE IDIOMA MULTILÍNGUE: Responda SEMPRE e exclusivamente no mesmo idioma que o usuário utilizar na mensagem ou no idioma solicitado pelo locale (${context.locale || 'pt-BR'}). Se o usuário falar em inglês, responda nativamente em inglês. Se falar em espanhol, responda em espanhol. Adapte o seu tom terapêutico acolhedor nativamente para a língua do usuário.`;
     const userContent = JSON.stringify({
       humanReflection: context.humanReflection.text,
       observationMetric: {
@@ -651,7 +653,8 @@ var AnthropicAdapter = class {
     if (!this.apiKey) {
       throw new Error("ANTHROPIC_API_KEY is not configured in server environment");
     }
-    const systemPrompt = `Voc\xEA \xE9 uma intelig\xEAncia integrativa rigorosa. Sua tarefa \xE9 acolher a reflex\xE3o humana e contextualiz\xE1-la estritamente em termos da observa\xE7\xE3o matem\xE1tica realizada. NUNCA fa\xE7a afirma\xE7\xF5es categ\xF3ricas de identidade (quem a pessoa \xE9), NUNCA imponha teleologia ou des\xEDgnio evolutivo, e NUNCA declare causalidade determin\xEDstica sem evid\xEAncia.`;
+    const systemPrompt = `Você é uma inteligência integrativa rigorosa. Sua tarefa é acolher a reflexão humana e contextualizá-la estritamente em termos da observação matemática realizada. NUNCA faça afirmações categóricas de identidade (quem a pessoa é), NUNCA imponha teleologia ou desígnio evolutivo, e NUNCA declare causalidade determinística sem evidência.
+REGRA DE IDIOMA MULTILÍNGUE: Responda SEMPRE e exclusivamente no mesmo idioma que o usuário utilizar na mensagem ou no idioma solicitado pelo locale (${context.locale || 'pt-BR'}). Se o usuário falar em inglês, responda nativamente em inglês. Se falar em espanhol, responda em espanhol. Adapte o seu tom terapêutico acolhedor nativamente para a língua do usuário.`;
     const userContent = JSON.stringify({
       humanReflection: context.humanReflection.text,
       observationMetric: {

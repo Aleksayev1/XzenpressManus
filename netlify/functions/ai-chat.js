@@ -83,7 +83,7 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        const { message, conversationHistory = [], userEmail, isPremium = false, anamneseContext = null } = JSON.parse(event.body);
+        const { message, conversationHistory = [], userEmail, isPremium = false, anamneseContext = null, locale = null } = JSON.parse(event.body);
 
         // Validação básica
         if (!message || message.trim().length === 0) {
@@ -292,7 +292,7 @@ Para esta condição, você DEVE priorizar a seguinte causa metafísica e orient
         const gatewayResult = await gateway.process({
             userMessage: message,
             anamneseContext: [anamneseContext, clinicalContext].filter(Boolean).join('\n\n') || undefined,
-            locale: 'pt-BR',
+            locale: locale || 'pt-BR',
             isPremium: isPremium
         });
 

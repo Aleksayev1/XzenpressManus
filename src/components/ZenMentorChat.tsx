@@ -466,26 +466,26 @@ function useTTS() {
           throw new Error('SpeechSynthesis não suportado neste ambiente');
         }
 
-        // Detecta idioma automaticamente pelo navegador do usuário
-        const browserLang = navigator.language || navigator.languages?.[0] || 'pt-BR';
-        const baseLang = browserLang.split('-')[0];
+        // Detecta idioma da página (respeitando Google Translate ativo) ou do navegador
+        const activeLang = document.documentElement.lang || navigator.language || navigator.languages?.[0] || 'pt-BR';
+        const baseLang = activeLang.split('-')[0].toLowerCase();
 
         const utter = new SpeechSynthesisUtterance(clean);
-        utter.lang = browserLang; // ← usa o idioma real do navegador
+        utter.lang = activeLang; // ← usa o idioma real/traduzido da página
         utter.rate = 0.95;
         utter.pitch = 1.05;
 
-        // Procura a melhor voz disponível no idioma do navegador
+        // Procura a melhor voz disponível no idioma ativo/traduzido
         const voices = window.speechSynthesis.getVoices();
-        const langVoices = voices.filter(v => v.lang.startsWith(baseLang));
+        const langVoices = voices.filter(v => v.lang.toLowerCase().startsWith(baseLang));
         const premiumKeywords = ['google', 'natural', 'premium', 'neural', 'microsoft'];
         
         const bestVoice = langVoices.find(v => 
-          v.lang === browserLang && 
+          v.lang.toLowerCase() === activeLang.toLowerCase() && 
           premiumKeywords.some(kw => v.name.toLowerCase().includes(kw))
         ) || langVoices.find(v => 
           premiumKeywords.some(kw => v.name.toLowerCase().includes(kw))
-        ) || langVoices.find(v => v.lang === browserLang) || langVoices[0];
+        ) || langVoices.find(v => v.lang.toLowerCase().startsWith(baseLang)) || langVoices[0];
 
         if (bestVoice) {
           utter.voice = bestVoice;
@@ -817,6 +817,7 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
           userEmail: user?.email || null,
           isPremium: user?.isPremium || false,
           anamneseContext: anamneseContext || null,
+          locale: document.documentElement.lang || navigator.language || 'pt-BR',
         }),
       });
 
@@ -1079,6 +1080,7 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                   )}
                   <div className="max-w-[82%]">
                     <div
+                      id={`zen-msg-text-${i}`}
                       className="px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed"
                       style={msg.role === 'user'
                         ? { background: `linear-gradient(135deg, ${accentColor}cc, #6366f1aa)`, color: 'white', borderBottomRightRadius: '6px' }
@@ -1097,7 +1099,10 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                           } else {
                             stop();
                             setPlayingIndex(i);
-                            speak(cleanContent, selectedVoice);
+                            // Extrai o texto diretamente do DOM para capturar traduções ativas do navegador (ex: Google Translate)
+                            const domNode = document.getElementById(`zen-msg-text-${i}`);
+                            const textToSpeak = domNode?.textContent || cleanContent;
+                            speak(textToSpeak, selectedVoice);
                           }
                         }}
                         className="mt-1.5 flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all hover:opacity-90"

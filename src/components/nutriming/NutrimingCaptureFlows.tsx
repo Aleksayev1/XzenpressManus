@@ -90,97 +90,184 @@ const SearchFlow: React.FC<{ onComplete: (f: string[]) => void }> = ({ onComplet
    2. RECONHECIMENTO DE VOZ (MICROFONE)
    ═══════════════════════════════════════════════════════════════ */
 const VoiceFlow: React.FC<{ onComplete: (f: string[]) => void }> = ({ onComplete }) => {
-  const [recording, setRecording] = useState(true);
+  const [isRecording, setIsRecording] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
 
-  useEffect(() => {
-    // Suporte ao Web Speech API
+  const startListening = () => {
+    setErrorMessage(null);
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      try {
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'pt-BR';
-        recognition.continuous = true;
-        recognition.interimResults = true;
-
-        recognition.onresult = (event: any) => {
-          let currentTranscript = '';
-          for (let i = 0; i < event.results.length; i++) {
-            currentTranscript += event.results[i][0].transcript;
-          }
-          setTranscript(currentTranscript);
-        };
-
-        recognition.onerror = (err: any) => {
-          console.warn('[Nutriming Voice] Erro de reconhecimento:', err);
-        };
-
-        recognition.start();
-        recognitionRef.current = recognition;
-      } catch (err) {
-        console.warn('[Nutriming Voice] Inicialização de voz falhou:', err);
-      }
+    if (!SpeechRecognition) {
+      setErrorMessage('Reconhecimento de voz não suportado neste navegador. Digite sua refeição abaixo:');
+      return;
     }
 
-    return () => {
+    try {
       if (recognitionRef.current) {
-        try { recognitionRef.current.stop(); } catch {}
+        try { recognitionRef.current.abort(); } catch {}
+      }
+
+      const rec = new SpeechRecognition();
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.lang = 'pt-BR';
+
+      rec.onstart = () => {
+        setIsRecording(true);
+      };
+
+      rec.onresult = (event: any) => {
+        let text = '';
+        for (let i = 0; i < event.results.length; i++) {
+          text += event.results[i][0].transcript;
+        }
+        if (text.trim()) {
+          setTranscript(text.trim());
+        }
+      };
+
+      rec.onerror = (err: any) => {
+        console.warn('[Nutriming Voice Error]:', err.error);
+        setIsRecording(false);
+        if (err.error === 'not-allowed') {
+          setErrorMessage('Permissão do microfone negada. Autorize o microfone ou digite abaixo:');
+        } else if (err.error !== 'no-speech') {
+          setErrorMessage('Não foi possível captar sua voz com clareza. Você pode tentar de novo ou digitar abaixo:');
+        }
+      };
+
+      rec.onend = () => {
+        setIsRecording(false);
+      };
+
+      rec.start();
+      recognitionRef.current = rec;
+      setIsRecording(true);
+    } catch (err: any) {
+      console.warn('[Nutriming Voice Start Error]:', err);
+      setIsRecording(false);
+      setErrorMessage('Não foi possível iniciar o microfone. Digite os alimentos abaixo:');
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
+    }
+    setIsRecording(false);
+  };
+
+  const handleFinish = () => {
+    stopListening();
+    if (!transcript.trim()) return;
+
+    setProcessing(true);
+    setTimeout(() => {
+      const items = transcript
+        .split(/,|\be\b|\bcom\b/i)
+        .map(s => s.trim())
+        .filter(s => s.length > 1);
+      onComplete(items.length > 0 ? items : [transcript.trim()]);
+    }, 800);
+  };
+
+  // Inicia a gravação ao abrir
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      startListening();
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch {}
       }
     };
   }, []);
 
-  const handleStop = () => {
-    if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch {}
-    }
-    setRecording(false);
-    setProcessing(true);
-
-    setTimeout(() => {
-      if (transcript.trim()) {
-        const items = transcript
-          .split(/,|\be\b|\bcom\b/i)
-          .map(s => s.trim())
-          .filter(Boolean);
-        onComplete(items.length > 0 ? items : [transcript.trim()]);
-      } else {
-        onComplete(['Omelete', 'Café coado', 'Fruta']);
-      }
-    }, 1000);
-  };
-
   return (
-    <div className="p-8 flex flex-col items-center justify-center min-h-[320px] text-center">
+    <div className="p-8 flex flex-col items-center justify-center min-h-[340px] text-center">
       {processing ? (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center py-8">
           <Loader2 className="w-12 h-12 text-blue-400 animate-spin mb-4" />
-          <p className="text-blue-100 font-medium">Transcrevendo áudio com IA...</p>
+          <p className="text-blue-100 font-medium text-base">Identificando alimentos com IA...</p>
         </div>
       ) : (
         <>
+          {/* Botão de Microfone Interativo */}
           <div className="relative mb-6">
-            <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping"></div>
-            <div className="relative w-24 h-24 bg-gradient-to-br from-blue-600 to-cyan-700 rounded-full flex items-center justify-center shadow-lg shadow-blue-900/50">
+            {isRecording && (
+              <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping"></div>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                if (isRecording) {
+                  stopListening();
+                } else {
+                  startListening();
+                }
+              }}
+              className={`relative w-24 h-24 rounded-full flex items-center justify-center shadow-xl transition-all ${
+                isRecording 
+                  ? 'bg-gradient-to-br from-rose-500 to-red-600 shadow-rose-900/50 animate-pulse' 
+                  : 'bg-gradient-to-br from-blue-600 to-cyan-700 shadow-blue-900/50 hover:scale-105'
+              }`}
+            >
               <Mic className="w-10 h-10 text-white" />
-            </div>
+            </button>
           </div>
-          <h3 className="text-xl font-light text-white mb-2">Ouvindo...</h3>
-          <p className="text-blue-200/60 text-sm mb-4">Fale naturalmente o que você comeu.</p>
+
+          <h3 className="text-xl font-light text-white mb-1">
+            {isRecording ? 'Ouvindo você...' : 'Toque no microfone para falar'}
+          </h3>
+          <p className="text-blue-200/60 text-xs mb-4">
+            {isRecording ? 'Fale normalmente o que você comeu.' : 'Fale ou digite sua refeição abaixo.'}
+          </p>
           
-          {transcript && (
-            <div className="w-full bg-[#11241e] border border-emerald-900/40 rounded-xl p-3 mb-6 text-sm text-emerald-200 italic max-h-24 overflow-y-auto">
-              "{transcript}"
+          {/* Mensagem de Erro / Alerta com fallback amigável */}
+          {errorMessage && (
+            <div className="w-full bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 mb-4 text-xs text-amber-200 flex items-center gap-2 text-left">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 text-amber-400" />
+              <span>{errorMessage}</span>
             </div>
           )}
 
-          <button 
-            onClick={handleStop}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors font-medium shadow-lg shadow-blue-900/30"
-          >
-            Finalizar e Identificar
-          </button>
+          {/* Campo de Texto com transcrição em tempo real ou digitação */}
+          <div className="w-full mb-6 text-left">
+            <textarea
+              rows={2}
+              value={transcript}
+              onChange={e => setTranscript(e.target.value)}
+              placeholder="Ex: Arroz, feijão, frango grelhado e salada"
+              className="w-full bg-[#11241e] border border-emerald-900/50 rounded-xl p-3 text-emerald-100 placeholder:text-emerald-800 focus:outline-none focus:border-emerald-500/50 text-sm resize-none"
+            />
+          </div>
+
+          {/* Botões de Ação */}
+          <div className="w-full flex gap-3">
+            {isRecording ? (
+              <button 
+                type="button"
+                onClick={handleFinish}
+                disabled={!transcript.trim()}
+                className="flex-1 py-3 bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white rounded-xl transition-colors font-medium shadow-lg shadow-rose-900/30"
+              >
+                Concluir e Identificar
+              </button>
+            ) : (
+              <button 
+                type="button"
+                onClick={handleFinish}
+                disabled={!transcript.trim()}
+                className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl transition-colors font-medium shadow-lg shadow-emerald-900/30"
+              >
+                Identificar Alimentos
+              </button>
+            )}
+          </div>
         </>
       )}
     </div>

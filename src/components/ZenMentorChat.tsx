@@ -608,23 +608,42 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate, onBack
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
 
-  useEffect(() => {
+  const startRecording = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognition) {
+    if (!SpeechRecognition) {
+      alert('Reconhecimento de voz não suportado neste navegador. Por favor, digite sua mensagem.');
+      return;
+    }
+
+    try {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch {}
+      }
+
       const rec = new SpeechRecognition();
-      rec.continuous = false;
-      rec.lang = navigator.language || navigator.languages?.[0] || 'pt-BR'; // ← idioma do navegador
+      rec.continuous = true;
       rec.interimResults = true;
+      rec.lang = 'pt-BR';
+
+      rec.onstart = () => {
+        setIsRecording(true);
+      };
 
       rec.onresult = (event: any) => {
-        let text = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            text += event.results[i][0].transcript;
-          }
+        let transcript = '';
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
         }
-        if (text) {
-          setInput(prev => (prev + ' ' + text).trim());
+        if (transcript.trim()) {
+          setInput(transcript.trim());
+        }
+      };
+
+      rec.onerror = (event: any) => {
+        console.warn('[ZenMentor SpeechRecognition Error]:', event.error);
+        setIsRecording(false);
+        if (event.error === 'not-allowed') {
+          alert('Permissão de microfone não autorizada. Por favor, autorize o microfone no navegador.');
         }
       };
 
@@ -632,23 +651,39 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate, onBack
         setIsRecording(false);
       };
 
+      rec.start();
       recognitionRef.current = rec;
-    }
-  }, []);
-
-  const toggleRecording = () => {
-    if (!recognitionRef.current) {
-      alert('Gravação de voz não suportada neste navegador. Por favor, digite sua resposta.');
-      return;
-    }
-
-    if (isRecording) {
-      recognitionRef.current.stop();
-    } else {
       setIsRecording(true);
-      recognitionRef.current.start();
+    } catch (err: any) {
+      console.warn('[ZenMentor SpeechRecognition Start Error]:', err);
+      setIsRecording(false);
     }
   };
+
+  const stopRecording = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+    }
+    setIsRecording(false);
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch {}
+      }
+    };
+  }, []);
   
   // ── ZenMemory UI States ────────────────────────────────────────────────────
   const [isRetrievingMemory, setIsRetrievingMemory] = useState(false);

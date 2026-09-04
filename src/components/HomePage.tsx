@@ -358,24 +358,38 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 <p className="text-slate-500 mt-2 font-medium">Registre sinais vitais e observe seu estado presente.</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all">
-                  <Activity className="w-8 h-8 text-emerald-500 mb-4" />
-                  <h5 className="font-bold text-slate-900 mb-2">Zen Check-in</h5>
+                <div 
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('xzen-open-checkin'));
+                  }}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group active:scale-[0.98]"
+                >
+                  <Activity className="w-8 h-8 text-emerald-500 mb-4 group-hover:scale-110 transition-transform" />
+                  <h5 className="font-bold text-slate-900 mb-2 flex items-center justify-between">
+                    <span>Zen Check-in</span>
+                    <ArrowRight className="w-4 h-4 text-emerald-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </h5>
                   <p className="text-sm text-slate-600">Registro diário em menos de 30s. Observação de sinais vitais e referenciais MTC.</p>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all">
-                  <Search className="w-8 h-8 text-pink-500 mb-4" />
-                  <h5 className="font-bold text-slate-900 mb-2">Busca Semântica</h5>
+                <div 
+                  onClick={() => onPageChange('plantas-medicinais')}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-pink-200 transition-all cursor-pointer group active:scale-[0.98]"
+                >
+                  <Search className="w-8 h-8 text-pink-500 mb-4 group-hover:scale-110 transition-transform" />
+                  <h5 className="font-bold text-slate-900 mb-2 flex items-center justify-between">
+                    <span>Busca Semântica</span>
+                    <ArrowRight className="w-4 h-4 text-pink-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </h5>
                   <p className="text-sm text-slate-600">Pesquise pelo que sente e encontre recursos e conteúdos rapidamente.</p>
                 </div>
                 <div 
                   onClick={() => onPageChange('nutriming')}
-                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group"
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group active:scale-[0.98]"
                 >
                   <Apple className="w-8 h-8 text-rose-500 mb-4 group-hover:scale-110 transition-transform" />
-                  <h5 className="font-bold text-slate-900 mb-2 flex items-center gap-2">
-                    Nutriming Integrativo
-                    <ArrowRight className="w-4 h-4 text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <h5 className="font-bold text-slate-900 mb-2 flex items-center justify-between">
+                    <span>Nutriming Integrativo</span>
+                    <ArrowRight className="w-4 h-4 text-emerald-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                   </h5>
                   <p className="text-sm text-slate-600">Explore alimentos, registre suas refeições e observe como suas experiências se relacionam com seus padrões ao longo do tempo.</p>
                 </div>
@@ -396,10 +410,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
               </div>
 
               {/* Temporal Engine Destaque Principal */}
-              <div className="bg-slate-900 p-8 rounded-3xl shadow-xl text-white hover:scale-[1.01] transition-transform mb-6 border border-slate-800">
-                <div className="flex items-center gap-4 mb-4">
-                  <LineChart className="w-10 h-10 text-blue-400" />
-                  <h5 className="text-2xl font-bold">Temporal Observation Engine</h5>
+              <div 
+                onClick={() => onPageChange('dashboard')}
+                className="bg-slate-900 p-8 rounded-3xl shadow-xl text-white hover:scale-[1.01] active:scale-[0.99] transition-all mb-6 border border-slate-800 hover:border-blue-400/50 cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <LineChart className="w-10 h-10 text-blue-400 group-hover:scale-110 transition-transform" />
+                    <h5 className="text-2xl font-bold">Temporal Observation Engine</h5>
+                  </div>
+                  <ArrowRight className="w-6 h-6 text-blue-400 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </div>
                 <p className="text-slate-300 leading-relaxed text-lg">
                   O XZenPress organiza seus registros em uma linha temporal para identificar recorrências e associações entre experiências, hábitos e sinais observados.
@@ -407,14 +427,26 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-200 transition-all">
-                  <MessageCircle className="w-8 h-8 text-violet-500 mb-4" />
-                  <h5 className="font-bold text-slate-900 mb-2">ZenMentor IA</h5>
+                <div 
+                  onClick={() => onPageChange('ai-assistant')}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-violet-200 transition-all cursor-pointer group active:scale-[0.98]"
+                >
+                  <MessageCircle className="w-8 h-8 text-violet-500 mb-4 group-hover:scale-110 transition-transform" />
+                  <h5 className="font-bold text-slate-900 mb-2 flex items-center justify-between">
+                    <span>ZenMentor IA</span>
+                    <ArrowRight className="w-4 h-4 text-violet-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </h5>
                   <p className="text-sm text-slate-600">Assistente 24/7 para explorar padrões e práticas personalizadas de bem-estar.</p>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-200 transition-all">
-                  <Leaf className="w-8 h-8 text-green-600 mb-4" />
-                  <h5 className="font-bold text-slate-900 mb-2">Mapa Vivo & Botânica</h5>
+                <div 
+                  onClick={() => onPageChange('mapa-vivo')}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer group active:scale-[0.98]"
+                >
+                  <Leaf className="w-8 h-8 text-green-600 mb-4 group-hover:scale-110 transition-transform" />
+                  <h5 className="font-bold text-slate-900 mb-2 flex items-center justify-between">
+                    <span>Mapa Vivo & Botânica</span>
+                    <ArrowRight className="w-4 h-4 text-green-600 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </h5>
                   <p className="text-sm text-slate-600">Explore visualmente o mapa corporal, plantas e conhecimento tradicional.</p>
                 </div>
               </div>
@@ -433,19 +465,37 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 <p className="text-slate-500 mt-2 font-medium">Experimente práticas integrativas alinhadas aos seus dados.</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-amber-200 transition-all">
-                  <Compass className="w-8 h-8 text-amber-500 mb-4" />
-                  <h5 className="font-bold text-slate-900 mb-2">Sessão Mestra</h5>
+                <div 
+                  onClick={() => onPageChange('triad-session')}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-amber-200 transition-all cursor-pointer group active:scale-[0.98]"
+                >
+                  <Compass className="w-8 h-8 text-amber-500 mb-4 group-hover:scale-110 transition-transform" />
+                  <h5 className="font-bold text-slate-900 mb-2 flex items-center justify-between">
+                    <span>Sessão Mestra</span>
+                    <ArrowRight className="w-4 h-4 text-amber-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </h5>
                   <p className="text-sm text-slate-600">Jornada guiada que conecta seus registros, padrões e objetivos.</p>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-amber-200 transition-all">
-                  <Volume2 className="w-8 h-8 text-orange-500 mb-4" />
-                  <h5 className="font-bold text-slate-900 mb-2">ZenAudio Engine</h5>
+                <div 
+                  onClick={() => onPageChange('sounds')}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-orange-200 transition-all cursor-pointer group active:scale-[0.98]"
+                >
+                  <Volume2 className="w-8 h-8 text-orange-500 mb-4 group-hover:scale-110 transition-transform" />
+                  <h5 className="font-bold text-slate-900 mb-2 flex items-center justify-between">
+                    <span>ZenAudio Engine</span>
+                    <ArrowRight className="w-4 h-4 text-orange-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </h5>
                   <p className="text-sm text-slate-600">Experiências sonoras inteligentes, binaural beats e ritmos respiratórios.</p>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-amber-200 transition-all">
-                  <Heart className="w-8 h-8 text-red-500 mb-4" />
-                  <h5 className="font-bold text-slate-900 mb-2">Acupressão Clínica</h5>
+                <div 
+                  onClick={() => onPageChange('acupressure')}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-red-200 transition-all cursor-pointer group active:scale-[0.98]"
+                >
+                  <Heart className="w-8 h-8 text-red-500 mb-4 group-hover:scale-110 transition-transform" />
+                  <h5 className="font-bold text-slate-900 mb-2 flex items-center justify-between">
+                    <span>Acupressão Clínica</span>
+                    <ArrowRight className="w-4 h-4 text-red-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </h5>
                   <p className="text-sm text-slate-600">Mapa interativo de pontos e craniopuntura com visualização avançada.</p>
                 </div>
               </div>
@@ -464,14 +514,26 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 <p className="text-slate-500 mt-2 font-medium">Observe sua evolução e a resposta do seu corpo ao longo do tempo.</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-300 transition-all">
-                  <BarChart3 className="w-8 h-8 text-indigo-500 mb-4" />
-                  <h5 className="font-bold text-slate-900 mb-2">Dashboard Integrado</h5>
+                <div 
+                  onClick={() => onPageChange('dashboard')}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer group active:scale-[0.98]"
+                >
+                  <BarChart3 className="w-8 h-8 text-indigo-500 mb-4 group-hover:scale-110 transition-transform" />
+                  <h5 className="font-bold text-slate-900 mb-2 flex items-center justify-between">
+                    <span>Dashboard Integrado</span>
+                    <ArrowRight className="w-4 h-4 text-indigo-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </h5>
                   <p className="text-sm text-slate-600">Tenha visão unificada do seu histórico e evolução das suas práticas.</p>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-300 transition-all">
-                  <Heart className="w-8 h-8 text-rose-500 mb-4" />
-                  <h5 className="font-bold text-slate-900 mb-2">Coerência & HRV</h5>
+                <div 
+                  onClick={() => onPageChange('progress')}
+                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-rose-200 transition-all cursor-pointer group active:scale-[0.98]"
+                >
+                  <Heart className="w-8 h-8 text-rose-500 mb-4 group-hover:scale-110 transition-transform" />
+                  <h5 className="font-bold text-slate-900 mb-2 flex items-center justify-between">
+                    <span>Coerência & HRV</span>
+                    <ArrowRight className="w-4 h-4 text-rose-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </h5>
                   <p className="text-sm text-slate-600">Acompanhe métricas de coerência cardíaca e observe sua resposta biológica ao longo do tempo.</p>
                 </div>
               </div>

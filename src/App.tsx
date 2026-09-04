@@ -251,6 +251,10 @@ function AppContent() {
         return <FeedbackPage onPageChange={setCurrentPage} />;
       case 'home':
         return <HomePage onPageChange={setCurrentPage} />;
+      case 'zencheckin':
+        setShowZenCheckin(true);
+        setCurrentPage('home');
+        return <HomePage onPageChange={setCurrentPage} />;
       case 'login':
         return <LoginPage onPageChange={setCurrentPage} />;
       case 'breathing':

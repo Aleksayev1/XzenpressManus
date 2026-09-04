@@ -11,6 +11,7 @@ const { createClient } = require('@supabase/supabase-js');
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
+const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
 // Tópicos que a IA deve pesquisar e atualizar semanalmente
 const RESEARCH_TOPICS = [
@@ -71,38 +72,74 @@ Responda em JSON rigoroso:
 ];
 
 async function callGemini(prompt) {
-    const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                generationConfig: {
-                    temperature: 0.2,
-                    maxOutputTokens: 2048,
-                    responseMimeType: 'application/json',
+    if (GEMINI_KEY) {
+        try {
+            const res = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                        generationConfig: {
+                            temperature: 0.2,
+                            maxOutputTokens: 2048,
+                            responseMimeType: 'application/json',
+                        }
+                    })
                 }
-            })
+            );
+
+            if (res.ok) {
+                const data = await res.json();
+                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                try {
+                    return JSON.parse(text);
+                } catch {
+                    const match = text.match(/(\{[\s\S]*\})/);
+                    return match ? JSON.parse(match[1]) : {};
+                }
+            }
+        } catch (geminiErr) {
+            console.warn('[Weekly Refresh] Gemini falhou, tentando fallback OpenAI...', geminiErr.message);
         }
-    );
-
-    if (!res.ok) throw new Error(`Gemini API error: ${res.status}`);
-    const data = await res.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-
-    try {
-        return JSON.parse(text);
-    } catch {
-        const match = text.match(/(\{[\s\S]*\})/);
-        return match ? JSON.parse(match[1]) : {};
     }
+
+    if (OPENAI_KEY) {
+        try {
+            const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${OPENAI_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-4o-mini',
+                    temperature: 0.2,
+                    messages: [
+                        { role: 'user', content: prompt }
+                    ],
+                    response_format: { type: 'json_object' }
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const text = data?.choices?.[0]?.message?.content || '{}';
+                return JSON.parse(text);
+            }
+        } catch (openaiErr) {
+            console.error('[Weekly Refresh] OpenAI falhou:', openaiErr.message);
+        }
+    }
+
+    throw new Error('Nenhum provedor de IA (Gemini/OpenAI) disponível para Weekly Refresh.');
 }
 
 exports.handler = async (event) => {
     console.log('🔄 Xzenpress Weekly Knowledge Refresh iniciado:', new Date().toISOString());
 
-    if (!supabaseUrl || !supabaseKey || !GEMINI_KEY) {
+    if (!supabaseUrl || !supabaseKey || (!GEMINI_KEY && !OPENAI_KEY)) {
         console.error('❌ Variáveis de ambiente ausentes');
         return { statusCode: 500, body: JSON.stringify({ error: 'Config incompleta' }) };
     }

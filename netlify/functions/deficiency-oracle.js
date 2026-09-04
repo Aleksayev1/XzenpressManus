@@ -147,8 +147,9 @@ exports.handler = async (event) => {
     }
 
     const GEMINI_KEY = process.env.GEMINI_API_KEY;
-    if (!GEMINI_KEY) {
-        return { statusCode: 503, headers, body: JSON.stringify({ error: 'ServiÃ§o temporariamente indisponÃ­vel.' }) };
+    const OPENAI_KEY = process.env.OPENAI_API_KEY;
+    if (!GEMINI_KEY && !OPENAI_KEY) {
+        return { statusCode: 503, headers, body: JSON.stringify({ error: 'Serviço temporariamente indisponível.' }) };
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -279,42 +280,85 @@ Escreva a justificativa clÃ­nica dessa escolha no campo "visaoIntegrativa" e p
 Responda exclusivamente em JSON vÃ¡lido, seguindo o formato especificado no seu sistema. Seja completo, profundo e verdadeiramente Ãºtil para o usuÃ¡rio.`;
 
     try {
-        const geminiRes = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                    contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-                    generationConfig: {
-                        temperature: 0.3,
-                        maxOutputTokens: 8192,
-                        responseMimeType: "application/json"
-                    },
-                    safetySettings: [
-                        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
-                    ]
-                })
-            }
-        );
+        let rawText = '';
 
-        if (!geminiRes.ok) {
-            const errText = await geminiRes.text();
-            console.error('Gemini API Error:', geminiRes.status, errText);
+        // 1. Tentar Gemini primeiro se houver chave configurada
+        if (GEMINI_KEY) {
+            try {
+                const geminiRes = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                            contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+                            generationConfig: {
+                                temperature: 0.3,
+                                maxOutputTokens: 8192,
+                                responseMimeType: "application/json"
+                            },
+                            safetySettings: [
+                                { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+                                { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+                                { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+                                { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+                            ]
+                        })
+                    }
+                );
+
+                if (geminiRes.ok) {
+                    const geminiData = await geminiRes.json();
+                    rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                } else {
+                    console.warn('[Oráculo] Gemini retornou status:', geminiRes.status, await geminiRes.text().catch(() => ''));
+                }
+            } catch (geminiErr) {
+                console.warn('[Oráculo] Erro ao consultar Gemini:', geminiErr.message);
+            }
+        }
+
+        // 2. Fallback resiliente para OpenAI (gpt-4o-mini) se Gemini falhou ou não tiver chave
+        if (!rawText && OPENAI_KEY) {
+            try {
+                console.log('[Oráculo] Acionando fallback OpenAI (gpt-4o-mini)...');
+                const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENAI_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        temperature: 0.3,
+                        messages: [
+                            { role: 'system', content: SYSTEM_PROMPT },
+                            { role: 'user', content: userMessage }
+                        ],
+                        response_format: { type: 'json_object' }
+                    })
+                });
+
+                if (openaiRes.ok) {
+                    const openaiData = await openaiRes.json();
+                    rawText = openaiData?.choices?.[0]?.message?.content || '';
+                    console.log('✅ [Oráculo] Protocolo gerado via OpenAI gpt-4o-mini com sucesso.');
+                } else {
+                    console.error('[Oráculo] OpenAI retornou erro:', openaiRes.status, await openaiRes.text().catch(() => ''));
+                }
+            } catch (openaiErr) {
+                console.error('[Oráculo] Erro ao chamar OpenAI:', openaiErr.message);
+            }
+        }
+
+        if (!rawText) {
             return {
                 statusCode: 502,
                 headers,
                 body: JSON.stringify({ error: 'Erro ao consultar o Oracle. Tente novamente.' })
             };
         }
-
-        const geminiData = await geminiRes.json();
-
-        const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
         // Tenta parsear o JSON retornado pela IA
         let protocol;

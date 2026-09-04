@@ -11,10 +11,14 @@ import { MealEventsApi } from '../services/nutriming/mealEventsApi';
 import { TemporalObservationEngine } from '../services/nutriming/TemporalObservationEngine';
 import { ExplorationSelector } from '../services/nutriming/ExplorationSelector';
 import { ZenEvent, PatternEventData, ExplorationOption, InterventionEventData } from '../types/nutriming';
-import { Check } from 'lucide-react';
+import { Check, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const NutrimingDashboard: React.FC = () => {
+interface NutrimingDashboardProps {
+  onBack?: () => void;
+}
+
+export const NutrimingDashboard: React.FC<NutrimingDashboardProps> = ({ onBack }) => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [extractedFoods, setExtractedFoods] = useState<string[]>([]);
@@ -125,7 +129,17 @@ export const NutrimingDashboard: React.FC = () => {
       </AnimatePresence>
 
       <div className="max-w-4xl mx-auto relative z-10">
-        <header className="mb-10 text-center">
+        <header className="mb-10 text-center relative">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="absolute left-0 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors flex items-center justify-center backdrop-blur-sm"
+              title="Voltar"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          )}
           <h1 className="text-4xl font-light text-white mb-2">Nutriming <span className="text-emerald-400 font-medium">Zen</span></h1>
           <p className="text-gray-400">O ecossistema que aprende com a sua rotina alimentar.</p>
         </header>
@@ -152,6 +166,14 @@ export const NutrimingDashboard: React.FC = () => {
           </div>
         </main>
       </div>
+
+      {activeCaptureMethod && (
+        <NutrimingCaptureFlows 
+          method={activeCaptureMethod}
+          onCancel={() => setActiveCaptureMethod(null)}
+          onComplete={handleCaptureComplete}
+        />
+      )}
 
       <NutrimingConfirmationModal 
         isOpen={isModalOpen}

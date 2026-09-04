@@ -3,7 +3,8 @@ const ALLOWED_ORIGINS = [
   'https://www.xzenpress.com',
   'https://xzenpressbolt.netlify.app',
   'https://incredible-hummingbird-dda3e2.netlify.app',
-  'https://xzenpress-app.netlify.app'
+  'https://xzenpress-app.netlify.app',
+  'https://dulcet-conkies-0f1f56.netlify.app'
 ];
 
 const ALLOWED_LOCAL_PATTERNS = [
@@ -11,6 +12,8 @@ const ALLOWED_LOCAL_PATTERNS = [
   /^http:\/\/127\.0\.0\.1(:\d+)?$/,
   /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/,
   /^http:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/,
+  /^https:\/\/[a-z0-9-]+--dulcet-conkies-0f1f56\.netlify\.app$/,
+  /^https:\/\/[a-z0-9-]+\.netlify\.app$/,
   /^capacitor:\/\/localhost$/,
   /^https:\/\/localhost$/,
   /^file:\/\/$/

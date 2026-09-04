@@ -140,6 +140,70 @@ const VALCAPELLI_AXIOMS = [
         "causality": "O sistema imune ataca o próprio corpo espelhando a dinâmica interna: autocrítica destrutiva, autossabotagem, sentimento de não merecer. 'Eu sou meu próprio inimigo.'",
         "symptom": "Doenças Autoimunes (Lúpus, Esclerose Múltipla, Psoríase grave)",
         "virtue_needed": "Amor Próprio / Autocompaixão"
+    },
+    {
+        "organ": "coluna_dorsal",
+        "element": "estrutura",
+        "emotion": "culpa_sobrecarga",
+        "causality": "Sentimento de culpa e sobrecarga por carregar o peso dos outros. 'Carregar o mundo nas costas'. Sensação de desamparo emocional na altura do peito.",
+        "symptom": "Dores no meio das costas, Escoliose torácica, Tensão interescapular",
+        "virtue_needed": "Autorresponsabilidade Serena / Soltar os Fardos Alheios"
+    },
+    {
+        "organ": "utero_ovarios",
+        "element": "agua_fogo",
+        "emotion": "criatividade_bloqueada_magoas_afetivas",
+        "causality": "Bloqueio do poder de criação e gestação de novos projetos de vida; mágoas profundas em relacionamentos afetivos e sexuais guardadas no íntimo; desvalorização feminina.",
+        "symptom": "Miomas Uterinos, Cistos nos Ovários, Endometriose, TPM Intensa",
+        "virtue_needed": "Autoestima Sagrada / Perdão Afetivo / Criatividade Plena"
+    },
+    {
+        "organ": "nervo_ciatico",
+        "element": "agua_madeira",
+        "emotion": "medo_do_futuro_hesitacao",
+        "causality": "Medo de dar o próximo passo na vida; insegurança em avançar profissionalmente ou financeiramente; medo de perder o rumo ou ficar desamparado.",
+        "symptom": "Ciatalgia, Dor que irradia pelo glúteo e perna, Dificuldade de andar",
+        "virtue_needed": "Coragem para Caminhar / Fé no Futuro"
+    },
+    {
+        "organ": "ossos_osteoporose",
+        "element": "agua_estrutura",
+        "emotion": "desvalorizacao_perda_de_fe",
+        "causality": "Perda da sustentação interior; perda da fé na própria capacidade e valor pessoal; sentimento de ser inútil ou um estorvo para os outros nas transições da vida.",
+        "symptom": "Osteopenia, Osteoporose, Fragilidade óssea, Fraturas frequentes",
+        "virtue_needed": "Dignidade Interior / Valorização da Própria História"
+    },
+    {
+        "organ": "musculos_tensao",
+        "element": "madeira_fogo",
+        "emotion": "alerta_constante_medo_de_fluir",
+        "causality": "Necessidade constante de se defender; incapacidade de relaxar e confiar na vida; ação represada ou hipervigilância crônica.",
+        "symptom": "Fibromialgia, Espasmos musculares, Cãibras recorrentes, Tensão generalizada",
+        "virtue_needed": "Entrega / Fluidez com a Vida / Serenidade"
+    },
+    {
+        "organ": "olhos_visao",
+        "element": "madeira",
+        "emotion": "recusa_de_enxergar_a_realidade",
+        "causality": "Não querer ver o que está acontecendo ao seu redor (família, trabalho, finanças); medo do presente ou do futuro; fechar os olhos para conflitos.",
+        "symptom": "Miopia, Hipermetropia, Astigmatismo, Catarata, Conjuntivite crônica",
+        "virtue_needed": "Visão Clara / Aceitação Lúcida da Verdade"
+    },
+    {
+        "organ": "ouvidos_audicao",
+        "element": "agua",
+        "emotion": "resistencia_a_ouvir_intolerancia",
+        "causality": "Não querer escutar os outros; irritação com o que ouve em casa ou no trabalho; teimosia que tapa os ouvidos para conselhos; excesso de barulho mental.",
+        "symptom": "Zumbido no Ouvido (Tinnitus), Otites de repetição, Perda progressiva da audição",
+        "virtue_needed": "Escuta Amorosa / Humildade para Aprender"
+    },
+    {
+        "organ": "garganta_laringe",
+        "element": "comunicacao",
+        "emotion": "palavras_engolidas_expressao_reprimida",
+        "causality": "Engolir sapos sistematicamente por medo de desagradar; sufocar a própria verdade para manter uma falsa harmonia; agressividade contida que vira pigarro e dor.",
+        "symptom": "Faringite, Amigdalite frequente, Rouquidão crônica, Pigarro persistente",
+        "virtue_needed": "Expressão Serena da Verdade / Comunicação com Mansuetude"
     }
 ];
 

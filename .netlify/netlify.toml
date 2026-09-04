@@ -147,6 +147,18 @@ force = false
 [redirects.headers]
 
 [[redirects]]
+from = "/assets/*"
+to = "/assets/*"
+status = 404.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
 from = "/*"
 to = "/index.html"
 status = 200.0

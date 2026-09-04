@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowRight, Brain, Zap, Activity, Send, Loader2, Sparkles, X, Crown, CheckCircle } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
@@ -1664,7 +1664,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     onClose={() => setShowStoriesCaptureModal(false)}
                     defaultAuthorName={user?.name || ''}
                     context={{
-                        sessionName: selectedEmotion ? `Alívio ${selectedEmotion.label}` : 'Reset do Sistema Nervoso',
+                        sessionName: selectedEmotion ? `Alívio ${selectedEmotion.namePortuguese}` : 'Reset do Sistema Nervoso',
                         beforeScore: preSessionAnxiety,
                         afterScore: postSessionAnxiety,
                         coherenceGainMs: (postSessionRmssd && preSessionRmssd && postSessionRmssd > preSessionRmssd) 

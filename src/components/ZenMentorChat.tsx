@@ -814,11 +814,10 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate, onBack
       
       // Injecting ZenMemory Context
       if (topMemories.length > 0) {
-        anamneseContext += '\n\n🧠 MEMÓRIA LONGITUDINAL XZEN (Memórias Ativadas):\n';
+        anamneseContext += '\n\n🧠 MEMÓRIA LONGITUDINAL XZEN (Memórias do Usuário):\n';
         topMemories.forEach(m => {
-          anamneseContext += `• [Categoria: ${m.memory_category}] ${m.memory_content} (Confiança: ${m.confidence_score}, Estado: ${m.memory_state})\n`;
+          anamneseContext += `• [${m.memory_category}] ${m.memory_content}\n`;
         });
-        anamneseContext += `\nREGRAS DO ESPELHO COGNITIVO:\n${ZenMemoryEngine.getMemoryContract()}`;
       }
 
       // ── ZenSom Instructions ── informa a IA sobre os protocolos sonoros disponíveis

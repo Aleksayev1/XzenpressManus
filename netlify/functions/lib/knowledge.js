@@ -526,6 +526,30 @@ const LECTURE_KNOWLEDGE = {
     "CHAKRAS_AND_MENTORS": {
         "name": "Crop Circles, Chakras e Mentores",
         "concept": "Geometrias sagradas (como Crop Circles que replicam os chakras) mostram a ordem cósmica. Lembrar que nunca estamos sozinhos: mentores e guias estão a postos para ajudar toda vez que sintonizamos com o alto (viramos o copo para cima)."
+    },
+    "ENCARNACAO_IOIO": {
+        "name": "A Ilusão da Encarnação Iôiô",
+        "concept": "O risco de passar pela vida terrena em idas e vindas cíclicas ('encarnação iôiô'), perdendo o foco do que realmente viemos fazer por se deixar engolir pelo consumismo, pela rotina mecânica ou por distrações fúteis. É hora de despertar e assumir o leme da própria evolução."
+    },
+    "TRINTA_MINUTOS_DE_OURO": {
+        "name": "Os 30 Minutos de Ouro Diários",
+        "concept": "A prática diária de reservar 30 minutos em silêncio absoluto, longe das telas e do ruído do mundo, para autoanálise acolhedora (sem culpa): 'O que fiz de bom hoje? Onde posso melhorar? Perdoei quem me ofendeu?'. É o banho diário de higiene mental que reorganiza o campo bioenergético e induz o sono reparador."
+    },
+    "TUDO_E_EMPRESTIMO": {
+        "name": "A Lei do Empréstimo Sagrado",
+        "concept": "Compreender com serenidade que tudo na matéria é empréstimo transitório: o corpo físico, os bens materiais, os títulos sociais e os relacionamentos terrenos. Nada nos pertence em definitivo além da bagagem da consciência: o pensamento, a emoção, o sentimento, as virtudes conquistadas e o amor que distribuímos."
+    },
+    "VONTADE_INTELIGENTE": {
+        "name": "A Vontade Inteligente (Aliança da Inteligência com a Ação)",
+        "concept": "Não basta ter 'força de vontade' cega. A Vontade Inteligente percorre estágios ordenados: motivação lúcida, reflexão consciente, deliberação, planejamento e execução com amor. É ela que desvia as energias do campo emocional descontrolado para atividades criativas e reparadoras da alma."
+    },
+    "PERDAO_REAL_SOLILOQUIOS": {
+        "name": "O Perdão Real vs. Ressentimentos nos Solilóquios",
+        "concept": "Desmascarar a armadilha do perdão superficial ('perdoei mas não esqueço'). Enquanto houver mágoas ruminadas em solilóquios íntimos no silêncio da mente, há veneno corroendo os órgãos (estômago, fígado, rins). O Perdão Real é esvaziar totalmente a taça do ressentimento para que a luz volte a nutrir as células."
+    },
+    "REESCREVER_A_HISTORIA": {
+        "name": "Reescrever a História da Alma (Restart em Vida)",
+        "concept": "A mente humana não é um computador que deleta registros do pretérito: o que está gravado na memória não pode ser apagado, MAS PODE SER REESCRITO! E o momento de reescrever é AGORA, nesta encarnação presente, através da Reforma Íntima — a Reencarnação em Vida / Restart em Vida."
     }
 };
 

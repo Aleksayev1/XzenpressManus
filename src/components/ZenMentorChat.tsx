@@ -1226,12 +1226,24 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                     {msg.role === 'assistant' && i === sessionReadyMsgIndex && detectedEmotionId && (
                       <div className="mt-3 flex flex-col gap-2">
 
-                        {/* ── SESSÃO MESTRA — Primária ── */}
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1"
-                            style={{ color: accentColor }}>
-                            <Sparkles className="w-3 h-3" /> Recomendado para você agora
-                          </p>
+                        {/* ── SESSÃO MESTRA — Com Robozinho Zen Concierge ── */}
+                        <div className="bg-gradient-to-r from-purple-900/40 to-indigo-900/40 border border-purple-500/30 rounded-2xl p-3 shadow-lg">
+                          <div className="flex items-center gap-3 mb-2.5 text-left">
+                            <img 
+                              src="/robo-zen-meditando.png" 
+                              alt="Robozinho Zen" 
+                              className="w-11 h-11 rounded-full border-2 border-purple-400 shadow-md object-cover flex-shrink-0"
+                            />
+                            <div className="flex-1">
+                              <div className="text-xs font-bold text-purple-200 flex items-center gap-1.5">
+                                <span>Robozinho Zen</span>
+                                <span className="text-[10px] bg-purple-500/30 text-purple-300 px-1.5 py-0.2 rounded-full font-medium">Guia Integrativo</span>
+                              </div>
+                              <p className="text-[11px] text-gray-300 leading-snug mt-0.5">
+                                Olá! O Mestre já me passou o seu protocolo. Não precisa me explicar nada de novo, venha comigo para a Sessão Mestra!
+                              </p>
+                            </div>
+                          </div>
                           <button
                             onClick={() => {
                               const lastMsgs = messages.slice(-3).map(m => ({ role: m.role, content: m.content }));
@@ -1245,22 +1257,15 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                               setIsOpen(false);
                               onNavigate?.('triad-session');
                             }}
-                            className="w-full flex flex-col items-center gap-0.5 px-4 py-3 rounded-xl font-bold transition-all hover:scale-[1.02] hover:brightness-110"
+                            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] hover:brightness-110 shadow-md text-white"
                             style={{
                               background: `linear-gradient(135deg, ${accentColor}, #6366f1)`,
-                              boxShadow: `0 4px 20px ${accentColor}55`,
-                              color: 'white',
-                              animation: 'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite',
+                              boxShadow: `0 4px 15px ${accentColor}55`,
                             }}
                           >
-                            <span className="flex items-center gap-2 text-sm">
-                              <Sparkles className="w-4 h-4" />
-                              ✨ Iniciar Sessão Mestra
-                              <ArrowRight className="w-4 h-4" />
-                            </span>
-                            <span className="text-[10px] font-normal opacity-80">
-                              Protocolo 100% personalizado — a IA montou para você agora
-                            </span>
+                            <Sparkles className="w-4 h-4" />
+                            <span>Acompanhar Robozinho Zen</span>
+                            <ArrowRight className="w-4 h-4" />
                           </button>
                         </div>
 

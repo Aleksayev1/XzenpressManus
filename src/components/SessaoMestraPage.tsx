@@ -413,7 +413,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                         setIntensity(handoff.intensity || 3);
                         setPhase('insight');
                         registerSessionStart();
-                        initiateChat(emotion, handoff.intensity || 3);
+                        initiateChat(emotion, handoff.intensity || 3, true);
                         return; // handoff handled, skip the rest
                     }
                 }
@@ -461,7 +461,18 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         }
     };
 
-    const initiateChat = async (emotion: EmotionalState, intensity: number) => {
+    const initiateChat = async (emotion: EmotionalState, intensity: number, fromHandoff: boolean = false) => {
+        if (fromHandoff) {
+            // Handoff acolhedor e minimalista: reconhece o Mestre e os 2 pontos sem repetição de texto
+            const warmGreeting = `Olá! Já recebi aqui o seu encaminhamento do Mestre com foco em **${emotion.namePortuguese}** e no órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).\n\nAqui na Sessão Mestra, nossa competência é neurofisiológica: vamos acalmar o seu sistema nervoso simpático, restaurar a coerência cardíaca e harmonizar suas ondas cerebrais em 432 Hz.\n\nColoque seus fones, respire fundo comigo no ritmo guiado e vamos iniciar o seu alívio.`;
+            setMessages([{
+                role: 'assistant',
+                content: warmGreeting,
+                timestamp: new Date()
+            }]);
+            return;
+        }
+
         setIsLoading(true);
         const seedMessage = `OLÁ. Identifiquei que estou sentindo **${emotion.namePortuguese}** (Nível ${intensity}/5). 
         Isso está ligado energeticamente ao órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).
@@ -1371,7 +1382,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             )}
 
                             {/* ──────────────────────────────────────────────────────── */}
-                            {/* OFICINA TERAPÊUTICA — Próximos Setores                       */}
+                            {/* OFICINA TERAPÊUTICA — Próximos Setores com Robozinho Zen     */}
                             {/* ──────────────────────────────────────────────────────── */}
                             <div className="mt-6 mb-4">
                                 <div className="flex items-center gap-2 mb-3">
@@ -1379,11 +1390,52 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     <span className="text-xs text-gray-500 font-semibold uppercase tracking-widest">Continuar o Ciclo</span>
                                     <div className="flex-1 h-px bg-white/10"></div>
                                 </div>
-                                <p className="text-gray-600 text-xs text-center mb-4">
-                                    Sua sessão foi só o início. Cada setor da oficina cuida de uma parte do seu equilíbrio.
-                                </p>
+
+                                {/* Robozinho Zen Concierge */}
+                                <div className="bg-gradient-to-r from-purple-950/60 to-slate-900/80 border border-purple-500/30 rounded-2xl p-4 mb-4 text-left flex items-center gap-3 shadow-lg">
+                                    <img 
+                                        src="/robo-zen-meditando.png" 
+                                        alt="Robozinho Zen" 
+                                        className="w-12 h-12 rounded-full border-2 border-purple-400 shadow-md object-cover flex-shrink-0"
+                                    />
+                                    <div className="flex-1">
+                                        <div className="text-xs font-bold text-purple-300 flex items-center gap-1.5">
+                                            <span>Robozinho Zen</span>
+                                            <span className="text-[9px] bg-purple-500/30 text-purple-300 px-1.5 py-0.5 rounded-full font-medium">Guia Integrativo</span>
+                                        </div>
+                                        <p className="text-xs text-gray-200 mt-1 leading-relaxed">
+                                            Parabéns pela sessão! Sua coerência cardíaca foi restabelecida. O Mestre indicou que os pontos ideais na <strong>Acupressão</strong> já estão à sua disposição para consolidar o alívio.
+                                        </p>
+                                    </div>
+                                </div>
 
                                 <div className="space-y-2.5">
+                                    {/* 0 ─ Acupressão (Meridianos & YNSA) */}
+                                    <button
+                                        onClick={() => {
+                                            const recPoint = selectedEmotion?.primaryPoints?.[0] || 'yintang-ex-hn3';
+                                            localStorage.setItem('preselected_acupressure_point', recPoint);
+                                            localStorage.setItem('acupressure_highlight', JSON.stringify({
+                                                emotionId: selectedEmotion?.id,
+                                                element: selectedEmotion?.mtcElement,
+                                                organ: selectedEmotion?.mtcOrgan,
+                                                recommendedPoint: recPoint,
+                                                source: 'triad-session',
+                                                timestamp: Date.now()
+                                            }));
+                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'acupressure' }));
+                                        }}
+                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all hover:scale-[1.02] active:scale-95 shadow-md"
+                                        style={{ background: 'rgba(168,85,247,0.15)', border: '1px solid rgba(168,85,247,0.35)' }}
+                                    >
+                                        <span className="text-2xl">⚡</span>
+                                        <div className="flex-1">
+                                            <div className="text-white font-bold text-sm">Acupressão — Pontos Prescritos</div>
+                                            <div className="text-purple-300 text-xs mt-0.5">Pontos mapeados para harmonizar {selectedEmotion?.mtcOrgan || 'a sua energia'}</div>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                                    </button>
+
                                     {/* 1 ─ ZenFlow (Movimento) */}
                                     <button
                                         onClick={() => {

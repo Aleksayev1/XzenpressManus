@@ -17,7 +17,8 @@ export const GoogleTranslateWidget = () => {
                         new window.google.translate.TranslateElement(
                             {
                                 pageLanguage: 'pt',
-                                layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+                                // 🌍 Línguas mais faladas com códigos ISO 639-1 100% válidos
+                                includedLanguages: 'pt,en,es,fr,de,it,zh-CN,ja,ru,ar,hi,ko,tr,nl,pl,sv,vi,id,th,uk,he,el,cs,ro,hu,da,fi,no',
                                 autoDisplay: false
                             },
                             'google_translate_element'

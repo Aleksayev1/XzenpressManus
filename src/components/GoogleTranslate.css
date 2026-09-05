@@ -72,3 +72,35 @@ body {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
 }
+
+/* Responsive & Sleek styling for Google Translate Combo on Mobile & Desktop */
+.goog-te-gadget {
+    font-size: 0px !important;
+    color: transparent !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+.goog-te-gadget span {
+    display: none !important;
+}
+
+.goog-te-gadget .goog-te-combo {
+    background-color: rgba(30, 41, 59, 0.95) !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    outline: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    max-width: 160px !important;
+}
+
+.goog-te-gadget .goog-te-combo option {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    font-size: 14px !important;
+}

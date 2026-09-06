@@ -462,76 +462,16 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     };
 
     const initiateChat = async (emotion: EmotionalState, intensity: number, fromHandoff: boolean = false) => {
-        if (fromHandoff) {
-            // Handoff acolhedor e minimalista: reconhece o Mestre e os 2 pontos sem repetição de texto
-            const warmGreeting = `Olá! Já recebi aqui o seu encaminhamento do Mestre com foco em **${emotion.namePortuguese}** e no órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).\n\nAqui na Sessão Mestra, nossa competência é neurofisiológica: vamos acalmar o seu sistema nervoso simpático, restaurar a coerência cardíaca e harmonizar suas ondas cerebrais em 432 Hz.\n\nColoque seus fones, respire fundo comigo no ritmo guiado e vamos iniciar o seu alívio.`;
-            setMessages([{
-                role: 'assistant',
-                content: warmGreeting,
-                timestamp: new Date()
-            }]);
-            return;
-        }
+        // Handoff acolhedor e minimalista: reconhece o Mestre e os 2 pontos principais sem repetição de texto
+        const warmGreeting = fromHandoff
+            ? `Olá! Já recebi aqui o seu encaminhamento do Mestre com foco em **${emotion.namePortuguese}** e no órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).\n\nNossa competência aqui na Sessão Mestra é neurofisiológica: vamos acalmar o seu sistema nervoso, restaurar a coerência cardíaca em 432 Hz e preparar o corpo. Ao concluir a respiração, seus pontos de Acupressão já estarão pré-selecionados para o alívio físico.`
+            : `Olá! O Mestre mapeou o seu foco em **${emotion.namePortuguese}** (Nível ${intensity}/5) e no meridiano de **${emotion.mtcOrgan}** (${emotion.mtcElement}).\n\nVamos conduzir você pela coerência cardíaca e respiração 4-7-8 para aliviar a sobrecarga do sistema nervoso. Ao final, seus pontos ideais na Acupressão já estarão disponíveis para consolidar o tratamento.`;
 
-        setIsLoading(true);
-        const seedMessage = `OLÁ. Identifiquei que estou sentindo **${emotion.namePortuguese}** (Nível ${intensity}/5). 
-        Isso está ligado energeticamente ao órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).
-        Por favor, me ajude a compreender a causa emocional e a metafísica por trás disso de forma acolhedora.`;
-
-        // Add hidden user message to history (or just system context)
-        // We simulate the AI greeting based on this context
-
-        try {
-            // Call AI Endpoint
-            const { getBaseApiUrl } = await import('../lib/api');
-            const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/ai-chat`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: seedMessage,
-                    conversationHistory: [], // Fresh start
-                    userEmail: user?.email || 'guest',
-                    isPremium: user?.isPremium || false,
-                    anamneseContext: oracleContext,
-                })
-            });
-
-            const data = await response.json();
-            if (data.reply) {
-                const { cleanContent, candidateMemoryText } = parseActionButtonsSM(data.reply);
-
-                // Register candidate memory if found
-                if (candidateMemoryText && user?.id) {
-                    ZenMemoryEngine.captureCandidateMemory({
-                        user_id: user.id,
-                        memory_type: 'episodic',
-                        memory_category: 'general',
-                        tags: ['ai_inference', 'sessao_mestra_chat'],
-                        memory_content: candidateMemoryText,
-                        source_type: 'ai_inference',
-                        privacy_level: 'personal_context',
-                        influence_weight: 2,
-                        confidence_score: 30
-                    });
-                }
-
-                setMessages([{
-                    role: 'assistant',
-                    content: cleanContent,
-                    timestamp: new Date()
-                }]);
-            }
-        } catch (error) {
-            console.warn("Offline/Localhost mode: AI unavailable. Using fallback.");
-            // Fallback generic greeting for offline mode
-            setMessages([{
-                role: 'assistant',
-                content: `(Modo Offline) Olá. Percebo que você está sentindo **${emotion.namePortuguese}** (Nível ${intensity}/5).\n\nComo estamos sem conexão com o servidor de IA, vamos focar no que seu corpo diz. Como essa emoção está se manifestando fisicamente agora?`,
-                timestamp: new Date()
-            }]);
-        } finally {
-            setIsLoading(false);
-        }
+        setMessages([{
+            role: 'assistant',
+            content: warmGreeting,
+            timestamp: new Date()
+        }]);
     };
 
     const handleSendMessage = async () => {
@@ -843,9 +783,27 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                     <div className="absolute inset-0 flex flex-col max-w-4xl mx-auto w-full animate-in fade-in bg-gray-900">
                         {selectedEmotion && (
                             <div className="p-4 bg-purple-900/20 border-b border-purple-500/20 text-center">
-                                <h2 className="text-purple-300 text-sm">Focando em: <span className="text-white font-bold">{selectedEmotion.namePortuguese}</span> (Elemento {selectedEmotion.mtcElement})</h2>
+                                <h2 className="text-purple-300 text-sm">Focando em: <span className="text-white font-bold">{selectedEmotion.namePortuguese}</span> (Elemento {selectedEmotion.mtcElement} • Órgão {selectedEmotion.mtcOrgan})</h2>
                             </div>
                         )}
+
+                        {/* Robozinho Zen Concierge Banner */}
+                        <div className="mx-4 mt-3 bg-gradient-to-r from-purple-950/60 to-slate-900/80 border border-purple-500/30 rounded-2xl p-3.5 flex items-center gap-3 shadow-lg">
+                            <img 
+                                src="/robo-zen-meditando.png" 
+                                alt="Robozinho Zen" 
+                                className="w-12 h-12 rounded-full border-2 border-purple-400 shadow-md object-cover flex-shrink-0"
+                            />
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-white font-bold text-sm">Robozinho Zen</span>
+                                    <span className="text-[9px] bg-purple-500/30 text-purple-300 px-1.5 py-0.5 rounded-full font-medium">Guia Integrativo</span>
+                                </div>
+                                <p className="text-xs text-gray-200 mt-1 leading-relaxed">
+                                    Seu atendimento está alinhado com o Mestre! Vamos conduzir você pela coerência cardíaca e, logo em seguida, a Acupressão já estará aberta com seus pontos ideais.
+                                </p>
+                            </div>
+                        </div>
 
                         <div className="flex-1 overflow-y-auto p-4 space-y-4">
                             {messages.map((msg, idx) => (
@@ -861,7 +819,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 <div className="flex justify-start">
                                     <div className="bg-gray-800 rounded-2xl px-4 py-3 flex items-center space-x-2">
                                         <Loader2 className="w-4 h-4 animate-spin text-purple-400" />
-                                        <span className="text-gray-400 text-sm">Analisando...</span>
+                                        <span className="text-gray-400 text-sm">Analisando com o Mestre...</span>
                                     </div>
                                 </div>
                             )}
@@ -874,10 +832,10 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     value={input}
                                     onChange={e => setInput(e.target.value)}
                                     onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
-                                    placeholder="Converse com o Neo..."
-                                    className="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none"
+                                    placeholder="Dúvida ou reflexão para o Mestre (opcional)..."
+                                    className="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none text-sm"
                                 />
-                                <button onClick={handleSendMessage} className="bg-purple-600 p-3 rounded-xl hover:bg-purple-700 transition-colors">
+                                <button onClick={handleSendMessage} className="bg-purple-600 p-3 rounded-xl hover:bg-purple-700 transition-colors" title="Enviar para o Mestre">
                                     <Send className="w-5 h-5 text-white" />
                                 </button>
                             </div>
@@ -888,14 +846,14 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                     setBreathSeconds(0);
                                     setPhase('preparation');
                                 }}
-                                className="w-full mt-3 py-3 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl font-bold text-white hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                                className="w-full mt-3 py-3.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl font-bold text-white hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg"
                             >
-                                <span>Entendi. Iniciar Preparação</span>
+                                <span>Entendi. Iniciar Preparação & Coerência</span>
                                 <ArrowRight className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={onBack}
-                                className="w-full mt-3 py-3 border border-gray-700 rounded-xl font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+                                className="w-full mt-2.5 py-2.5 border border-gray-700 rounded-xl font-medium text-xs text-gray-400 hover:text-white hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
                             >
                                 <ArrowLeft className="w-4 h-4" />
                                 <span>Desistir e Voltar</span>

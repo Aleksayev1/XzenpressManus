@@ -464,16 +464,71 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     };
 
     const initiateChat = async (emotion: EmotionalState, intensity: number, fromHandoff: boolean = false) => {
-        // Handoff acolhedor e minimalista: reconhece o Mestre e os 2 pontos principais sem repetição de texto
-        const warmGreeting = fromHandoff
-            ? `Olá! Já recebi aqui o seu encaminhamento do Mestre com foco em **${emotion.namePortuguese}** e no órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).\n\nNossa competência aqui na Sessão Mestra é neurofisiológica: vamos acalmar o seu sistema nervoso, restaurar a coerência cardíaca em 432 Hz e preparar o corpo. Ao concluir a respiração, seus pontos de Acupressão já estarão pré-selecionados para o alívio físico.`
-            : `Olá! O Mestre mapeou o seu foco em **${emotion.namePortuguese}** (Nível ${intensity}/5) e no meridiano de **${emotion.mtcOrgan}** (${emotion.mtcElement}).\n\nVamos conduzir você pela coerência cardíaca e respiração 4-7-8 para aliviar a sobrecarga do sistema nervoso. Ao final, seus pontos ideais na Acupressão já estarão disponíveis para consolidar o tratamento.`;
+        if (fromHandoff) {
+            // Handoff acolhedor e minimalista: reconhece o Mestre e os 2 pontos principais sem repetir o que já foi falado
+            const warmGreeting = `Olá! Já recebi aqui o seu encaminhamento do Mestre com foco em **${emotion.namePortuguese}** e no órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).\n\nNossa competência aqui na Sessão Mestra é neurofisiológica: vamos acalmar o seu sistema nervoso, restaurar a coerência cardíaca em 432 Hz e preparar o corpo. Ao concluir a respiração, seus pontos de Acupressão já estarão pré-selecionados para o alívio físico.`;
+            setMessages([{
+                role: 'assistant',
+                content: warmGreeting,
+                timestamp: new Date()
+            }]);
+            return;
+        }
 
-        setMessages([{
-            role: 'assistant',
-            content: warmGreeting,
-            timestamp: new Date()
-        }]);
+        // Sessão direta: o Mestre traz a reflexão profunda de autoconhecimento, Metafísica da Saúde e Reforma Íntima
+        setIsLoading(true);
+        const seedMessage = `OLÁ. Identifiquei que estou sentindo **${emotion.namePortuguese}** (Nível ${intensity}/5). 
+        Isso está ligado energeticamente ao órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).
+        Por favor, me traga uma reflexão profunda e acolhedora sobre a causa emocional, a virtude deste órgão e a Reforma Íntima para o meu autoconhecimento, finalizando com uma pergunta reflexiva socrática que toque meu coração.`;
+
+        try {
+            const { getBaseApiUrl } = await import('../lib/api');
+            const response = await fetch(`${getBaseApiUrl()}/.netlify/functions/ai-chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: seedMessage,
+                    conversationHistory: [],
+                    userEmail: user?.email || 'guest',
+                    isPremium: user?.isPremium || false,
+                    anamneseContext: oracleContext,
+                })
+            });
+
+            const data = await response.json();
+            if (data.reply) {
+                const { cleanContent, candidateMemoryText } = parseActionButtonsSM(data.reply);
+
+                if (candidateMemoryText && user?.id) {
+                    ZenMemoryEngine.captureCandidateMemory({
+                        user_id: user.id,
+                        memory_type: 'episodic',
+                        memory_category: 'general',
+                        tags: ['ai_inference', 'sessao_mestra_chat'],
+                        memory_content: candidateMemoryText,
+                        source_type: 'ai_inference',
+                        privacy_level: 'personal_context',
+                        influence_weight: 2,
+                        confidence_score: 30
+                    });
+                }
+
+                setMessages([{
+                    role: 'assistant',
+                    content: cleanContent,
+                    timestamp: new Date()
+                }]);
+            }
+        } catch (error) {
+            console.warn("Offline/Localhost mode: AI unavailable. Using fallback.");
+            setMessages([{
+                role: 'assistant',
+                content: `Olá. O Mestre acolheu o seu foco em **${emotion.namePortuguese}** (Nível ${intensity}/5) e no órgão **${emotion.mtcOrgan}** (${emotion.mtcElement}).\n\nA virtude deste órgão convida você à reflexão, ao auto-perdão e à serenidade. Respire fundo e sinta onde essa emoção pede para ser liberada.`,
+                timestamp: new Date()
+            }]);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleSendMessage = async () => {

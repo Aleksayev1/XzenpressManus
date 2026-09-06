@@ -27,6 +27,7 @@ interface Message {
 function parseActionButtonsSM(content: string) {
   const actionRegex = /\[ABRIR:([\w-]+)\]/g;
   const zenflowRegex = /\[ZENFLOW:([\w]+)\]/g;
+  const zensomRegex = /\[ZENSOM:([\w-]+)\]/gi;
   const candidataRegex = /\[CANDIDATA:\s*(.+?)\]/gi;
 
   let candidateMemoryText = null;
@@ -42,6 +43,7 @@ function parseActionButtonsSM(content: string) {
   const cleanContent = content
     .replace(actionRegex, '')
     .replace(zenflowRegex, '')
+    .replace(zensomRegex, '')
     .replace(candidataRegex, '')
     .replace(/\[[A-Z0-9_]+:[^\]]*$/gi, '') // Clean up any truncated/unclosed tags at the end
     .trim();

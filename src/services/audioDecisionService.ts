@@ -115,7 +115,7 @@ export const SESSION_MAP: Record<string, SessionConfig> = {
             loop: false
         },
         free: {
-            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWoMTcAERtU'
+            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u'
         }
     },
 
@@ -132,7 +132,7 @@ export const SESSION_MAP: Record<string, SessionConfig> = {
             loop: true
         },
         free: {
-            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX7EF893kO26A'
+            spotifyPlaylistUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ'
         }
     },
 

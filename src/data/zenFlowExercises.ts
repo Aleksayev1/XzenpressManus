@@ -1,4 +1,4 @@
-﻿// ZenFlow - Farmácia de Movimentos
+// ZenFlow - Farmácia de Movimentos
 // Estrutura Mínima Viável (MVP): 9 Sequências Mestras
 // Foco: Regulação, Liberação, Integração
 
@@ -63,7 +63,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '6 min',
         targetEmotion: ['medo', 'insegurança', 'água', 'terra'],
         intention: 'Estou seguro e sustentado pela terra.',
-        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWoMTcAERtU', // Nature Sounds for Meditation (Grounding/Water/Earth)
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u', // Nature & Meditation (Grounding/Water/Earth)
         steps: [
             {
                 id: 'stomp',
@@ -149,7 +149,7 @@ export const zenFlowExercises: ZenFlowSequence[] = [
         durationTotal: '4 min',
         targetEmotion: ['raiva', 'frustração', 'madeira', 'fígado'],
         intention: 'Eu solto o que não preciso carregar.',
-        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWoMTcAERtU', // Global Groove/Drums (Active/Wood)
+        spotifyEmbedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ', // Focus Flow / Drums (Active/Wood)
         steps: [
             {
                 id: 'fists',

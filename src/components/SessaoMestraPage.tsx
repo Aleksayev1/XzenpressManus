@@ -607,12 +607,12 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     // Helper for Spotify
     const getSpotifyUrl = () => {
         // Map elements to playlists
-        if (!selectedEmotion) return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO?utm_source=generator"; // Chill default
+        if (!selectedEmotion) return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO"; // Chill default
         switch (selectedEmotion.mtcElement) {
             case 'fire': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO"; // Chill/Piano (Calm Anxiety)
             case 'wood': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO"; // Nature Sounds (Wood/Forest Relaxation)
             case 'earth': return "https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ"; // Chill Vibes (Grounding)
-            case 'metal': return "https://open.spotify.com/embed/playlist/37i9dQZF1DX9B1hu03ZXWZ"; // Jazz (Comfort Sadness)
+            case 'metal': return "https://open.spotify.com/embed/playlist/37i9dQZF1DXbITWG1ZJKYt"; // Jazz (Comfort Sadness)
             case 'water': return "https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u"; // Peaceful Piano (Safety for Fear)
             default: return "https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO";
         }
@@ -1277,7 +1277,8 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                 ? zenFlowExercises.find(z => z.id === selectedEmotion.zenFlowExerciseId)
                                 : zenFlowExercises[0]; // Fallback to Regulation
 
-                            const spotifyUrl = exercise?.spotifyEmbedUrl || getSpotifyUrl();
+                            const rawSpotify = exercise?.spotifyEmbedUrl || getSpotifyUrl();
+                            const spotifyEmbedSrc = rawSpotify.includes("?") ? (rawSpotify.includes("theme=") ? rawSpotify : rawSpotify + "&theme=0") : (rawSpotify + "?theme=0");
 
                             return (
                                 <div className="relative z-10 w-full max-w-4xl text-center pb-20">
@@ -1300,10 +1301,10 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
                                     <div className="grid md:grid-cols-2 gap-8 mb-8 text-left">
                                         {/* Left: Spotify Player */}
-                                        <div className="w-full aspect-square md:aspect-auto bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-blue-500/30 flex flex-col">
+                                        <div className="w-full min-h-[352px] md:min-h-[380px] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-blue-500/30 flex flex-col">
                                             <iframe
-                                                style={{ borderRadius: '12px', flex: 1 }}
-                                                src={`${spotifyUrl}?theme=0`}
+                                                style={{ borderRadius: '12px', flex: 1, minHeight: '352px' }}
+                                                src={spotifyEmbedSrc}
                                                 width="100%"
                                                 height="100%"
                                                 frameBorder="0"

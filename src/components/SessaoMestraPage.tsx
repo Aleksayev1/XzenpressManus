@@ -189,10 +189,9 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [breathSeconds, setBreathSeconds] = useState(0);
     const breathPhaseStartTime = useRef(Date.now());
 
-    // ── Acupressure Timer ────────────────────────────────────────────────────
+    // ── Acupressure & ZenFlow Timer ──────────────────────────────────────────
     const [timeLeft, setTimeLeft] = useState(60);
     const [isTimerActive, setIsTimerActive] = useState(false);
-    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     // toggleTimer: starts or stops the timer. Gong plays ONLY on finish (not on start).
     const toggleTimer = useCallback(() => {
@@ -203,47 +202,6 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         if (seconds <= 0) return '✓ Pronto';
         return `${seconds}s`;
     }, []);
-
-    // Timer Countdown Effect — gong fires exactly once when timer reaches zero
-    useEffect(() => {
-        if (!isTimerActive) {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
-            }
-            return;
-        }
-
-        // Clear any previous interval before creating a new one
-        if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-        }
-
-        timerRef.current = setInterval(() => {
-            setTimeLeft(prev => {
-                if (prev <= 1) {
-                    // Stop interval immediately to prevent re-fire
-                    if (timerRef.current) {
-                        clearInterval(timerRef.current);
-                        timerRef.current = null;
-                    }
-                    setIsTimerActive(false);
-                    // Schedule gong outside of setState to avoid double-fire
-                    setTimeout(() => playGong(), 0);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
-            }
-        };
-    }, [isTimerActive]);
 
     // ── ZenFlow State ────────────────────────────────────────────────────────
     const [zenFlowStepIndex, setZenFlowStepIndex] = useState(0);
@@ -299,20 +257,12 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
         return false;
     };
 
-    // ── Auto-start Timer on New Point or ZenFlow ──
+    // ── Auto-start & Reset Timer on New Point or ZenFlow Step ──
     useEffect(() => {
         if (phase === 'acupressure') {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
-            }
             setTimeLeft(60);
             setIsTimerActive(true);
         } else if (phase === 'zenflow') {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
-            }
             const exercise = selectedEmotion?.zenFlowExerciseId
                 ? zenFlowExercises.find(z => z.id === selectedEmotion.zenFlowExerciseId)
                 : zenFlowExercises[0];
@@ -320,13 +270,29 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
             setTimeLeft(currentDuration);
             setIsTimerActive(true);
         } else {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
-            }
             setIsTimerActive(false);
         }
-    }, [currentPointIndex, phase, zenFlowStepIndex, selectedEmotion]);
+    }, [phase, currentPointIndex, zenFlowStepIndex, selectedEmotion]);
+
+    // ── Timer Countdown Effect ──
+    useEffect(() => {
+        if (!isTimerActive || (phase !== 'acupressure' && phase !== 'zenflow')) {
+            return;
+        }
+
+        const interval = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev <= 1) {
+                    setIsTimerActive(false);
+                    setTimeout(() => playGong(), 0);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [isTimerActive, phase, currentPointIndex, zenFlowStepIndex]);
 
     // ── Auto-advance ZenFlow steps when timer reaches zero ──
     useEffect(() => {
@@ -1334,9 +1300,18 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                                                                 {idx + 1}. {step.name}
                                                             </h4>
                                                             {idx === zenFlowStepIndex && (
-                                                                <span className="text-xs font-mono font-bold text-blue-300 bg-blue-900/50 px-2 py-1 rounded-md border border-blue-500/30">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        toggleTimer();
+                                                                    }}
+                                                                    title={isTimerActive ? "Pausar timer" : "Continuar timer"}
+                                                                    className="text-xs font-mono font-bold text-blue-300 bg-blue-900/50 hover:bg-blue-800/60 px-2 py-1 rounded-md border border-blue-500/30 flex items-center gap-1.5 transition-all cursor-pointer"
+                                                                >
+                                                                    <span className={`inline-block w-1.5 h-1.5 rounded-full ${timeLeft === 0 ? 'bg-green-400' : isTimerActive ? 'bg-blue-400 animate-ping' : 'bg-yellow-400'}`}></span>
                                                                     {formatTime(timeLeft)}
-                                                                </span>
+                                                                </button>
                                                             )}
                                                             {idx !== zenFlowStepIndex && (
                                                                 <span className="text-xs text-gray-500">

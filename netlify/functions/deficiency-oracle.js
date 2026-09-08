@@ -93,11 +93,11 @@ exports.handler = async (event) => {
 
     const isDeveloper = userEmail && (userEmail.toLowerCase().includes('aleksayev') || userEmail.toLowerCase().includes('alexandre'));
     const rateLimitKey = userEmail || getClientIp();
-    const limit = (isPremium || isDeveloper) ? 100 : 3; // 100 para Premium/Dev, 3 para Gratuitos/Visitantes
+    const limit = (isPremium || isDeveloper) ? 100 : 1; // 1 uso gratuito por vez para nao-assinantes
     const rateLimit = checkRateLimit(rateLimitKey, limit);
 
     if (!rateLimit.allowed) {
-        let errorMessage = `Degustação diária do Oráculo de Deficiências concluída! 🌟\n\nPara continuar fazendo consultas ilimitadas ao oráculo e receber protocolos personalizados, assine o plano Premium ou faça o login!`;
+        let errorMessage = "Degustação do Protocolo 360° concluída! 🌟 Você já utilizou seu 1 protocolo gratuito de degustação. Para gerar novos protocolos ilimitados para qualquer queixa sua e da sua família, salvar no Mapa Vivo e receber relatórios oficiais por e-mail, assine o plano Premium!";
         if (isPremium) {
             errorMessage = 'Limite de requisições excedido. Tente novamente em 1 hora.';
         }
@@ -106,6 +106,7 @@ exports.handler = async (event) => {
             headers,
             body: JSON.stringify({
                 error: errorMessage,
+                requiresSubscription: !isPremium && !isDeveloper,
                 remaining: 0
             })
         };

@@ -4,7 +4,7 @@ import {
     ArrowLeft, Leaf, Search, MapPin, AlertTriangle, BookOpen, Activity, 
     Heart, Sprout, Dna, ShoppingCart, Sparkles, Brain, Compass, Clock, 
     Utensils, ChevronDown, ChevronUp, Loader, RotateCcw, Shield, HelpCircle,
-    ZoomIn, X
+    ZoomIn, X, Mail, Printer, CheckCircle, Lock
 } from 'lucide-react';
 import { HERB_DATABASE, Herb } from '../data/herbLibrary';
 import { acupressurePoints } from '../data/points/index';
@@ -61,7 +61,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<'Todos' | 'Brasil' | 'China (MTC)' | 'Peptídeos'>('Todos');
     const [fromMapaVivo, setFromMapaVivo] = useState(false);
-    const { user } = useAuth();
+    const { user, login, signUp, signInWithGoogle } = useAuth();
     const [anamnese, setAnamnese] = useState<any>(null);
     const [geneticMarkers, setGeneticMarkers] = useState<GeneticMarkers | null>(null);
 
@@ -96,12 +96,29 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
         loadUserAnamnese();
     }, [user]);
 
-    // Estados do Oráculo de Deficiências
+        // Estados do Oráculo de Deficiências
     const [oracleResult, setOracleResult] = useState<OracleProtocol | null>(null);
     const [isOracleLoading, setIsOracleLoading] = useState(false);
     const [oracleError, setOracleError] = useState<string | null>(null);
     const [showOracleDetails, setShowOracleDetails] = useState(true);
     const [chronicity, setChronicity] = useState<'agudo' | 'cronico' | 'misto'>('misto');
+
+    // Estados de Degustação Única & Relatório Oficial 360°
+    const [isLimitReached, setIsLimitReached] = useState(false);
+    const [isSendingEmail, setIsSendingEmail] = useState(false);
+    const [emailSentSuccess, setEmailSentSuccess] = useState<string | null>(null);
+    const [emailError, setEmailError] = useState<string | null>(null);
+    const [officialHtml, setOfficialHtml] = useState<string | null>(null);
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [showPaywallModal, setShowPaywallModal] = useState(false);
+
+    // Auth modal form state
+    const [authEmail, setAuthEmail] = useState('');
+    const [authPassword, setAuthPassword] = useState('');
+    const [authName, setAuthName] = useState('');
+    const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup');
+    const [authError, setAuthError] = useState<string | null>(null);
+    const [authLoading, setAuthLoading] = useState(false);
 
     // Estados de Protocolos Dinâmicos acumulados no Supabase
     const [dynamicProtocols, setDynamicProtocols] = useState<Array<{ query: string; protocol: OracleProtocol }>>([]);
@@ -1458,7 +1475,171 @@ const ImageZoomModal: React.FC<{
                     </div>
                 </div>
             </div>
-        </div>,
+        
+            {/* Modal de Autenticação / Registro para Envio do Relatório */}
+            {showAuthModal && createPortal(
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+                    <div className="bg-slate-900 border border-purple-500/30 rounded-3xl max-w-md w-full p-6 sm:p-8 text-white relative shadow-2xl">
+                        <button
+                            onClick={() => setShowAuthModal(false)}
+                            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800 transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        <div className="text-center mb-6">
+                            <img
+                                src="/robo-zen-meditando.png"
+                                alt="Robozinho Zen"
+                                className="w-16 h-16 rounded-full border-2 border-emerald-400 mx-auto mb-3 shadow-lg object-cover"
+                            />
+                            <h3 className="text-xl font-black text-white">
+                                Para onde envio seu Relatório 360°? 🌿
+                            </h3>
+                            <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                                Faça login ou crie sua conta gratuita em 1 clique para receber seu Dossiê Clínico no e-mail e integrar suas queixas ao seu Mapa Vivo.
+                            </p>
+                        </div>
+
+                        {/* Google Auth */}
+                        <button
+                            onClick={handleGoogleAuth}
+                            disabled={authLoading}
+                            className="w-full py-3 px-4 bg-white hover:bg-gray-100 text-gray-900 font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-3 shadow-md mb-4"
+                        >
+                            <svg className="w-5 h-5" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                            </svg>
+                            <span>Continuar com Google</span>
+                        </button>
+
+                        <div className="flex items-center gap-2 my-4">
+                            <div className="flex-1 h-px bg-slate-800" />
+                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">ou com seu e-mail</span>
+                            <div className="flex-1 h-px bg-slate-800" />
+                        </div>
+
+                        {authError && (
+                            <div className="mb-4 p-3 bg-red-950/60 border border-red-500/30 rounded-xl text-xs text-red-300">
+                                {authError}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleAuthSubmit} className="space-y-3">
+                            {authMode === 'signup' && (
+                                <div>
+                                    <label className="block text-[11px] font-bold text-slate-300 mb-1">Seu Nome</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={authName}
+                                        onChange={(e) => setAuthName(e.target.value)}
+                                        placeholder="Ex: Dra. Mariana ou Carlos"
+                                        className="w-full px-3.5 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500"
+                                    />
+                                </div>
+                            )}
+                            <div>
+                                <label className="block text-[11px] font-bold text-slate-300 mb-1">E-mail para Receber o Relatório</label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={authEmail}
+                                    onChange={(e) => setAuthEmail(e.target.value)}
+                                    placeholder="seuemail@exemplo.com"
+                                    className="w-full px-3.5 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-bold text-slate-300 mb-1">Senha</label>
+                                <input
+                                    type="password"
+                                    required
+                                    value={authPassword}
+                                    onChange={(e) => setAuthPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full px-3.5 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500"
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={authLoading}
+                                className="w-full mt-2 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2"
+                            >
+                                {authLoading ? <Loader className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                                <span>{authMode === 'signup' ? 'Cadastrar e Receber Dossiê' : 'Entrar e Receber Dossiê'}</span>
+                            </button>
+                        </form>
+
+                        <div className="text-center mt-4">
+                            <button
+                                type="button"
+                                onClick={() => setAuthMode(authMode === 'signup' ? 'login' : 'signup')}
+                                className="text-xs text-emerald-400 hover:text-emerald-300 underline transition-colors"
+                            >
+                                {authMode === 'signup' ? 'Já tem conta? Fazer login' : 'Novo por aqui? Criar conta gratuita'}
+                            </button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
+
+            {/* Modal de Paywall / Limite de Degustação Excedido */}
+            {showPaywallModal && createPortal(
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
+                    <div className="bg-gradient-to-br from-slate-900 via-slate-950 to-purple-950 border border-purple-500/40 rounded-3xl max-w-md w-full p-6 sm:p-8 text-white relative shadow-2xl text-center">
+                        <button
+                            onClick={() => setShowPaywallModal(false)}
+                            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800 transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        <div className="w-16 h-16 bg-purple-500/20 border border-purple-400/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-purple-300">
+                            <Lock className="w-8 h-8 text-amber-300" />
+                        </div>
+
+                        <div className="inline-block bg-amber-400/20 text-amber-300 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-amber-400/30 mb-3">
+                            Limite de Degustação Atingido
+                        </div>
+
+                        <h3 className="text-2xl font-black mb-2">
+                            Assine para Emissões Ilimitadas
+                        </h3>
+
+                        <p className="text-xs text-slate-300 leading-relaxed mb-6">
+                            Você já utilizou sua <strong>1 emissão oficial gratuita</strong> de Relatório do Protocolo 360°. Para gerar novos protocolos ilimitados para qualquer queixa sua e da sua família, exportar relatórios em PDF com autoridade e salvar sua evolução no Mapa Vivo, torne-se Premium!
+                        </p>
+
+                        <div className="space-y-3">
+                            <button
+                                onClick={() => {
+                                    setShowPaywallModal(false);
+                                    onPageChange?.('pricing');
+                                }}
+                                className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black rounded-xl text-sm transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95"
+                            >
+                                <Sparkles className="w-4 h-4 text-amber-200" />
+                                <span>Ver Planos & Assinar Premium</span>
+                            </button>
+                            <button
+                                onClick={() => setShowPaywallModal(false)}
+                                className="w-full py-2.5 text-xs text-slate-400 hover:text-white transition-colors"
+                            >
+                                Continuar explorando
+                            </button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
+
+</div>,
         document.body
     );
 };

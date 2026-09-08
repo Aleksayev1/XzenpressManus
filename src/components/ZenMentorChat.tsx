@@ -315,6 +315,18 @@ function parseActionButtons(content: string) {
     }
     if (page === 'acupressure') label = '💆 Mapa de Acupressão';
     if (page === 'breathing') label = '🌬️ Exercício de Respiração';
+    if (page === 'protocolo-360' || page === 'plantas-medicinais' || page === 'fitoterapia') {
+      label = '🌿 Protocolo 360° & Fitoterapia (1 Grátis)';
+      targetPage = 'plantas-medicinais';
+    }
+    if (page === 'nutriming') {
+      label = '🥗 Nutriming Alimentos';
+      targetPage = 'nutriming-ai';
+    }
+    if (page === 'mapa-vivo') {
+      label = '🧭 Meu Mapa Vivo';
+      targetPage = 'mapa-vivo';
+    }
     actions.push({ label, page: targetPage });
   }
 
@@ -823,10 +835,10 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate, onBack
       // ── ZenSom Instructions ── informa a IA sobre os protocolos sonoros disponíveis
       anamneseContext += `
 
-🔊 ZENSOM — PROTOCOLOS SONOROS CLÍNICOS DISPONÍVEIS:
-Você pode prescrever um protocolo sonoro terapêutico adicionando uma tag [ZENSOM:id] ao final da sua resposta.
-Use apenas quando identificar claramente que o usuário se beneficiaria de intervenção sonora.
-Protocolos disponíveis:
+🔊 ZENSOM & PROTOCOLOS INTEGRATIVOS DISPONÍVEIS:
+Você pode prescrever recursos e páginas integrativas adicionando tags invisíveis ao final da sua resposta:
+• [ABRIR:protocolo-360] → Quando o usuário apresentar queixa física, nutricional, imunidade baixa, dores crônicas ou pedir indicação de plantas/fitoterapia e suplementação (1 degustação gratuita).
+• [ABRIR:sessao-mestra] → Para regulação profunda corpo-mente.
 • [ZENSOM:down-regulation] → Alta ativação simpática, ansiedade aguda, estresse severo, pânico. Rampa BPM 80→58 + Grounding 174Hz (8 min).
 • [ZENSOM:binaural-alpha] → Tensão moderada, dificuldade de focar, mente agitada. Alpha 10Hz — relaxamento com clareza.
 • [ZENSOM:binaural-theta] → Bloqueio criativo, meditação, introspecção profunda. Theta 6Hz.
@@ -1422,6 +1434,7 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
           {messages.filter(m => m.role === 'user').length === 0 && (
             <div className="px-4 pb-2 flex flex-wrap gap-1.5">
               {[
+                '🌿 Protocolo 360° (Fitoterapia & Nutrição)',
                 '🔍 Buscar pontos no Self Oracle',
                 'Como está meu equilíbrio hoje?',
                 'Protocolo para ansiedade',

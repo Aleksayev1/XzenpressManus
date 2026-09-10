@@ -171,7 +171,7 @@ export const ynsaPoints: AcupressurePoint[] = [
     description: 'Ponto YNSA Brain M-1 — Gânglios Basais + Sistema Límbico. Localização: Adjacente à linha média craniana frontal. TÉCNICA DIAGNÓSTICA: Maior sensibilidade indica desequilíbrio emocional. CRUCIAL para ansiedade de performance e medo. Estabiliza emoções profundas. VALIDAÇÃO: fMRI/PET-CT confirmam ativação dos gânglios basais com YNSA.',
     descriptionEn: 'YNSA Brain M-1 — Basal Ganglia + Limbic System. Location: Adjacent to frontal midline. DIAGNOSTIC: Greater sensitivity indicates emotional imbalance. CRUCIAL for performance anxiety and fear. Stabilizes deep emotions. VALIDATION: fMRI/PET-CT confirm basal ganglia activation with YNSA.',
     position: { x: 50, y: 20 },
-    image: '/YNSA/ynsa-basic-points-master.png',
+    image: '/YNSA/ynsa-cerebrais-ganglios-basais.jpg',
     imageAlt: 'YNSA Brain M-1 (Gânglios Basais) — Localização frontal para estabilidade emocional',
     benefits: [
       'Estabilidade emocional profunda',

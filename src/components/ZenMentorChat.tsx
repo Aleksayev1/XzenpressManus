@@ -1125,23 +1125,25 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
             </div>
           )}
 
-          {/* Robozinho Zen Concierge Welcome */}
-          <div className="mx-3 mt-2.5 mb-1 bg-gradient-to-r from-purple-950/60 to-indigo-950/70 border border-purple-500/30 rounded-2xl p-2.5 flex items-center gap-3 shadow-md flex-shrink-0">
-            <img 
-              src="/robo-zen-meditando.png" 
-              alt="Robozinho Zen" 
-              className="w-10 h-10 rounded-full border-2 border-purple-400 shadow-md object-cover flex-shrink-0"
-            />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-white font-bold text-xs">Robozinho Zen</span>
-                <span className="text-[9px] bg-purple-500/30 text-purple-300 px-1.5 py-0.2 rounded-full font-medium">Guia Integrativo</span>
+          {/* Robozinho Zen Concierge Welcome (Retrátil com a conversa) */}
+          {!hasUserMessages && (
+            <div className="mx-3 mt-2 mb-1 bg-gradient-to-r from-purple-950/60 to-indigo-950/70 border border-purple-500/30 rounded-2xl p-2.5 flex items-center gap-3 shadow-md flex-shrink-0 transition-all duration-500 animate-[fadeIn_0.3s_ease-out]">
+              <img 
+                src="/robo-zen-meditando.png" 
+                alt="Robozinho Zen" 
+                className="w-10 h-10 rounded-full border-2 border-purple-400 shadow-md object-cover flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-white font-bold text-xs">Robozinho Zen</span>
+                  <span className="text-[9px] bg-purple-500/30 text-purple-300 px-1.5 py-0.2 rounded-full font-medium">Guia Integrativo</span>
+                </div>
+                <p className="text-[11px] text-gray-300 leading-snug mt-0.5">
+                  Olá! Sou seu guia. O Mestre está aqui para te acolher. Fale o que sente e te levarei à Sessão Mestra e Acupressão.
+                </p>
               </div>
-              <p className="text-[11px] text-gray-300 leading-snug mt-0.5">
-                Olá! Sou seu guia. O Mestre está aqui para te acolher. Fale o que sente e te levarei à Sessão Mestra e Acupressão.
-              </p>
             </div>
-          </div>
+          )}
 
           {/* Messages */}
           <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollBehavior: 'auto' }}>
@@ -1448,27 +1450,6 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
             <div ref={messagesEndRef} />
           </div>
 
-<<<<<<< HEAD
-          {/* Suggestions — visíveis até o usuário enviar a primeira mensagem */}
-          {messages.filter(m => m.role === 'user').length === 0 && (
-            <div className="px-4 pb-2 flex flex-wrap gap-1.5">
-              {[
-                '🌿 Protocolo 360° (Fitoterapia & Nutrição)',
-                '🔍 Buscar pontos no Self Oracle',
-                'Como está meu equilíbrio hoje?',
-                'Protocolo para ansiedade',
-                'Pontos para insônia',
-              ].map((s, i) => (
-                <button
-                  key={i}
-                  onClick={() => { setInput(s.replace(/^[\p{Emoji}\s]+/u, '').trim()); setTimeout(() => inputRef.current?.focus(), 50); }}
-                  className="px-2.5 py-1 rounded-lg text-xs text-gray-300 transition-all hover:text-white font-medium"
-                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}
-                >
-                  {s}
-                </button>
-              ))}
-=======
           {/* Suggestions — Carrossel horizontal elegante (1 única linha, scroll suave, sem ocupar altura vertical) */}
           {!hasUserMessages && (
             <div className="px-3 py-2 border-t border-white/5 bg-black/20 flex-shrink-0">
@@ -1477,6 +1458,7 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                   Sugestões:
                 </span>
                 {[
+                  '🌿 Protocolo 360° (Fitoterapia & Nutrição)',
                   '🔍 Buscar pontos no Self Oracle',
                   '✨ Como está meu equilíbrio hoje?',
                   '🌿 Protocolo para ansiedade',
@@ -1493,7 +1475,6 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                   </button>
                 ))}
               </div>
->>>>>>> ad7e0fa (fix(zenmentor): avatar retratil responsivo, robozinho no header e sugestoes em carrossel)
             </div>
           )}
 

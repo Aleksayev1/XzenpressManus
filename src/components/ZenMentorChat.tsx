@@ -964,12 +964,18 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
   }
 
   // ── Chat Window ─────────────────────────────────────────────────────────────
+  const hasUserMessages = messages.some(m => m.role === 'user');
   const content = (
     <div
-      className={isPageMode ? "w-full max-w-4xl mx-auto flex flex-col rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 relative z-30" : "fixed bottom-6 right-6 z-50 flex flex-col rounded-3xl overflow-hidden shadow-2xl transition-all duration-300"}
+      className={
+        isPageMode
+          ? "w-full max-w-4xl mx-auto flex flex-col rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 relative z-30"
+          : "fixed z-50 flex flex-col overflow-hidden shadow-2xl transition-all duration-300 max-sm:inset-x-2 max-sm:bottom-2 max-sm:w-auto max-sm:rounded-2xl sm:bottom-6 sm:right-6 sm:rounded-3xl"
+      }
       style={{
-        width: isPageMode ? '100%' : (isMinimized ? '260px' : '360px'),
-        height: isPageMode ? '740px' : (isMinimized ? 'auto' : '640px'),
+        width: isPageMode ? '100%' : (isMinimized ? '260px' : '380px'),
+        height: isPageMode ? 'min(780px, calc(100dvh - 80px))' : (isMinimized ? 'auto' : 'min(660px, calc(100dvh - 32px))'),
+        maxHeight: isMinimized ? 'auto' : 'calc(100dvh - 16px)',
         background: 'rgba(10, 10, 20, 0.97)',
         border: `1px solid ${accentColor}44`,
         boxShadow: `0 24px 64px rgba(0,0,0,0.8), 0 0 0 1px ${accentColor}22`,
@@ -991,19 +997,23 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
               <ArrowLeft className="w-3.5 h-3.5" /> Voltar
             </button>
           )}
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-            style={{ background: `linear-gradient(135deg, ${accentColor}44, #6366f133)`, border: `1px solid ${accentColor}55` }}
-          >
-            {guardianEl.emoji}
-          </div>
+          <ZenAvatar 
+            size="sm" 
+            state={speaking || ttsLoading ? 'speaking' : isLoading ? 'listening' : 'idle'} 
+          />
           <div>
-            <div className="text-white font-bold text-sm leading-none">ZenMentor</div>
-            <div className="text-[10px] mt-0.5" style={{ color: accentColor }}>
-              Self Oracle · {guardianEl.name}
+            <div className="text-white font-bold text-sm leading-none flex items-center gap-1.5">
+              <span>ZenMentor</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-gray-300 font-normal">
+                {speaking || ttsLoading ? 'Falando...' : isLoading ? 'Ouvindo...' : guardianEl.name}
+              </span>
+            </div>
+            <div className="text-[10px] mt-0.5 flex items-center gap-1" style={{ color: accentColor }}>
+              <span>{guardianEl.emoji} {guardianEl.element}</span>
+              <span className="text-gray-500">·</span>
+              <span className="text-gray-400">Guia Integrativo</span>
             </div>
           </div>
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-1" />
         </div>
 
         <div className="flex items-center gap-1">
@@ -1102,10 +1112,18 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
             </div>
           )}
 
-          {/* ZenAvatar Visualization Center */}
-          <div className="flex flex-col items-center justify-center py-4 bg-slate-950/30 border-b border-white/5 flex-shrink-0">
-            <ZenAvatar state={speaking || ttsLoading ? 'speaking' : isLoading ? 'listening' : 'idle'} />
-          </div>
+          {/* ZenAvatar Welcoming Center (Visível apenas no acolhimento inicial; retrai durante a conversa) */}
+          {!hasUserMessages && (
+            <div className="flex flex-col items-center justify-center py-3 px-4 bg-slate-950/40 border-b border-white/5 flex-shrink-0 transition-all duration-500 animate-[fadeIn_0.3s_ease-out]">
+              <ZenAvatar 
+                size="md" 
+                state={speaking || ttsLoading ? 'speaking' : isLoading ? 'listening' : 'idle'} 
+              />
+              <p className="text-[11px] text-gray-400 mt-1 font-medium text-center">
+                Presença e escuta ativa · Como posso apoiar você hoje?
+              </p>
+            </div>
+          )}
 
           {/* Robozinho Zen Concierge Welcome */}
           <div className="mx-3 mt-2.5 mb-1 bg-gradient-to-r from-purple-950/60 to-indigo-950/70 border border-purple-500/30 rounded-2xl p-2.5 flex items-center gap-3 shadow-md flex-shrink-0">
@@ -1430,6 +1448,7 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
             <div ref={messagesEndRef} />
           </div>
 
+<<<<<<< HEAD
           {/* Suggestions — visíveis até o usuário enviar a primeira mensagem */}
           {messages.filter(m => m.role === 'user').length === 0 && (
             <div className="px-4 pb-2 flex flex-wrap gap-1.5">
@@ -1449,6 +1468,32 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                   {s}
                 </button>
               ))}
+=======
+          {/* Suggestions — Carrossel horizontal elegante (1 única linha, scroll suave, sem ocupar altura vertical) */}
+          {!hasUserMessages && (
+            <div className="px-3 py-2 border-t border-white/5 bg-black/20 flex-shrink-0">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-0.5" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <span className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider flex-shrink-0 pl-1">
+                  Sugestões:
+                </span>
+                {[
+                  '🔍 Buscar pontos no Self Oracle',
+                  '✨ Como está meu equilíbrio hoje?',
+                  '🌿 Protocolo para ansiedade',
+                  '🌙 Pontos para insônia',
+                  '⚡ Aliviar dor e tensão',
+                ].map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setInput(s.replace(/^[\p{Emoji}\s]+/u, '').trim()); setTimeout(() => inputRef.current?.focus(), 50); }}
+                    className="flex-shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-xs text-gray-300 transition-all hover:text-white hover:bg-white/15 active:scale-95 font-medium"
+                    style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)' }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+>>>>>>> ad7e0fa (fix(zenmentor): avatar retratil responsivo, robozinho no header e sugestoes em carrossel)
             </div>
           )}
 

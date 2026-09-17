@@ -1388,93 +1388,6 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                         setZoomImageUrl(null);
                     }}
                 />
-            </div>
-        </div>
-    );
-};
-
-const ImageZoomModal: React.FC<{
-    isVisible: boolean;
-    imageUrl: string | null;
-    onClose: () => void;
-}> = ({ isVisible, imageUrl, onClose }) => {
-    const [imageLoaded, setImageLoaded] = useState(false);
-
-    useEffect(() => {
-        if (isVisible) {
-            setImageLoaded(false);
-        }
-    }, [isVisible, imageUrl]);
-
-    useEffect(() => {
-        const handleEscape = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                onClose();
-            }
-        };
-
-        if (isVisible) {
-            document.addEventListener('keydown', handleEscape);
-            document.body.style.overflow = 'hidden';
-        }
-
-        return () => {
-            document.removeEventListener('keydown', handleEscape);
-            document.body.style.overflow = 'unset';
-        };
-    }, [isVisible, onClose]);
-
-    if (!isVisible || !imageUrl) return null;
-
-    return createPortal(
-        <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-90 transition-opacity duration-300 p-4 backdrop-blur-sm"
-            onClick={onClose}
-        >
-            <div
-                className="relative w-full max-w-6xl max-h-[95vh] flex items-center justify-center"
-                onClick={(e) => e.stopPropagation()}
-            >
-                {!imageLoaded && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="flex flex-col items-center gap-3">
-                            <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-white text-sm">Carregando imagem...</span>
-                        </div>
-                    </div>
-                )}
-
-                <img
-                    src={imageUrl}
-                    alt="Ponto de acupressão ampliado"
-                    className={`max-w-full max-h-[95vh] object-contain rounded-xl shadow-2xl transition-opacity duration-300 cursor-pointer ${imageLoaded ? 'opacity-100' : 'opacity-0'
-                        }`}
-                    onClick={onClose}
-                    onLoad={() => {
-                        setImageLoaded(true);
-                    }}
-                    onError={(e) => {
-                        console.error('Erro ao carregar imagem oráculo:', imageUrl);
-                        e.currentTarget.style.display = 'none';
-                        setImageLoaded(true);
-                    }}
-                />
-
-                <button
-                    onClick={onClose}
-                    className="absolute -top-14 right-0 bg-red-500 hover:bg-red-600 text-white transition-colors p-3 rounded-full shadow-lg hover:scale-110 transform duration-200"
-                    aria-label="Fechar"
-                    title="Fechar (ESC)"
-                >
-                    <X className="w-6 h-6" />
-                </button>
-
-                <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 px-6 py-3 rounded-full">
-                    <div className="flex items-center gap-3 text-white text-sm">
-                        <span className="opacity-90">💡 Clique na imagem ou pressione ESC para fechar</span>
-                    </div>
-                </div>
-            </div>
         
             {/* Modal de Autenticação / Registro para Envio do Relatório */}
             {showAuthModal && createPortal(
@@ -1639,7 +1552,94 @@ const ImageZoomModal: React.FC<{
                 document.body
             )}
 
-</div>,
+            </div>
+        </div>
+    );
+};
+
+const ImageZoomModal: React.FC<{
+    isVisible: boolean;
+    imageUrl: string | null;
+    onClose: () => void;
+}> = ({ isVisible, imageUrl, onClose }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    useEffect(() => {
+        if (isVisible) {
+            setImageLoaded(false);
+        }
+    }, [isVisible, imageUrl]);
+
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        if (isVisible) {
+            document.addEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'hidden';
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'unset';
+        };
+    }, [isVisible, onClose]);
+
+    if (!isVisible || !imageUrl) return null;
+
+    return createPortal(
+        <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-90 transition-opacity duration-300 p-4 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <div
+                className="relative w-full max-w-6xl max-h-[95vh] flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {!imageLoaded && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-white text-sm">Carregando imagem...</span>
+                        </div>
+                    </div>
+                )}
+
+                <img
+                    src={imageUrl}
+                    alt="Ponto de acupressão ampliado"
+                    className={`max-w-full max-h-[95vh] object-contain rounded-xl shadow-2xl transition-opacity duration-300 cursor-pointer ${imageLoaded ? 'opacity-100' : 'opacity-0'
+                        }`}
+                    onClick={onClose}
+                    onLoad={() => {
+                        setImageLoaded(true);
+                    }}
+                    onError={(e) => {
+                        console.error('Erro ao carregar imagem oráculo:', imageUrl);
+                        e.currentTarget.style.display = 'none';
+                        setImageLoaded(true);
+                    }}
+                />
+
+                <button
+                    onClick={onClose}
+                    className="absolute -top-14 right-0 bg-red-500 hover:bg-red-600 text-white transition-colors p-3 rounded-full shadow-lg hover:scale-110 transform duration-200"
+                    aria-label="Fechar"
+                    title="Fechar (ESC)"
+                >
+                    <X className="w-6 h-6" />
+                </button>
+
+                <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 px-6 py-3 rounded-full">
+                    <div className="flex items-center gap-3 text-white text-sm">
+                        <span className="opacity-90">💡 Clique na imagem ou pressione ESC para fechar</span>
+                    </div>
+                </div>
+            </div>
+        </div>,
         document.body
     );
 };

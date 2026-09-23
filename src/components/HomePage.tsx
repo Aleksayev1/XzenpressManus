@@ -144,7 +144,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
           </div>
 
           {/* Therapy Selection Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
             {/* Respiração 4-7-8 */}
             <div
               onClick={() => onPageChange('breathing')}
@@ -232,6 +232,50 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 </div>
               </div>
             </div>
+
+            {/* Nutriming Zen (MTC & Ayurveda) */}
+            <div
+              onClick={() => onPageChange('nutriming')}
+              className="group bg-white rounded-3xl shadow-2xl p-8 cursor-pointer transform hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-emerald-300"
+            >
+              <div className="text-center">
+                <div className="flex justify-center mb-6">
+                  <div className="p-6 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full group-hover:from-emerald-600 group-hover:to-teal-600 transition-all">
+                    <Apple className="w-16 h-16 text-white" />
+                  </div>
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  Nutriming Zen
+                </h2>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Dietoterapia MTC & Ayurveda com Bússola Energética em tempo real.
+                  Descubra como seu alimento afeta seu tratamento.
+                </p>
+                <div className="space-y-2 text-sm text-gray-500 mb-6">
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+                    <span>Classificação Yin / Yang & 5 Sabores</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                    <span>Doshas: Vata, Pitta, Kapha & Agni</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
+                    <span>Bússola e Recomendações de Harmonização</span>
+                  </div>
+                </div>
+                <div className="bg-emerald-50 rounded-xl p-4 mb-6">
+                  <div className="text-sm text-emerald-800">
+                    <strong>Ideal para:</strong> Digestão, fadiga, estresse e potencialização terapêutica
+                  </div>
+                </div>
+                <div className="flex items-center justify-center space-x-2 text-emerald-600 font-semibold group-hover:text-emerald-700">
+                  <span>Abrir Nutriming</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Back Button */}
@@ -313,6 +357,20 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 className="text-slate-400 px-6 py-4 rounded-full font-medium hover:text-white transition-all duration-200 underline decoration-white/20 underline-offset-4"
               >
                 Saiba Mais
+              </button>
+            </div>
+
+            {/* Acesso Direto em Destaque ao Nutriming */}
+            <div className="mt-8 flex justify-center">
+              <button
+                type="button"
+                onClick={() => onPageChange('nutriming')}
+                className="group flex items-center gap-3 px-6 py-3 rounded-full bg-emerald-950/60 border border-emerald-500/40 hover:border-emerald-400 hover:bg-emerald-900/50 text-emerald-300 text-sm font-medium transition-all shadow-[0_0_25px_rgba(16,185,129,0.15)] hover:scale-105 cursor-pointer backdrop-blur-md"
+              >
+                <span className="text-lg group-hover:rotate-12 transition-transform">🥗</span>
+                <span><strong>Nutriming Zen:</strong> Dietoterapia MTC & Ayurveda</span>
+                <span className="text-xs bg-emerald-500/25 text-emerald-200 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Novo</span>
+                <span className="text-emerald-400 group-hover:translate-x-1 transition-transform">→</span>
               </button>
             </div>
             {isTeaserActive && (

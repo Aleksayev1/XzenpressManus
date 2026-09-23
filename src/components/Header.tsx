@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, User, LogOut, Crown, BookOpen, Globe, ChevronDown, Zap, Activity, Waves, Database, MessageSquare, Briefcase, Brain, Wind, TrendingUp, Music, Sparkles } from 'lucide-react';
+import { Menu, X, User, LogOut, Crown, BookOpen, Globe, ChevronDown, Zap, Activity, Waves, Database, MessageSquare, Briefcase, Brain, Wind, TrendingUp, Music, Sparkles, Pill } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { trackPageView } from './GoogleAnalytics';
@@ -69,7 +69,8 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
     { id: 'breathing', label: t('nav.breathing'), icon: <Activity className="w-4 h-4" /> },
     { id: 'sounds', label: t('nav.sounds'), icon: <Waves className="w-4 h-4" /> },
     { id: 'zenflow', label: 'ZenFlow', icon: <Wind className="w-4 h-4 text-purple-600" /> },
-    { id: 'nutriming-ai', label: 'Nutriming', icon: <Zap className="w-4 h-4 text-green-500" /> },
+    { id: 'nutriming', label: '🥗 Nutriming: Dietoterapia (MTC & Ayurveda)', icon: <Zap className="w-4 h-4 text-emerald-400" /> },
+    { id: 'nutriming-ai', label: '💊 Nutriming: Suplementos & Crononutrição', icon: <Pill className="w-4 h-4 text-blue-400" /> },
     { id: 'plantas-medicinais', label: 'Plantas Medicinais', icon: <BookOpen className="w-4 h-4 text-emerald-600" /> },
     { id: 'protocols', label: t('nav.protocols'), icon: <Database className="w-4 h-4" /> },
     { id: 'zoster-map', label: 'Mapa Zoster', icon: <Activity className="w-4 h-4 text-red-400" /> },
@@ -135,7 +136,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                   <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'library' ? 'rotate-180' : ''}`} />
                 </button>
                 {activeDropdown === 'library' && (
-                  <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 z-[60]">
+                  <div className="absolute top-full left-0 mt-1 w-72 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 z-[60]">
                     {libraryItems.map((item) => (
                       <button
                         key={item.id}
@@ -162,7 +163,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                   <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'community' ? 'rotate-180' : ''}`} />
                 </button>
                 {activeDropdown === 'community' && (
-                  <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 z-[60]">
+                  <div className="absolute top-full left-0 mt-1 w-72 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 z-[60]">
                     {communityItems.map((item) => (
                       <button
                         key={item.id}

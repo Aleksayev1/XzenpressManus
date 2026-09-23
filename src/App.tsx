@@ -273,7 +273,9 @@ function AppContent() {
       case 'dashboard':
         return <DashboardPage onPageChange={setCurrentPage} />;
       case 'nutriming':
-        return <NutrimingDashboard onBack={() => setCurrentPage('home')} />;
+        return <NutrimingDashboard onBack={() => setCurrentPage('home')} initialTab="diet" />;
+      case 'nutriming-ai':
+        return <NutrimingDashboard onBack={() => setCurrentPage('home')} initialTab="supplements" />;
       case 'sounds':
         return <SoundsLibraryPage onPageChange={setCurrentPage} />;
       case 'progress':
@@ -296,7 +298,7 @@ function AppContent() {
         return <ProtocolPage onPageChange={setCurrentPage} />;
       case 'debug-auth':
         return <DebugAuth />;
-      case 'nutriming-ai':
+      case 'nutriming-legacy':
         return <NutrimingPage onPageChange={setCurrentPage} />;
       case 'terms-of-service':
         return <TermsOfServicePage onPageChange={setCurrentPage} />;

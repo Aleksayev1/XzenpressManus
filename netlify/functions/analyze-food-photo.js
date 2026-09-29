@@ -95,7 +95,7 @@ exports.handler = async (event) => {
     }
 
     // 2. Tentar Gemini Flash com Visão Computacional (Rápido e Resiliente)
-    const activeGeminiKey = GEMINI_KEY || 'AIzaSyAkfijNGilGIuDeA2ROp2ad1mAjHa0Ler4';
+    const activeGeminiKey = GEMINI_KEY || process.env.GEMINI_KEY || process.env.VITE_GEMINI_API_KEY;
     if (activeGeminiKey) {
         try {
             console.log('[Nutriming Vision] Analisando foto com Gemini Flash Vision...');

@@ -6,6 +6,7 @@ import {
   MealContext 
 } from '../../types/nutriming';
 import { MtcFoodClassifier } from './mtcFoodClassifier';
+import { AuthenticityGuard } from './authenticityGuard';
 
 export class FoodStateEngine {
   /**
@@ -133,7 +134,29 @@ export class FoodStateEngine {
     let explanation = 'A combinação de temperatura e natureza energética apoia o equilíbrio do seu organismo.';
     const balancingSuggestions: string[] = [];
 
-    if (treatmentAlignment?.status === 'conflict') {
+    // ── 5.1 AUTENTICIDADE (adulteração industrial) ──
+    const authFlag = AuthenticityGuard.evaluate(
+      food.name,
+      (food as any).ingredientsText
+    );
+
+    if (authFlag.level === 'misleading') {
+      compass = 'red';
+      headline = '🚫 Produto maquiado detectado: não é o alimento que parece ser.';
+      explanation = authFlag.explanation + (authFlag.clinicalNote ? `\n\n🧬 ${authFlag.clinicalNote}` : '');
+      balancingSuggestions.push('Verifique a lista completa de ingredientes na embalagem física.');
+      balancingSuggestions.push('Considere substituir por um produto com ingredientes reconhecíveis e sem extensores industriais.');
+      if (authFlag.consumerRights) balancingSuggestions.push(authFlag.consumerRights);
+    } else if (authFlag.level === 'suspect') {
+      if (compass === 'green') {
+        compass = 'yellow';
+        headline = '⚠️ Ingrediente suspeito encontrado — verifique o rótulo.';
+        explanation = authFlag.explanation;
+        balancingSuggestions.push('Compare o rótulo com uma versão original do produto e prefira o de ingredientes mais simples.');
+      }
+    }
+
+    if (treatmentAlignment?.status === 'conflict' && authFlag.level === 'genuine') {
       compass = 'red';
       headline = 'Atenção: este alimento contraria seu foco de autocuidado hoje.';
       explanation = treatmentAlignment.message;
@@ -141,18 +164,24 @@ export class FoodStateEngine {
       if (treatmentAlignment.recommendedPoints) {
         balancingSuggestions.push(`Estimule o ponto ${treatmentAlignment.recommendedPoints.join(' e ')} por 1 minuto para neutralizar o impacto.`);
       }
+    } else if (treatmentAlignment?.status === 'conflict') {
+      // já está vermelho por adulteração — apenas acrescenta nota do tratamento
+      balancingSuggestions.push(`⚠️ Conflito adicional com seu tratamento atual: ${treatmentAlignment.message}`);
     } else if (tcmDirection === 'intensifies' || westernSeverity === 'high_attention') {
-      compass = 'yellow';
-      headline = 'Vale observar: este alimento tende a puxar o corpo para um extremo.';
-      if (isFoodWarming) {
-        explanation = 'Como você registrou tensão ou cansaço acumulado, estimulantes ou alimentos muito quentes podem dar um impulso ilusório agora e cobrar energia à noite.';
-        balancingSuggestions.push('Beba água pura antes e após a refeição.');
-        balancingSuggestions.push('Combine com um alimento neutro ou refrescante (ex: maçã, folhas, chá morno).');
-      } else {
-        explanation = 'Alimentos muito frios ou crus podem paralisar temporariamente a digestão em momentos de energia mais baixa.';
-        balancingSuggestions.push('Se puder, aqueça a refeição ou adicione uma pitada de gengibre ou canela.');
+      if (compass === 'green') {
+        compass = 'yellow';
+        headline = 'Vale observar: este alimento tende a puxar o corpo para um extremo.';
+        if (isFoodWarming) {
+          explanation = 'Como você registrou tensão ou cansaço acumulado, estimulantes ou alimentos muito quentes podem dar um impulso ilusório agora e cobrar energia à noite.';
+          balancingSuggestions.push('Beba água pura antes e após a refeição.');
+          balancingSuggestions.push('Combine com um alimento neutro ou refrescante (ex: maçã, folhas, chá morno).');
+        } else {
+          explanation = 'Alimentos muito frios ou crus podem paralisar temporariamente a digestão em momentos de energia mais baixa.';
+          balancingSuggestions.push('Se puder, aqueça a refeição ou adicione uma pitada de gengibre ou canela.');
+        }
       }
     }
+
 
     return {
       western: {

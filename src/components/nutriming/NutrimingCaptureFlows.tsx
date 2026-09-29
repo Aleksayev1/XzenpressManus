@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Mic, Search, X, Loader2, Scan, Upload, RefreshCw, AlertCircle } from 'lucide-react';
+import { Camera, Mic, Search, X, Loader2, Scan, Upload, RefreshCw, AlertCircle, Check, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { OpenFoodFactsService } from '../../services/nutriming/openFoodFactsService';
 
-export type CaptureMethod = 'photo' | 'voice' | 'search' | null;
+export type CaptureMethod = 'photo' | 'voice' | 'search' | 'barcode' | null;
 
 interface NutrimingCaptureFlowsProps {
   method: CaptureMethod;
   onCancel: () => void;
-  onComplete: (foods: string[]) => void;
+  onComplete: (foods: string[], barcode?: string) => void;
 }
 
 export const NutrimingCaptureFlows: React.FC<NutrimingCaptureFlowsProps> = ({ method, onCancel, onComplete }) => {
@@ -33,12 +34,261 @@ export const NutrimingCaptureFlows: React.FC<NutrimingCaptureFlowsProps> = ({ me
             <X className="w-5 h-5" />
           </button>
 
+          {method === 'barcode' && <BarcodeScanFlow onComplete={onComplete} />}
           {method === 'search' && <SearchFlow onComplete={onComplete} />}
           {method === 'voice' && <VoiceFlow onComplete={onComplete} />}
           {method === 'photo' && <PhotoFlow onComplete={onComplete} />}
         </motion.div>
       </div>
     </AnimatePresence>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   0. LEITOR CONTÍNUO DE CÓDIGO DE BARRAS (OPEN FOOD FACTS)
+   ═══════════════════════════════════════════════════════════════ */
+const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string) => void }> = ({ onComplete }) => {
+  const [hasCameraStream, setHasCameraStream] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [barcodeInput, setBarcodeInput] = useState('');
+  const [isQuerying, setIsQuerying] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [notFoundBarcode, setNotFoundBarcode] = useState<string | null>(null);
+  const [fallbackFoodName, setFallbackFoodName] = useState('');
+  const [isNativeBarcodeSupported, setIsNativeBarcodeSupported] = useState(true);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const isScanningActiveRef = useRef(true);
+
+  // Iniciar Câmera
+  useEffect(() => {
+    isScanningActiveRef.current = true;
+    let active = true;
+
+    async function initCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setCameraError('Câmera não suportada neste dispositivo. Digite o código de barras abaixo:');
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        });
+
+        if (!active) {
+          stream.getTracks().forEach(t => t.stop());
+          return;
+        }
+
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play().catch(() => {});
+        }
+        setHasCameraStream(true);
+      } catch (err: any) {
+        console.warn('[BarcodeScanner] Câmera não autorizada:', err);
+        setCameraError('Acesso à câmera bloqueado. Digite o código de barras no campo abaixo:');
+      }
+    }
+
+    initCamera();
+
+    return () => {
+      active = false;
+      isScanningActiveRef.current = false;
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop());
+      }
+    };
+  }, []);
+
+  // Loop de detecção contínua via BarcodeDetector nativo
+  useEffect(() => {
+    if (!hasCameraStream) return;
+    const BarcodeDetectorClass = (window as any).BarcodeDetector;
+    if (!BarcodeDetectorClass) {
+      setIsNativeBarcodeSupported(false);
+      return;
+    }
+
+    let detector: any;
+    try {
+      detector = new BarcodeDetectorClass({
+        formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'qr_code']
+      });
+    } catch {
+      setIsNativeBarcodeSupported(false);
+      return;
+    }
+
+    const intervalId = setInterval(async () => {
+      if (!isScanningActiveRef.current || !videoRef.current || videoRef.current.readyState < 2) {
+        return;
+      }
+
+      try {
+        const barcodes = await detector.detect(videoRef.current);
+        if (barcodes && barcodes.length > 0 && isScanningActiveRef.current) {
+          const rawCode = barcodes[0].rawValue;
+          if (rawCode && rawCode.trim().length >= 4) {
+            isScanningActiveRef.current = false; // Pausa escaneamento para processar
+            handleProcessBarcode(rawCode.trim());
+          }
+        }
+      } catch (e) {
+        // Ignora falhas de frame transitórias
+      }
+    }, 250);
+
+    return () => clearInterval(intervalId);
+  }, [hasCameraStream]);
+
+  // Consulta ao Open Food Facts
+  const handleProcessBarcode = async (code: string) => {
+    setIsQuerying(true);
+    setStatusMessage(`Consultando produto ${code} no Open Food Facts...`);
+    setNotFoundBarcode(null);
+
+    try {
+      const product = await OpenFoodFactsService.getProductByBarcode(code);
+      if (product && product.productName) {
+        setStatusMessage(`Encontrado: ${product.productName}`);
+        setTimeout(() => {
+          onComplete([product.productName!], code);
+        }, 600);
+        return;
+      }
+    } catch (err) {
+      console.warn('[Barcode] Erro na busca OFF:', err);
+    }
+
+    // Se não encontrou no banco do Open Food Facts
+    setIsQuerying(false);
+    setNotFoundBarcode(code);
+    setStatusMessage(`Código ${code} lido, mas não catalogado no Open Food Facts.`);
+  };
+
+  const handleManualSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (barcodeInput.trim()) {
+      isScanningActiveRef.current = false;
+      handleProcessBarcode(barcodeInput.trim());
+    }
+  };
+
+  const handleFallbackConfirm = (e: React.FormEvent) => {
+    e.preventDefault();
+    const finalName = fallbackFoodName.trim() || `Alimento (EAN: ${notFoundBarcode})`;
+    if (notFoundBarcode && fallbackFoodName.trim()) {
+      // Registra permanentemente para nunca mais pedir o nome deste código
+      OpenFoodFactsService.registerCustomBarcode(notFoundBarcode, fallbackFoodName.trim());
+    }
+    onComplete([finalName], notFoundBarcode || undefined);
+  };
+
+  return (
+    <div className="flex flex-col text-left">
+      {/* Topo: Câmera ou Viewfinder */}
+      <div className="relative h-64 bg-black overflow-hidden flex items-center justify-center">
+        {hasCameraStream ? (
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center p-6 text-center text-slate-400">
+            <Scan className="w-12 h-12 text-emerald-500/40 mb-2" />
+            <p className="text-xs">{cameraError || 'Iniciando câmera para leitura de código de barras...'}</p>
+          </div>
+        )}
+
+        {/* Moldura do Scanner com cantos estilizados e laser */}
+        <div className="absolute inset-x-8 inset-y-10 border-2 border-emerald-500/60 rounded-2xl flex items-center justify-center pointer-events-none shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+          {/* Laser animado */}
+          <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent absolute animate-pulse shadow-[0_0_12px_#34d399]" />
+        </div>
+
+        {/* Badge superior */}
+        <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-emerald-500/30 flex items-center gap-1.5 text-[11px] text-emerald-300">
+          <Scan className="w-3.5 h-3.5" />
+          <span>Aponte para o código de barras (EAN)</span>
+        </div>
+
+        {/* Notificação de compatibilidade visual */}
+        {!isNativeBarcodeSupported && hasCameraStream && (
+          <div className="absolute bottom-2 inset-x-4 bg-black/80 backdrop-blur-md border border-amber-500/40 rounded-xl p-2 text-center text-[10px] text-amber-200">
+            <span>💡 Leitura visual automática indisponível neste navegador. Digite os dígitos do código abaixo:</span>
+          </div>
+        )}
+      </div>
+
+      {/* Conteúdo Inferior */}
+      <div className="p-6 bg-[#0c1814] border-t border-emerald-900/40">
+        {isQuerying ? (
+          <div className="flex items-center justify-center py-4 gap-3 text-emerald-300">
+            <Loader2 className="w-5 h-5 animate-spin text-emerald-400" />
+            <span className="text-sm font-medium">{statusMessage}</span>
+          </div>
+        ) : notFoundBarcode ? (
+          /* Quando código não consta na base OFF */
+          <form onSubmit={handleFallbackConfirm} className="space-y-3">
+            <div className="bg-amber-950/40 border border-amber-600/40 rounded-xl p-3 text-xs text-amber-200 flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 flex-shrink-0 text-amber-400" />
+                <span>Código <strong>{notFoundBarcode}</strong> lido. Dê um nome para este alimento:</span>
+              </div>
+              <span className="text-[10px] text-amber-300/70 ml-6">✨ O XZenPress salvará este alimento para reconhecer este código de barras automaticamente nas próximas vezes.</span>
+            </div>
+            <input
+              type="text"
+              autoFocus
+              value={fallbackFoodName}
+              onChange={e => setFallbackFoodName(e.target.value)}
+              placeholder="Ex: Iogurte Natural, Biscoito Integral..."
+              className="w-full bg-[#11241e] border border-emerald-900/50 rounded-xl p-3 text-emerald-50 placeholder:text-emerald-900/60 text-sm focus:outline-none focus:border-emerald-500/60"
+            />
+            <button
+              type="submit"
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-xl transition-colors shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2"
+            >
+              <Check className="w-4 h-4" />
+              Salvar e Continuar com este Alimento
+            </button>
+          </form>
+        ) : (
+          /* Digitação manual alternativa */
+          <form onSubmit={handleManualSubmit} className="space-y-3">
+            <label className="text-xs text-emerald-300/80 block font-medium">
+              Ou digite o código de barras numérico (EAN):
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={barcodeInput}
+                onChange={e => setBarcodeInput(e.target.value)}
+                placeholder="Ex: 7891000315507"
+                className="flex-1 bg-[#11241e] border border-emerald-900/50 rounded-xl px-3 py-2.5 text-emerald-50 placeholder:text-emerald-900/50 text-sm focus:outline-none focus:border-emerald-500/50"
+              />
+              <button
+                type="submit"
+                disabled={!barcodeInput.trim()}
+                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5"
+              >
+                Buscar
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
   );
 };
 

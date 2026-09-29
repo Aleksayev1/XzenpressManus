@@ -1,5 +1,6 @@
 import { FoodProduct, FoodProfile, DataOrigin } from '../../types/nutriming';
 import { MtcFoodClassifier } from './mtcFoodClassifier';
+import { AuthenticityGuard } from './authenticityGuard';
 
 export class FoodNormalizer {
   /**
@@ -61,6 +62,24 @@ export class FoodNormalizer {
       });
     }
 
+    // ── Autenticidade (adulteração / produtos maquiados) ──
+    const productNameRaw = raw.product_name_pt || raw.product_name || '';
+    const ingredientsRaw = raw.ingredients_text_pt || raw.ingredients_text || '';
+    const authFlag = AuthenticityGuard.evaluate(productNameRaw, ingredientsRaw);
+    if (authFlag.level === 'misleading') {
+      warnings.push({
+        type: 'adulteration_confirmed',
+        severity: 'danger',
+        message: authFlag.explanation
+      });
+    } else if (authFlag.level === 'suspect') {
+      warnings.push({
+        type: 'adulteration_suspect',
+        severity: 'caution',
+        message: authFlag.explanation
+      });
+    }
+
     const name = raw.product_name_pt || raw.product_name || 'Produto sem nome';
     const brand = raw.brands || undefined;
     const imageUrl = raw.image_front_url || raw.image_url || undefined;
@@ -96,6 +115,43 @@ export class FoodNormalizer {
         additives
       },
       warnings
+    };
+  }
+
+  /**
+   * Cria um FoodProduct tipado para alimentos cadastrados pelo usuário ou identificados por IA/visão.
+   */
+  public static createCustomOrAiProduct(barcode: string, name: string, extras?: Partial<FoodProduct>): FoodProduct {
+    const cleanName = (name || 'Alimento').trim();
+    const cleanBarcode = (barcode || '').trim();
+
+    return {
+      id: cleanBarcode || `custom_${Date.now()}`,
+      barcode: cleanBarcode || undefined,
+      name: cleanName,
+      brand: extras?.brand || 'Catálogo XZenPress',
+      imageUrl: extras?.imageUrl,
+      source: {
+        provider: 'manual',
+        externalId: cleanBarcode || undefined,
+        fetchedAt: new Date().toISOString(),
+        completeness: 0.85,
+        origin: cleanBarcode ? 'barcode_verified' : 'user_declared'
+      },
+      labelFacts: {
+        ingredientsText: extras?.labelFacts?.ingredientsText,
+        allergens: extras?.labelFacts?.allergens || [],
+        traces: extras?.labelFacts?.traces || [],
+        novaGroup: extras?.labelFacts?.novaGroup,
+        nutritionPer100g: extras?.labelFacts?.nutritionPer100g || {
+          energyKcal: undefined,
+          carbs: undefined,
+          protein: undefined,
+          fat: undefined
+        },
+        additives: extras?.labelFacts?.additives || []
+      },
+      warnings: extras?.warnings || []
     };
   }
 

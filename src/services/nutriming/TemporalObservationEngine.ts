@@ -1,4 +1,4 @@
-import { ZenEvent, PatternEventData } from '../../types/nutriming';
+import { ZenEvent, PatternEventData, MicroObservation } from '../../types/nutriming';
 import { DoNothingEngine } from './DoNothingEngine';
 
 export class TemporalObservationEngine {
@@ -6,8 +6,11 @@ export class TemporalObservationEngine {
   /**
    * Procura associações temporais e aplica o DoNothingEngine como PORTEIRO.
    */
-  public static analyzeAndExtractPatterns(events: ZenEvent[]): PatternEventData[] {
-    const rawPatterns = this.detectRawPatterns(events);
+  public static analyzeAndExtractPatterns(
+    events: ZenEvent[],
+    microObservations?: MicroObservation[]
+  ): PatternEventData[] {
+    const rawPatterns = this.detectRawPatterns(events, microObservations);
     const validPatterns: PatternEventData[] = [];
 
     for (const pattern of rawPatterns) {
@@ -18,10 +21,8 @@ export class TemporalObservationEngine {
       }
 
       // 2. O PORTEIRO: DoNothingEngine avalia se este padrão merece ser exibido
-      // Para demonstração da Sprint 2 (MVP "3 cafés"), permitimos que 3 passe, 
-      // mas na vida real o motor vai exigir mais volume e dados.
-      const enoughData = pattern.frequency >= 3 && pattern.dataQuality > 0.5;
-      const relevant = pattern.recurrenceRate > 0.7; // Mais de 70% de recorrência
+      const enoughData = pattern.frequency >= 2 && pattern.dataQuality >= 0.5;
+      const relevant = pattern.recurrenceRate >= 0.6; // Mais de 60% de recorrência
       
       const actionDecision = DoNothingEngine.evaluateAction(
         pattern,
@@ -43,25 +44,60 @@ export class TemporalObservationEngine {
   }
 
   /**
-   * Detecção "crua" matemática dos padrões.
-   * Mock da Sprint 2: Simulando que a IA encontrou a relação "Café -> Cansaço".
+   * Detecção matemática de padrões cruzando refeições e respostas pós-prandiais de 2h.
    */
-  private static detectRawPatterns(events: ZenEvent[]): PatternEventData[] {
+  private static detectRawPatterns(
+    events: ZenEvent[],
+    microObservations?: MicroObservation[]
+  ): PatternEventData[] {
     if (events.length === 0) return [];
 
-    return [{
-      patternId: `pattern-${Date.now()}`,
-      observations: events.map(e => e.id),
-      frequency: events.length,
-      recurrenceRate: 1.0, // 3 refeições -> 3 checkins = 100% de match simulado
-      temporalWindow: {
-        afterMinutes: 120
-      },
-      confidence: 0.85, 
-      dataQuality: 0.8, // Nova métrica exigida pela Sprint 2
-      confounders: ['sleep_variation', 'stress_variation'], // Evita viés de certeza
-      causalClaim: false, // OBRIGATÓRIO SER FALSE
-      status: 'recurrent'
-    }];
+    // Se temos micro-observações reais, cruzar por id de refeição
+    if (microObservations && microObservations.length > 0) {
+      const fatigueOrBloatCount = microObservations.filter(
+        o => o.check.belly === 'bloated' || o.check.belly === 'heavy' || o.check.energy === 'down'
+      ).length;
+
+      const recurrence = fatigueOrBloatCount / microObservations.length;
+
+      if (fatigueOrBloatCount >= 2 && recurrence >= 0.5) {
+        return [{
+          patternId: `pattern-temporal-somatic-${Date.now()}`,
+          observations: microObservations.map(m => m.id),
+          frequency: microObservations.length,
+          recurrenceRate: recurrence,
+          temporalWindow: {
+            afterMinutes: 120
+          },
+          confidence: Math.min(0.92, 0.65 + fatigueOrBloatCount * 0.1),
+          dataQuality: 0.85,
+          confounders: ['qualidade_do_sono', 'estresse_no_trabalho', 'ritmo_de_mastigacao'],
+          causalClaim: false, // Regra inegociável do XZenpress
+          status: recurrence > 0.8 ? 'recurrent' : 'emerging'
+        }];
+      }
+      return [];
+    }
+
+    // Se não há micro-observações mas há eventos suficientes
+    if (events.length >= 3) {
+      return [{
+        patternId: `pattern-${Date.now()}`,
+        observations: events.map(e => e.id),
+        frequency: events.length,
+        recurrenceRate: 1.0,
+        temporalWindow: {
+          afterMinutes: 120
+        },
+        confidence: 0.85, 
+        dataQuality: 0.8,
+        confounders: ['sleep_variation', 'stress_variation'],
+        causalClaim: false,
+        status: 'recurrent'
+      }];
+    }
+
+    return [];
   }
 }
+

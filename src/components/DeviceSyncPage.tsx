@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Activity, Heart, Moon, RefreshCw, Sliders, Smartphone, Battery, Info, ShieldAlert, Cpu, Brain } from 'lucide-react';
+import { ArrowLeft, Activity, Heart, Moon, RefreshCw, Sliders, Smartphone, Battery, Info, ShieldAlert, Cpu, Brain, Bluetooth, Radio, Zap, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { useBLEHeartRate } from '../hooks/useBLEHeartRate';
 
 interface DeviceSyncPageProps {
   onPageChange: (page: string) => void;
@@ -22,16 +23,28 @@ interface Device {
     deepSleepMinutes: number;
     remSleepMinutes: number;
   };
+  isBle?: boolean;
 }
 
 export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) => {
   const [activeDeviceId, setActiveDeviceId] = useState<string>(() => {
-    return localStorage.getItem('active_device_id') || 'oura';
+    return localStorage.getItem('active_device_id') || 'polar';
   });
 
   const [devices, setDevices] = useState<Device[]>(() => {
-    const savedActiveId = localStorage.getItem('active_device_id') || 'oura';
+    const savedActiveId = localStorage.getItem('active_device_id') || 'polar';
     return [
+      {
+        id: 'polar',
+        name: 'Polar H10 / Cinta BLE',
+        brand: 'Bluetooth Low Energy (GATT)',
+        icon: '💓',
+        status: savedActiveId === 'polar' ? 'connected' : 'disconnected',
+        battery: 98,
+        syncTime: savedActiveId === 'polar' ? 'Ao vivo via BLE' : '-',
+        defaultMetrics: { vfc: 62, rhr: 58, deepSleepMinutes: 110, remSleepMinutes: 105 },
+        isBle: true
+      },
       {
         id: 'oura',
         name: 'Oura Ring Gen 3',
@@ -102,12 +115,67 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   const [freeSyncUsed, setFreeSyncUsed] = useState<boolean>(false);
   const [loadingPremiumCheck, setLoadingPremiumCheck] = useState<boolean>(true);
 
+  // Web Bluetooth hook for physical BLE chest straps (Polar H10 / Garmin HRM / Wahoo)
+  const {
+    status: bleStatus,
+    metrics: bleMetrics,
+    deviceName: bleDeviceName,
+    error: bleError,
+    isSupported: bleIsSupported,
+    connect: bleConnect,
+    disconnect: bleDisconnect,
+  } = useBLEHeartRate();
+
+  // Bi-directional synchronization: BLE -> devices state & active device
+  useEffect(() => {
+    setDevices(prev => prev.map(d => {
+      if (d.id === 'polar') {
+        const isConn = bleStatus === 'connected';
+        const isConnecting = bleStatus === 'connecting' || bleStatus === 'requesting';
+        return {
+          ...d,
+          status: isConn ? 'connected' : isConnecting ? 'connecting' : 'disconnected',
+          name: bleDeviceName || 'Polar H10 / Cinta BLE',
+          syncTime: isConn ? 'Ao vivo via BLE' : '-',
+          battery: isConn ? 98 : 0,
+        };
+      }
+      return d;
+    }));
+
+    if (bleStatus === 'connected') {
+      setActiveDeviceId('polar');
+    }
+  }, [bleStatus, bleDeviceName]);
+
+  // Push live BLE RMSSD & BPM into active telemetry state
+  useEffect(() => {
+    if (bleStatus === 'connected') {
+      if (bleMetrics.rmssd > 0) {
+        setVfcValue(bleMetrics.rmssd);
+      }
+      if (bleMetrics.bpm > 0) {
+        setRhrValue(bleMetrics.bpm);
+      }
+    }
+  }, [bleStatus, bleMetrics.rmssd, bleMetrics.bpm]);
+
   // For visual graph animation
   const [graphData, setGraphData] = useState<number[]>(Array.from({ length: 20 }, () => 50 + Math.random() * 20));
   const graphInterval = useRef<NodeJS.Timeout | null>(null);
 
   // Active device helper
-  const activeDevice = devices.find(d => d.id === activeDeviceId && d.status === 'connected');
+  const activeDevice = devices.find(d => d.id === activeDeviceId && d.status === 'connected') || (bleStatus === 'connected' ? {
+    id: 'polar',
+    name: bleDeviceName || 'Polar H10 (Cinta BLE)',
+    brand: 'Bluetooth Low Energy (GATT)',
+    icon: '💓',
+    status: 'connected' as const,
+    battery: 98,
+    syncTime: 'Ao vivo via BLE',
+    defaultMetrics: { vfc: bleMetrics.rmssd || 62, rhr: bleMetrics.bpm || 58, deepSleepMinutes: 110, remSleepMinutes: 105 },
+    isBle: true
+  } : undefined);
 
   // Dynamic recommendation based on Anamnese Profile elements
   const getRecommendedPoint = () => {
@@ -180,24 +248,30 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
     localStorage.setItem('wearable_sleep', `${h}h ${m}m`);
   }, [vfcValue, rhrValue, deepSleepMinutes, remSleepMinutes]);
 
-  // Live heart pulse representation
+  // Live heart pulse representation (tempo-synced when BLE is active)
   useEffect(() => {
+    const tickInterval = bleStatus === 'connected' && bleMetrics.bpm > 0
+      ? Math.max(300, Math.min(2000, Math.round(60000 / bleMetrics.bpm)))
+      : 1000;
+
     graphInterval.current = setInterval(() => {
       setGraphData(prev => {
         const next = [...prev.slice(1)];
         // Add variation centered around current VFC value
-        const target = isSimulating ? vfcValue : (activeDevice?.defaultMetrics.vfc || 55);
-        const randVariation = (Math.random() - 0.5) * 8;
+        const target = isSimulating
+          ? vfcValue
+          : (bleStatus === 'connected' && bleMetrics.rmssd > 0 ? bleMetrics.rmssd : (activeDevice?.defaultMetrics.vfc || 55));
+        const randVariation = (Math.random() - 0.5) * (bleStatus === 'connected' ? 4 : 8);
         const newPoint = Math.max(10, Math.min(100, target + randVariation));
         next.push(newPoint);
         return next;
       });
-    }, 1000);
+    }, tickInterval);
 
     return () => {
       if (graphInterval.current) clearInterval(graphInterval.current);
     };
-  }, [vfcValue, isSimulating, activeDeviceId, devices]);
+  }, [vfcValue, isSimulating, activeDeviceId, devices, bleStatus, bleMetrics.rmssd, bleMetrics.bpm]);
 
   // Trigger predictive alert when VFC drops below threshold (e.g. 35 ms)
   useEffect(() => {
@@ -288,7 +362,11 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
       // Save to Supabase if logged in
       if (user?.id && supabase) {
         try {
-          const deviceName = activeDevice ? activeDevice.name : 'Simulador Virtual';
+          const isBle = activeDeviceId === 'polar' || bleStatus === 'connected';
+          const deviceName = isBle
+            ? (bleDeviceName || 'Polar H10 BLE')
+            : (activeDevice ? activeDevice.name : 'Simulador Virtual');
+          const providerName = isBle ? 'web_bluetooth' : 'simulador';
           
           await supabase
             .from('xzen_user_telemetry')
@@ -300,7 +378,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
               wearable_deep_sleep_minutes: deepSleepMinutes,
               wearable_rem_sleep_minutes: remSleepMinutes,
               active_device_id: deviceName,
-              provider: 'simulador'
+              provider: providerName
             });
 
           await supabase
@@ -310,11 +388,11 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
               sync_status: 'active',
               last_sync_at: new Date().toISOString(),
               active_device_id: deviceName,
-              provider: 'simulador'
+              provider: providerName
             });
 
           setApiSyncStatus('active');
-          setApiProvider('simulador');
+          setApiProvider(providerName);
           setApiDeviceName(deviceName);
         } catch (err) {
           console.error('Erro ao sincronizar com banco de dados:', err);
@@ -343,6 +421,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
       setShowVitalWidget(false);
       setSelectedWidgetDevice('');
       const deviceNames: Record<string, string> = {
+        polar: 'Polar H10 / Cinta BLE',
         apple: 'Apple Watch',
         oura: 'Oura Ring',
         garmin: 'Garmin Connect',
@@ -355,6 +434,11 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   };
 
   const handleConnect = (id: string) => {
+    if (id === 'polar') {
+      bleConnect();
+      return;
+    }
+
     setDevices(prev => prev.map(d => d.id === id ? { ...d, status: 'connecting' } : d));
 
     setTimeout(() => {
@@ -377,6 +461,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
       
       // Update values to new device defaults directly on connection using static map to avoid stale closures
       const defaultMetricsMap: Record<string, { vfc: number, rhr: number, deepSleepMinutes: number, remSleepMinutes: number }> = {
+        polar: { vfc: 62, rhr: 58, deepSleepMinutes: 110, remSleepMinutes: 105 },
         oura: { vfc: 58, rhr: 54, deepSleepMinutes: 105, remSleepMinutes: 110 },
         apple: { vfc: 52, rhr: 62, deepSleepMinutes: 80, remSleepMinutes: 95 },
         garmin: { vfc: 66, rhr: 50, deepSleepMinutes: 135, remSleepMinutes: 120 },
@@ -394,6 +479,9 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
   };
 
   const handleDisconnect = (id: string) => {
+    if (id === 'polar') {
+      bleDisconnect();
+    }
     setDevices(prev => {
       const updated = prev.map(d => d.id === id ? { ...d, status: 'disconnected' as const, battery: 0, syncTime: '-' } : d);
       const remaining = updated.filter(d => d.status === 'connected');
@@ -706,12 +794,19 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
             <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl p-8 border border-slate-800/60 shadow-2xl relative overflow-hidden">
               <div className="absolute top-4 right-4 flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                <span className="text-xs text-slate-400 font-mono">Telemetria Ativa</span>
+                <span className="text-xs text-slate-400 font-mono">
+                  {bleStatus === 'connected' ? `BLE: ${bleDeviceName || 'Polar H10'}` : 'Telemetria Ativa'}
+                </span>
               </div>
 
               <h2 className="text-xl font-bold text-slate-200 mb-6 flex items-center gap-2">
                 <Activity className="w-5 h-5 text-cyan-400" />
                 Painel Biométrico em Tempo Real
+                {bleStatus === 'connected' && (
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono font-bold">
+                    ECG R-R AO VIVO
+                  </span>
+                )}
               </h2>
 
               {!activeDevice && (
@@ -719,7 +814,7 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                   <Activity className="w-12 h-12 text-slate-600 mx-auto mb-4 animate-pulse" />
                   <h3 className="font-semibold text-slate-400 mb-2">Nenhum dispositivo transmitindo</h3>
                   <p className="text-slate-500 text-sm max-w-md mx-auto px-4">
-                    Ative a sincronização de um dos seus wearables (Oura Ring, Apple Watch, Garmin ou Galaxy Watch) para monitorar seus sinais vitais em tempo real.
+                    Conecte sua cinta Polar H10 via Bluetooth direto ou ative um dos wearables abaixo para monitorar seus sinais vitais em tempo real.
                   </p>
                 </div>
               )}
@@ -803,7 +898,9 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                         <span className="text-[11px] text-slate-500">Representação gráfica do tónus vagal</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-xs font-mono font-bold text-cyan-400">Origem: {activeDevice.name}</span>
+                        <span className="text-xs font-mono font-bold text-cyan-400">
+                          Origem: {bleStatus === 'connected' ? `${bleDeviceName || 'Polar H10'} (ECG R-R Direto)` : (activeDevice?.name || 'Simulador')}
+                        </span>
                       </div>
                     </div>
                     
@@ -950,8 +1047,223 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
             </div>
           </div>
 
-          {/* Column 3: Connected Devices List */}
+          {/* Column 3: Hardware BLE Direct & Connected Devices List */}
           <div className="space-y-6">
+
+            {/* Featured Hardware BLE Direct Connection Card (Polar H10 / Garmin HRM / Wahoo) */}
+            <div className={`p-6 rounded-3xl border shadow-2xl relative overflow-hidden transition-all duration-500 ${
+              bleStatus === 'connected'
+                ? 'bg-gradient-to-br from-emerald-950/40 via-slate-900/90 to-cyan-950/40 border-emerald-500/40 shadow-emerald-950/20'
+                : 'bg-slate-900/60 backdrop-blur-xl border-slate-800/80 hover:border-cyan-500/30'
+            }`}>
+              {/* Ambient glowing accent */}
+              <div className={`absolute top-0 right-0 w-36 h-36 rounded-full blur-3xl pointer-events-none ${
+                bleStatus === 'connected' ? 'bg-emerald-500/15' : 'bg-cyan-500/10'
+              }`} />
+
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className={`p-2.5 rounded-xl border flex items-center justify-center transition-all ${
+                    bleStatus === 'connected'
+                      ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 animate-pulse'
+                      : 'bg-cyan-950/60 text-cyan-400 border-cyan-800/40'
+                  }`}>
+                    <Bluetooth className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-extrabold text-slate-100 flex items-center gap-1.5">
+                      Sensor Físico BLE
+                      {bleStatus === 'connected' && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono">
+                          ECG ATIVO
+                        </span>
+                      )}
+                    </h2>
+                    <p className="text-[11px] text-slate-400">Polar H10 / Garmin HRM / Wahoo</p>
+                  </div>
+                </div>
+
+                {/* Status badge */}
+                <div className="text-right">
+                  {bleStatus === 'connected' ? (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                      Conectado
+                    </span>
+                  ) : bleStatus === 'connecting' ? (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-2.5 py-1 rounded-full animate-pulse">
+                      <RefreshCw className="w-3 h-3 animate-spin" />
+                      Pareando...
+                    </span>
+                  ) : bleStatus === 'requesting' ? (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-400 bg-amber-950/60 border border-amber-500/30 px-2.5 py-1 rounded-full">
+                      Buscando...
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                      Web Bluetooth
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {bleStatus === 'connected' ? (
+                <div className="space-y-4">
+                  {/* Device Name Banner */}
+                  <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
+                      <span className="text-xs font-bold text-slate-200">{bleDeviceName || 'Cinta Cardíaca Bluetooth'}</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-500">GATT 0x180D / 0x2A37</span>
+                  </div>
+
+                  {/* Live Stream Telemetry: BPM + RMSSD */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Instant BPM */}
+                    <div className="bg-slate-950/70 border border-pink-500/20 rounded-2xl p-3.5 relative overflow-hidden">
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+                        <span className="font-semibold uppercase tracking-wider">Batimento</span>
+                        <Heart
+                          className="w-4 h-4 text-pink-500 animate-pulse"
+                          style={{
+                            animationDuration: bleMetrics.bpm > 0 ? `${(60 / bleMetrics.bpm).toFixed(2)}s` : '0.8s'
+                          }}
+                        />
+                      </div>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-3xl font-mono font-black text-slate-100">
+                          {bleMetrics.bpm || '--'}
+                        </span>
+                        <span className="text-xs font-semibold text-slate-500">bpm</span>
+                      </div>
+                      <p className="text-[10px] text-pink-400/80 mt-1 font-mono">Frequência instantânea</p>
+                    </div>
+
+                    {/* Live RMSSD */}
+                    <div className="bg-slate-950/70 border border-cyan-500/20 rounded-2xl p-3.5 relative overflow-hidden">
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+                        <span className="font-semibold uppercase tracking-wider">RMSSD (VFC)</span>
+                        <Activity className="w-4 h-4 text-cyan-400" />
+                      </div>
+                      <div className="flex items-baseline gap-1">
+                        <span className={`text-3xl font-mono font-black ${
+                          bleMetrics.rmssd >= 50
+                            ? 'text-emerald-400'
+                            : bleMetrics.rmssd >= 35
+                            ? 'text-amber-400'
+                            : 'text-red-400'
+                        }`}>
+                          {bleMetrics.rmssd || '--'}
+                        </span>
+                        <span className="text-xs font-semibold text-slate-500">ms</span>
+                      </div>
+                      <p className="text-[10px] text-cyan-400/80 mt-1 font-mono">Tônus parassimpático</p>
+                    </div>
+                  </div>
+
+                  {/* R-R Intervals Stream Pills */}
+                  <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3.5">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400">
+                        Intervalos R-R Brutos (Arritmia Sinusal)
+                      </span>
+                      <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                        {bleMetrics.sampleCount} amostras
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none">
+                      {bleMetrics.rrIntervals.length > 0 ? (
+                        bleMetrics.rrIntervals.slice(-7).map((rr, idx) => (
+                          <span
+                            key={idx}
+                            className="px-2 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[10px] font-mono text-cyan-300 font-bold shrink-0 animate-fade-in"
+                          >
+                            {rr}ms
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-[11px] text-slate-500 italic">Aguardando primeiros intervalos R-R...</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Disconnect and Sync Actions */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSync}
+                      disabled={syncStatus === 'syncing'}
+                      className="flex-1 py-2.5 px-3 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <Zap className="w-3.5 h-3.5 fill-current" />
+                      <span>Gravar no Perfil</span>
+                    </button>
+                    <button
+                      onClick={bleDisconnect}
+                      className="py-2.5 px-4 bg-slate-900 hover:bg-red-950/40 text-slate-400 hover:text-red-400 border border-slate-800 hover:border-red-500/30 rounded-xl text-xs font-semibold transition-all"
+                    >
+                      Desconectar
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Conecte diretamente sua cinta cardíaca via Bluetooth Low Energy padrão (GATT 0x180D). Mede intervalos R-R milissegundo a milissegundo com precisão clínica de eletrocardiograma.
+                  </p>
+
+                  {/* Sensor tags */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Polar H10 (Padrão-Ouro)', 'Polar H9', 'Garmin HRM-Pro', 'Wahoo TICKR'].map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-slate-950/60 border border-slate-800 text-slate-400"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  {bleError && (
+                    <div className="p-3 bg-red-950/40 border border-red-500/30 rounded-xl text-red-400 text-xs flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 shrink-0" />
+                      <span>{bleError}</span>
+                    </div>
+                  )}
+
+                  {!bleIsSupported ? (
+                    <div className="p-3.5 bg-amber-950/40 border border-amber-500/30 rounded-xl text-amber-300 text-xs leading-relaxed space-y-1">
+                      <p className="font-semibold flex items-center gap-1.5">
+                        <Info className="w-3.5 h-3.5" />
+                        Navegador Incompatível com Web Bluetooth
+                      </p>
+                      <p className="text-[11px] text-amber-300/80">
+                        A Web Bluetooth API é suportada nativamente no <strong>Google Chrome, Edge e Brave</strong> (Windows, Mac, Linux e Android). No Safari/iOS (iPhone/iPad), a Apple bloqueia conexões Bluetooth no browser.
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={bleConnect}
+                      disabled={bleStatus === 'requesting' || bleStatus === 'connecting'}
+                      className="w-full py-3.5 px-4 bg-gradient-to-r from-cyan-500 via-teal-400 to-indigo-500 hover:from-cyan-400 hover:via-teal-300 hover:to-indigo-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shadow-cyan-950/30 transition-all duration-200 transform hover:scale-[1.01] flex items-center justify-center gap-2"
+                    >
+                      {bleStatus === 'requesting' || bleStatus === 'connecting' ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          <span>Aguardando Pareamento BLE...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Bluetooth className="w-4 h-4" />
+                          <span>Conectar Cinta Polar / BLE ao Vivo</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
             <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-6 shadow-2xl">
               <h2 className="text-lg font-bold text-slate-200 mb-6 flex items-center gap-2">
                 <Smartphone className="w-5 h-5 text-indigo-400" />
@@ -964,7 +1276,17 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                   return (
                     <div
                       key={device.id}
-                      onClick={() => device.status === 'connected' && setActiveDeviceId(device.id)}
+                      onClick={() => {
+                        if (device.id === 'polar') {
+                          if (bleStatus !== 'connected') {
+                            bleConnect();
+                          } else {
+                            setActiveDeviceId('polar');
+                          }
+                        } else if (device.status === 'connected') {
+                          setActiveDeviceId(device.id);
+                        }
+                      }}
                       className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer ${
                         isSelected && device.status === 'connected'
                           ? 'bg-gradient-to-br from-indigo-950/40 to-slate-900/60 border-indigo-500/40 shadow-lg shadow-indigo-950/20'
@@ -975,7 +1297,14 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                         <div className="flex gap-3">
                           <span className="text-2xl p-2 bg-slate-900 rounded-xl border border-slate-800">{device.icon}</span>
                           <div>
-                            <h3 className="font-bold text-slate-200 text-sm">{device.name}</h3>
+                            <h3 className="font-bold text-slate-200 text-sm flex items-center gap-1.5">
+                              {device.name}
+                              {device.isBle && (
+                                <span className="text-[9px] px-1.5 py-0.2 bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded font-mono">
+                                  BLE
+                                </span>
+                              )}
+                            </h3>
                             <span className="text-[10px] text-slate-400 uppercase tracking-widest">{device.brand}</span>
                           </div>
                         </div>
@@ -1026,8 +1355,9 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                               e.stopPropagation();
                               handleConnect(device.id);
                             }}
-                            className="py-1 px-3 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs rounded-lg transition-colors"
+                            className="py-1 px-3 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs rounded-lg transition-colors flex items-center gap-1"
                           >
+                            {device.id === 'polar' && <Bluetooth className="w-3 h-3" />}
                             Parear
                           </button>
                         )}

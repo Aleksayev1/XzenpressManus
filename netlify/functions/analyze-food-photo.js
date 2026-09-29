@@ -94,7 +94,55 @@ exports.handler = async (event) => {
         }
     }
 
-    // 2. Fallback resiliente
+    // 2. Tentar Gemini Flash com Visão Computacional (Rápido e Resiliente)
+    const activeGeminiKey = GEMINI_KEY || 'AIzaSyAkfijNGilGIuDeA2ROp2ad1mAjHa0Ler4';
+    if (activeGeminiKey) {
+        try {
+            console.log('[Nutriming Vision] Analisando foto com Gemini Flash Vision...');
+            const base64Data = dataUri.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
+            const mimeType = dataUri.match(/^data:(image\/[a-zA-Z]+);base64,/)?.[1] || 'image/jpeg';
+
+            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${activeGeminiKey}`;
+            const geminiRes = await fetch(geminiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { text: 'Você é um especialista em reconhecimento de alimentos e rótulos nutricionais do Nutriming Zen. Identifique os alimentos ou o produto/rótulo embalado nesta foto. Retorne EXCLUSIVAMENTE um JSON no formato: {"foods": ["Nome do Alimento 1", "Alimento 2"]}. Priorize o nome do produto específico se for embalagem/rótulo ou itens da refeição.' },
+                            { inline_data: { mime_type: mimeType, data: base64Data } }
+                        ]
+                    }],
+                    generationConfig: {
+                        temperature: 0.2,
+                        maxOutputTokens: 250,
+                        responseMimeType: 'application/json',
+                        thinkingConfig: { thinkingBudget: 0 }
+                    }
+                })
+            });
+
+            if (geminiRes.ok) {
+                const data = await geminiRes.json();
+                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                const parsed = JSON.parse(text);
+                if (Array.isArray(parsed.foods) && parsed.foods.length > 0) {
+                    console.log('✅ [Nutriming Vision] Alimentos identificados com Gemini:', parsed.foods);
+                    return {
+                        statusCode: 200,
+                        headers,
+                        body: JSON.stringify({ foods: parsed.foods })
+                    };
+                }
+            } else {
+                console.warn('[Nutriming Vision] Gemini retornou status:', geminiRes.status);
+            }
+        } catch (err) {
+            console.warn('[Nutriming Vision] Erro na requisição Gemini:', err.message);
+        }
+    }
+
+    // 3. Fallback resiliente
     return {
         statusCode: 200,
         headers,

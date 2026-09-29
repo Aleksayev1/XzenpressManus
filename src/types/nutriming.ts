@@ -188,8 +188,8 @@ export interface FoodProduct {
   };
 
   warnings: {
-    type: 'allergen' | 'restriction' | 'missing_data' | 'high_sodium' | 'high_sugar' | 'ultraprocessed';
-    severity: 'info' | 'caution' | 'critical';
+    type: 'allergen' | 'restriction' | 'missing_data' | 'high_sodium' | 'high_sugar' | 'ultraprocessed' | 'adulteration_suspect' | 'adulteration_confirmed';
+    severity: 'info' | 'caution' | 'critical' | 'danger';
     message: string;
   }[];
 }

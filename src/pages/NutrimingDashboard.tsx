@@ -380,6 +380,7 @@ export const NutrimingDashboard: React.FC<NutrimingDashboardProps> = ({ onBack, 
                 Controle de ruído metabólico e digestivo sobre a assimetria térmica cutânea (&Delta;T) e VFC (RMSSD).
               </p>
           </div>
+          </div>
         </main>
         )}
       </div>

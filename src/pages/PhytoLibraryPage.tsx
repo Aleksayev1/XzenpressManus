@@ -223,125 +223,158 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
     }, []);
 
     // Helper para cruzar texto do Oráculo com dados reais dos pontos estáticos
-    const getMatchingPoint = (pointStr: string) => {
+    const getMatchingPoint = (pointStr: string, domain: 'ynsa' | 'mtc' = 'ynsa') => {
         if (!pointStr) return undefined;
         const cleanStr = pointStr.toLowerCase();
-        
-        // 1. CASOS ESPECIAIS DE CORRESPONDÊNCIA YNSA
-        // Ponto ZS (Mestre Hormonal Feminino)
-        if (cleanStr.includes('zs') || cleanStr.includes('zeise') || cleanStr.includes('suess')) {
-            return acupressurePoints.find(p => p.id === 'ynsa-zs-point' || p.id === 'hormonal-feminino-zs');
-        }
-        
-        // Cérebro / Cerebrum (M1)
-        if (cleanStr.includes('cérebro') || cleanStr.includes('cerebro') || cleanStr.includes('cerebrum') || cleanStr.includes('brain-m1') || cleanStr.includes('m1')) {
-            const matched = acupressurePoints.find(p => p.id === 'ynsa-brain-m1');
-            if (matched) return matched;
+
+        // 0. SEGREGAÇÃO ESTRITA DE DOMÍNIO
+        // Garante que YNSA NUNCA receba pontos de meridianos corporais (braço/perna/etc.)
+        // e que MTC só busque pontos de meridianos chineses
+        const candidatePoints = acupressurePoints.filter(p => {
+            const isYnsaOrCranio = p.category === 'ynsa' || p.category === 'cranio' || 
+                                   p.id.startsWith('ynsa-') || p.id.startsWith('cranio-');
+            return domain === 'ynsa' ? isYnsaOrCranio : !isYnsaOrCranio;
+        });
+
+        // 1. MAPEAMENTO ESPECÍFICO DE YNSA (ÓRGÃOS CRANIANOS & YPSILON)
+        if (domain === 'ynsa' || cleanStr.includes('ynsa') || cleanStr.includes('yamamoto') || cleanStr.includes('craniopuntura')) {
+            // Ponto ZS (Mestre Hormonal Feminino)
+            if (cleanStr.includes('zs') || cleanStr.includes('zeise') || cleanStr.includes('suess')) {
+                return candidatePoints.find(p => p.id === 'ynsa-zs-point' || p.id === 'hormonal-feminino-zs');
+            }
+
+            // Baço / Pâncreas
+            if (cleanStr.includes('baço') || cleanStr.includes('baco') || cleanStr.includes('spleen')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-zf-baco' || p.id === 'ynsa-baco');
+                if (matched) return matched;
+            }
+
+            // Estômago
+            if (cleanStr.includes('estômago') || cleanStr.includes('estomago') || cleanStr.includes('stomach')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-zf-estomago' || p.id === 'ynsa-ypsilon-stomach');
+                if (matched) return matched;
+            }
+
+            // Intestino Delgado
+            if (cleanStr.includes('delgado') || cleanStr.includes('small intestine')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-zf-intestino-delgado' || p.id === 'ynsa-ypsilon-si');
+                if (matched) return matched;
+            }
+
+            // Intestino Grosso (YNSA Craniano)
+            if (cleanStr.includes('grosso') || cleanStr.includes('large intestine')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-zf-intestino-grosso');
+                if (matched) return matched;
+            }
+
+            // Fígado
+            if (cleanStr.includes('fígado') || cleanStr.includes('figado') || cleanStr.includes('liver')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-zf-figado' || p.id === 'ynsa-ypsilon-liver');
+                if (matched) return matched;
+            }
+
+            // Rim
+            if (cleanStr.includes('rim') || cleanStr.includes('kidney') || cleanStr.includes('y-1') || cleanStr.includes('y1')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-kidney-y1');
+                if (matched) return matched;
+            }
+
+            // Pulmão
+            if (cleanStr.includes('pulmão') || cleanStr.includes('pulmao') || cleanStr.includes('lung') || cleanStr.includes('y-2') || cleanStr.includes('y2')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-ypsilon-lung');
+                if (matched) return matched;
+            }
+
+            // Pericárdio
+            if (cleanStr.includes('pericárdio') || cleanStr.includes('pericardio') || cleanStr.includes('circulação') || cleanStr.includes('circulacao') || cleanStr.includes('y-3') || cleanStr.includes('y3')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-zf-pericardio' || p.id === 'ynsa-ypsilon-pericardium');
+                if (matched) return matched;
+            }
+
+            // Coração
+            if (cleanStr.includes('coração') || cleanStr.includes('coracao') || cleanStr.includes('heart') || cleanStr.includes('cardio')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-zf-coracao' || p.id === 'ynsa-cardio-heart');
+                if (matched) return matched;
+            }
+
+            // Vesícula Biliar
+            if (cleanStr.includes('vesícula') || cleanStr.includes('vesicula') || cleanStr.includes('gallbladder') || cleanStr.includes('biliar')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-zf-vesicula' || p.id === 'ynsa-gb');
+                if (matched) return matched;
+            }
+
+            // Bexiga
+            if (cleanStr.includes('bexiga') || cleanStr.includes('bladder')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-zf-bexiga');
+                if (matched) return matched;
+            }
+
+            // Triplo Aquecedor
+            if (cleanStr.includes('triplo') || cleanStr.includes('aquecedor') || cleanStr.includes('san jiao')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-zf-triplo-aquecedor');
+                if (matched) return matched;
+            }
+
+            // Cérebro / Gânglios Basais (M1)
+            if (cleanStr.includes('cérebro') || cleanStr.includes('cerebro') || cleanStr.includes('cerebrum') || cleanStr.includes('brain') || cleanStr.includes('m1') || cleanStr.includes('gânglios') || cleanStr.includes('ganglios')) {
+                const matched = candidatePoints.find(p => p.id === 'ynsa-brain-m1');
+                if (matched) return matched;
+            }
+
+            // Pontos Básicos YNSA (A a K)
+            const matchBasic = cleanStr.match(/\b(?:ponto|grupo|ynsa|yamamoto)\s+([a-k])\b|\b([a-k])\s+(?:ynsa|yamamoto|ponto)\b/i);
+            if (matchBasic) {
+                const letter = (matchBasic[1] || matchBasic[2]).toLowerCase();
+                const matched = candidatePoints.find(p => p.id === `ynsa-${letter}` || p.id === `ynsa-ponto-${letter}`);
+                if (matched) return matched;
+            }
         }
 
-        // Ponto Ypsilon do Rim (Y-1 / Ypsilon 1)
-        if (cleanStr.includes('y-1') || cleanStr.includes('y1') || (cleanStr.includes('ypsilon') && cleanStr.includes('rim'))) {
-            const matched = acupressurePoints.find(p => p.id === 'ynsa-kidney-y1');
-            if (matched) return matched;
+        // 2. REGRA DE INTERCEPTAÇÃO DE PONTOS MTC MAIS PRESCRITOS
+        if (domain === 'mtc') {
+            if (cleanStr.includes('b23') || cleanStr.includes('bl23') || cleanStr.includes('b-23') || cleanStr.includes('bl-23') || cleanStr.includes('shenshu')) {
+                const matched = candidatePoints.find(p => p.id === 'bl23');
+                if (matched) return matched;
+            }
+            if (cleanStr.includes('ig4') || cleanStr.includes('li4') || cleanStr.includes('ig-4') || cleanStr.includes('li-4') || cleanStr.includes('hegu')) {
+                const matched = candidatePoints.find(p => p.id === 'septicemia-hegu-li4' || p.id === 'li4-hegu');
+                if (matched) return matched;
+            }
+            if (cleanStr.includes('bp6') || cleanStr.includes('sp6') || cleanStr.includes('bp-6') || cleanStr.includes('sp-6') || cleanStr.includes('sanyinjiao')) {
+                const matched = candidatePoints.find(p => p.id === 'sp6-sanyinjiao' || p.id === 'bp6-sanyinjiao');
+                if (matched) return matched;
+            }
+            if (cleanStr.includes('bp9') || cleanStr.includes('sp9') || cleanStr.includes('bp-9') || cleanStr.includes('sp-9') || cleanStr.includes('yinlingquan') || cleanStr.includes('yin ling quan')) {
+                const matched = candidatePoints.find(p => p.id === 'sp9-yinlingquan');
+                if (matched) return matched;
+            }
+            if (cleanStr.includes('e36') || cleanStr.includes('st36') || cleanStr.includes('e-36') || cleanStr.includes('st-36') || cleanStr.includes('zusanli')) {
+                const matched = candidatePoints.find(p => p.id === 'septicemia-zusanli-st36');
+                if (matched) return matched;
+            }
+            if (cleanStr.includes('r3') || cleanStr.includes('kd3') || cleanStr.includes('r-3') || cleanStr.includes('kd-3') || cleanStr.includes('taixi')) {
+                const matched = candidatePoints.find(p => p.id === 'kd3' || p.id === 'septicemia-taixi-kd3' || p.id.includes('kd3'));
+                if (matched) return matched;
+            }
+            if (cleanStr.includes('pc6') || cleanStr.includes('neiguan') || cleanStr.includes('neiguan-pc6')) {
+                const matched = candidatePoints.find(p => p.id === 'neiguan-pc6');
+                if (matched) return matched;
+            }
+            if (cleanStr.includes('f3') || cleanStr.includes('lv3') || cleanStr.includes('lr3') || cleanStr.includes('taichong')) {
+                const matched = candidatePoints.find(p => p.id === 'lv3-taichong');
+                if (matched) return matched;
+            }
+            if (cleanStr.includes('vb41') || cleanStr.includes('gb41') || cleanStr.includes('vb-41') || cleanStr.includes('gb-41') || cleanStr.includes('zulinqi') || cleanStr.includes('zu lin qi')) {
+                const matched = candidatePoints.find(p => p.id === 'gb41-zulinqi' || p.id === 'zoster-zulinqi-gb41');
+                if (matched) return matched;
+            }
         }
 
-        // Ponto Ypsilon do Pulmão (Y-2 / Ypsilon 2)
-        if (cleanStr.includes('y-2') || cleanStr.includes('y2') || (cleanStr.includes('ypsilon') && (cleanStr.includes('pulmão') || cleanStr.includes('pulmao')))) {
-            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-lung');
-            if (matched) return matched;
-        }
-
-        // Ponto Ypsilon do Pericárdio (Y-3 / Ypsilon 3 / Pericardium)
-        if (cleanStr.includes('y-3') || cleanStr.includes('y3') || (cleanStr.includes('ypsilon') && (cleanStr.includes('pericárdio') || cleanStr.includes('pericardio') || cleanStr.includes('circulação') || cleanStr.includes('circulacao')))) {
-            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-pericardium');
-            if (matched) return matched;
-        }
-
-        // Ponto Ypsilon do Coração (Y-4 / Ypsilon 4 / Heart / Coração)
-        if ((cleanStr.includes('y-4') || cleanStr.includes('y4') || cleanStr.includes('ypsilon')) && (cleanStr.includes('coração') || cleanStr.includes('coracao'))) {
-            const matched = acupressurePoints.find(p => p.id === 'ynsa-cardio-heart');
-            if (matched) return matched;
-        }
-
-        // Ponto Ypsilon do Estômago (Y-4 / Ypsilon 4 / Stomach)
-        if ((cleanStr.includes('y-4') || cleanStr.includes('y4') || cleanStr.includes('ypsilon')) && (cleanStr.includes('estômago') || cleanStr.includes('estomago'))) {
-            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-stomach');
-            if (matched) return matched;
-        }
-
-        // Ponto Ypsilon do Intestino Delgado (Y-5 / Ypsilon 5 / Small Intestine / SI)
-        if (cleanStr.includes('y-5') || cleanStr.includes('y5') || (cleanStr.includes('ypsilon') && (cleanStr.includes('delgado') || cleanStr.includes('intestino delgado')))) {
-            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-si');
-            if (matched) return matched;
-        }
-
-        // Ponto Ypsilon do Fígado (Liver / Fígado)
-        if (cleanStr.includes('ypsilon') && (cleanStr.includes('fígado') || cleanStr.includes('figado') || cleanStr.includes('liver'))) {
-            const matched = acupressurePoints.find(p => p.id === 'ynsa-ypsilon-liver');
-            if (matched) return matched;
-        }
-
-        // Ponto Ypsilon da Vesícula Biliar (Gallbladder / Vesícula Biliar)
-        if (cleanStr.includes('ypsilon') && (cleanStr.includes('vesícula') || cleanStr.includes('vesicula') || cleanStr.includes('biliar') || cleanStr.includes('gallbladder'))) {
-            const matched = acupressurePoints.find(p => p.id === 'ynsa-gb');
-            if (matched) return matched;
-        }
-
-        // 2. REGRA DE INTERCEPTAÇÃO DE PONTOS BÁSICOS YNSA (A a K)
-        // Evita falsos positivos com a palavra "ponto" ou letras soltas nas preposições (como "de", "do").
-        // Captura padrões como: "Ponto D (Lombar)", "Ponto A", "Grupo D YNSA", "Yamamoto Ponto B"
-        const matchBasic = cleanStr.match(/\b(?:ponto|grupo|ynsa|yamamoto)\s+([a-k])\b|\b([a-k])\s+(?:ynsa|yamamoto|ponto)\b/i);
-        if (matchBasic) {
-            const letter = (matchBasic[1] || matchBasic[2]).toLowerCase();
-            const matched = acupressurePoints.find(p => p.id === `ynsa-${letter}` || p.id === `ynsa-ponto-${letter}`);
-            if (matched) return matched;
-        }
-
-        // 3. REGRA DE INTERCEPTAÇÃO DE PONTOS MTC MAIS PRESCRITOS
-        // Evita colisões no loop genérico de termos
-        if (cleanStr.includes('b23') || cleanStr.includes('bl23') || cleanStr.includes('b-23') || cleanStr.includes('bl-23') || cleanStr.includes('shenshu')) {
-            const matched = acupressurePoints.find(p => p.id === 'bl23');
-            if (matched) return matched;
-        }
-        if (cleanStr.includes('ig4') || cleanStr.includes('li4') || cleanStr.includes('ig-4') || cleanStr.includes('li-4') || cleanStr.includes('hegu')) {
-            const matched = acupressurePoints.find(p => p.id === 'septicemia-hegu-li4');
-            if (matched) return matched;
-        }
-        if (cleanStr.includes('bp6') || cleanStr.includes('sp6') || cleanStr.includes('bp-6') || cleanStr.includes('sp-6') || cleanStr.includes('sanyinjiao')) {
-            const matched = acupressurePoints.find(p => p.id === 'sp6-sanyinjiao');
-            if (matched) return matched;
-        }
-        if (cleanStr.includes('bp9') || cleanStr.includes('sp9') || cleanStr.includes('bp-9') || cleanStr.includes('sp-9') || cleanStr.includes('yinlingquan') || cleanStr.includes('yin ling quan')) {
-            const matched = acupressurePoints.find(p => p.id === 'sp9-yinlingquan');
-            if (matched) return matched;
-        }
-        if (cleanStr.includes('e36') || cleanStr.includes('st36') || cleanStr.includes('e-36') || cleanStr.includes('st-36') || cleanStr.includes('zusanli')) {
-            const matched = acupressurePoints.find(p => p.id === 'septicemia-zusanli-st36');
-            if (matched) return matched;
-        }
-        if (cleanStr.includes('r3') || cleanStr.includes('kd3') || cleanStr.includes('r-3') || cleanStr.includes('kd-3') || cleanStr.includes('taixi')) {
-            const matched = acupressurePoints.find(p => p.id === 'kd3' || p.id === 'septicemia-taixi-kd3' || p.id.includes('kd3'));
-            if (matched) return matched;
-        }
-        if (cleanStr.includes('pc6') || cleanStr.includes('neiguan') || cleanStr.includes('neiguan-pc6')) {
-            const matched = acupressurePoints.find(p => p.id === 'neiguan-pc6');
-            if (matched) return matched;
-        }
-        if (cleanStr.includes('f3') || cleanStr.includes('lv3') || cleanStr.includes('lr3') || cleanStr.includes('taichong')) {
-            const matched = acupressurePoints.find(p => p.id === 'lv3-taichong');
-            if (matched) return matched;
-        }
-        if (cleanStr.includes('vb41') || cleanStr.includes('gb41') || cleanStr.includes('vb-41') || cleanStr.includes('gb-41') || cleanStr.includes('zulinqi') || cleanStr.includes('zu lin qi')) {
-            const matched = acupressurePoints.find(p => p.id === 'gb41-zulinqi' || p.id === 'zoster-zulinqi-gb41');
-            if (matched) return matched;
-        }
-
-        // 4. CORRESPONDÊNCIA POR ID EXATO OU EQUIVALÊNCIAS
-        for (const point of acupressurePoints) {
+        // 3. CORRESPONDÊNCIA POR ID EXATO OU EQUIVALÊNCIAS
+        for (const point of candidatePoints) {
             const pid = point.id.toLowerCase();
             if (cleanStr.includes(pid)) return point;
-            
-            // Tratamento para prefixos de meridianos tradicionais em Português vs Inglês
+
             const pidMtc = pid
                 .replace('kd', 'r')
                 .replace('st', 'e')
@@ -351,24 +384,37 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                 .replace('cv', 'vc')
                 .replace('si', 'id')
                 .replace('gb', 'vb');
-            
+
             if (cleanStr.includes(pidMtc)) return point;
         }
-        
-        // 5. CORRESPONDÊNCIA FALLBACK POR TERMOS DO NOME
-        for (const point of acupressurePoints) {
-            const nameParts = point.name.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
-            for (const part of nameParts) {
-                // IGNORAR palavras genéricas/comuns que causam falsos positivos
-                if (['ponto', 'pontos', 'point', 'points', 'para', 'como', 'com', 'assentamento', 'ypsilon', 'ynsa', 'mtc', 'chinesa'].includes(part)) {
-                    continue;
-                }
-                if (part.length > 3 && cleanStr.includes(part)) {
+
+        // 4. CORRESPONDÊNCIA FALLBACK POR PALAVRAS COMPLETAS DO NOME (SEM FALSOS POSITIVOS)
+        const stopWords = new Set([
+            'ponto', 'pontos', 'point', 'points', 'para', 'como', 'com', 'assentamento', 
+            'ypsilon', 'ynsa', 'mtc', 'chinesa', 'bilateral', 'lateral', 'ambas', 'têmporas', 
+            'temporas', 'estimule', 'pressao', 'pressão', 'minutos', 'segundos', 'leve', 
+            'profunda', 'crânio', 'cranio', 'região', 'regiao'
+        ]);
+
+        for (const point of candidatePoints) {
+            const nameClean = point.name.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+            const words = nameClean.split(/\s+/);
+            for (const part of words) {
+                if (stopWords.has(part) || part.length <= 3) continue;
+                // Exige palavra completa exata (evita 'lateral' bater em 'bilateral')
+                const regex = new RegExp(`\\b${part}\\b`, 'i');
+                if (regex.test(cleanStr)) {
                     return point;
                 }
             }
         }
-        
+
+        // 5. FALLBACK SEGURO POR DOMÍNIO
+        // Se for YNSA e não achou ponto específico, retorna mapa craniano canônico YNSA
+        if (domain === 'ynsa') {
+            return candidatePoints.find(p => p.image && (p.image.includes('ynsa-cranial-organs-map.jpg') || p.id === 'ynsa-zf-baco')) || candidatePoints[0];
+        }
+
         return undefined;
     };
 
@@ -998,7 +1044,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                                         <h4 className="text-xs font-bold text-purple-300 mb-3 uppercase tracking-wide">Craniopuntura de Yamamoto (YNSA)</h4>
                                                         <div className="space-y-4">
                                                             {oracleResult.protocolo.pontosYNSA.map((p, idx) => {
-                                                                const matchedPoint = getMatchingPoint(p);
+                                                                const matchedPoint = getMatchingPoint(p, 'ynsa');
                                                                 return (
                                                                     <div key={idx} className="border-b border-slate-900/40 last:border-0 pb-3 last:pb-0">
                                                                         <div className="text-xs text-slate-300 leading-relaxed font-semibold mb-2">• {p}</div>
@@ -1036,7 +1082,7 @@ export const PhytoLibraryPage: React.FC<PhytoLibraryPageProps> = ({ onPageChange
                                                         <h4 className="text-xs font-bold text-orange-300 mb-3 uppercase tracking-wide">Meridianos da Medicina Tradicional Chinesa</h4>
                                                         <div className="space-y-4">
                                                             {oracleResult.protocolo.pontosMTC.map((p, idx) => {
-                                                                const matchedPoint = getMatchingPoint(p);
+                                                                const matchedPoint = getMatchingPoint(p, 'mtc');
                                                                 return (
                                                                     <div key={idx} className="border-b border-slate-900/40 last:border-0 pb-3 last:pb-0">
                                                                         <div className="text-xs text-slate-300 leading-relaxed font-semibold mb-2">• {p}</div>

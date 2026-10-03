@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Mic, Search, X, Loader2, Scan, Upload, RefreshCw, AlertCircle, Check, ArrowRight } from 'lucide-react';
+import { Camera, Mic, Search, X, Loader2, Scan, Upload, RefreshCw, AlertCircle, Check, ArrowRight, Sparkles, HelpCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { OpenFoodFactsService } from '../../services/nutriming/openFoodFactsService';
 
@@ -56,49 +56,49 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
   const [notFoundBarcode, setNotFoundBarcode] = useState<string | null>(null);
   const [fallbackFoodName, setFallbackFoodName] = useState('');
   const [isNativeBarcodeSupported, setIsNativeBarcodeSupported] = useState(true);
+  
+  // UX da Câmera (Item 3) e Fallback com IA (Item 2)
+  const [showCameraHelp, setShowCameraHelp] = useState(false);
+  const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
+  const [aiDetectedSuccess, setAiDetectedSuccess] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const isScanningActiveRef = useRef(true);
+  const fileInputBarcodeRef = useRef<HTMLInputElement | null>(null);
+  const fileInputPackageRef = useRef<HTMLInputElement | null>(null);
 
-  // Iniciar Câmera
-  useEffect(() => {
-    isScanningActiveRef.current = true;
-    let active = true;
-
-    async function initCamera() {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setCameraError('Câmera não suportada neste dispositivo. Digite o código de barras abaixo:');
-        return;
-      }
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: false
-        });
-
-        if (!active) {
-          stream.getTracks().forEach(t => t.stop());
-          return;
-        }
-
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.play().catch(() => {});
-        }
-        setHasCameraStream(true);
-      } catch (err: any) {
-        console.warn('[BarcodeScanner] Câmera não autorizada:', err);
-        setCameraError('Acesso à câmera bloqueado. Digite o código de barras no campo abaixo:');
-      }
+  // Iniciar Câmera Web Stream
+  const initCamera = async () => {
+    setCameraError(null);
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setCameraError('Câmera não suportada neste dispositivo. Digite o código de barras abaixo:');
+      return;
     }
 
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play().catch(() => {});
+      }
+      setHasCameraStream(true);
+    } catch (err: any) {
+      console.warn('[BarcodeScanner] Câmera não autorizada:', err);
+      setCameraError('Acesso à câmera bloqueado. Digite o código de barras no campo abaixo:');
+    }
+  };
+
+  useEffect(() => {
+    isScanningActiveRef.current = true;
     initCamera();
 
     return () => {
-      active = false;
       isScanningActiveRef.current = false;
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(t => t.stop());
@@ -106,7 +106,7 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
     };
   }, []);
 
-  // Loop de detecção contínua via BarcodeDetector nativo
+  // Loop de detecção contínua via BarcodeDetector nativo no vídeo
   useEffect(() => {
     if (!hasCameraStream) return;
     const BarcodeDetectorClass = (window as any).BarcodeDetector;
@@ -152,6 +152,7 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
     setIsQuerying(true);
     setStatusMessage(`Consultando produto ${code} no Open Food Facts...`);
     setNotFoundBarcode(null);
+    setAiDetectedSuccess(null);
 
     try {
       const product = await OpenFoodFactsService.getProductByBarcode(code);
@@ -180,6 +181,152 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
     }
   };
 
+  // Capturar foto com câmera nativa do celular (leitura de barras ou identificação visual)
+  const handleBarcodePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsQuerying(true);
+    setStatusMessage('Lendo imagem da câmera...');
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = ev.target?.result as string;
+      if (!result) {
+        setIsQuerying(false);
+        return;
+      }
+
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 1200;
+        let targetW = img.width;
+        let targetH = img.height;
+        if (img.width > maxDim || img.height > maxDim) {
+          if (img.width > img.height) {
+            targetW = maxDim;
+            targetH = Math.round((img.height * maxDim) / img.width);
+          } else {
+            targetH = maxDim;
+            targetW = Math.round((img.width * maxDim) / img.height);
+          }
+        }
+        canvas.width = targetW;
+        canvas.height = targetH;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+        }
+
+        // 1. Tentar detectar código de barras na foto estática usando BarcodeDetector nativo
+        const BarcodeDetectorClass = (window as any).BarcodeDetector;
+        if (BarcodeDetectorClass) {
+          try {
+            const detector = new BarcodeDetectorClass({
+              formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'qr_code']
+            });
+            const barcodes = await detector.detect(canvas);
+            if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
+              const detected = barcodes[0].rawValue.trim();
+              setBarcodeInput(detected);
+              handleProcessBarcode(detected);
+              return;
+            }
+          } catch (e) {
+            console.warn('[BarcodeDetector] Falha na detecção da foto estática:', e);
+          }
+        }
+
+        // 2. Se não detectou linhas de barras com precisão, envia foto para IA Vision identificar o alimento/rótulo
+        setStatusMessage('Código não identificado no leitor. Analisando produto com IA...');
+        const compressed = canvas.toDataURL('image/jpeg', 0.85);
+        await callAiVisionForFood(compressed);
+        setIsQuerying(false);
+      };
+      img.src = result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Processar foto de embalagem/rótulo para identificar com IA (Item 2)
+  const handlePackagePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsAiAnalyzing(true);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = ev.target?.result as string;
+      if (!result) {
+        setIsAiAnalyzing(false);
+        return;
+      }
+
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 800;
+        let targetW = img.width;
+        let targetH = img.height;
+        if (img.width > maxDim || img.height > maxDim) {
+          if (img.width > img.height) {
+            targetW = maxDim;
+            targetH = Math.round((img.height * maxDim) / img.width);
+          } else {
+            targetH = maxDim;
+            targetW = Math.round((img.width * maxDim) / img.height);
+          }
+        }
+        canvas.width = targetW;
+        canvas.height = targetH;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+          const compressed = canvas.toDataURL('image/jpeg', 0.85);
+          await callAiVisionForFood(compressed, notFoundBarcode || undefined);
+        } else {
+          await callAiVisionForFood(result, notFoundBarcode || undefined);
+        }
+      };
+      img.src = result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const callAiVisionForFood = async (dataUri: string, barcode?: string) => {
+    setIsAiAnalyzing(true);
+    try {
+      const res = await fetch('/.netlify/functions/analyze-food-photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: dataUri, barcode })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.foods) && data.foods.length > 0) {
+          const detectedName = data.foods[0];
+          setFallbackFoodName(detectedName);
+          setAiDetectedSuccess(detectedName);
+          setIsAiAnalyzing(false);
+          // Se não havia código pendente e foi foto direta da câmera, avança para a confirmação
+          if (!notFoundBarcode && !barcode) {
+            setTimeout(() => onComplete([detectedName]), 700);
+          }
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('[Nutriming Vision Fallback] Erro:', err);
+    }
+
+    setIsAiAnalyzing(false);
+    if (!fallbackFoodName) {
+      setFallbackFoodName(`Alimento (EAN: ${barcode || notFoundBarcode || 'identificado'})`);
+    }
+  };
+
   const handleFallbackConfirm = (e: React.FormEvent) => {
     e.preventDefault();
     const finalName = fallbackFoodName.trim() || `Alimento (EAN: ${notFoundBarcode})`;
@@ -192,8 +339,26 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
 
   return (
     <div className="flex flex-col text-left">
-      {/* Topo: Câmera ou Viewfinder */}
-      <div className="relative h-64 bg-black overflow-hidden flex items-center justify-center">
+      {/* Inputs nativos invisíveis para captura pela câmera nativa do celular */}
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        ref={fileInputBarcodeRef}
+        onChange={handleBarcodePhotoCapture}
+        className="hidden"
+      />
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        ref={fileInputPackageRef}
+        onChange={handlePackagePhoto}
+        className="hidden"
+      />
+
+      {/* Topo: Câmera ao vivo ou Estado de Câmera Bloqueada com Auxílio */}
+      <div className="relative min-h-[260px] bg-black overflow-hidden flex items-center justify-center">
         {hasCameraStream ? (
           <video
             ref={videoRef}
@@ -203,27 +368,72 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
-          <div className="flex flex-col items-center justify-center p-6 text-center text-slate-400">
-            <Scan className="w-12 h-12 text-emerald-500/40 mb-2" />
-            <p className="text-xs">{cameraError || 'Iniciando câmera para leitura de código de barras...'}</p>
+          <div className="flex flex-col items-center justify-center p-5 text-center text-slate-300 w-full max-w-sm mx-auto z-10">
+            <Scan className="w-10 h-10 text-emerald-400 mb-2" />
+            <p className="text-xs text-amber-200/90 font-medium mb-2 leading-relaxed">
+              {cameraError || 'Iniciando câmera para leitura de código de barras...'}
+            </p>
+
+            {cameraError && (
+              <div className="flex flex-col items-center gap-2 w-full mt-1">
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => initCamera()}
+                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    Tentar Câmera Novamente
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => fileInputBarcodeRef.current?.click()}
+                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+                  >
+                    <Camera className="w-3.5 h-3.5 text-emerald-400" />
+                    Foto com Câmera Nativa
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowCameraHelp(!showCameraHelp)}
+                  className="text-[11px] text-emerald-400/90 hover:text-emerald-300 underline flex items-center gap-1 mt-1 transition-colors"
+                >
+                  <HelpCircle className="w-3.5 h-3.5" />
+                  {showCameraHelp ? 'Ocultar instruções' : 'Como desbloquear a câmera no Chrome?'}
+                </button>
+
+                {showCameraHelp && (
+                  <div className="mt-1 p-3 bg-black/90 border border-emerald-500/40 rounded-2xl text-left text-[11px] text-slate-200 space-y-1.5 shadow-xl backdrop-blur-md">
+                    <p className="font-semibold text-emerald-300">Liberar no Chrome do celular:</p>
+                    <p>1️⃣ Toque no ícone do cadeado 🔒 ou opções na barra de endereços (ao lado de <strong>xzenpress.com</strong>).</p>
+                    <p>2️⃣ Toque em <strong>Permissões</strong> &gt; <strong>Câmera</strong>.</p>
+                    <p>3️⃣ Mude para <strong>Permitir</strong> e toque no botão "Tentar Câmera Novamente" acima.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
         {/* Moldura do Scanner com cantos estilizados e laser */}
-        <div className="absolute inset-x-8 inset-y-10 border-2 border-emerald-500/60 rounded-2xl flex items-center justify-center pointer-events-none shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-          {/* Laser animado */}
-          <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent absolute animate-pulse shadow-[0_0_12px_#34d399]" />
-        </div>
+        {hasCameraStream && (
+          <div className="absolute inset-x-8 inset-y-10 border-2 border-emerald-500/60 rounded-2xl flex items-center justify-center pointer-events-none shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+            <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent absolute animate-pulse shadow-[0_0_12px_#34d399]" />
+          </div>
+        )}
 
         {/* Badge superior */}
-        <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-emerald-500/30 flex items-center gap-1.5 text-[11px] text-emerald-300">
+        <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-emerald-500/30 flex items-center gap-1.5 text-[11px] text-emerald-300 z-10">
           <Scan className="w-3.5 h-3.5" />
           <span>Aponte para o código de barras (EAN)</span>
         </div>
 
         {/* Notificação de compatibilidade visual */}
         {!isNativeBarcodeSupported && hasCameraStream && (
-          <div className="absolute bottom-2 inset-x-4 bg-black/80 backdrop-blur-md border border-amber-500/40 rounded-xl p-2 text-center text-[10px] text-amber-200">
+          <div className="absolute bottom-2 inset-x-4 bg-black/80 backdrop-blur-md border border-amber-500/40 rounded-xl p-2 text-center text-[10px] text-amber-200 z-10">
             <span>💡 Leitura visual automática indisponível neste navegador. Digite os dígitos do código abaixo:</span>
           </div>
         )}
@@ -237,8 +447,8 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
             <span className="text-sm font-medium">{statusMessage}</span>
           </div>
         ) : notFoundBarcode ? (
-          /* Quando código não consta na base OFF */
-          <form onSubmit={handleFallbackConfirm} className="space-y-3">
+          /* Quando código não consta na base OFF (Item 2 - Fallback Inteligente com IA) */
+          <div className="space-y-4">
             <div className="bg-amber-950/40 border border-amber-600/40 rounded-xl p-3 text-xs text-amber-200 flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0 text-amber-400" />
@@ -246,22 +456,65 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
               </div>
               <span className="text-[10px] text-amber-300/70 ml-6">✨ O XZenPress salvará este alimento para reconhecer este código de barras automaticamente nas próximas vezes.</span>
             </div>
-            <input
-              type="text"
-              autoFocus
-              value={fallbackFoodName}
-              onChange={e => setFallbackFoodName(e.target.value)}
-              placeholder="Ex: Iogurte Natural, Biscoito Integral..."
-              className="w-full bg-[#11241e] border border-emerald-900/50 rounded-xl p-3 text-emerald-50 placeholder:text-emerald-900/60 text-sm focus:outline-none focus:border-emerald-500/60"
-            />
-            <button
-              type="submit"
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-xl transition-colors shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2"
-            >
-              <Check className="w-4 h-4" />
-              Salvar e Continuar com este Alimento
-            </button>
-          </form>
+
+            {/* Painel de Identificação por Foto da Embalagem / IA Vision */}
+            <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-2xl p-3.5 flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-emerald-300 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  Identificar produto com IA (sem digitar):
+                </span>
+                {isAiAnalyzing && (
+                  <span className="text-[10px] text-emerald-400 flex items-center gap-1 animate-pulse">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Analisando rótulo...
+                  </span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                disabled={isAiAnalyzing}
+                onClick={() => fileInputPackageRef.current?.click()}
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white font-semibold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
+              >
+                <Camera className="w-4 h-4" />
+                📸 Fotografar Embalagem / Rótulo
+              </button>
+
+              {aiDetectedSuccess && (
+                <div className="text-[11px] text-emerald-200 bg-emerald-900/40 border border-emerald-500/40 rounded-xl p-2.5 flex items-center gap-2 animate-in fade-in">
+                  <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span>Identificado pela IA: <strong>{aiDetectedSuccess}</strong></span>
+                </div>
+              )}
+            </div>
+
+            {/* Formulário com campo de texto e confirmação */}
+            <form onSubmit={handleFallbackConfirm} className="space-y-3">
+              <div>
+                <label className="text-xs text-emerald-300/80 block mb-1 font-medium">
+                  Ou digite / confirme o nome do alimento:
+                </label>
+                <input
+                  type="text"
+                  autoFocus
+                  value={fallbackFoodName}
+                  onChange={e => setFallbackFoodName(e.target.value)}
+                  placeholder="Ex: Iogurte Natural, Biscoito Integral..."
+                  className="w-full bg-[#11241e] border border-emerald-900/50 rounded-xl p-3 text-emerald-50 placeholder:text-emerald-900/60 text-sm focus:outline-none focus:border-emerald-500/60"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isAiAnalyzing}
+                className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold text-sm rounded-xl transition-colors shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 active:scale-95"
+              >
+                <Check className="w-4 h-4" />
+                Salvar e Continuar com este Alimento
+              </button>
+            </form>
+          </div>
         ) : (
           /* Digitação manual alternativa */
           <form onSubmit={handleManualSubmit} className="space-y-3">
@@ -291,7 +544,6 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
     </div>
   );
 };
-
 /* ═══════════════════════════════════════════════════════════════
    1. BUSCA TEXTUAL DIRETA
    ═══════════════════════════════════════════════════════════════ */

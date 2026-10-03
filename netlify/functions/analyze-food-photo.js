@@ -19,9 +19,11 @@ exports.handler = async (event) => {
     }
 
     let image = '';
+    let barcode = '';
     try {
         const body = JSON.parse(event.body || '{}');
         image = body.image || '';
+        barcode = body.barcode ? String(body.barcode).trim() : '';
     } catch {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'JSON inválido' }) };
     }
@@ -60,7 +62,7 @@ exports.handler = async (event) => {
                     messages: [
                         {
                             role: 'system',
-                            content: 'Você é um especialista em reconhecimento alimentar do Nutriming Zen. Analise a imagem da refeição e extraia uma lista concisa dos alimentos identificados em português (máximo 4 a 6 itens). Responda EXCLUSIVAMENTE em formato JSON: { "foods": ["Alimento 1", "Alimento 2"] }'
+                            content: `Você é um especialista em reconhecimento de alimentos e rótulos do Nutriming Zen.${barcode ? ` O código de barras fornecido foi: ${barcode}.` : ''} Analise a imagem da refeição ou rótulo do produto e extraia o nome do alimento ou produto em português (máximo 1 a 4 itens). Responda EXCLUSIVAMENTE em formato JSON: { "foods": ["Nome do Alimento"] }`
                         },
                         {
                             role: 'user',
@@ -109,7 +111,7 @@ exports.handler = async (event) => {
                 body: JSON.stringify({
                     contents: [{
                         parts: [
-                            { text: 'Você é um especialista em reconhecimento de alimentos e rótulos nutricionais do Nutriming Zen. Identifique os alimentos ou o produto/rótulo embalado nesta foto. Retorne EXCLUSIVAMENTE um JSON no formato: {"foods": ["Nome do Alimento 1", "Alimento 2"]}. Priorize o nome do produto específico se for embalagem/rótulo ou itens da refeição.' },
+                            { text: `Você é um especialista em reconhecimento de alimentos e rótulos nutricionais do Nutriming Zen.${barcode ? ` O código de barras (EAN) lido foi: ${barcode}.` : ''} Identifique os alimentos ou o produto/rótulo embalado nesta foto. Retorne EXCLUSIVAMENTE um JSON no formato: {"foods": ["Nome do Alimento 1"]}. Priorize o nome comercial exato do produto se for embalagem ou rótulo.` },
                             { inline_data: { mime_type: mimeType, data: base64Data } }
                         ]
                     }],

@@ -77,6 +77,15 @@ export class OpenFoodFactsService {
           return parsed.product;
         }
       }
+      // Checar também catálogo personalizado do usuário (xzen_custom_user_barcodes)
+      const customListRaw = localStorage.getItem(CUSTOM_BARCODES_KEY);
+      if (customListRaw) {
+        const customList = JSON.parse(customListRaw);
+        if (customList[cleanBarcode]) {
+          const product = FoodNormalizer.createCustomOrAiProduct(cleanBarcode, customList[cleanBarcode]);
+          return product;
+        }
+      }
     } catch {
       // Ignora falhas de localStorage
     }

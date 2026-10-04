@@ -867,10 +867,11 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
         }),
       });
 
+      const contentType = response.headers.get('content-type') || '';
+
       if (!response.ok) {
         let errMessage = 'Serviço temporariamente indisponível no momento. Tente novamente em instantes.';
         try {
-          const contentType = response.headers.get('content-type') || '';
           if (contentType.includes('application/json')) {
             const errData = await response.json();
             errMessage = errData.error || errMessage;
@@ -879,6 +880,10 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
           // Response was not JSON (e.g., HTML 404/500)
         }
         throw new Error(errMessage);
+      }
+
+      if (!contentType.includes('application/json')) {
+        throw new Error('Serviço de IA temporariamente indisponível. Tente novamente em instantes.');
       }
 
       const data = await response.json();

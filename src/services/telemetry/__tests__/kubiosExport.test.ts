@@ -151,10 +151,11 @@ describe('kubiosExportService — Bateria Metrológica da Tarefa 2', () => {
     // Integridade bidirecional: os hashes no manifesto batem com os arquivos gerados
     expect(m.integrity.series_sha256).toBe(result.seriesSha256);
     expect(m.integrity.cleaned_sha256).toBe(result.cleanedSha256);
+    expect(m.integrity.import_instructions_pt).toContain('MILISSEGUNDOS (ms)');
 
     // Nomenclatura metrológica contém prefixo XZEN, data e shortId
-    expect(result.seriesFilename).toContain('XZEN_2026-10-03-22-00-00_12345678_rr_series.txt');
-    expect(result.cleanedFilename).toContain('XZEN_2026-10-03-22-00-00_12345678_rr_cleaned.txt');
+    expect(result.seriesFilename).toContain('XZEN_2026-10-03-22-00-00_12345678_rr_series_ms.txt');
+    expect(result.cleanedFilename).toContain('XZEN_2026-10-03-22-00-00_12345678_rr_cleaned_ms.txt');
     expect(result.manifestFilename).toContain('XZEN_2026-10-03-22-00-00_12345678_manifest.json');
   });
 });

@@ -8,8 +8,8 @@
  * 3. Camada C (Quality Metadata): Classificação de validade fisiológica (300–2000 ms) e status de contato.
  *    Regra de Ouro: contactStatus é metadado contextual e NUNCA exclusão automática de RR.
  * 4. Camada D (Exportação Dual e Canônica):
- *    - <session>_rr_series.txt: 100% da série bruta em ms, uma por linha (LF \n universal).
- *    - <session>_rr_cleaned.txt: série filtrada documentada (produto analítico secundário).
+ *    - <session>_rr_series_ms.txt: 100% da série bruta em ms, uma por linha (LF \n universal).
+ *    - <session>_rr_cleaned_ms.txt: série filtrada documentada (produto analítico secundário).
  *    - <session>_manifest.json: manifesto XZEN-RR-1.0 com SHA-256 determinístico dos bytes UTF-8.
  *
  * Invariante Metrológico: O exportador NUNCA altera, interpola ou reordena a aquisição.
@@ -56,6 +56,7 @@ export interface XzenRRManifest {
     canonical_format: 'utf8_single_column_ms_newline_separated';
     series_sha256: string;
     cleaned_sha256: string | null;
+    import_instructions_pt: string;
   };
   quality_summary: {
     total_raw_samples: number;
@@ -218,8 +219,8 @@ export async function exportKubiosSession(
   // Nomenclatura metrológica recomendada pelo ChatGPT e Grok:
   // prefixo XZEN + data ISO sanitizada + shortId + sufixo
   const datePrefix = startTime.slice(0, 19).replace(/[:T]/g, '-');
-  const seriesFilename = `XZEN_${datePrefix}_${safeIdShort}_rr_series.txt`;
-  const cleanedFilename = `XZEN_${datePrefix}_${safeIdShort}_rr_cleaned.txt`;
+  const seriesFilename = `XZEN_${datePrefix}_${safeIdShort}_rr_series_ms.txt`;
+  const cleanedFilename = `XZEN_${datePrefix}_${safeIdShort}_rr_cleaned_ms.txt`;
   const manifestFilename = `XZEN_${datePrefix}_${safeIdShort}_manifest.json`;
 
   // 6. Manifesto Criptográfico XZEN-RR-1.0
@@ -242,6 +243,8 @@ export async function exportKubiosSession(
       canonical_format: 'utf8_single_column_ms_newline_separated',
       series_sha256: seriesSha256,
       cleaned_sha256: cleanedSha256,
+      import_instructions_pt:
+        'Ao abrir este arquivo no Kubios HRV, use File > Open > Custom Type. Na caixa de diálogo de importação, defina manualmente a unidade da coluna como MILISSEGUNDOS (ms). O carregamento rápido/padrão do Kubios assume segundos por padrão (ex.: 0.812) e, se a unidade não for ajustada, o tacograma resultante estará incorreto por um fator de 1000.',
     },
     quality_summary: {
       total_raw_samples: orderedSamples.length,

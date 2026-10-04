@@ -43,47 +43,66 @@ export const ClinicalCorrelationModal: React.FC<ClinicalCorrelationModalProps> =
     const total = pairedSessions.length;
     const cleanBaselines = pairedSessions.filter(s => s.prandialStatus === 'fasting_baseline').length;
     const confounded = pairedSessions.filter(s => s.confounderLevel === 'critical_adulteration').length;
-    const avgReliability = total > 0
-      ? Math.round(pairedSessions.reduce((acc, s) => acc + s.thermalReliabilityScore, 0) / total)
-      : 100;
-    const avgDeltaRmssd = total > 0
-      ? Math.round((pairedSessions.reduce((acc, s) => acc + s.deltaRmssd, 0) / total) * 10) / 10
+    const syntheticCount = pairedSessions.filter(s => s.dataSource === 'synthetic_demo').length;
+    
+    const validDeltas = pairedSessions
+      .map(s => s.deltaRmssd)
+      .filter((d): d is number => d !== null);
+      
+    const avgDeltaRmssd = validDeltas.length > 0
+      ? Math.round((validDeltas.reduce((acc, d) => acc + d, 0) / validDeltas.length) * 10) / 10
       : 0;
 
-    return { total, cleanBaselines, confounded, avgReliability, avgDeltaRmssd };
+    return { total, cleanBaselines, confounded, syntheticCount, avgDeltaRmssd };
   }, [pairedSessions]);
 
   if (!isOpen) return null;
 
+  const isSyntheticBatch = pairedSessions.some(s => s.dataSource === 'synthetic_demo');
+
   const handleDownloadCSV = () => {
-    const csvData = ClinicalCorrelationService.exportToCSV(pairedSessions);
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `xzen_piloto_brioschi_termografia_vfc_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const csvData = ClinicalCorrelationService.exportToCSV(pairedSessions, { allowSynthetic: isSyntheticBatch });
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      const prefix = isSyntheticBatch ? 'DEMO_SINTETICO_' : '';
+      link.setAttribute('download', `${prefix}xzen_correlacao_prandial_vfc_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e: any) {
+      alert(e.message || 'Erro ao exportar CSV');
+    }
   };
 
   const handleDownloadJSON = () => {
-    const jsonData = ClinicalCorrelationService.exportToJSON(pairedSessions);
-    const blob = new Blob([jsonData], { type: 'application/json;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `xzen_piloto_brioschi_fair_data_${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const jsonData = ClinicalCorrelationService.exportToJSON(pairedSessions, { allowSynthetic: isSyntheticBatch });
+      const blob = new Blob([jsonData], { type: 'application/json;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      const prefix = isSyntheticBatch ? 'DEMO_SINTETICO_' : '';
+      link.setAttribute('download', `${prefix}xzen_correlacao_prandial_fair_data_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e: any) {
+      alert(e.message || 'Erro ao exportar JSON');
+    }
   };
 
   const handleCopyDossier = () => {
-    const dossierText = ClinicalCorrelationService.exportDossierReport(pairedSessions);
-    navigator.clipboard.writeText(dossierText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      const dossierText = ClinicalCorrelationService.exportDossierReport(pairedSessions, { allowSynthetic: isSyntheticBatch });
+      navigator.clipboard.writeText(dossierText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e: any) {
+      alert(e.message || 'Erro ao copiar parecer');
+    }
   };
 
   return (
@@ -94,7 +113,7 @@ export const ClinicalCorrelationModal: React.FC<ClinicalCorrelationModalProps> =
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         className="w-full max-w-4xl max-h-[92vh] bg-slate-900 border border-slate-700/60 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-100"
       >
-        {/* Header Científico */}
+        {/* Header Metrológico */}
         <div className="p-6 border-b border-slate-800 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950/40 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-400">
@@ -102,13 +121,19 @@ export const ClinicalCorrelationModal: React.FC<ClinicalCorrelationModalProps> =
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-white">Piloto Clínico Termografia N-of-1</h2>
-                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-mono font-semibold border border-indigo-500/30">
-                  Prof. Dr. Brioschi / ABRATERM
-                </span>
+                <h2 className="text-xl font-bold text-white">Correlação Prandial & Telemetria N-of-1</h2>
+                {isSyntheticBatch ? (
+                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-semibold border border-amber-500/30">
+                    DEMO SINTÉTICO
+                  </span>
+                ) : (
+                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-mono font-semibold border border-indigo-500/30">
+                    Protocolo Prandial N-of-1
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-400">
-                Cruzamento cronológico de refeições, alimentos adulterados e telemetria autonômica (RMSSD/VFC).
+                Cruzamento cronológico de refeições, qualidade do alimento e telemetria autonômica (RMSSD/VFC).
               </p>
             </div>
           </div>
@@ -125,19 +150,18 @@ export const ClinicalCorrelationModal: React.FC<ClinicalCorrelationModalProps> =
         <div className="px-6 py-3 bg-indigo-950/30 border-b border-indigo-900/30 text-xs text-indigo-200/90 flex items-start gap-2.5">
           <Sparkles className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
           <div>
-            <span className="font-bold text-indigo-300">Controle Estrito de Confounders:</span> A termografia médica cutânea (ΔT) e os intervalos R-R exigem estabilização metabólica. O Nutriming audita a janela digestiva e acusa alimentos adulterados para garantir integridade científica aos dados do estudo piloto.
+            <span className="font-bold text-indigo-300">Controle Estrito de Confounders:</span> A variabilidade cardíaca (RMSSD) é sensível à fase digestiva e à presença de aditivos industriais. O Nutriming audita a janela digestiva e sinaliza refeições adulteradas para registrar o contexto qualitativo de cada sessão.
           </div>
         </div>
 
         {/* Resumo Metrológico dos Dados */}
         <div className="p-6 bg-slate-950/60 border-b border-slate-800/60 grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col">
-            <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Confiabilidade Térmica</span>
+            <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Origem dos Dados</span>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className={`text-2xl font-black ${stats.avgReliability >= 85 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                {stats.avgReliability}%
+              <span className={`text-lg font-black ${isSyntheticBatch ? 'text-amber-400' : 'text-emerald-400'}`}>
+                {isSyntheticBatch ? 'Demonstração' : 'Observação Real'}
               </span>
-              <span className="text-[10px] text-slate-500">índice médio</span>
             </div>
           </div>
 
@@ -166,7 +190,9 @@ export const ClinicalCorrelationModal: React.FC<ClinicalCorrelationModalProps> =
           <div className="p-3 rounded-2xl bg-indigo-950/20 border border-indigo-900/30 flex flex-col">
             <span className="text-[11px] text-indigo-300 font-medium uppercase tracking-wider">Δ RMSSD Médio</span>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-2xl font-black text-indigo-400">+{stats.avgDeltaRmssd}</span>
+              <span className="text-2xl font-black text-indigo-400">
+                {stats.avgDeltaRmssd >= 0 ? '+' : ''}{stats.avgDeltaRmssd}
+              </span>
               <span className="text-[10px] text-indigo-400/60">ms ganho</span>
             </div>
           </div>
@@ -197,6 +223,11 @@ export const ClinicalCorrelationModal: React.FC<ClinicalCorrelationModalProps> =
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">
                         {session.sessionId.toUpperCase()}
                       </span>
+                      {session.dataSource === 'synthetic_demo' && (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          SINTÉTICO
+                        </span>
+                      )}
                       {isCritical && (
                         <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-600 text-white shadow-sm shadow-red-950">
                           <span className="relative flex h-2 w-2">
@@ -221,11 +252,15 @@ export const ClinicalCorrelationModal: React.FC<ClinicalCorrelationModalProps> =
                     </h4>
                   </div>
 
-                  {/* Score de Confiabilidade da Termografia */}
+                  {/* Nível de Confundidor Alimentar */}
                   <div className="text-right flex-shrink-0">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Confiabilidade IR</span>
-                    <span className={`text-xl font-black ${session.thermalReliabilityScore >= 85 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                      {session.thermalReliabilityScore}%
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Ruído Prandial</span>
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-lg ${
+                      isCritical ? 'bg-red-500/20 text-red-300 border border-red-500/30' :
+                      isModerate ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+                      'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    }`}>
+                      {isCritical ? 'Crítico (Adulterado)' : isModerate ? 'Moderado' : 'Neutro / Baixo'}
                     </span>
                   </div>
                 </div>
@@ -235,28 +270,28 @@ export const ClinicalCorrelationModal: React.FC<ClinicalCorrelationModalProps> =
                   <div className="p-2 rounded-xl bg-slate-950/40 border border-slate-800/60">
                     <span className="text-slate-400 block text-[10px] uppercase">RMSSD Pré → Pós</span>
                     <span className="font-mono font-bold text-white">
-                      {session.rmssdBefore} ms → {session.rmssdAfter} ms
+                      {session.rmssdBefore !== null ? `${session.rmssdBefore} ms` : 'NA'} → {session.rmssdAfter !== null ? `${session.rmssdAfter} ms` : 'NA'}
                     </span>
                   </div>
 
                   <div className="p-2 rounded-xl bg-slate-950/40 border border-slate-800/60">
                     <span className="text-slate-400 block text-[10px] uppercase">Ganho Autonômico</span>
-                    <span className={`font-mono font-bold ${session.deltaRmssd >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {session.deltaRmssd >= 0 ? '+' : ''}{session.deltaRmssd} ms (VFC)
+                    <span className={`font-mono font-bold ${session.deltaRmssd !== null && session.deltaRmssd >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {session.deltaRmssd !== null ? `${session.deltaRmssd >= 0 ? '+' : ''}${session.deltaRmssd} ms (VFC)` : 'NA'}
                     </span>
                   </div>
 
                   <div className="p-2 rounded-xl bg-slate-950/40 border border-slate-800/60">
                     <span className="text-slate-400 block text-[10px] uppercase">Escala de Estresse (EVA)</span>
                     <span className="font-mono font-bold text-white">
-                      {session.anxietyBefore}/10 → {session.anxietyAfter}/10
+                      {session.anxietyBefore !== null ? `${session.anxietyBefore}/10` : 'NA'} → {session.anxietyAfter !== null ? `${session.anxietyAfter}/10` : 'NA'}
                     </span>
                   </div>
 
                   <div className="p-2 rounded-xl bg-slate-950/40 border border-slate-800/60">
                     <span className="text-slate-400 block text-[10px] uppercase">Estado Prandial</span>
                     <span className="font-bold text-slate-200">
-                      {isClean ? 'Jejum (>180m)' : `${session.lastMeal?.minutesBeforeSession}m pós-refeição`}
+                      {isClean ? 'Jejum (>180m)' : `${session.lastMeal?.minutesRelativeToSession}m da refeição`}
                     </span>
                   </div>
                 </div>
@@ -270,7 +305,7 @@ export const ClinicalCorrelationModal: React.FC<ClinicalCorrelationModalProps> =
                   }`}>
                     <div className="flex items-center justify-between">
                       <span className="font-bold">
-                        Refeição Anterior: {session.lastMeal.productName} ({session.lastMeal.minutesBeforeSession} min antes)
+                        Refeição Registrada: {session.lastMeal.productName} ({session.lastMeal.minutesRelativeToSession} min relativo à sessão)
                       </span>
                       <span className="text-[10px] uppercase font-mono font-semibold">
                         {session.lastMeal.compass.toUpperCase()}
@@ -278,13 +313,13 @@ export const ClinicalCorrelationModal: React.FC<ClinicalCorrelationModalProps> =
                     </div>
                     {session.lastMeal.isAdulterated && (
                       <p className="mt-1 text-red-300/90 text-[11px] leading-relaxed">
-                        ⚠️ Alimento fraudado/adulterado consumido na janela crítica. Alerta o operador da câmera FLIR/termográfica quanto a dilatação esplâncnica e assimetria térmica cutânea no tronco anterior.
+                        ⚠️ Alimento fraudado/adulterado registrado na janela da sessão. Registrado como confundidor potencial sobre a resposta de variabilidade da frequência cardíaca (VFC).
                       </p>
                     )}
                   </div>
                 )}
 
-                {/* Nota Metodológica Brioschi */}
+                {/* Nota Metodológica */}
                 <p className="text-[11px] text-slate-400 italic">
                   🔬 {session.methodologicalNote}
                 </p>
@@ -302,7 +337,7 @@ export const ClinicalCorrelationModal: React.FC<ClinicalCorrelationModalProps> =
               className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs flex items-center gap-1.5 transition-colors border border-slate-700"
             >
               <Download className="w-3.5 h-3.5" />
-              CSV (R / Python / Kubios)
+              CSV {isSyntheticBatch ? '(Demo)' : '(Research)'}
             </button>
             <button
               type="button"

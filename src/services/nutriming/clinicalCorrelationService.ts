@@ -1,18 +1,25 @@
 /**
  * ClinicalCorrelationService
  * ─────────────────────────────────────────────────────────────────────────────
- * Módulo de Integração Científica: Nutriming ↔ Piloto Clínico de Termografia N-of-1
- * Referência Metodológica: Prof. Dr. Marcos Leal Brioschi (ABRATERM)
+ * Módulo de correlação entre eventos alimentares (Nutriming) e sessões de
+ * autorregulação autonômica (RMSSD/VFC via Polar H10).
  *
- * Objetivo:
- * Eliminar ou quantificar o ruído metabólico/alimentar (confounder prandial)
- * sobre a assimetria térmica cutânea (ΔT) e a variabilidade da frequência cardíaca (RMSSD/VFC).
+ * O QUE ESTE MÓDULO FAZ: classifica cada sessão fisiológica pelo tempo
+ * decorrido até a refeição mais próxima e por características declaradas
+ * dessa refeição (autenticidade, adulteração), produzindo um contexto
+ * alimentar/prandial qualitativo.
  *
- * Uma das maiores causas de falso-positivo ou ruído em termografia médica infravermelha
- * e ECG autonômico é o influxo sanguíneo esplâncnico e a endotoxemia metabólica pós-prandial
- * decorrente de alimentos ultraprocessados ou adulterados com óleos refinados/gorduras hidrogenadas.
+ * O QUE ESTE MÓDULO NÃO FAZ: não lê, recebe ou deriva nenhuma medida de
+ * termografia (sem câmera IR conectada, sem ΔT, sem ROI, sem temperatura).
+ * Qualquer menção a "térmico" em versões anteriores deste arquivo descrevia
+ * uma aspiração do projeto, não uma capacidade existente — foi removida.
+ *
+ * Referências metodológicas formais (ex.: um protocolo específico, um
+ * parceiro de pesquisa nomeado) pertencem a um documento de protocolo
+ * versionado fora do código, não a este serviço — ver campo `provenance`
+ * nas funções de exportação.
+ * ---------------------------------------------------------------------------
  */
-
 import { MealEventsApi } from './mealEventsApi';
 import { MealEvent } from '../../types/nutriming';
 
@@ -23,53 +30,76 @@ export type ThermalPrandialStatus =
   | 'post_prandial_late';   // 120 a 180 min: clareamento fisiológico
 
 export type ThermalConfounderLevel =
-  | 'none'                  // Ruído zero (jejum ou chá neutro)
+  | 'none'                  // Ruído zero (jejum ou refeição neutra)
   | 'low'                   // Alimento autêntico leve
-  | 'moderate'              // Alimento com sobrecarga térmica MTC ou suspeito
+  | 'moderate'              // Alimento com desarmonia declarada ou suspeito
   | 'critical_adulteration'; // Alimento fraudado/adulterado com gordura vegetal ou aditivos
+
+/** Origem do registro — nunca deve ser inferida, sempre explícita. */
+export type DataSource = 'real' | 'synthetic_demo';
+
+/**
+ * Proveniência do dataset, para preencher apenas quando houver vínculo
+ * formal e autorizado. Vazio por padrão — nunca inferir nomes aqui.
+ */
+export interface Provenance {
+  protocolAuthor?: string;
+  dataCollectorApp?: string;
+  operator?: string;
+}
 
 export interface PairedClinicalSession {
   sessionId: string;
   timestamp: string;
   sessionType: string;
   durationSeconds: number;
-  
-  // Dados Autonômicos (VFC / RMSSD Polar H10)
-  rmssdBefore: number;
-  rmssdAfter: number;
-  deltaRmssd: number;
-  anxietyBefore: number;
-  anxietyAfter: number;
+
+  /** Origem do registro. Nunca omitir; nunca inferir no consumidor. */
+  dataSource: DataSource;
+
+  // Dados Autonômicos (VFC / RMSSD Polar H10).
+  // null = não observado/calculável. NUNCA usar 0 como substituto de dado
+  // ausente — 0 ms é um valor fisiológico possível, null não é a mesma coisa.
+  rmssdBefore: number | null;
+  rmssdAfter: number | null;
+  deltaRmssd: number | null;
+  anxietyBefore: number | null;
+  anxietyAfter: number | null;
 
   // Cruzamento Nutriming
   lastMeal?: {
     mealId: string;
     productName: string;
     consumedAt: string;
-    minutesBeforeSession: number;
+    /**
+     * Minutos entre a refeição e a sessão. Pode ser um valor pequeno
+     * negativo (até -5) dentro da tolerância de sincronização de relógio
+     * entre os dois registros — isso significa que a refeição foi
+     * registrada muito perto da sessão, possivelmente alguns instantes
+     * depois dela, não necessariamente antes. Não é clampado para 0: um
+     * valor negativo real é informação, não ruído a esconder.
+     */
+    minutesRelativeToSession: number;
     compass: 'green' | 'yellow' | 'red';
     headline: string;
     thermalNature: string;
     isAdulterated: boolean;
     fraudTerms: string[];
   };
-
   prandialStatus: ThermalPrandialStatus;
+  /**
+   * Classificação de ruído alimentar/contextual. NÃO é uma medida de
+   * qualidade termográfica — não existe termografia neste pipeline.
+   */
   confounderLevel: ThermalConfounderLevel;
-  thermalReliabilityScore: number; // 0 a 100% de confiança para leitura de Dr. Brioschi
   methodologicalNote: string;
 }
 
 export class ClinicalCorrelationService {
-
-  /**
-   * Cruza as sessões de autorregulação e telemetria (coherence_history)
-   * com o histórico de refeições registradas no Nutriming.
-   */
   public static getPairedClinicalSessions(userId?: string): PairedClinicalSession[] {
     const mealEvents = MealEventsApi.getAllMealEvents();
-    
-    // 1. Tentar ler histórico de sessões fisiológicas do localStorage
+
+    // 1. Tentar ler histórico real de sessões fisiológicas do localStorage
     let rawSessions: any[] = [];
     try {
       const storageKey = `coherence_history_${userId || 'guest'}`;
@@ -81,13 +111,17 @@ export class ClinicalCorrelationService {
       console.warn('Erro ao carregar sessões de coerência:', e);
     }
 
-    // 2. Se ainda não houver sessões salvas, gerar sessões clínicas do piloto
-    // correspondentes aos testes de bancada N-of-1 descritos no Dossiê Brioschi
+    // 2. Se não houver histórico real, gerar sessões de DEMONSTRAÇÃO.
+    // dataSource é marcado explicitamente abaixo e nunca é opcional —
+    // é o que impede essas sessões de atravessar o gate de exportação
+    // científica sem marca.
+    let isSyntheticBatch = false;
     if (!rawSessions || rawSessions.length === 0) {
+      isSyntheticBatch = true;
       const now = Date.now();
       rawSessions = [
         {
-          timestamp: new Date(now - 15 * 60 * 1000).toISOString(), // 15 min após a refeição demo (Chocolate Garoto)
+          timestamp: new Date(now - 15 * 60 * 1000).toISOString(),
           sessionType: 'integrated',
           durationSeconds: 600,
           before: { rmssd: 38, anxietyScore: 6, timestamp: new Date(now - 25 * 60 * 1000).toISOString() },
@@ -95,7 +129,7 @@ export class ClinicalCorrelationService {
           result: { score: 72, deltaRmssd: 6, deltaAnxiety: -3, improved: true }
         },
         {
-          timestamp: new Date(now - 3 * 60 * 60 * 1000).toISOString(), // 3h atrás (em jejum ou pós azeite)
+          timestamp: new Date(now - 3 * 60 * 60 * 1000).toISOString(),
           sessionType: 'integrated',
           durationSeconds: 600,
           before: { rmssd: 52, anxietyScore: 4, timestamp: new Date(now - 3.2 * 60 * 60 * 1000).toISOString() },
@@ -103,7 +137,7 @@ export class ClinicalCorrelationService {
           result: { score: 94, deltaRmssd: 16, deltaAnxiety: -3, improved: true }
         },
         {
-          timestamp: new Date(now - 23.5 * 60 * 60 * 1000).toISOString(), // Ontem após requeijão com amido
+          timestamp: new Date(now - 23.5 * 60 * 60 * 1000).toISOString(),
           sessionType: 'integrated',
           durationSeconds: 600,
           before: { rmssd: 34, anxietyScore: 7, timestamp: new Date(now - 23.8 * 60 * 60 * 1000).toISOString() },
@@ -112,45 +146,40 @@ export class ClinicalCorrelationService {
         }
       ];
     }
+    const dataSource: DataSource = isSyntheticBatch ? 'synthetic_demo' : 'real';
 
-    // 3. Pareamento Temporal estrito (janela de até 3 horas prévias à sessão)
+    // 3. Pareamento Temporal (janela de até 4h antes da sessão, com
+    // tolerância de -5min para dessincronia de relógio entre os dois
+    // registros — ver comentário em `minutesRelativeToSession`).
     return rawSessions.map((session, index) => {
       const sessionTime = new Date(session.timestamp || session.after?.timestamp || Date.now()).getTime();
-
-      // Encontrar a refeição mais próxima que aconteceu ANTES da sessão (janela de até 240 minutos)
       let nearestMeal: MealEvent | undefined;
       let minDiffMinutes = Infinity;
-
       for (const meal of mealEvents) {
         const mealTime = new Date(meal.createdAt).getTime();
         const diffMinutes = Math.round((sessionTime - mealTime) / (1000 * 60));
-
-        // Refeição consumida antes da sessão ou até 5 min no início
         if (diffMinutes >= -5 && diffMinutes < minDiffMinutes && diffMinutes <= 240) {
           minDiffMinutes = diffMinutes;
           nearestMeal = meal;
         }
       }
 
-      // 4. Avaliar Confounder e Status Prandial
       let prandialStatus: ThermalPrandialStatus = 'fasting_baseline';
       let confounderLevel: ThermalConfounderLevel = 'none';
-      let reliabilityScore = 98; // Base de 98% em jejum
-      let note = 'Linha de base pura: > 3 horas sem aporte nutricional. Sem viés metabólico na termografia cutânea.';
-
+      let note = 'Linha de base: > 3 horas sem aporte nutricional registrado antes da sessão.';
       let lastMealData: PairedClinicalSession['lastMeal'] = undefined;
 
       if (nearestMeal && minDiffMinutes < 180) {
         const isRed = nearestMeal.stateResult.personal.compass === 'red';
         const isYellow = nearestMeal.stateResult.personal.compass === 'yellow';
-        const isAdulterated = nearestMeal.stateResult.personal.headline.includes('ADULTERADO') || 
+        const isAdulterated = nearestMeal.stateResult.personal.headline.includes('ADULTERADO') ||
                               nearestMeal.stateResult.personal.headline.includes('ANÁLOGO');
 
         lastMealData = {
           mealId: nearestMeal.id,
           productName: nearestMeal.product.name,
           consumedAt: nearestMeal.createdAt,
-          minutesBeforeSession: Math.max(0, minDiffMinutes),
+          minutesRelativeToSession: minDiffMinutes,
           compass: nearestMeal.stateResult.personal.compass,
           headline: nearestMeal.stateResult.personal.headline,
           thermalNature: nearestMeal.stateResult.tcmProfile?.thermalNature || 'neutral',
@@ -168,30 +197,48 @@ export class ClinicalCorrelationService {
 
         if (isAdulterated) {
           confounderLevel = 'critical_adulteration';
-          reliabilityScore = Math.max(45, 85 - Math.round((120 - minDiffMinutes) * 0.4));
-          note = `⚠️ Alerta de Viés Clínico: Alimento com adulteração/extensores (${nearestMeal.product.name}) consumido ${minDiffMinutes} min antes. Possível interferência de fluxo esplâncnico e inflamação sobre a simetria infravermelha (ΔT).`;
+          note = `⚠️ Alimento com adulteração/extensores declarada (${nearestMeal.product.name}) registrado ${minDiffMinutes} min antes da sessão. Possível confundidor metabólico sobre a VFC.`;
         } else if (isRed || isYellow) {
           confounderLevel = 'moderate';
-          reliabilityScore = 75;
-          note = `Atenção Metrológica: Alimento com desarmonia térmica consumido ${minDiffMinutes} min antes. Recomenda-se correlacionar com a área do epigástrio na termografia.`;
+          note = `Alimento com desarmonia declarada ${minDiffMinutes} min antes da sessão.`;
         } else {
           confounderLevel = 'low';
-          reliabilityScore = 92;
-          note = `Refeição genuína e balanceada ${minDiffMinutes} min antes. Baixo impacto de ruído autonômico.`;
+          note = `Refeição declarada como autêntica e balanceada ${minDiffMinutes} min antes da sessão.`;
         }
       }
 
-      const rmssdBefore = session.before?.rmssd || 0;
-      const rmssdAfter = session.after?.rmssd || session.result?.deltaRmssd ? (rmssdBefore + session.result.deltaRmssd) : 0;
-      const deltaRmssd = session.result?.deltaRmssd ?? (rmssdAfter - rmssdBefore);
-      const anxietyBefore = session.before?.anxietyScore ?? 0;
-      const anxietyAfter = session.after?.anxietyScore ?? 0;
+      // ── Cálculo de RMSSD pré/pós/delta ──────────────────────────────────
+      // Regra: o valor MEDIDO (session.after.rmssd) sempre tem prioridade
+      // sobre qualquer valor derivado. Nenhum acesso a session.result é
+      // feito sem optional chaining — a versão anterior deste código podia
+      // lançar TypeError quando session.result era undefined mas
+      // session.after.rmssd existia (o `||`/ternário entrava no ramo que
+      // lia session.result.deltaRmssd sem o `?.`).
+      const rmssdBefore: number | null = session.before?.rmssd ?? null;
+      const measuredAfter: number | null = session.after?.rmssd ?? null;
+      const reportedDelta: number | null = session.result?.deltaRmssd ?? null;
+
+      const rmssdAfter: number | null =
+        measuredAfter !== null
+          ? measuredAfter
+          : rmssdBefore !== null && reportedDelta !== null
+            ? rmssdBefore + reportedDelta
+            : null;
+
+      const deltaRmssd: number | null =
+        measuredAfter !== null && rmssdBefore !== null
+          ? measuredAfter - rmssdBefore
+          : reportedDelta;
+
+      const anxietyBefore: number | null = session.before?.anxietyScore ?? null;
+      const anxietyAfter: number | null = session.after?.anxietyScore ?? null;
 
       return {
         sessionId: `session-n1-${index + 1}`,
         timestamp: new Date(sessionTime).toISOString(),
         sessionType: session.sessionType || 'integrated',
         durationSeconds: session.durationSeconds || 600,
+        dataSource,
         rmssdBefore,
         rmssdAfter,
         deltaRmssd,
@@ -200,114 +247,108 @@ export class ClinicalCorrelationService {
         lastMeal: lastMealData,
         prandialStatus,
         confounderLevel,
-        thermalReliabilityScore: reliabilityScore,
         methodologicalNote: note
       };
     });
   }
 
   /**
-   * Exporta os dados pareados em formato CSV estruturado para Bioestatística (R, Kubios, Python).
+   * Garante que nenhuma sessão sintética atravesse para um artefato de
+   * exportação sem autorização explícita. Lança erro em vez de exportar
+   * silenciosamente — a quarentena é o comportamento padrão.
    */
-  public static exportToCSV(sessions: PairedClinicalSession[]): string {
+  private static assertExportable(
+    sessions: PairedClinicalSession[],
+    allowSynthetic: boolean
+  ): void {
+    const synthetic = sessions.filter(s => s.dataSource !== 'real');
+    if (synthetic.length > 0 && !allowSynthetic) {
+      throw new Error(
+        `Exportação bloqueada: ${synthetic.length} sessão(ões) com dataSource !== 'real' ` +
+        `(ex.: 'synthetic_demo') não podem ser exportadas como dataset de pesquisa. ` +
+        `Se esta é intencionalmente uma exportação de demonstração, chame esta função ` +
+        `com { allowSynthetic: true } — o arquivo resultante ainda incluirá a coluna/campo ` +
+        `de origem em cada registro.`
+      );
+    }
+  }
+
+  public static exportToCSV(
+    sessions: PairedClinicalSession[],
+    options: { allowSynthetic?: boolean } = {}
+  ): string {
+    this.assertExportable(sessions, options.allowSynthetic ?? false);
+
     const headers = [
-      'session_id',
-      'timestamp_iso',
-      'session_type',
-      'duration_sec',
-      'rmssd_pre_ms',
-      'rmssd_post_ms',
-      'delta_rmssd_ms',
-      'anxiety_pre_0_10',
-      'anxiety_post_0_10',
-      'has_pre_meal',
-      'meal_product_name',
-      'minutes_since_meal',
-      'meal_authenticity_compass',
-      'is_meal_adulterated',
-      'prandial_status',
-      'confounder_level',
-      'thermal_reliability_percent',
+      'session_id', 'data_source', 'timestamp_iso', 'session_type', 'duration_sec',
+      'rmssd_pre_ms', 'rmssd_post_ms', 'delta_rmssd_ms',
+      'anxiety_pre_0_10', 'anxiety_post_0_10', 'has_pre_meal',
+      'meal_product_name', 'minutes_relative_to_session', 'meal_authenticity_compass',
+      'is_meal_adulterated', 'prandial_status', 'confounder_level',
       'methodological_note'
     ];
-
     const rows = sessions.map(s => [
-      s.sessionId,
-      s.timestamp,
-      s.sessionType,
-      s.durationSeconds,
-      s.rmssdBefore,
-      s.rmssdAfter,
-      s.deltaRmssd,
-      s.anxietyBefore,
-      s.anxietyAfter,
+      s.sessionId, s.dataSource, s.timestamp, s.sessionType, s.durationSeconds,
+      s.rmssdBefore ?? 'NA', s.rmssdAfter ?? 'NA', s.deltaRmssd ?? 'NA',
+      s.anxietyBefore ?? 'NA', s.anxietyAfter ?? 'NA',
       s.lastMeal ? '1' : '0',
       s.lastMeal ? `"${s.lastMeal.productName.replace(/"/g, '""')}"` : '""',
-      s.lastMeal ? s.lastMeal.minutesBeforeSession : 'NA',
+      s.lastMeal ? s.lastMeal.minutesRelativeToSession : 'NA',
       s.lastMeal ? s.lastMeal.compass : 'NA',
       s.lastMeal ? (s.lastMeal.isAdulterated ? '1' : '0') : '0',
-      s.prandialStatus,
-      s.confounderLevel,
-      s.thermalReliabilityScore,
+      s.prandialStatus, s.confounderLevel,
       `"${s.methodologicalNote.replace(/"/g, '""')}"`
     ]);
-
     return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
   }
 
-  /**
-   * Exporta pacote JSON completo com metadados do protocolo N-of-1.
-   */
-  public static exportToJSON(sessions: PairedClinicalSession[]): string {
+  public static exportToJSON(
+    sessions: PairedClinicalSession[],
+    options: { allowSynthetic?: boolean; provenance?: Provenance } = {}
+  ): string {
+    this.assertExportable(sessions, options.allowSynthetic ?? false);
+
     const payload = {
-      protocol: 'XZenPress Termografia Médica & Telemetria N-of-1',
-      scientificLeadPotential: 'Prof. Dr. Marcos Leal Brioschi / ABRATERM',
-      author: 'Alexandre de Brito Pinheiro',
+      protocol: 'XZenPress — Correlação Prandial/Autonômica N-of-1',
+      // Preenchido apenas quando fornecido explicitamente pelo chamador.
+      // Nunca hardcoded com nome de pessoa ou instituição não formalizada.
+      provenance: options.provenance ?? {},
       generatedAt: new Date().toISOString(),
-      standards: ['FAIR Data Principles', 'LGPD Art. 20', 'ABRATERM Metrological Guidelines'],
+      standards: ['FAIR Data Principles', 'LGPD Art. 20'],
       summary: {
         totalSessions: sessions.length,
+        syntheticSessionsCount: sessions.filter(s => s.dataSource !== 'real').length,
         cleanBaselineSessions: sessions.filter(s => s.prandialStatus === 'fasting_baseline').length,
-        confoundedSessions: sessions.filter(s => s.confounderLevel === 'critical_adulteration').length,
-        averageThermalReliability: Math.round(
-          sessions.reduce((acc, s) => acc + s.thermalReliabilityScore, 0) / (sessions.length || 1)
-        )
+        confoundedSessions: sessions.filter(s => s.confounderLevel === 'critical_adulteration').length
       },
       sessions
     };
-
     return JSON.stringify(payload, null, 2);
   }
 
-  /**
-   * Gera parecer técnico em Markdown pronto para o Dossiê ou Prontuário Clínico.
-   */
-  public static exportDossierReport(sessions: PairedClinicalSession[]): string {
+  public static exportDossierReport(
+    sessions: PairedClinicalSession[],
+    options: { allowSynthetic?: boolean } = {}
+  ): string {
+    this.assertExportable(sessions, options.allowSynthetic ?? false);
+
     const cleanCount = sessions.filter(s => s.prandialStatus === 'fasting_baseline').length;
-    const avgReliability = Math.round(
-      sessions.reduce((acc, s) => acc + s.thermalReliabilityScore, 0) / (sessions.length || 1)
-    );
+    const syntheticCount = sessions.filter(s => s.dataSource !== 'real').length;
 
-    return `# Parecer Técnico de Correlação Nutriming ↔ Termografia N-of-1
-**Protocolo:** Validação de Assinatura de Resposta Fisiológica (PRS)
+    return `# Correlação Prandial/Autonômica N-of-1
 **Data de Emissão:** ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}
-**Auditoria de Confounders Alimentares:** Ativa (AuthenticityGuard + Cronobiologia Prandial)
-
+${syntheticCount > 0 ? `\n⚠️ **${syntheticCount} de ${sessions.length} sessões são dados de DEMONSTRAÇÃO (dataSource: synthetic_demo), não observações reais.**\n` : ''}
 ---
-
 ### 1. Resumo Executivo da Série
-* **Total de Sessões Analisadas:** ${sessions.length}
-* **Sessões em Linha de Base Pura (Jejum >3h):** ${cleanCount} de ${sessions.length}
-* **Índice Médio de Confiabilidade Termográfica:** **${avgReliability}%**
-* **Interferência de Alimentos Adulterados:** Monitorada via AuthenticityGuard v1.0
-
+* **Total de Sessões:** ${sessions.length}
+* **Sessões em Linha de Base (jejum >3h):** ${cleanCount} de ${sessions.length}
+* **Sessões Sintéticas/Demo:** ${syntheticCount}
 ### 2. Tabela de Sessões Pareadas
-| Sessão | Data/Hora | Δ RMSSD (ms) | Ansiedade (Pré→Pós) | Refeição Prévia | Janela Prandial | Confiabilidade Termografia |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-${sessions.map(s => `| ${s.sessionId} | ${new Date(s.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} | ${s.deltaRmssd >= 0 ? '+' : ''}${s.deltaRmssd} ms | ${s.anxietyBefore} → ${s.anxietyAfter} | ${s.lastMeal ? s.lastMeal.productName : 'Jejum (>3h)'} | ${s.prandialStatus} | **${s.thermalReliabilityScore}%** |`).join('\n')}
-
+| Sessão | Origem | Data/Hora | Δ RMSSD (ms) | Ansiedade (Pré→Pós) | Refeição Próxima | Janela Prandial | Confundidor |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+${sessions.map(s => `| ${s.sessionId} | ${s.dataSource} | ${new Date(s.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} | ${s.deltaRmssd === null ? 'NA' : (s.deltaRmssd >= 0 ? '+' : '') + s.deltaRmssd + ' ms'} | ${s.anxietyBefore ?? 'NA'} → ${s.anxietyAfter ?? 'NA'} | ${s.lastMeal ? s.lastMeal.productName : 'Jejum (>3h)'} | ${s.prandialStatus} | ${s.confounderLevel} |`).join('\n')}
 ---
-*Emitido por XZenPress Clinical Intelligence Engine.*
+*Emitido por XZenPress — ver campo \`provenance\` em exportToJSON para atribuição formal.*
 `;
   }
 }

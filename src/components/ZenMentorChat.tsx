@@ -867,8 +867,21 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
         }),
       });
 
+      if (!response.ok) {
+        let errMessage = 'Serviço temporariamente indisponível no momento. Tente novamente em instantes.';
+        try {
+          const contentType = response.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            const errData = await response.json();
+            errMessage = errData.error || errMessage;
+          }
+        } catch {
+          // Response was not JSON (e.g., HTML 404/500)
+        }
+        throw new Error(errMessage);
+      }
+
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Erro ao processar mensagem');
 
       // Parse fora do callback para que cleanContent fique no escopo correto
       const { cleanContent, actions, zenSomProtocols, candidateMemoryText } = parseActionButtons(data.reply);

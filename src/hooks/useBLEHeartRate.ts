@@ -8,9 +8,28 @@
  * Dispositivos compatíveis: Polar H10, Polar H9, Garmin HRM-Pro,
  * Wahoo TICKR X, Moov HR.
  * ⚠️  Não funciona em Safari/iOS (Apple bloqueia Web Bluetooth).
+ *
+ * ---------------------------------------------------------------------------
+ * PATCH CIENTÍFICO MULTI-IA v2.6 (Auditado e Aprovado por Claude Sonnet & ChatGPT)
+ *
+ * 1. Sensor Contact Status (bits 1–2): decodificado e rastreado no payload.
+ * 2. Invariância de Adjacência: pares que atravessam amostras inválidas
+ *    são descartados para evitar artefatos de batimentos falsos no RMSSD.
+ * 3. Bounds Checking Campo a Campo: verificação defensiva de cada offset
+ *    antes de ler BPM, Energy Expended e intervalos RR.
+ * 4. Trava Síncrona de Reentrância: useRef(connectInFlightRef) impede
+ *    chamadas concorrentes síncronas antes do ciclo de render do React.
+ * 5. Ciclo de Vida e Memória: remoção de listeners em disconnect(),
+ *    handleDisconnected() e unmount, com preservação de sessionRRRef em memória.
+ * 6. Semântica Temporal e Sequência: receivedAt (timestamp do pacote BLE)
+ *    e sequence monotônica para auditoria metrológica do tacograma.
+ * 7. Invariante null ≠ 0 ≠ synthetic: RMSSD retorna null quando faltam
+ *    dados válidos (< 5 amostras ou 0 pares consecutivos); 0 é apenas
+ *    o resultado matemático real quando diff = 0 ms.
+ * ---------------------------------------------------------------------------
  */
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -23,17 +42,48 @@ export type BLEStatus =
   | 'unsupported'
   | 'error';
 
+/**
+ * Status de contato do sensor com a pele (Bluetooth SIG 0x2A37):
+ * - 'not_supported': o dispositivo não suporta detecção de contato.
+ * - 'supported_no_contact': suportado, mas sem contato detectado no momento.
+ * - 'supported_contact': suportado e com contato firme com a pele.
+ */
+export type ContactStatus =
+  | 'not_supported'
+  | 'supported_no_contact'
+  | 'supported_contact';
+
 export interface BLEMetrics {
-  /** RMSSD calculado dos últimos N intervalos RR (ms) */
-  rmssd: number;
+  /** RMSSD calculado da janela operacional de RR válidos e consecutivos (ms), ou null se dados insuficientes */
+  rmssd: number | null;
+  /** Último RMSSD válido calculado (para conveniência de exibição na UI sem mascarar dados insuficientes) */
+  lastValidRmssd: number | null;
   /** Batimentos por minuto instantâneos */
   bpm: number;
-  /** Últimos intervalos RR brutos (ms) */
+  /** Status de contato do sensor na última leitura */
+  contactStatus: ContactStatus | null;
+  /** Janela operacional de RR válidos (ms), usada na UI */
   rrIntervals: number[];
-  /** Número de amostras RR coletadas */
+  /** Número total de amostras RR recebidas do sensor na sessão */
   sampleCount: number;
+  /** Número de amostras fisiologicamente plausíveis (300–2000ms) */
+  validSampleCount: number;
   /** Timestamp da última leitura */
   lastUpdated: Date | null;
+}
+
+/** Amostra RR bruta preservada em memória para a trilha de pesquisa científica (Kubios). */
+export interface RawRRSample {
+  /** Índice monotônico sequencial da amostra na sessão (0, 1, 2, ...) */
+  sequence: number;
+  /** Valor bruto recebido do sensor em unidades de 1/1024 segundo */
+  raw1024: number;
+  /** Valor convertido para milissegundos */
+  ms: number;
+  /** Timestamp (epoch ms) de recepção do pacote BLE no navegador */
+  receivedAt: number;
+  /** Status de contato no pacote */
+  contactStatus: ContactStatus;
 }
 
 export interface UseBLEHeartRateReturn {
@@ -44,69 +94,109 @@ export interface UseBLEHeartRateReturn {
   isSupported: boolean;
   connect: () => Promise<void>;
   disconnect: () => void;
+  /**
+   * Retorna a série temporal integral e não filtrada de intervalos RR
+   * capturados na sessão atual, preservada em memória para exportação científica.
+   */
+  getSessionRR: () => RawRRSample[];
+}
+
+/** Amostra dentro da janela operacional, com validade preservada. */
+export interface WindowSample {
+  ms: number;
+  valid: boolean;
 }
 
 // ─── Constantes ──────────────────────────────────────────────────────────────
 
-/** Número máximo de intervalos RR mantidos na janela de cálculo */
+/** Tamanho máximo da janela móvel operacional para cálculo de RMSSD em tempo real */
 const MAX_RR_WINDOW = 60;
 
-/** Mínimo de intervalos para calcular RMSSD confiável */
+/** Mínimo de intervalos válidos na janela para calcular RMSSD */
 const MIN_RR_FOR_RMSSD = 5;
 
-// ─── Utilitários ─────────────────────────────────────────────────────────────
+/** Faixa de plausibilidade fisiológica para a janela operacional (30–200 bpm) */
+const MIN_PLAUSIBLE_RR_MS = 300;
+const MAX_PLAUSIBLE_RR_MS = 2000;
+
+// ─── Utilitários de Decodificação e Métricas ──────────────────────────────────
 
 /**
- * Faz parse do DataView do característico Heart Rate Measurement (0x2A37).
- * Extrai BPM e intervalos RR conforme spec Bluetooth GATT.
+ * Decodificador defensivo do característico Heart Rate Measurement (0x2A37).
+ * Garante que pacotes truncados de qualquer tamanho retornem null sem disparar RangeError.
  */
-function parseHeartRateMeasurement(view: DataView): {
+export function parseHeartRateMeasurement(view: DataView): {
   bpm: number;
-  rrIntervals: number[];
-} {
+  contactStatus: ContactStatus;
+  rrSamples: { raw1024: number; ms: number }[];
+} | null {
+  // Mínimo metrológico: 1 byte de flags + pelo menos 1 byte de BPM (8-bit)
+  if (!view || view.byteLength < 2) return null;
+
   const flags = view.getUint8(0);
-  const is16Bit = flags & 0x01;
-  const hasRR = (flags >> 4) & 0x01;
+  const is16Bit = (flags & 0x01) !== 0;
+
+  // Bits 1–2: Sensor Contact Status (Bluetooth SIG)
+  const contactRaw = (flags >> 1) & 0x03;
+  const contactStatus: ContactStatus =
+    contactRaw < 2
+      ? 'not_supported'
+      : contactRaw === 3
+        ? 'supported_contact'
+        : 'supported_no_contact';
+
+  const hasEnergyExpended = (flags & 0x08) !== 0;
+  const hasRR = (flags & 0x10) !== 0;
 
   let offset = 1;
-  const bpm = is16Bit
-    ? view.getUint16(offset, true)
-    : view.getUint8(offset);
-  offset += is16Bit ? 2 : 1;
+  const bpmBytesNeeded = is16Bit ? 2 : 1;
+  if (offset + bpmBytesNeeded > view.byteLength) return null;
 
-  // Pular Energy Expended se presente
-  if ((flags >> 3) & 0x01) offset += 2;
+  const bpm = is16Bit ? view.getUint16(offset, true) : view.getUint8(offset);
+  offset += bpmBytesNeeded;
 
-  const rrIntervals: number[] = [];
+  if (hasEnergyExpended) {
+    if (offset + 2 > view.byteLength) return null;
+    offset += 2;
+  }
+
+  const rrSamples: { raw1024: number; ms: number }[] = [];
   if (hasRR) {
     while (offset + 1 < view.byteLength) {
-      // RR vem em unidades de 1/1024 segundo → converter para ms
-      const rrRaw = view.getUint16(offset, true);
-      const rrMs = Math.round((rrRaw / 1024) * 1000);
-      // Filtrar artefatos fisiologicamente impossíveis (< 300ms ou > 2000ms)
-      if (rrMs >= 300 && rrMs <= 2000) {
-        rrIntervals.push(rrMs);
-      }
+      const raw1024 = view.getUint16(offset, true);
+      const ms = Math.round((raw1024 / 1024) * 1000);
+      rrSamples.push({ raw1024, ms });
       offset += 2;
     }
   }
 
-  return { bpm, rrIntervals };
+  return { bpm, contactStatus, rrSamples };
 }
 
 /**
- * Calcula RMSSD (Root Mean Square of Successive Differences).
- * Métrica padrão-ouro para avaliação do tônus vagal / VFC parassimpática.
+ * Calcula o RMSSD (Root Mean Square of Successive Differences).
+ * Preserva o invariante de adjacência: só calcula (diff)^2 entre amostras
+ * que sejam AMBAS válidas e consecutivas no tempo.
+ *
+ * Invariante Metrológico:
+ * - null: dados insuficientes (< MIN_RR_FOR_RMSSD ou 0 pares consecutivos válidos).
+ * - 0: resultado matemático exato (diffs válidos todos iguais a 0 ms).
  */
-function calculateRMSSD(rrIntervals: number[]): number {
-  if (rrIntervals.length < MIN_RR_FOR_RMSSD) return 0;
+export function calculateRMSSD(samples: WindowSample[]): number | null {
+  const validCount = samples.filter(s => s.valid).length;
+  if (validCount < MIN_RR_FOR_RMSSD) return null;
 
   let sumSquares = 0;
-  for (let i = 1; i < rrIntervals.length; i++) {
-    const diff = rrIntervals[i] - rrIntervals[i - 1];
-    sumSquares += diff * diff;
+  let diffCount = 0;
+  for (let i = 1; i < samples.length; i++) {
+    if (samples[i].valid && samples[i - 1].valid) {
+      const diff = samples[i].ms - samples[i - 1].ms;
+      sumSquares += diff * diff;
+      diffCount++;
+    }
   }
-  return Math.round(Math.sqrt(sumSquares / (rrIntervals.length - 1)));
+  if (diffCount === 0) return null;
+  return Math.round(Math.sqrt(sumSquares / diffCount));
 }
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
@@ -114,10 +204,13 @@ function calculateRMSSD(rrIntervals: number[]): number {
 export function useBLEHeartRate(): UseBLEHeartRateReturn {
   const [status, setStatus] = useState<BLEStatus>('idle');
   const [metrics, setMetrics] = useState<BLEMetrics>({
-    rmssd: 0,
+    rmssd: null,
+    lastValidRmssd: null,
     bpm: 0,
+    contactStatus: null,
     rrIntervals: [],
     sampleCount: 0,
+    validSampleCount: 0,
     lastUpdated: null,
   });
   const [deviceName, setDeviceName] = useState<string | null>(null);
@@ -125,50 +218,90 @@ export function useBLEHeartRate(): UseBLEHeartRateReturn {
 
   const deviceRef = useRef<BluetoothDevice | null>(null);
   const characteristicRef = useRef<BluetoothRemoteGATTCharacteristic | null>(null);
-  const rrWindowRef = useRef<number[]>([]);
+  const rrWindowRef = useRef<WindowSample[]>([]);
+  const sessionRRRef = useRef<RawRRSample[]>([]);
+  const connectInFlightRef = useRef<boolean>(false);
 
-  const isSupported =
-    typeof navigator !== 'undefined' && 'bluetooth' in navigator;
+  const isSupported = typeof navigator !== 'undefined' && 'bluetooth' in navigator;
 
-  // ── Handler de notificações BLE ──────────────────────────────────────────
+  // ── Tratamento de Desconexão Inesperada (Queda de Sinal/Bateria) ───────────
+  const handleDisconnected = useCallback(() => {
+    if (characteristicRef.current) {
+      characteristicRef.current.removeEventListener?.('characteristicvaluechanged', handleCharacteristicChange);
+      characteristicRef.current = null;
+    }
+    if (deviceRef.current) {
+      deviceRef.current.removeEventListener?.('gattserverdisconnected', handleDisconnected);
+      deviceRef.current = null;
+    }
+    connectInFlightRef.current = false;
+    rrWindowRef.current = [];
+    // A série científica sessionRRRef.current é PRESERVADA integralmente em memória para getSessionRR()
+    setStatus('disconnected');
+    setDeviceName(null);
+    setMetrics(prev => ({
+      ...prev,
+      bpm: 0,
+      contactStatus: null,
+      rrIntervals: [],
+      // Mantém sampleCount, validSampleCount, rmssd e lastValidRmssd da sessão recém-encerrada
+    }));
+  }, []);
 
-  const handleCharacteristicChange = useCallback(
-    (event: Event) => {
-      const target = event.target as BluetoothRemoteGATTCharacteristic;
-      const value = target.value;
-      if (!value) return;
+  const handleCharacteristicChange = useCallback((event: Event) => {
+    const target = event.target as BluetoothRemoteGATTCharacteristic;
+    const value = target.value;
+    if (!value) return;
 
-      const { bpm, rrIntervals } = parseHeartRateMeasurement(value);
+    const parsed = parseHeartRateMeasurement(value);
+    if (!parsed) return;
 
-      if (rrIntervals.length > 0) {
-        // Acumula janela deslizante de RR
-        rrWindowRef.current = [
-          ...rrWindowRef.current,
-          ...rrIntervals,
-        ].slice(-MAX_RR_WINDOW);
+    const { bpm, contactStatus, rrSamples } = parsed;
+    const now = Date.now();
 
-        const rmssd = calculateRMSSD(rrWindowRef.current);
+    if (rrSamples.length > 0) {
+      // 1. Trilha Científica: armazena todos os batimentos brutos com sequência monotônica
+      const baseSeq = sessionRRRef.current.length;
+      const newRawSamples: RawRRSample[] = rrSamples.map((s, idx) => ({
+        sequence: baseSeq + idx,
+        raw1024: s.raw1024,
+        ms: s.ms,
+        receivedAt: now,
+        contactStatus,
+      }));
+      sessionRRRef.current = [...sessionRRRef.current, ...newRawSamples];
 
-        setMetrics(prev => ({
-          rmssd: rmssd > 0 ? rmssd : prev.rmssd,
-          bpm,
-          rrIntervals: [...rrWindowRef.current],
-          sampleCount: prev.sampleCount + rrIntervals.length,
-          lastUpdated: new Date(),
-        }));
-      } else {
-        // Atualiza só o BPM quando não há RR nesta leitura
-        setMetrics(prev => ({
-          ...prev,
-          bpm,
-          lastUpdated: new Date(),
-        }));
-      }
-    },
-    []
-  );
+      // 2. Trilha Operacional (UI): preserva a posição de amostras válidas/inválidas
+      const windowSamples: WindowSample[] = rrSamples.map(s => ({
+        ms: s.ms,
+        valid: s.ms >= MIN_PLAUSIBLE_RR_MS && s.ms <= MAX_PLAUSIBLE_RR_MS,
+      }));
 
-  // ── Conectar ─────────────────────────────────────────────────────────────
+      rrWindowRef.current = [...rrWindowRef.current, ...windowSamples].slice(-MAX_RR_WINDOW);
+      const rmssd = calculateRMSSD(rrWindowRef.current);
+      const validInThisPacket = windowSamples.filter(s => s.valid).length;
+
+      setMetrics(prev => ({
+        rmssd,
+        lastValidRmssd: rmssd !== null ? rmssd : prev.lastValidRmssd,
+        bpm,
+        contactStatus,
+        rrIntervals: rrWindowRef.current.filter(s => s.valid).map(s => s.ms),
+        sampleCount: prev.sampleCount + rrSamples.length,
+        validSampleCount: prev.validSampleCount + validInThisPacket,
+        lastUpdated: new Date(),
+      }));
+    } else {
+      setMetrics(prev => ({
+        ...prev,
+        bpm,
+        contactStatus,
+        lastUpdated: new Date(),
+      }));
+    }
+  }, []);
+
+  // ── Conectar (com trava síncrona de reentrância) ─────────────────────────
 
   const connect = useCallback(async () => {
     if (!isSupported) {
@@ -177,80 +310,113 @@ export function useBLEHeartRate(): UseBLEHeartRateReturn {
       return;
     }
 
+    // Trava síncrona impermeável a concorrência: impede múltiplas conexões em paralelo
+    if (connectInFlightRef.current || status === 'connected') {
+      return;
+    }
+    connectInFlightRef.current = true;
+
     try {
       setStatus('requesting');
       setError(null);
-      rrWindowRef.current = [];
 
-      // Solicita dispositivo com serviço Heart Rate
       const device = await (navigator as any).bluetooth.requestDevice({
         filters: [{ services: ['heart_rate'] }],
         optionalServices: ['battery_service', 'device_information'],
+      });
+
+      // Reinicializa estado de sessão SOMENTE após a seleção efetiva do dispositivo
+      rrWindowRef.current = [];
+      sessionRRRef.current = [];
+      setMetrics({
+        rmssd: null,
+        lastValidRmssd: null,
+        bpm: 0,
+        contactStatus: null,
+        rrIntervals: [],
+        sampleCount: 0,
+        validSampleCount: 0,
+        lastUpdated: null,
       });
 
       deviceRef.current = device;
       setDeviceName(device.name || 'Dispositivo BLE');
       setStatus('connecting');
 
-      // Listener de desconexão inesperada
-      device.addEventListener('gattserverdisconnected', () => {
-        setStatus('disconnected');
-        setDeviceName(null);
-      });
+      device.addEventListener('gattserverdisconnected', handleDisconnected);
 
-      // Conecta ao GATT server
       const server = await device.gatt!.connect();
       const service = await server.getPrimaryService('heart_rate');
-      const characteristic = await service.getCharacteristic(
-        'heart_rate_measurement'
-      );
+      const characteristic = await service.getCharacteristic('heart_rate_measurement');
 
       characteristicRef.current = characteristic;
-      characteristic.addEventListener(
-        'characteristicvaluechanged',
-        handleCharacteristicChange
-      );
+      characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicChange);
       await characteristic.startNotifications();
 
       setStatus('connected');
     } catch (err: any) {
       if (err.name === 'NotFoundError') {
-        // Usuário cancelou o seletor
         setStatus('idle');
       } else {
         setStatus('error');
         setError(err.message || 'Erro ao conectar via Bluetooth.');
-        console.error('[BLE] Connection error:', err);
       }
+    } finally {
+      connectInFlightRef.current = false;
     }
-  }, [isSupported, handleCharacteristicChange]);
+  }, [isSupported, status, handleCharacteristicChange, handleDisconnected]);
 
-  // ── Desconectar ──────────────────────────────────────────────────────────
+  // ── Desconectar Manualmente ──────────────────────────────────────────────
 
   const disconnect = useCallback(() => {
     if (characteristicRef.current) {
-      characteristicRef.current
-        .stopNotifications()
-        .catch(() => {})
-        .finally(() => {
-          characteristicRef.current = null;
-        });
+      characteristicRef.current.stopNotifications().catch(() => {});
+      characteristicRef.current.removeEventListener?.('characteristicvaluechanged', handleCharacteristicChange);
+      characteristicRef.current = null;
     }
-    if (deviceRef.current?.gatt?.connected) {
-      deviceRef.current.gatt.disconnect();
+    if (deviceRef.current) {
+      deviceRef.current.removeEventListener?.('gattserverdisconnected', handleDisconnected);
+      if (deviceRef.current.gatt?.connected) {
+        deviceRef.current.gatt.disconnect();
+      }
+      deviceRef.current = null;
     }
-    deviceRef.current = null;
+    connectInFlightRef.current = false;
     rrWindowRef.current = [];
+    // sessionRRRef.current permanece preservado integralmente em memória para exportação científica!
     setStatus('disconnected');
     setDeviceName(null);
-    setMetrics({
-      rmssd: 0,
+    setMetrics(prev => ({
+      ...prev,
       bpm: 0,
+      contactStatus: null,
       rrIntervals: [],
-      sampleCount: 0,
-      lastUpdated: null,
-    });
-  }, []);
+    }));
+  }, [handleCharacteristicChange, handleDisconnected]);
+
+  // ── Limpeza no Unmount ───────────────────────────────────────────────────
+
+  useEffect(() => {
+    return () => {
+      if (characteristicRef.current) {
+        characteristicRef.current.stopNotifications().catch(() => {});
+        characteristicRef.current.removeEventListener?.('characteristicvaluechanged', handleCharacteristicChange);
+        characteristicRef.current = null;
+      }
+      if (deviceRef.current) {
+        deviceRef.current.removeEventListener('gattserverdisconnected', handleDisconnected);
+        if (deviceRef.current.gatt?.connected) {
+          deviceRef.current.gatt.disconnect();
+        }
+        deviceRef.current = null;
+      }
+      connectInFlightRef.current = false;
+    };
+  }, [handleCharacteristicChange, handleDisconnected]);
+
+  // ── Exportação da Sessão Bruta ───────────────────────────────────────────
+
+  const getSessionRR = useCallback(() => [...sessionRRRef.current], []);
 
   return {
     status,
@@ -260,5 +426,6 @@ export function useBLEHeartRate(): UseBLEHeartRateReturn {
     isSupported,
     connect,
     disconnect,
+    getSessionRR,
   };
 }

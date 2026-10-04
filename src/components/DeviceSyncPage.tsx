@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Activity, Heart, Moon, RefreshCw, Sliders, Smartphone, Battery, Info, ShieldAlert, Cpu, Brain, Bluetooth, Radio, Zap, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Activity, Heart, Moon, RefreshCw, Sliders, Smartphone, Battery, Info, ShieldAlert, Cpu, Brain, Bluetooth, Radio, Zap, AlertTriangle, CheckCircle2, Download, FileCheck } from 'lucide-react';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { useBLEHeartRate } from '../hooks/useBLEHeartRate';
+import { exportKubiosSession } from '../services/telemetry/kubiosExportService';
 
 interface DeviceSyncPageProps {
   onPageChange: (page: string) => void;
@@ -124,7 +125,53 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
     isSupported: bleIsSupported,
     connect: bleConnect,
     disconnect: bleDisconnect,
+    getSessionRR,
   } = useBLEHeartRate();
+
+  const [kubiosNotice, setKubiosNotice] = useState<string | null>(null);
+
+  const handleExportKubios = async () => {
+    try {
+      const samples = getSessionRR();
+      if (!samples || samples.length === 0) {
+        alert('Nenhuma amostra R-R registrada nesta sessão para exportação.');
+        return;
+      }
+
+      const result = await exportKubiosSession(samples, {
+        deviceName: bleDeviceName || 'Polar H10 (Cinta BLE)',
+      });
+
+      // 1. Download <session>_rr_series.txt
+      const seriesBlob = new Blob([result.seriesContent], { type: 'text/plain;charset=utf-8;' });
+      const seriesUrl = URL.createObjectURL(seriesBlob);
+      const link1 = document.createElement('a');
+      link1.href = seriesUrl;
+      link1.download = result.seriesFilename;
+      document.body.appendChild(link1);
+      link1.click();
+      document.body.removeChild(link1);
+      URL.revokeObjectURL(seriesUrl);
+
+      // 2. Download <session>_manifest.json
+      setTimeout(() => {
+        const manifestBlob = new Blob([result.manifestContent], { type: 'application/json;charset=utf-8;' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const link2 = document.createElement('a');
+        link2.href = manifestUrl;
+        link2.download = result.manifestFilename;
+        document.body.appendChild(link2);
+        link2.click();
+        document.body.removeChild(link2);
+        URL.revokeObjectURL(manifestUrl);
+      }, 300);
+
+      setKubiosNotice(`✓ Exportação Kubios gerada! Arquivo: ${result.seriesFilename} | SHA-256: ${result.seriesSha256.slice(0, 12)}...`);
+      setTimeout(() => setKubiosNotice(null), 10000);
+    } catch (err: any) {
+      alert(err.message || 'Erro ao exportar dados para Kubios.');
+    }
+  };
 
   // Bi-directional synchronization: BLE -> devices state & active device
   useEffect(() => {
@@ -1205,6 +1252,26 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                       Desconectar
                     </button>
                   </div>
+
+                  {/* Exportação Kubios HRV (Série RR canônica + Manifesto SHA-256) */}
+                  {getSessionRR().length > 0 && (
+                    <div className="pt-2 border-t border-slate-800/60">
+                      <button
+                        type="button"
+                        onClick={handleExportKubios}
+                        className="w-full py-2.5 px-3 bg-slate-900 hover:bg-cyan-950/40 text-cyan-300 hover:text-cyan-200 border border-cyan-800/40 hover:border-cyan-500/50 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
+                        title="Exportar série de intervalos R-R para Kubios HRV com manifesto criptográfico SHA-256"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Exportar Kubios HRV (.txt + SHA-256)</span>
+                      </button>
+                      {kubiosNotice && (
+                        <p className="text-[10px] text-emerald-400 font-mono mt-1.5 text-center bg-emerald-950/40 p-1.5 rounded-lg border border-emerald-800/30 animate-fade-in">
+                          {kubiosNotice}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -1228,6 +1295,29 @@ export const DeviceSyncPage: React.FC<DeviceSyncPageProps> = ({ onPageChange }) 
                     <div className="p-3 bg-red-950/40 border border-red-500/30 rounded-xl text-red-400 text-xs flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 shrink-0" />
                       <span>{bleError}</span>
+                    </div>
+                  )}
+
+                  {/* Se houver dados em memória de uma sessão recém-encerrada */}
+                  {getSessionRR().length > 0 && (
+                    <div className="p-3 bg-slate-950/80 border border-cyan-800/40 rounded-2xl space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-300 font-medium">Sessão anterior preservada:</span>
+                        <span className="font-mono text-cyan-400 font-bold">{getSessionRR().length} amostras R-R</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleExportKubios}
+                        className="w-full py-2 px-3 bg-cyan-950/60 hover:bg-cyan-900/60 text-cyan-300 border border-cyan-600/40 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Exportar Sessão para Kubios (.txt + SHA-256)</span>
+                      </button>
+                      {kubiosNotice && (
+                        <p className="text-[10px] text-emerald-400 font-mono mt-1.5 text-center bg-emerald-950/40 p-1.5 rounded-lg border border-emerald-800/30 animate-fade-in">
+                          {kubiosNotice}
+                        </p>
+                      )}
                     </div>
                   )}
 

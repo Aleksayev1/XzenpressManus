@@ -135,7 +135,7 @@ describe('Negative Capability Boundary Tests', () => {
 
       expect(() => {
         RuntimeBoundary.parseReflectionContext(spoofedData);
-      }).toThrow(/Invalid option: expected one of/);
+      }).toThrow(/Invalid enum value|invalid_enum_value/i);
     });
 
     it('throws if nested keys are contaminated via Object.assign/spread', () => {

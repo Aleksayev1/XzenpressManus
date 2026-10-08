@@ -37,7 +37,7 @@ export const NutrimingDashboard: React.FC<NutrimingDashboardProps> = ({ onBack, 
   const [isCheckinOpen, setIsCheckinOpen] = useState(false);
   const [pendingMeal, setPendingMeal] = useState<MealEvent | null>(null);
 
-  // Modais de Integridade Alimentar e Piloto Brioschi
+  // Modais de Integridade Alimentar e Telemetria N-of-1
   const [isAuthenticityReportOpen, setIsAuthenticityReportOpen] = useState(false);
   const [isClinicalCorrelationOpen, setIsClinicalCorrelationOpen] = useState(false);
   const [allMealEvents, setAllMealEvents] = useState<MealEvent[]>([]);
@@ -349,7 +349,7 @@ export const NutrimingDashboard: React.FC<NutrimingDashboardProps> = ({ onBack, 
               </div>
             </div>
 
-            {/* Card do Piloto Clínico Dr. Brioschi (ABRATERM) */}
+            {/* Card de Telemetria e Correlação Prandial N-of-1 */}
             <div className="p-5 rounded-3xl bg-gradient-to-br from-indigo-950/40 via-slate-900 to-slate-950 border border-indigo-500/30 shadow-xl relative overflow-hidden">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
@@ -358,12 +358,12 @@ export const NutrimingDashboard: React.FC<NutrimingDashboardProps> = ({ onBack, 
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-                      Piloto Clínico Termografia
+                      Correlação Prandial & VFC
                       <span className="text-[10px] px-2 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 font-mono border border-indigo-500/30">
                         N-OF-1
                       </span>
                     </h3>
-                    <p className="text-[11px] text-slate-400">Cruzamento com Prof. Dr. Marcos Brioschi</p>
+                    <p className="text-[11px] text-slate-400">Monitoramento Autonômico N-of-1</p>
                   </div>
                 </div>
 
@@ -379,7 +379,6 @@ export const NutrimingDashboard: React.FC<NutrimingDashboardProps> = ({ onBack, 
               <p className="text-xs text-slate-300 leading-relaxed pt-1">
                 Controle de ruído metabólico e digestivo sobre a assimetria térmica cutânea (&Delta;T) e VFC (RMSSD).
               </p>
-          </div>
           </div>
         </main>
         )}
@@ -417,7 +416,7 @@ export const NutrimingDashboard: React.FC<NutrimingDashboardProps> = ({ onBack, 
         mealEvents={allMealEvents}
       />
 
-      {/* Modal do Piloto Clínico Dr. Brioschi (ABRATERM) */}
+      {/* Modal de Correlação Prandial e Telemetria N-of-1 */}
       <ClinicalCorrelationModal
         isOpen={isClinicalCorrelationOpen}
         onClose={() => setIsClinicalCorrelationOpen(false)}

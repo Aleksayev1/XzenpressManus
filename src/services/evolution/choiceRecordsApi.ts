@@ -44,7 +44,7 @@ export const choiceRecordsApi = {
     }
 
     return data.map(mapDbToChoiceRecord);
-  }
+  },
 
   async fetchByChapter(chapterId: string): Promise<ChoiceRecord[]> {
     if (!supabase) return [];

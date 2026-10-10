@@ -45,7 +45,7 @@ export const practiceLogsApi = {
     }
 
     return data.map(mapDbToPracticeLog);
-  }
+  },
 
   async fetchLogsForChapter(chapterId: string): Promise<PracticeLog[]> {
     if (!supabase) return [];

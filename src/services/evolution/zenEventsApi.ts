@@ -48,7 +48,7 @@ export const zenEventsApi = {
       provenance: dbData.provenance,
       createdAt: dbData.created_at
     })) as ZenEvent[];
-  }
+  },
   async fetchAllUserEvents(userId: string): Promise<ZenEvent[]> {
     if (!supabase) return [];
 

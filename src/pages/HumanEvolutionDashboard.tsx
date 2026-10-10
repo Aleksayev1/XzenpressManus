@@ -142,8 +142,7 @@ export const HumanEvolutionDashboard: React.FC = () => {
     }
   };
 
-  // Conversão rápida dos PracticeLogs reais para ZenEvents
- para o MeaningEngine ler (em vez dos mocks duros anteriores)
+  // Conversão rápida dos PracticeLogs reais para ZenEvents para o MeaningEngine ler (em vez dos mocks duros anteriores)
   const convertedEvents: ZenEvent[] = practiceLogs.map(log => ZenEventBridge.createPracticeEvent(userId || 'anon', log));
   const observations = activeChapter ? MeaningEngine.interpret(convertedEvents, activeChapter) : [];
 

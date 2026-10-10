@@ -92,7 +92,7 @@ export const MeaningEngine = {
     });
 
     return observations;
-  }
+  },
   /**
    * Analisa eventos cruzados de Evolução + Nutriming para gerar observações interpretativas.
    * Regra de Ouro: Correlação não é causalidade. EpistemicStatus sempre 'interpretive'.

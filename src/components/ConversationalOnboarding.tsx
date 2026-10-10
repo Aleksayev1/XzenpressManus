@@ -104,6 +104,14 @@ export const ConversationalOnboarding: React.FC<ConversationalOnboardingProps> =
         }
       };
 
+      rec.onerror = (event: any) => {
+        console.warn('[Onboarding SpeechRecognition Error]:', event.error);
+        setIsRecording(false);
+        if (event.error === 'not-allowed') {
+          alert('Permissão de microfone não autorizada. Por favor, permita o acesso ao microfone no navegador.');
+        }
+      };
+
       rec.onend = () => {
         setIsRecording(false);
       };

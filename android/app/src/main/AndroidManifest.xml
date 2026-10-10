@@ -6,11 +6,13 @@
     <!-- Declaração explícita: NÃO usamos ID de publicidade -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
     
-    <!-- Permissões necessárias para PWA -->
+    <!-- Permissões necessárias para áudio e voz PWA/Capacitor -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     
     <!-- Permissões opcionais para funcionalidades futuras -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />

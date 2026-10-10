@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles, ArrowRight, ArrowLeft, Mic, MicOff, Zap } from 'lucide-react';
+import { X, Send, Loader2, ChevronDown, RotateCcw, Volume2, VolumeX, Play, Square, Sparkles, ArrowRight, ArrowLeft, Mic, MicOff, Zap, Radio } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { loadAnamneseProfile } from '../data/anamneseProfile';
 import { fiveElements } from '../data/fiveElements';
 import { ZenAvatar } from './ZenAvatar';
 import { emotionalStates } from '../data/emotionalMapping';
 import { ZenMemoryEngine, MemoryCategory, ZenMemory } from '../services/zenMemoryEngine';
+import { ZenLiveVoiceOverlay } from './ZenLiveVoiceOverlay';
 import {
   playMtcElement, startBinauralBeats, startQigongRhythm, startDownRegulationProtocol, stopAllZenAudio,
   type MtcElement, type BinauralState, type ZenAudioSession
@@ -327,6 +328,10 @@ function parseActionButtons(content: string) {
       label = '🧭 Meu Mapa Vivo';
       targetPage = 'mapa-vivo';
     }
+    if (page === 'login' || page === 'cadastro' || page === 'registro') {
+      label = '🔐 Criar Conta / Fazer Login';
+      targetPage = 'login';
+    }
     actions.push({ label, page: targetPage });
   }
 
@@ -616,6 +621,9 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate, onBack
   // Cleanup on unmount
   useEffect(() => () => { stopAllZenAudio(); zenSomRef.current?.stop(); }, []);
 
+  // ── Gemini Live Voice Modal ────────────────────────────────────────────────
+  const [isLiveVoiceOpen, setIsLiveVoiceOpen] = useState(false);
+
   // ── Speech Recognition ─────────────────────────────────────────────────────
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -867,26 +875,8 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
         }),
       });
 
-      const contentType = response.headers.get('content-type') || '';
-
-      if (!response.ok) {
-        let errMessage = 'Serviço temporariamente indisponível no momento. Tente novamente em instantes.';
-        try {
-          if (contentType.includes('application/json')) {
-            const errData = await response.json();
-            errMessage = errData.error || errMessage;
-          }
-        } catch {
-          // Response was not JSON (e.g., HTML 404/500)
-        }
-        throw new Error(errMessage);
-      }
-
-      if (!contentType.includes('application/json')) {
-        throw new Error('Serviço de IA temporariamente indisponível. Tente novamente em instantes.');
-      }
-
       const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Erro ao processar mensagem');
 
       // Parse fora do callback para que cleanContent fique no escopo correto
       const { cleanContent, actions, zenSomProtocols, candidateMemoryText } = parseActionButtons(data.reply);
@@ -1060,6 +1050,25 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
             title="Nova conversa"
           >
             <RotateCcw className="w-3.5 h-3.5" />
+          </button>
+          {/* Botão Gemini Live (Viva-Voz) */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              stop();
+              stopZenSom();
+              setIsLiveVoiceOpen(true);
+            }}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-semibold transition-all hover:scale-105 active:scale-95 shadow-sm"
+            style={{
+              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(56, 189, 248, 0.28))',
+              border: '1px solid rgba(99, 102, 241, 0.45)',
+              color: '#c7d2fe',
+            }}
+            title="Abrir diálogo por voz em tempo real (Gemini Live)"
+          >
+            <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+            <span className="text-[11px] font-bold">Live</span>
           </button>
           {/* Toggle auto-leitura */}
           <button
@@ -1542,15 +1551,21 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
 
           {/* Footer */}
           <div className="px-4 pb-1">
-            <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-lg p-1.5 text-center flex items-center justify-center gap-1">
+            <div 
+              onClick={() => { if (!user && onNavigate) onNavigate('login'); }}
+              className={`bg-indigo-500/5 border border-indigo-500/20 rounded-lg p-1.5 text-center flex items-center justify-center gap-1.5 ${!user ? 'cursor-pointer hover:bg-indigo-500/10 hover:border-indigo-500/40 transition-colors' : ''}`}
+              title={!user ? 'Clique para fazer login ou criar sua conta gratuita' : undefined}
+            >
               <Sparkles className="w-3 h-3 text-indigo-400 opacity-70" />
               <span className="text-[10px] text-indigo-300/80 font-medium leading-tight">
-                Seus insights ficam salvos automaticamente no Mapa Vivo (Premium)
+                {user 
+                  ? 'Seus insights ficam salvos automaticamente no Mapa Vivo (Premium)'
+                  : 'Faça login ou crie sua conta para salvar seus insights no Mapa Vivo ✨'}
               </span>
             </div>
           </div>
           <div className="px-4 pb-2 pt-1 text-[9px] text-gray-700 text-center">
-            Self Oracle · YNSA + MTC + Metafísica · Não substitui cuidado médico
+            Self Oracle · YNSA + MTC + Medicina Integrativa · Não substitui cuidado médico
           </div>
         </>
       )}
@@ -1561,9 +1576,35 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
     return (
       <div className="min-h-[85vh] py-6 px-4 flex flex-col items-center justify-center relative">
         {content}
+        <ZenLiveVoiceOverlay
+          isOpen={isLiveVoiceOpen}
+          onClose={() => setIsLiveVoiceOpen(false)}
+          accentColor={accentColor}
+          onAddTranscriptMessage={(role, text) => {
+            setMessages(prev => [
+              ...prev,
+              { role, content: text, timestamp: new Date() }
+            ]);
+          }}
+        />
       </div>
     );
   }
 
-  return content;
+  return (
+    <>
+      {content}
+      <ZenLiveVoiceOverlay
+        isOpen={isLiveVoiceOpen}
+        onClose={() => setIsLiveVoiceOpen(false)}
+        accentColor={accentColor}
+        onAddTranscriptMessage={(role, text) => {
+          setMessages(prev => [
+            ...prev,
+            { role, content: text, timestamp: new Date() }
+          ]);
+        }}
+      />
+    </>
+  );
 };

@@ -38,17 +38,42 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onPageChange }) => {
                     <span>Sistema vivo de autocuidado</span>
                 </div>
 
-                <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-                    Não trate sintomas.
+                <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+                    Sua saúde mental é o seu
                     <br />
-                    <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                        Entenda padrões.
+                    <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-emerald-600 bg-clip-text text-transparent">
+                        bem mais valioso.
                     </span>
                 </h1>
 
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                    Um sistema vivo que integra <strong>corpo, mente, tempo e emoção</strong> para autocuidado guiado, consciente e contínuo.
+                <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
+                    Afinal, quanto vale a sua qualidade de vida, seu sono reparador e a sua paz interior? Um sistema vivo que integra <strong>corpo, mente, tempo e emoção</strong> para acompanhamento guiado e contínuo.
                 </p>
+
+                {/* Ancoragem de Qualidade de Vida vs Gastos Diários */}
+                <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-indigo-50 border border-emerald-200/80 rounded-2xl p-6 max-w-4xl mx-auto mb-10 shadow-sm text-left sm:text-center">
+                    <p className="text-xs uppercase tracking-wider text-emerald-800 font-bold mb-2">
+                        💡 Coloque na balança o valor do seu bem-estar
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 text-center">
+                        <div className="bg-white/80 p-3 rounded-xl border border-gray-200 shadow-sm">
+                            <span className="text-2xl">☕</span>
+                            <p className="text-xs text-gray-500 mt-1">1 Café expresso / dia</p>
+                            <p className="text-sm font-bold text-gray-700">~R$ 210 / mês</p>
+                        </div>
+                        <div className="bg-white/80 p-3 rounded-xl border border-gray-200 shadow-sm">
+                            <span className="text-2xl">🛋️</span>
+                            <p className="text-xs text-gray-500 mt-1">1 Consulta isolada</p>
+                            <p className="text-sm font-bold text-gray-700">R$ 250 a R$ 380</p>
+                        </div>
+                        <div className="bg-gradient-to-b from-emerald-600 to-teal-700 p-3 rounded-xl text-white shadow-md">
+                            <span className="text-2xl">🌿</span>
+                            <p className="text-xs text-emerald-100 mt-1">ZenMentor Premium</p>
+                            <p className="text-sm font-extrabold text-white">A partir de R$ 33,25 / mês</p>
+                            <p className="text-[10px] text-emerald-100 font-medium">Menos de R$ 1,10 por dia!</p>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Medical Disclaimer - COMPLIANCE */}
                 <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 max-w-4xl mx-auto mb-8">
@@ -271,14 +296,20 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onPageChange }) => {
 
                         <div className="text-center mb-6 text-white">
                             <h3 className="text-2xl font-bold mb-2">Premium</h3>
-                            <div className="text-5xl font-bold mb-2">
+                            <div className="text-5xl font-bold mb-1">
                                 {billingCycle === 'monthly' ? 'R$ 49' : 'R$ 399'}
                             </div>
-                            <p className="text-purple-200">
-                                {billingCycle === 'monthly' ? 'por mês' : 'por ano'}
+                            <p className="text-purple-200 text-sm font-medium">
+                                {billingCycle === 'monthly' ? 'por mês (~R$ 1,63 por dia)' : 'por ano (~R$ 1,09 por dia)'}
                             </p>
-                            {billingCycle === 'annual' && (
-                                <p className="text-sm text-yellow-300 mt-2">Economize R$ 189/ano</p>
+                            {billingCycle === 'annual' ? (
+                                <p className="text-xs text-yellow-300 font-bold mt-2 bg-black/20 py-1 px-3 rounded-full inline-block">
+                                    Economize R$ 189/ano • Menos de R$ 1,10/dia!
+                                </p>
+                            ) : (
+                                <p className="text-xs text-purple-200 mt-2">
+                                    Acesso completo por menos que 1 lanche no mês
+                                </p>
                             )}
                         </div>
 

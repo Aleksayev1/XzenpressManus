@@ -216,8 +216,7 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
     const getDailyMaxLimit = () => {
         if (user?.isPremium) return 999;
-        if (user) return 2; // Usuário gratuito logado: 2 por dia
-        return 1; // Visitante sem login: 1 por dia
+        return 1; // 1 degustação por dia para não-assinantes (estimula assinatura)
     };
 
     const getDailyUsageCount = () => {
@@ -704,83 +703,63 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             <Crown className="w-8 h-8 text-amber-400" />
                         </div>
 
-                        {!user ? (
-                            <>
-                                <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200 mb-3">
-                                    Desperte seu Potencial
-                                </h2>
-                                <p className="text-gray-300 text-sm mb-6 leading-relaxed">
-                                    Sua primeira degustação da Sessão Mestra foi concluída.
-                                    <br /><br />
-                                    ✨ <strong>Crie sua conta gratuita agora</strong> para ganhar mais uma sessão hoje e salvar seu histórico.
-                                    <br />
-                                    👑 Ou vá além: assine o <strong>Premium</strong> para ter <strong>acesso espetacular</strong> e ilimitado a todos os protocolos e inteligência artificial da XZenPress!
-                                </p>
-                                <div className="space-y-3">
+                        <>
+                            <h2 className="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-200 to-amber-300 mb-3">
+                                Sua Saúde Merece Continuidade 🌿
+                            </h2>
+                            <p className="text-gray-300 text-xs sm:text-sm mb-5 leading-relaxed text-left sm:text-center">
+                                Sua degustação diária da <strong>Sessão Mestra</strong> foi concluída. 
+                                <br /><br />
+                                A regulação do sistema nervoso e a verdadeira paz interior não acontecem por acaso — <strong>exigem consistência diária</strong>.
+                                <br /><br />
+                                Invista no seu bem mais valioso: <strong>sua qualidade de vida</strong>. Com o <strong>ZenMentor Premium</strong>, você tem sessões ilimitadas, seus insights salvos no <strong>Mapa Vivo</strong> e acompanhamento diário contínuo.
+                            </p>
+
+                            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-2.5 mb-5 text-center">
+                                <span className="text-[11px] text-emerald-300 font-semibold">
+                                    ✨ Menos de R$ 1,30 por dia para transformar seu sono e sua mente
+                                </span>
+                            </div>
+
+                            <div className="space-y-3">
+                                <button
+                                    id="sessao-mestra-subscribe-btn"
+                                    onClick={() => {
+                                        setShowLimitModal(false);
+                                        onBack();
+                                        window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'pricing' }));
+                                    }}
+                                    className="w-full py-3.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 rounded-xl font-bold text-white shadow-xl hover:scale-105 transition-all text-xs sm:text-sm flex items-center justify-center gap-2"
+                                >
+                                    <Sparkles className="w-4 h-4" />
+                                    <span>Começar Minha Jornada Completa (Premium)</span>
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+
+                                {!user && (
                                     <button
                                         onClick={() => {
                                             setShowLimitModal(false);
                                             onBack();
                                             window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'login' }));
                                         }}
-                                        className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-bold text-white shadow-lg hover:scale-105 transition-all text-xs sm:text-sm"
+                                        className="w-full py-2.5 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 transition-colors text-xs flex items-center justify-center gap-1.5"
                                     >
-                                        🔑 Criar Conta / Fazer Login Grátis (+1 Sessão)
+                                        <span>Já é assinante? Fazer login</span>
                                     </button>
-                                    <button
-                                        onClick={() => {
-                                            setShowLimitModal(false);
-                                            onBack();
-                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'premium' }));
-                                        }}
-                                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl font-bold text-black hover:scale-105 transition-all text-xs sm:text-sm"
-                                    >
-                                        👑 Assinar Premium (Acesso Espetacular)
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setShowLimitModal(false);
-                                            onBack();
-                                        }}
-                                        className="w-full py-2.5 border border-gray-700 rounded-xl text-gray-400 hover:text-white transition-colors text-xs"
-                                    >
-                                        Voltar ao Menu
-                                    </button>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200 mb-3">
-                                    A Jornada Apenas Começou
-                                </h2>
-                                <p className="text-gray-300 text-sm mb-6 leading-relaxed">
-                                    Você atingiu o limite de 2 sessões diárias do plano gratuito.
-                                    <br /><br />
-                                    Liberte todo o poder da medicina integrativa. Obtenha <strong>acesso espetacular</strong> ao nosso ZenMentor IA, protocolos ilimitados e personalização clínica profunda fazendo o upgrade para o <strong>Premium</strong>.
-                                </p>
-                                <div className="space-y-3">
-                                    <button
-                                        onClick={() => {
-                                            setShowLimitModal(false);
-                                            onBack();
-                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'premium' }));
-                                        }}
-                                        className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl font-bold text-black shadow-lg hover:scale-105 transition-all text-xs sm:text-sm"
-                                    >
-                                        👑 Assinar Premium (Acesso Espetacular)
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setShowLimitModal(false);
-                                            onBack();
-                                        }}
-                                        className="w-full py-2.5 border border-gray-700 rounded-xl text-gray-400 hover:text-white transition-colors text-xs"
-                                    >
-                                        Voltar ao Menu
-                                    </button>
-                                </div>
-                            </>
-                        )}
+                                )}
+
+                                <button
+                                    onClick={() => {
+                                        setShowLimitModal(false);
+                                        onBack();
+                                    }}
+                                    className="w-full py-2 border border-transparent rounded-xl text-gray-500 hover:text-gray-400 transition-colors text-xs"
+                                >
+                                    Voltar ao Menu
+                                </button>
+                            </div>
+                        </>
                     </div>
                 </div>
             )}
@@ -1369,6 +1348,39 @@ export const SessaoMestraPage: React.FC<{ onBack: () => void }> = ({ onBack }) =
                             ) : (
                                 <div className="bg-slate-900 border border-white/5 rounded-2xl p-5 text-center mb-4">
                                     <p className="text-gray-400 text-sm">Você completou o ciclo Mente-Energia-Corpo.</p>
+                                </div>
+                            )}
+
+                            {/* Card de Assinatura pós-sessão (Se não for Premium) */}
+                            {!user?.isPremium && (
+                                <div className="mb-6 p-4 rounded-2xl text-left border border-emerald-500/30 bg-gradient-to-r from-emerald-950/50 via-purple-950/40 to-slate-900/90 shadow-xl">
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        <Sparkles className="w-4 h-4 text-emerald-400" />
+                                        <h4 className="text-xs sm:text-sm font-bold text-emerald-300">
+                                            Sua mente respondeu. Não pare por aqui 🌿
+                                        </h4>
+                                    </div>
+                                    <p className="text-[11px] sm:text-xs text-gray-300 leading-relaxed mb-3">
+                                        Você sentiu a regulação parassimpática no corpo. Para salvar seus biomarcadores no <strong>Mapa Vivo</strong> e ter sessões completas sem bloqueios, assine o ZenMentor.
+                                    </p>
+                                    <div className="flex items-center justify-between text-[11px] text-gray-400 mb-3 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/5">
+                                        <span>Investimento na sua paz:</span>
+                                        <span className="font-bold text-amber-300">Menos de R$ 1,30/dia</span>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            onBack();
+                                            window.dispatchEvent(new CustomEvent('xzen-navigate', { detail: 'pricing' }));
+                                        }}
+                                        className="w-full py-3 bg-gradient-to-r from-emerald-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <Crown className="w-4 h-4 text-amber-300" />
+                                        <span>Assinar Premium & Salvar no Mapa Vivo</span>
+                                        <ArrowRight className="w-4 h-4" />
+                                    </button>
+                                    <p className="text-[10px] text-gray-500 text-center mt-2">
+                                        ✨ 7 dias grátis • Cancele quando quiser
+                                    </p>
                                 </div>
                             )}
 

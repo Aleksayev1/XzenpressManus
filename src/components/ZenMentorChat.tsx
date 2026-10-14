@@ -328,6 +328,10 @@ function parseActionButtons(content: string) {
       label = '🧭 Meu Mapa Vivo';
       targetPage = 'mapa-vivo';
     }
+    if (page === 'assinar' || page === 'assinatura' || page === 'planos' || page === 'premium') {
+      label = '🌿 Começar minha jornada completa';
+      targetPage = 'pricing';
+    }
     if (page === 'login' || page === 'cadastro' || page === 'registro') {
       label = '🔐 Criar Conta / Fazer Login';
       targetPage = 'login';
@@ -786,14 +790,15 @@ export const ZenMentorChat: React.FC<ZenMentorChatProps> = ({ onNavigate, onBack
 
       if (timestamps.length >= 3) {
         const limitMessage = user ? 
-          `Degustação diária concluída! 🌟\n\nVocê sabia que a consistência é a chave para moldar sua epigenética e calibrar seus Guardiões? Acessar o Zen Mentor diariamente ajuda você a se compreender de forma integral.\n\nPara continuar este diálogo transformador e ter consultas ilimitadas, assine o plano Premium!` :
-          `Degustação finalizada (3 mensagens)! 🌟\n\nO Zen Mentor é apenas o início. Para dar continuidade ao seu tratamento e liberar consultas ilimitadas, faça o seu login ou assine o plano Premium!`;
+          `Degustação diária concluída! 🌟\n\nVocê sabia que a consistência é a chave para moldar sua epigenética e calibrar seus Guardiões? Acessar o Zen Mentor diariamente ajuda você a se compreender de forma integral.\n\nPara continuar este diálogo transformador e ter consultas ilimitadas, assine o ZenMentor Premium e continue sua jornada, sem limites!` :
+          `Degustação finalizada (3 mensagens)! 🌟\n\nO Zen Mentor é apenas o início. Para dar continuidade ao seu tratamento e liberar consultas ilimitadas, assine o ZenMentor Premium e libere consultas ilimitadas, a Sessão Mestra completa e o seu Mapa Vivo.`;
 
         setMessages(prev => [...prev, 
           { role: 'user', content: input.trim(), timestamp: new Date() },
           { 
             role: 'assistant', 
-            content: limitMessage, 
+            content: limitMessage,
+            actions: [{ label: '🌿 Começar minha jornada completa', page: 'pricing' }], 
             timestamp: new Date() 
           }
         ]);
@@ -1303,6 +1308,46 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
                     {msg.role === 'assistant' && i === sessionReadyMsgIndex && detectedEmotionId && (
                       <div className="mt-3 flex flex-col gap-2">
 
+                        {/* ── CONVITE À ASSINATURA — somente para não-Premium ── */}
+                        {!user?.isPremium && (
+                          <div
+                            className="rounded-2xl p-3.5 text-left shadow-lg"
+                            style={{
+                              background: 'linear-gradient(135deg, rgba(16,185,129,0.14), rgba(99,102,241,0.14))',
+                              border: `1px solid ${accentColor}55`,
+                            }}
+                          >
+                            <p className="text-xs font-bold text-emerald-200 mb-1.5">
+                              🌿 Seu mapeamento está pronto
+                            </p>
+                            <ul className="text-[11px] text-gray-300 leading-snug space-y-1 mb-2.5">
+                              <li>🧘 Sessões Mestras completas e personalizadas</li>
+                              <li>🗺️ Mapa Vivo guardando seus insights e evolução</li>
+                              <li>💬 Conversas ilimitadas com o ZenMentor</li>
+                            </ul>
+                            <button
+                              id="zenmentor-subscribe-cta"
+                              onClick={() => {
+                                stopZenSom();
+                                setIsOpen(false);
+                                onNavigate?.('pricing');
+                              }}
+                              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-white transition-all hover:scale-[1.02] hover:brightness-110 shadow-md"
+                              style={{
+                                background: `linear-gradient(135deg, #10b981, ${accentColor})`,
+                                boxShadow: `0 4px 15px ${accentColor}55`,
+                              }}
+                            >
+                              <Sparkles className="w-4 h-4" />
+                              <span>Começar minha jornada completa</span>
+                              <ArrowRight className="w-4 h-4" />
+                            </button>
+                            <p className="text-[9px] text-gray-500 text-center mt-1.5">
+                              Sua assinatura mantém este espaço vivo e acessível.
+                            </p>
+                          </div>
+                        )}
+
                         {/* ── SESSÃO MESTRA — Com Robozinho Zen Concierge ── */}
                         <div className="bg-gradient-to-r from-purple-900/40 to-indigo-900/40 border border-purple-500/30 rounded-2xl p-3 shadow-lg">
                           <div className="flex items-center gap-3 mb-2.5 text-left">
@@ -1552,15 +1597,15 @@ Não mencione a tag no texto, ela é invisível ao usuário. Máximo 1 tag por r
           {/* Footer */}
           <div className="px-4 pb-1">
             <div 
-              onClick={() => { if (!user && onNavigate) onNavigate('login'); }}
-              className={`bg-indigo-500/5 border border-indigo-500/20 rounded-lg p-1.5 text-center flex items-center justify-center gap-1.5 ${!user ? 'cursor-pointer hover:bg-indigo-500/10 hover:border-indigo-500/40 transition-colors' : ''}`}
-              title={!user ? 'Clique para fazer login ou criar sua conta gratuita' : undefined}
+              onClick={() => { if (!user?.isPremium && onNavigate) onNavigate('pricing'); }}
+              className={`bg-indigo-500/5 border border-indigo-500/20 rounded-lg p-1.5 text-center flex items-center justify-center gap-1.5 ${!user?.isPremium ? 'cursor-pointer hover:bg-indigo-500/10 hover:border-indigo-500/40 transition-colors' : ''}`}
+              title={!user?.isPremium ? 'Veja os planos e desbloqueie a jornada completa' : undefined}
             >
               <Sparkles className="w-3 h-3 text-indigo-400 opacity-70" />
               <span className="text-[10px] text-indigo-300/80 font-medium leading-tight">
-                {user 
+                {user?.isPremium 
                   ? 'Seus insights ficam salvos automaticamente no Mapa Vivo (Premium)'
-                  : 'Faça login ou crie sua conta para salvar seus insights no Mapa Vivo ✨'}
+                  : 'Assine para desbloquear a Sessão Mestra e o Mapa Vivo ✨'}
               </span>
             </div>
           </div>

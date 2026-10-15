@@ -1,4 +1,4 @@
-const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
+﻿const { getCorsHeaders, isOriginAllowed } = require('./lib/cors');
 
 exports.handler = async (event) => {
     const headers = {
@@ -29,13 +29,18 @@ exports.handler = async (event) => {
     }
 
     const OPENAI_KEY = process.env.OPENAI_API_KEY;
+    const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY;
     const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
     if (!image) {
         return {
             statusCode: 200,
             headers,
-            body: JSON.stringify({ foods: ['Prato de refeição', 'Salada', 'Proteína'] })
+            body: JSON.stringify({
+                foods: ['Refeição nutritiva', 'Salada fresca', 'Acompanhamento'],
+                description: 'Refeição registrada sem foto. Prato balanceado com nutrientes essenciais e suporte digestivo.',
+                thermalNature: 'neutral'
+            })
         };
     }
 
@@ -44,6 +49,19 @@ exports.handler = async (event) => {
     if (!dataUri.startsWith('data:')) {
         dataUri = `data:image/jpeg;base64,${image}`;
     }
+
+    const systemPrompt = `Você é um especialista em reconhecimento de alimentos e nutrição integrativa do Nutriming Zen.${barcode ? ` O código de barras fornecido foi: ${barcode}.` : ''} 
+Analise a imagem da refeição ou produto e extraia:
+1. "foods": Array com os nomes exatos de cada alimento/ingrediente presente no prato em português (ex: ["Peito de Frango Grelhado", "Arroz Integral", "Salada de Rúcula e Tomate"]). Máximo 1 a 5 itens.
+2. "description": Uma descrição clara e elegante de 2 a 3 frases explicando a composição do prato, seu equilíbrio de macronutrientes (proteínas, fibras, carboidratos) e perfil de digestibilidade.
+3. "thermalNature": Natureza térmica predominante segundo a Medicina Tradicional Chinesa ("warm", "neutral", "cool", "hot" ou "cold").
+
+Responda EXCLUSIVAMENTE em formato JSON:
+{
+  "foods": ["Nome do Alimento 1", "Nome do Alimento 2"],
+  "description": "Descrição detalhada da refeição em português...",
+  "thermalNature": "neutral"
+}`;
 
     // 1. Tentar OpenAI gpt-4o-mini com visão computacional
     if (OPENAI_KEY) {
@@ -58,16 +76,13 @@ exports.handler = async (event) => {
                 body: JSON.stringify({
                     model: 'gpt-4o-mini',
                     temperature: 0.2,
-                    max_tokens: 300,
+                    max_tokens: 450,
                     messages: [
-                        {
-                            role: 'system',
-                            content: `Você é um especialista em reconhecimento de alimentos e rótulos do Nutriming Zen.${barcode ? ` O código de barras fornecido foi: ${barcode}.` : ''} Analise a imagem da refeição ou rótulo do produto e extraia o nome do alimento ou produto em português (máximo 1 a 4 itens). Responda EXCLUSIVAMENTE em formato JSON: { "foods": ["Nome do Alimento"] }`
-                        },
+                        { role: 'system', content: systemPrompt },
                         {
                             role: 'user',
                             content: [
-                                { type: 'text', text: 'Quais alimentos compõem esta refeição?' },
+                                { type: 'text', text: 'Identifique os alimentos que compõem este prato e descreva a refeição.' },
                                 { type: 'image_url', image_url: { url: dataUri } }
                             ]
                         }
@@ -81,11 +96,15 @@ exports.handler = async (event) => {
                 const content = data?.choices?.[0]?.message?.content || '{}';
                 const parsed = JSON.parse(content);
                 if (Array.isArray(parsed.foods) && parsed.foods.length > 0) {
-                    console.log('✅ [Nutriming Vision] Alimentos identificados com sucesso:', parsed.foods);
+                    console.log('✅ [Nutriming Vision] Alimentos identificados com OpenAI:', parsed.foods);
                     return {
                         statusCode: 200,
                         headers,
-                        body: JSON.stringify({ foods: parsed.foods })
+                        body: JSON.stringify({
+                            foods: parsed.foods,
+                            description: parsed.description || `Refeição com ${parsed.foods.join(', ')}.`,
+                            thermalNature: parsed.thermalNature || 'neutral'
+                        })
                     };
                 }
             } else {
@@ -96,60 +115,68 @@ exports.handler = async (event) => {
         }
     }
 
-    // 2. Tentar Gemini Flash com Visão Computacional (Rápido e Resiliente)
-    const activeGeminiKey = GEMINI_KEY || process.env.GEMINI_KEY || process.env.VITE_GEMINI_API_KEY;
-    if (activeGeminiKey) {
+    // 2. Fallback de Alta Resiliência: OpenRouter com Visão Multimodal
+    if (OPENROUTER_KEY) {
         try {
-            console.log('[Nutriming Vision] Analisando foto com Gemini Flash Vision...');
-            const base64Data = dataUri.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
-            const mimeType = dataUri.match(/^data:(image\/[a-zA-Z]+);base64,/)?.[1] || 'image/jpeg';
-
-            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${activeGeminiKey}`;
-            const geminiRes = await fetch(geminiUrl, {
+            console.log('[Nutriming Vision] Analisando foto via OpenRouter multimodal...');
+            const openrouterRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${OPENROUTER_KEY}`,
+                    'HTTP-Referer': 'https://xzenpress.com',
+                    'X-Title': 'XZenpress Nutriming Vision'
+                },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [
-                            { text: `Você é um especialista em reconhecimento de alimentos e rótulos nutricionais do Nutriming Zen.${barcode ? ` O código de barras (EAN) lido foi: ${barcode}.` : ''} Identifique os alimentos ou o produto/rótulo embalado nesta foto. Retorne EXCLUSIVAMENTE um JSON no formato: {"foods": ["Nome do Alimento 1"]}. Priorize o nome comercial exato do produto se for embalagem ou rótulo.` },
-                            { inline_data: { mime_type: mimeType, data: base64Data } }
-                        ]
-                    }],
-                    generationConfig: {
-                        temperature: 0.2,
-                        maxOutputTokens: 250,
-                        responseMimeType: 'application/json',
-                        thinkingConfig: { thinkingBudget: 0 }
-                    }
+                    model: 'openai/gpt-4o-mini',
+                    temperature: 0.2,
+                    max_tokens: 450,
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        {
+                            role: 'user',
+                            content: [
+                                { type: 'text', text: 'Identifique os alimentos que compõem este prato e descreva a refeição.' },
+                                { type: 'image_url', image_url: { url: dataUri } }
+                            ]
+                        }
+                    ],
+                    response_format: { type: 'json_object' }
                 })
             });
 
-            if (geminiRes.ok) {
-                const data = await geminiRes.json();
-                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-                const parsed = JSON.parse(text);
+            if (openrouterRes.ok) {
+                const data = await openrouterRes.json();
+                const content = data?.choices?.[0]?.message?.content || '{}';
+                const parsed = JSON.parse(content);
                 if (Array.isArray(parsed.foods) && parsed.foods.length > 0) {
-                    console.log('✅ [Nutriming Vision] Alimentos identificados com Gemini:', parsed.foods);
+                    console.log('✅ [Nutriming Vision] Alimentos identificados via OpenRouter:', parsed.foods);
                     return {
                         statusCode: 200,
                         headers,
-                        body: JSON.stringify({ foods: parsed.foods })
+                        body: JSON.stringify({
+                            foods: parsed.foods,
+                            description: parsed.description || `Refeição composta por ${parsed.foods.join(', ')}.`,
+                            thermalNature: parsed.thermalNature || 'neutral'
+                        })
                     };
                 }
             } else {
-                console.warn('[Nutriming Vision] Gemini retornou status:', geminiRes.status);
+                console.warn('[Nutriming Vision] OpenRouter retornou status:', openrouterRes.status);
             }
         } catch (err) {
-            console.warn('[Nutriming Vision] Erro na requisição Gemini:', err.message);
+            console.warn('[Nutriming Vision] Erro no OpenRouter:', err.message);
         }
     }
 
-    // 3. Fallback resiliente
+    // 3. Fallback amigável e estruturado
     return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-            foods: ['Prato principal', 'Salada mista', 'Acompanhamento']
+            foods: ['Prato principal', 'Salada fresca', 'Acompanhamento'],
+            description: 'Refeição registrada com sucesso. Composição mista balanceada para manutenção da saciedade e energia.',
+            thermalNature: 'neutral'
         })
     };
 };

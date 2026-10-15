@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NutrimingCapture } from '../components/nutriming/NutrimingCapture';
 import { NutrimingCaptureFlows, CaptureMethod } from '../components/nutriming/NutrimingCaptureFlows';
@@ -46,6 +46,7 @@ export const NutrimingDashboard: React.FC<NutrimingDashboardProps> = ({ onBack, 
   const [isExplorerOpen, setIsExplorerOpen] = useState(false);
   const [activeIntervention, setActiveIntervention] = useState<ExplorationOption | null>(null);
   const [scannedBarcode, setScannedBarcode] = useState<string | undefined>(undefined);
+  const [mealDescription, setMealDescription] = useState<string | undefined>(undefined);
 
   const refreshPendingMeal = () => {
     const pending = MealEventsApi.getPendingMealForCheckin();

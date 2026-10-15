@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Mic, Search, X, Loader2, Scan, Upload, RefreshCw, AlertCircle, Check, ArrowRight, Sparkles, HelpCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ export type CaptureMethod = 'photo' | 'voice' | 'search' | 'barcode' | null;
 interface NutrimingCaptureFlowsProps {
   method: CaptureMethod;
   onCancel: () => void;
-  onComplete: (foods: string[], barcode?: string) => void;
+  onComplete: (foods: string[], barcode?: string, mealDescription?: string) => void;
 }
 
 export const NutrimingCaptureFlows: React.FC<NutrimingCaptureFlowsProps> = ({ method, onCancel, onComplete }) => {
@@ -47,7 +47,7 @@ export const NutrimingCaptureFlows: React.FC<NutrimingCaptureFlowsProps> = ({ me
 /* ═══════════════════════════════════════════════════════════════
    0. LEITOR CONTÍNUO DE CÓDIGO DE BARRAS (OPEN FOOD FACTS)
    ═══════════════════════════════════════════════════════════════ */
-const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string) => void }> = ({ onComplete }) => {
+const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string, mealDescription?: string) => void }> = ({ onComplete }) => {
   const [hasCameraStream, setHasCameraStream] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [barcodeInput, setBarcodeInput] = useState('');
@@ -240,7 +240,7 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
 
         // 2. Se não detectou linhas de barras com precisão, envia foto para IA Vision identificar o alimento/rótulo
         setStatusMessage('Código não identificado no leitor. Analisando produto com IA...');
-        const compressed = canvas.toDataURL('image/jpeg', 0.85);
+        const compressed = canvas.toDataURL('image/jpeg', 0.75);
         await callAiVisionForFood(compressed);
         setIsQuerying(false);
       };
@@ -266,7 +266,7 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
       const img = new Image();
       img.onload = async () => {
         const canvas = document.createElement('canvas');
-        const maxDim = 800;
+        const maxDim = 640;
         let targetW = img.width;
         let targetH = img.height;
         if (img.width > maxDim || img.height > maxDim) {
@@ -283,7 +283,7 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.drawImage(img, 0, 0, targetW, targetH);
-          const compressed = canvas.toDataURL('image/jpeg', 0.85);
+          const compressed = canvas.toDataURL('image/jpeg', 0.75);
           await callAiVisionForFood(compressed, notFoundBarcode || undefined);
         } else {
           await callAiVisionForFood(result, notFoundBarcode || undefined);
@@ -779,7 +779,7 @@ const VoiceFlow: React.FC<{ onComplete: (f: string[]) => void }> = ({ onComplete
 /* ═══════════════════════════════════════════════════════════════
    3. CAPTURA DE FOTO REAL COM CÂMERA OU ARQUIVO
    ═══════════════════════════════════════════════════════════════ */
-const PhotoFlow: React.FC<{ onComplete: (f: string[]) => void }> = ({ onComplete }) => {
+const PhotoFlow: React.FC<{ onComplete: (f: string[], barcode?: string, mealDescription?: string) => void }> = ({ onComplete }) => {
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [hasCameraStream, setHasCameraStream] = useState(false);
@@ -842,7 +842,7 @@ const PhotoFlow: React.FC<{ onComplete: (f: string[]) => void }> = ({ onComplete
     const height = video.videoHeight || 480;
     
     // Redimensionar para tamanho ideal para IA
-    const maxDim = 800;
+    const maxDim = 640;
     let targetW = width;
     let targetH = height;
     if (width > maxDim || height > maxDim) {
@@ -861,7 +861,7 @@ const PhotoFlow: React.FC<{ onComplete: (f: string[]) => void }> = ({ onComplete
     if (!ctx) return;
 
     ctx.drawImage(video, 0, 0, targetW, targetH);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
 
     // Parar stream
     if (streamRef.current) {
@@ -885,7 +885,7 @@ const PhotoFlow: React.FC<{ onComplete: (f: string[]) => void }> = ({ onComplete
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const maxDim = 800;
+          const maxDim = 640;
           let targetW = img.width;
           let targetH = img.height;
           if (img.width > maxDim || img.height > maxDim) {
@@ -902,7 +902,7 @@ const PhotoFlow: React.FC<{ onComplete: (f: string[]) => void }> = ({ onComplete
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0, targetW, targetH);
-            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+            const compressed = canvas.toDataURL('image/jpeg', 0.75);
             processCapturedImage(compressed);
           } else {
             processCapturedImage(result);

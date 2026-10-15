@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
+﻿import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, ShieldAlert, Sparkles, Compass, Info, ChevronDown, ChevronUp, Flame, Snowflake, Scale, ExternalLink, Scan, ShieldCheck, ShieldX } from 'lucide-react';
+import { Check, X, ShieldAlert, Sparkles, Compass, Info, ChevronDown, ChevronUp, Flame, Snowflake, Scale, ExternalLink, Scan, ShieldCheck, ShieldX, Clock } from 'lucide-react';
 import { FoodStateEngine } from '../../services/nutriming/FoodStateEngine';
 import { FoodNormalizer } from '../../services/nutriming/foodNormalizer';
 import { MtcFoodClassifier } from '../../services/nutriming/mtcFoodClassifier';
@@ -17,6 +17,7 @@ interface NutrimingConfirmationModalProps {
   extractedFoods: string[];
   barcode?: string;
   onExplorePoint?: (point: string) => void;
+  mealDescription?: string;
 }
 
 export const NutrimingConfirmationModal: React.FC<NutrimingConfirmationModalProps> = ({
@@ -110,7 +111,7 @@ export const NutrimingConfirmationModal: React.FC<NutrimingConfirmationModalProp
       createdAt: new Date().toISOString(),
       product: {
         foodProductId: foodProfile.id,
-        name: primaryFoodName,
+        name: foodsList.length > 1 ? foodsList.join(' + ') : primaryFoodName,
         confidence: barcode ? 'known' : 'estimated'
       },
       mealContext,

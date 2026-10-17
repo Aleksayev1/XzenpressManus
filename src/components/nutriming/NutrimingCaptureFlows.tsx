@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Mic, Search, X, Loader2, Scan, Upload, RefreshCw, AlertCircle, Check, ArrowRight, Sparkles, HelpCircle } from 'lucide-react';
+import { Camera, Mic, Search, X, Loader2, Scan, Upload, RefreshCw, AlertCircle, Check, ArrowRight, Sparkles, HelpCircle, Zap, ZapOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { OpenFoodFactsService } from '../../services/nutriming/openFoodFactsService';
 
@@ -61,6 +61,8 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
   const [showCameraHelp, setShowCameraHelp] = useState(false);
   const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
   const [aiDetectedSuccess, setAiDetectedSuccess] = useState<string | null>(null);
+  const [hasTorch, setHasTorch] = useState(false);
+  const [isTorchOn, setIsTorchOn] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -68,7 +70,21 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
   const fileInputBarcodeRef = useRef<HTMLInputElement | null>(null);
   const fileInputPackageRef = useRef<HTMLInputElement | null>(null);
 
-  // Iniciar Câmera Web Stream
+  // Anexar stream ao elemento de vídeo de forma 100% garantida no mobile
+  const attachStreamToVideo = (stream: MediaStream) => {
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.setAttribute('playsinline', 'true');
+      videoRef.current.setAttribute('webkit-playsinline', 'true');
+      videoRef.current.setAttribute('muted', 'true');
+      videoRef.current.muted = true;
+      videoRef.current.play().catch(err => {
+        console.warn('[BarcodeScanner] video.play() advertência:', err);
+      });
+    }
+  };
+
+  // Iniciar Câmera Web Stream com fallbacks de restrição
   const initCamera = async () => {
     setCameraError(null);
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -76,21 +92,82 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
       return;
     }
 
+    let stream: MediaStream | null = null;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false
       });
-
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play().catch(() => {});
+    } catch (err1) {
+      console.warn('[BarcodeScanner] 1280x720 ideal falhou, tentando modo básico:', err1);
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' },
+          audio: false
+        });
+      } catch (err2) {
+        console.warn('[BarcodeScanner] facingMode environment falhou, tentando video padrão:', err2);
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+          });
+        } catch (errFinal: any) {
+          console.warn('[BarcodeScanner] Câmera não autorizada ou bloqueada:', errFinal);
+          setCameraError('Acesso à câmera bloqueado. Digite o código de barras no campo abaixo:');
+          return;
+        }
       }
+    }
+
+    if (stream) {
+      streamRef.current = stream;
+      attachStreamToVideo(stream);
       setHasCameraStream(true);
-    } catch (err: any) {
-      console.warn('[BarcodeScanner] Câmera não autorizada:', err);
-      setCameraError('Acesso à câmera bloqueado. Digite o código de barras no campo abaixo:');
+
+      // Detectar suporte a lanterna (torch) e autofoco contínuo
+      const track = stream.getVideoTracks()[0];
+      if (track) {
+        try {
+          const capabilities = (track.getCapabilities ? track.getCapabilities() : {}) as any;
+          if (capabilities.torch) {
+            setHasTorch(true);
+          }
+          if (track.applyConstraints) {
+            track.applyConstraints({
+              advanced: [{ focusMode: 'continuous' } as any]
+            }).catch(() => {});
+          }
+        } catch (e) {
+          // Suporte avançado opcional
+        }
+      }
+    }
+  };
+
+  // Sincronizar stream caso o ref monte ou o estado mude (previne tela preta em re-render)
+  useEffect(() => {
+    if (hasCameraStream && streamRef.current && videoRef.current) {
+      if (videoRef.current.srcObject !== streamRef.current) {
+        attachStreamToVideo(streamRef.current);
+      }
+    }
+  }, [hasCameraStream]);
+
+  // Alternar Lanterna
+  const toggleTorch = async () => {
+    if (!streamRef.current) return;
+    const track = streamRef.current.getVideoTracks()[0];
+    if (track) {
+      try {
+        const nextState = !isTorchOn;
+        await (track as any).applyConstraints({
+          advanced: [{ torch: nextState }]
+        });
+        setIsTorchOn(nextState);
+      } catch (e) {
+        console.warn('[Torch] Erro ao alternar lanterna:', e);
+      }
     }
   };
 
@@ -357,78 +434,117 @@ const BarcodeScanFlow: React.FC<{ onComplete: (foods: string[], barcode?: string
         className="hidden"
       />
 
-      {/* Topo: Câmera ao vivo ou Estado de Câmera Bloqueada com Auxílio */}
-      <div className="relative min-h-[260px] bg-black overflow-hidden flex items-center justify-center">
-        {hasCameraStream ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        ) : (
+      {/* Topo: Câmera ao vivo (sempre no DOM para evitar tela preta) */}
+      <div className="relative min-h-[280px] bg-black overflow-hidden flex items-center justify-center">
+        {/* O vídeo permanece sempre no DOM com playsinline e muted obrigatórios */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          onLoadedMetadata={() => {
+            if (videoRef.current) {
+              videoRef.current.play().catch(() => {});
+            }
+          }}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+            hasCameraStream ? 'opacity-100 z-0' : 'opacity-0 -z-10 pointer-events-none'
+          }`}
+        />
+
+        {!hasCameraStream && (
           <div className="flex flex-col items-center justify-center p-5 text-center text-slate-300 w-full max-w-sm mx-auto z-10">
-            <Scan className="w-10 h-10 text-emerald-400 mb-2" />
+            <Scan className="w-10 h-10 text-emerald-400 mb-2 animate-pulse" />
             <p className="text-xs text-amber-200/90 font-medium mb-2 leading-relaxed">
               {cameraError || 'Iniciando câmera para leitura de código de barras...'}
             </p>
 
-            {cameraError && (
-              <div className="flex flex-col items-center gap-2 w-full mt-1">
-                <div className="flex flex-wrap items-center justify-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => initCamera()}
-                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-md active:scale-95"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    Tentar Câmera Novamente
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => fileInputBarcodeRef.current?.click()}
-                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-md active:scale-95"
-                  >
-                    <Camera className="w-3.5 h-3.5 text-emerald-400" />
-                    Foto com Câmera Nativa
-                  </button>
-                </div>
+            <div className="flex flex-col items-center gap-2 w-full mt-1">
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => initCamera()}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Tentar Câmera Novamente
+                </button>
 
                 <button
                   type="button"
-                  onClick={() => setShowCameraHelp(!showCameraHelp)}
-                  className="text-[11px] text-emerald-400/90 hover:text-emerald-300 underline flex items-center gap-1 mt-1 transition-colors"
+                  onClick={() => fileInputBarcodeRef.current?.click()}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-md active:scale-95"
                 >
-                  <HelpCircle className="w-3.5 h-3.5" />
-                  {showCameraHelp ? 'Ocultar instruções' : 'Como desbloquear a câmera no Chrome?'}
+                  <Camera className="w-3.5 h-3.5 text-emerald-400" />
+                  Foto com Câmera Nativa
                 </button>
-
-                {showCameraHelp && (
-                  <div className="mt-1 p-3 bg-black/90 border border-emerald-500/40 rounded-2xl text-left text-[11px] text-slate-200 space-y-1.5 shadow-xl backdrop-blur-md">
-                    <p className="font-semibold text-emerald-300">Liberar no Chrome do celular:</p>
-                    <p>1️⃣ Toque no ícone do cadeado 🔒 ou opções na barra de endereços (ao lado de <strong>xzenpress.com</strong>).</p>
-                    <p>2️⃣ Toque em <strong>Permissões</strong> &gt; <strong>Câmera</strong>.</p>
-                    <p>3️⃣ Mude para <strong>Permitir</strong> e toque no botão "Tentar Câmera Novamente" acima.</p>
-                  </div>
-                )}
               </div>
-            )}
+
+              {cameraError && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setShowCameraHelp(!showCameraHelp)}
+                    className="text-[11px] text-emerald-400/90 hover:text-emerald-300 underline flex items-center gap-1 mt-1 transition-colors"
+                  >
+                    <HelpCircle className="w-3.5 h-3.5" />
+                    {showCameraHelp ? 'Ocultar instruções' : 'Como desbloquear a câmera no Chrome?'}
+                  </button>
+
+                  {showCameraHelp && (
+                    <div className="mt-1 p-3 bg-black/90 border border-emerald-500/40 rounded-2xl text-left text-[11px] text-slate-200 space-y-1.5 shadow-xl backdrop-blur-md">
+                      <p className="font-semibold text-emerald-300">Liberar no Chrome do celular:</p>
+                      <p>1️⃣ Toque no ícone ao lado de <strong>xzenpress.com</strong> na barra de endereços.</p>
+                      <p>2️⃣ Toque em <strong>Permissões</strong> &gt; <strong>Câmera</strong>.</p>
+                      <p>3️⃣ Mude para <strong>Permitir</strong> e recarregue a página.</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         )}
 
-        {/* Moldura do Scanner com cantos estilizados e laser */}
+        {/* Moldura do Scanner com cantos estilizados e mira laser */}
         {hasCameraStream && (
-          <div className="absolute inset-x-8 inset-y-10 border-2 border-emerald-500/60 rounded-2xl flex items-center justify-center pointer-events-none shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+          <div className="absolute inset-x-8 inset-y-10 border-2 border-emerald-500/60 rounded-2xl flex items-center justify-center pointer-events-none shadow-[0_0_30px_rgba(16,185,129,0.2)] z-10">
             <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent absolute animate-pulse shadow-[0_0_12px_#34d399]" />
           </div>
         )}
 
-        {/* Badge superior */}
-        <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-emerald-500/30 flex items-center gap-1.5 text-[11px] text-emerald-300 z-10">
-          <Scan className="w-3.5 h-3.5" />
-          <span>Aponte para o código de barras (EAN)</span>
+        {/* Badge superior com instruções e atalhos de hardware */}
+        <div className="absolute top-3 inset-x-3 flex items-center justify-between gap-2 z-20 pointer-events-none">
+          <div className="bg-black/75 backdrop-blur-md px-3 py-1.5 rounded-full border border-emerald-500/30 flex items-center gap-1.5 text-[11px] text-emerald-300 shadow-md">
+            <Scan className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Aponte para o código de barras (EAN)</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 pointer-events-auto">
+            {hasTorch && (
+              <button
+                type="button"
+                onClick={toggleTorch}
+                title={isTorchOn ? "Desligar Lanterna" : "Ligar Lanterna"}
+                className={`p-2 rounded-full border transition-all shadow-md ${
+                  isTorchOn
+                    ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-amber-400/40'
+                    : 'bg-black/70 text-slate-200 border-white/20 hover:bg-black/90'
+                }`}
+              >
+                {isTorchOn ? <Zap className="w-4 h-4 fill-current" /> : <ZapOff className="w-4 h-4" />}
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => fileInputBarcodeRef.current?.click()}
+              title="Tirar foto em alta resolução com a câmera do celular"
+              className="bg-black/70 hover:bg-black/90 text-emerald-300 border border-emerald-500/30 px-2.5 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-1 shadow-md active:scale-95"
+            >
+              <Camera className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Foto HD</span>
+            </button>
+          </div>
         </div>
 
         {/* Notificação de compatibilidade visual */}

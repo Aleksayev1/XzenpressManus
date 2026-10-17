@@ -1,271 +1,414 @@
 /**
- * AuthenticityGuard
+ * FoodTransparencyGuard (anteriormente AuthenticityGuard)
  * ─────────────────────────────────────────────────────────────────────────────
- * Detecta padrões de adulteração e maquiagem industrial em rótulos alimentares.
+ * Analisador de Transparência e Composição Declarada de Rótulos Alimentares.
  * Opera 100% offline, < 2ms, zero rede.
  *
- * Contexto clínico XZenPress:
- * O paciente escaneia um produto que se apresenta como "chocolate", "leite" ou
- * "queijo". Este guard analisa a lista de ingredientes e o nome do produto para
- * identificar se o produto é genuíno ou se trata de um COMPOSTO, ANÁLOGO ou
- * PRODUTO MAQUIADO industrialmente — com impacto direto na inflamação sistêmica
- * e na resposta metabólica do paciente.
+ * Princípios de Engenharia e Compliance (GPT 6 & XZenPress):
+ * 1. Explica a composição declarada e a denominação de venda sem certificar autenticidade,
+ *    segurança ou conformidade legal.
+ * 2. Utiliza correspondência de termos com limites de palavras Unicode flexíveis.
+ * 3. Deduplica marcadores compostos (ex: 'amido modificado' não pontua 'amido' novamente).
+ * 4. Respeita alegações de negação no escopo apropriado (ex: 'zero lactose' não cancela alerta de leite).
+ * 5. Não acusa fabricantes de crime ou fraude: foca na transparência dos ingredientes
+ *    para orientar a decisão consciente do consumidor.
  */
 
 export type AuthenticityCategory =
-  | 'chocolate'
   | 'dairy_milk'
   | 'dairy_cheese'
-  | 'dairy_yogurt'
+  | 'chocolate'
   | 'juice'
   | 'honey'
   | 'olive_oil'
-  | 'meat_processed';
+  | 'meat_processed'
+  | 'dairy_yogurt';
 
-export type AuthenticityLevel =
-  | 'genuine'      // Produto genuíno, ingredientes compatíveis com a identidade
-  | 'suspect'      // Presença de extensores ou ingredientes que levantam suspeita
-  | 'misleading'   // Produto claramente adulterado ou "análogo" mascarado
-  | 'unknown';     // Não foi possível avaliar (sem lista de ingredientes)
+export type TransparencyStatus =
+  | 'standard_composition' // Composição compatível com a denominação clássica declarada
+  | 'divergent_category'   // Denominação alternativa (ex: bebida láctea vs leite, néctar vs suco)
+  | 'declared_substitutes'  // Presença de ingredientes substitutos ou extensores (amidos, gorduras vegetais)
+  | 'not_assessed';         // Dados insuficientes na base para análise conclusiva
+
+// Compatibilidade de tipo com o ecossistema existente
+export type AuthenticityLevel = 'genuine' | 'suspect' | 'misleading' | 'unknown';
+
+export interface TransparencyFinding {
+  ruleId: string;
+  matchedText: string;
+  explanation: string;
+  sourceField: 'name' | 'ingredients' | 'sales_description';
+}
 
 export interface AuthenticityFlag {
   level: AuthenticityLevel;
+  status: TransparencyStatus;
   category: AuthenticityCategory | null;
-  fraudTermsFound: string[];
+  findings: TransparencyFinding[];
+  fraudTermsFound: string[]; // Termos de substituição identificados (para retrocompatibilidade)
   explanation: string;
   clinicalNote: string;
   consumerRights: string;
+  regulatoryDisclaimer: string;
 }
 
-// ─── TERMOS POR CATEGORIA ───────────────────────────────────────────────────
+interface CategorySpec {
+  name: string;
+  categoryRegex: RegExp[];
+  genuineMarkers: string[];
+  replacementMarkers: string[];
+  divergentNamePatterns: string[];
+  explanationTemplates: {
+    standard: string;
+    divergent: string;
+    substitutes: string;
+  };
+}
 
-/** Termos que CONFIRMAM autenticidade (são esperados no produto genuíno) */
-const GENUINE_MARKERS: Record<AuthenticityCategory, string[]> = {
-  chocolate: ['cacau', 'liquor de cacau', 'massa de cacau', 'manteiga de cacau', 'pasta de cacau'],
-  dairy_milk: ['leite integral', 'leite desnatado', 'leite semidesnatado'],
-  dairy_cheese: ['leite', 'coalho', 'cloreto de cálcio', 'sal', 'fermento lático'],
-  dairy_yogurt: ['leite', 'fermento lático', 'streptococcus thermophilus', 'lactobacillus bulgaricus'],
-  juice: ['suco de', 'polpa de'],
-  honey: ['mel'],
-  olive_oil: ['azeite de oliva'],
-  meat_processed: ['carne', 'frango', 'suíno']
+const CATEGORY_SPECS: Record<AuthenticityCategory, CategorySpec> = {
+  dairy_milk: {
+    name: 'Leite',
+    categoryRegex: [/(?:^|[^p{L}p{N}])leite(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])compostos+l[aá]cteo(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])bebidas+l[aá]ctea(?:[^p{L}p{N}]|$)/ui],
+    genuineMarkers: ['leite integral', 'leite semidesnatado', 'leite desnatado', 'leite pasteurizado', 'leite uht', 'leite fluido', 'leite em pó'],
+    replacementMarkers: [
+      'soro de leite reconstituído',
+      'soro de leite em pó',
+      'soro de leite',
+      'gordura vegetal hidrogenada',
+      'gordura vegetal',
+      'óleo vegetal',
+      'amido modificado',
+      'amido',
+      'maltodextrina',
+      'xarope de milho'
+    ],
+    divergentNamePatterns: ['composto lácteo', 'bebida láctea', 'mistura láctea', 'alimento lácteo'],
+    explanationTemplates: {
+      standard: 'Composição declarada compatível com a denominação padrão de leite integral/desnatado.',
+      divergent: 'O rótulo identifica o produto como composto lácteo ou bebida láctea, categoria regulatória diferente de leite.',
+      substitutes: 'A lista consultada declara ingredientes substitutos como soro de leite, gordura vegetal ou amido.'
+    }
+  },
+
+  dairy_cheese: {
+    name: 'Queijo / Requeijão',
+    categoryRegex: [/(?:^|[^p{L}p{N}])queijo(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])requeij[aã]o(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])an[aá]logos+des+queijo(?:[^p{L}p{N}]|$)/ui],
+    genuineMarkers: ['leite', 'coalho', 'cloreto de cálcio', 'sal', 'fermento lático', 'creme de leite', 'massa coalhada'],
+    replacementMarkers: [
+      'requeijão cremoso com amido',
+      'requeijão com amido',
+      'análogo de queijo',
+      'gordura vegetal hidrogenada',
+      'gordura de palmiste',
+      'gordura vegetal',
+      'óleo de palma',
+      'óleo vegetal',
+      'amido modificado',
+      'amido',
+      'fécula de mandioca',
+      'proteína de soja'
+    ],
+    divergentNamePatterns: ['mistura alimentícia sabor queijo', 'preparado sabor queijo', 'produto sabor requeijão', 'análogo', 'especialidade láctea'],
+    explanationTemplates: {
+      standard: 'Composição declarada compatível com o padrão tradicional de queijo/requeijão.',
+      divergent: 'A denominação indica mistura alimentícia ou preparado sabor queijo, e não queijo tradicional puro.',
+      substitutes: 'A lista declara amido modificado e/ou gordura vegetal como ingredientes extensores.'
+    }
+  },
+
+  chocolate: {
+    name: 'Chocolate',
+    categoryRegex: [/(?:^|[^p{L}p{N}])chocolate(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])coberturas+sabors+chocolate(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])cacau(?:[^p{L}p{N}]|$)/ui],
+    genuineMarkers: ['manteiga de cacau', 'massa de cacau', 'cacau em pó', 'liquor de cacau', 'pasta de cacau'],
+    replacementMarkers: [
+      'cobertura fracionada sabor chocolate',
+      'cobertura sabor chocolate',
+      'gordura parcialmente hidrogenada',
+      'gordura vegetal hidrogenada',
+      'gordura vegetal interesterificada',
+      'gordura vegetal fracionada',
+      'gordura de palmiste',
+      'gordura de palma',
+      'gordura vegetal'
+    ],
+    divergentNamePatterns: ['cobertura sabor chocolate', 'cobertura fracionada', 'achocolatado', 'doce sabor chocolate'],
+    explanationTemplates: {
+      standard: 'Composição declarada compatível com derivados de cacau tradicionais.',
+      divergent: 'A denominação disponível é cobertura sabor chocolate, categoria distinta de chocolate.',
+      substitutes: 'A composição declara gordura vegetal fracionada/hidrogenada substituindo a manteiga de cacau.'
+    }
+  },
+
+  juice: {
+    name: 'Suco',
+    categoryRegex: [/(?:^|[^p{L}p{N}])suco(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])n[eé]ctar(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])refresco(?:[^p{L}p{N}]|$)/ui],
+    genuineMarkers: ['suco de', 'polpa de', 'suco integral'],
+    replacementMarkers: [
+      'açúcar adicionado',
+      'sacarose',
+      'xarope de glicose',
+      'xarope de frutose',
+      'edulcorante sucralose',
+      'sucralose',
+      'acessulfame de potássio',
+      'aroma artificial'
+    ],
+    divergentNamePatterns: ['néctar', 'refresco', 'bebida de fruta', 'drink de fruta'],
+    explanationTemplates: {
+      standard: 'Identificado como suco integral ou polpa sem adição declarada de açúcares ou edulcorantes.',
+      divergent: 'O produto é identificado como néctar ou refresco, que regulatoriamente possuem menor percentual de fruta que suco integral.',
+      substitutes: 'A lista declara adição de água, açúcares ou edulcorantes artificiais.'
+    }
+  },
+
+  honey: {
+    name: 'Mel',
+    categoryRegex: [/(?:^|[^p{L}p{N}])mel(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])honey(?:[^p{L}p{N}]|$)/ui],
+    genuineMarkers: ['mel'],
+    replacementMarkers: [
+      'xarope de milho com alto teor de frutose',
+      'xarope de glicose',
+      'xarope de frutose',
+      'xarope de milho',
+      'açúcar invertido',
+      'xarope de açúcar',
+      'aroma de mel',
+      'aromatizante',
+      'extrato de mel'
+    ],
+    divergentNamePatterns: ['mel composto', 'xarope sabor mel', 'preparado com mel', 'produto sabor mel'],
+    explanationTemplates: {
+      standard: 'Composição consultada declara mel puro de abelhas como ingrediente.',
+      divergent: 'Identificado como mel composto ou xarope com mel, categoria diferente de mel puro.',
+      substitutes: 'A composição declara adição de xaropes de glicose/milho ou açúcar invertido.'
+    }
+  },
+
+  olive_oil: {
+    name: 'Azeite de Oliva',
+    categoryRegex: [/(?:^|[^p{L}p{N}])azeite(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])[oó]leos+misto(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])[oó]leos+composto(?:[^p{L}p{N}]|$)/ui],
+    genuineMarkers: ['azeite de oliva extra virgem', 'azeite de oliva virgem', 'azeite de oliva'],
+    replacementMarkers: [
+      'óleo de soja',
+      'óleo de canola',
+      'óleo de girassol',
+      'óleo de milho',
+      'óleo vegetal',
+      'mistura de óleos',
+      'óleo misto',
+      'azeite de oliva refinado'
+    ],
+    divergentNamePatterns: ['óleo misto', 'óleo composto', 'tempero de mesa', 'mistura de azeite'],
+    explanationTemplates: {
+      standard: 'Declaração de azeite de oliva sem menção a outros óleos vegetais na lista.',
+      divergent: 'Denominado como óleo misto ou composto, categoria que combina azeite com óleos refinados de sementes.',
+      substitutes: 'A lista declara presença de óleo de soja, canola ou girassol misturados ao azeite.'
+    }
+  },
+
+  meat_processed: {
+    name: 'Produto Cárneo',
+    categoryRegex: [/(?:^|[^p{L}p{N}])presunto(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])mortadela(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])salsicha(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])lingui[cç]a(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])hamb[uú]rguer(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])apresuntado(?:[^p{L}p{N}]|$)/ui],
+    genuineMarkers: ['carne bovina', 'carne suína', 'carne de frango'],
+    replacementMarkers: [
+      'carne mecanicamente separada de aves',
+      'carne mecanicamente separada de frango',
+      'carne mecanicamente separada',
+      'proteína vegetal texturizada de soja',
+      'proteína vegetal texturizada',
+      'proteína de soja',
+      'amido modificado',
+      'amido'
+    ],
+    divergentNamePatterns: ['apresuntado', 'empanado sabor', 'hambúrguer misto com soja'],
+    explanationTemplates: {
+      standard: 'Composição declarada compatível com corte cárneo tradicional.',
+      divergent: 'Denominação de apresuntado ou empanado misto.',
+      substitutes: 'Declara uso de carne mecanicamente separada (CMS), amido ou proteína de soja.'
+    }
+  },
+
+  dairy_yogurt: {
+    name: 'Iogurte',
+    categoryRegex: [/(?:^|[^p{L}p{N}])iogurte(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])yogurt(?:[^p{L}p{N}]|$)/ui, /(?:^|[^p{L}p{N}])bebidas+l[aá]cteas+fermentada(?:[^p{L}p{N}]|$)/ui],
+    genuineMarkers: ['leite', 'fermento lático', 'streptococcus thermophilus', 'lactobacillus bulgaricus'],
+    replacementMarkers: [
+      'bebida láctea fermentada',
+      'bebida láctea',
+      'amido modificado',
+      'amido',
+      'xarope de glicose',
+      'maltodextrina'
+    ],
+    divergentNamePatterns: ['bebida láctea fermentada', 'bebida láctea'],
+    explanationTemplates: {
+      standard: 'Composição compatível com iogurte tradicional fermentado.',
+      divergent: 'Identificado como bebida láctea fermentada, categoria distinta de iogurte integral.',
+      substitutes: 'Presença declarada de amido modificado e xaropes açucarados.'
+    }
+  }
 };
 
-/** Termos que DENUNCIAM adulteração ou extensão industrial */
-const FRAUD_MARKERS: Record<AuthenticityCategory, string[]> = {
-  chocolate: [
-    'gordura vegetal', 'gordura de palma', 'gordura de palmiste',
-    'gordura parcialmente hidrogenada', 'gordura interesterificada',
-    'óleo vegetal parcialmente', 'gordura vegetal fracionada',
-    'aroma de chocolate', 'aroma artificial', 'cacau em pó alcalinizado',
-    'farinha de trigo', 'amido de milho', 'dextrose', 'xarope de glicose',
-    'cobertura sabor chocolate', 'coating', 'hidrogenado'
-  ],
-  dairy_milk: [
-    'amido', 'amido modificado', 'gordura vegetal', 'soro de leite em pó',
-    'maltodextrina', 'xarope de milho', 'lactose', 'proteína de soja',
-    'carragena', 'goma guar', 'extrato de baunilha artificial',
-    'composto lácteo', 'bebida láctea', 'mistura láctea'
-  ],
-  dairy_cheese: [
-    'amido', 'amido modificado', 'gordura vegetal', 'óleo vegetal',
-    'proteína de soja', 'caseína', 'caseinato', 'carragena',
-    'goma xantana', 'fosfato', 'análogo', 'requeijão light com amido',
-    'gordura de palmiste', 'gordura interesterificada',
-    'produto lácteo composto', 'produto de queijo processado', 'queijo processado'
-  ],
-  dairy_yogurt: [
-    'amido', 'amido modificado', 'gelatina', 'maltodextrina', 'dextrose',
-    'xarope de frutose', 'xarope de glucose', 'carragena', 'goma',
-    'sabor artificial', 'corante', 'sacarose excessiva'
-  ],
-  juice: [
-    'açúcar adicionado', 'frutose', 'xarope de milho', 'aroma artificial',
-    'ácido cítrico', 'conservante', 'corante', 'água adicionada',
-    'suco reconstituído com adição'
-  ],
-  honey: [
-    'xarope de glicose', 'xarope de frutose', 'açúcar invertido',
-    'sacarose', 'xarope de milho', 'aroma', 'corante', 'conservante',
-    'extrato de mel'
-  ],
-  olive_oil: [
-    'óleo de soja', 'óleo de canola', 'óleo de girassol', 'óleo vegetal',
-    'óleo de palma', 'mistura de óleos', 'blend'
-  ],
-  meat_processed: [
-    'proteína de soja', 'proteína vegetal texturizada', 'amido', 'amido modificado',
-    'carragena', 'polifosfato', 'nitrito de sódio', 'nitrato de sódio',
-    'corante', 'eritorbato de sódio', 'glutamato monossódico',
-    'caldo de carne artificial', 'aroma de carne'
-  ]
-};
-
-/** Termos no NOME do produto que denunciam identidade falsa */
-const MISLEADING_NAME_PATTERNS: Record<AuthenticityCategory, string[]> = {
-  chocolate:    ['sabor chocolate', 'cobertura sabor', 'achocolatado', 'composto de chocolate'],
-  dairy_milk:   ['composto lácteo', 'bebida láctea', 'mistura láctea', 'leite uht com'],
-  dairy_cheese: ['análogo', 'produto de queijo', 'queijo processado', 'composto lácteo'],
-  dairy_yogurt: ['bebida láctea fermentada', 'bebida iogurtizada'],
-  juice:        ['néctar', 'refresco', 'bebida de fruta', 'drink de'],
-  honey:        ['mel composto', 'produto de mel'],
-  olive_oil:    ['blend de azeite', 'composto de azeite', 'mistura de azeite'],
-  meat_processed: ['hambúrguer de soja', 'almôndega de soja', 'presunto de frango tipo']
-};
-
-// ─── DETECÇÃO DE CATEGORIA POR NOME ─────────────────────────────────────────
-
-const CATEGORY_DETECTION: Array<{ category: AuthenticityCategory; keywords: string[] }> = [
-  { category: 'chocolate',      keywords: ['chocolate', 'cacau', 'achocolatado', 'trufa', 'bombom', 'cobertura'] },
-  { category: 'dairy_cheese',   keywords: ['queijo', 'requeijão', 'cream cheese', 'catupiry', 'mussarela', 'parmesão', 'ricota', 'cottage', 'provolone', 'gorgonzola'] },
-  { category: 'dairy_yogurt',   keywords: ['iogurte', 'yogurt', 'kefir', 'bebida fermentada'] },
-  { category: 'dairy_milk',     keywords: ['leite', 'leite condensado', 'creme de leite', 'nata', 'composto lácteo'] },
-  { category: 'juice',          keywords: ['suco', 'néctar', 'refresco', 'bebida de fruta'] },
-  { category: 'honey',          keywords: ['mel'] },
-  { category: 'olive_oil',      keywords: ['azeite'] },
-  { category: 'meat_processed', keywords: ['presunto', 'mortadela', 'salame', 'salsicha', 'linguiça', 'hambúrguer', 'nugget', 'apresuntado', 'peito de peru', 'blanquet'] }
-];
-
-// ─── MENSAGENS CLÍNICAS ──────────────────────────────────────────────────────
-
-const CLINICAL_NOTES: Record<AuthenticityCategory, string> = {
-  chocolate:
-    'Gorduras vegetais hidrogenadas/interesterificadas no lugar da manteiga de cacau são pró-inflamatórias e interferem na biossíntese de prostaglandinas. Impacto relevante em quadros de inflamação sistêmica, intestino irritável e desequilíbrios hormonais.',
-  dairy_milk:
-    'Compostos lácteos com amido ou gordura vegetal têm índice glicêmico maior e perfil de gordura pior que o leite integral. Em pacientes com resistência à insulina ou disbiose, esse padrão agrava a permeabilidade intestinal.',
-  dairy_cheese:
-    'Queijos análogos (com amido + gordura vegetal) não possuem ácido láurico nem probióticos naturais. Em pacientes com deficiência de cálcio ou inflamação articular, este produto não oferece os benefícios esperados de um queijo real.',
-  dairy_yogurt:
-    'Bebidas iogurtizadas com espessantes e açúcares simples têm perfil glicêmico desfavorável. Ausência de probióticos vivos reduz o benefício para microbiota intestinal. Relevante em protocolos de saúde intestinal e imunidade.',
-  juice:
-    'Néctares e refrescos com açúcar adicionado produzem pico glicêmico equivalente a refrigerante. Ausência de fibras da fruta inteira amplifica a absorção de frutose livre — risco adicional em pacientes com fígado gorduroso.',
-  honey:
-    'Mel adulterado com xaropes de glicose/frutose perde atividade antibacteriana, enzimas e polifenóis. Impacto em pacientes que usam mel como suporte imunológico ou terapêutico.',
-  olive_oil:
-    'Blends de azeite com óleos refinados de soja/canola têm ômega-6 dominante, o que reverte o efeito anti-inflamatório esperado do azeite extra virgem. Crítico para pacientes em protocolo cardiovascular.',
-  meat_processed:
-    'Embutidos com proteína de soja e nitritos em excesso são associados a estresse oxidativo e carga inflamatória. Em pacientes com hipertensão, doenças autoimunes ou câncer, o consumo regular deve ser reavaliado.'
-};
-
-// ─── ENGINE PRINCIPAL ────────────────────────────────────────────────────────
+function safeEscape(str: string): string {
+  return str.replace(/[-/\^$*+?.()|[]{}]/g, '\$&');
+}
 
 export class AuthenticityGuard {
 
-  /**
-   * Detecta a categoria sensível do produto pelo nome.
-   */
   public static detectCategory(productName: string): AuthenticityCategory | null {
-    const lower = productName.toLowerCase();
-    for (const { category, keywords } of CATEGORY_DETECTION) {
-      if (keywords.some(k => lower.includes(k))) {
-        return category;
+    for (const [catKey, spec] of Object.entries(CATEGORY_SPECS)) {
+      if (spec.categoryRegex.some(rx => rx.test(productName))) {
+        return catKey as AuthenticityCategory;
       }
     }
     return null;
   }
 
-  /**
-   * Avalia a autenticidade de um produto dado o nome e a lista de ingredientes.
-   *
-   * @param productName   Nome comercial do produto
-   * @param ingredients   Texto livre dos ingredientes (como no rótulo)
-   * @returns             AuthenticityFlag com diagnóstico completo
-   */
   public static evaluate(productName: string, ingredients?: string): AuthenticityFlag {
     const category = this.detectCategory(productName);
     const lowerName = productName.toLowerCase();
-    const lowerIngredients = (ingredients || '').toLowerCase();
+    const rawIngredients = (ingredients || '').trim();
+    const lowerIngredients = rawIngredients.toLowerCase();
+
+    const regulatoryDisclaimer =
+      'Informação, não diagnóstico. O XZenPress analisa os dados declarados no rótulo e bases públicas abertas. Confira sempre a embalagem física da unidade antes do consumo.';
 
     if (!category) {
       return {
         level: 'unknown',
+        status: 'not_assessed',
         category: null,
+        findings: [],
         fraudTermsFound: [],
-        explanation: 'Produto fora das categorias monitoradas pelo AuthenticityGuard.',
+        explanation: 'Produto fora das categorias monitoradas para análise de substituição de ingredientes.',
         clinicalNote: '',
-        consumerRights: ''
+        consumerRights: '',
+        regulatoryDisclaimer
       };
     }
 
-    if (!lowerIngredients || lowerIngredients.trim().length < 5) {
+    const spec = CATEGORY_SPECS[category];
+    const minLength = category === 'honey' ? 3 : 5;
+
+    if (!lowerIngredients || lowerIngredients.length < minLength) {
       return {
         level: 'unknown',
+        status: 'not_assessed',
         category,
+        findings: [],
         fraudTermsFound: [],
-        explanation: 'Lista de ingredientes não disponível. Verifique a embalagem física do produto.',
-        clinicalNote: CLINICAL_NOTES[category],
-        consumerRights: 'Exija a lista completa de ingredientes — é um direito do consumidor (CDC Art. 31 e RDC 259/2002).'
+        explanation: 'Lista de ingredientes não detalhada na base consultada. Verifique a embalagem física da unidade.',
+        clinicalNote: '',
+        consumerRights: 'O consumidor tem direito à informação clara sobre ingredientes (CDC Art. 6º, III e RDC 727/2022).',
+        regulatoryDisclaimer
       };
     }
 
-    const fraudMarkers = FRAUD_MARKERS[category] || [];
-    const foundFraudTerms = fraudMarkers.filter(term => lowerIngredients.includes(term.toLowerCase()));
+    const findings: TransparencyFinding[] = [];
+    const foundReplacements: string[] = [];
 
-    const misleadingNamePatterns = MISLEADING_NAME_PATTERNS[category] || [];
-    const hasMisleadingName = misleadingNamePatterns.some(p => lowerName.includes(p.toLowerCase()));
-
-    const genuineMarkers = GENUINE_MARKERS[category] || [];
-    const hasGenuineMarkers = genuineMarkers.some(m => lowerIngredients.includes(m.toLowerCase()));
-
-    let level: AuthenticityLevel = 'genuine';
-
-    if (hasMisleadingName && foundFraudTerms.length > 0) {
-      level = 'misleading';
-    } else if (foundFraudTerms.length >= 2 || (foundFraudTerms.length >= 1 && !hasGenuineMarkers)) {
-      level = 'misleading';
-    } else if (foundFraudTerms.length === 1 && hasGenuineMarkers) {
-      level = 'suspect';
+    // Checagem de denominação divergente no nome
+    let hasDivergentName = false;
+    for (const pattern of spec.divergentNamePatterns) {
+      const rx = new RegExp('(^|[^\p{L}\p{N}])' + safeEscape(pattern) + '([^\p{L}\p{N}]|$)', 'ui');
+      if (rx.test(lowerName)) {
+        hasDivergentName = true;
+        findings.push({
+          ruleId: 'DIVERGENT_SALES_NAME',
+          matchedText: pattern,
+          explanation: spec.explanationTemplates.divergent,
+          sourceField: 'name'
+        });
+        break;
+      }
     }
 
-    const explanation = this.buildExplanation(level, category, foundFraudTerms, hasMisleadingName);
+    // Busca de marcadores de substituição com isolamento e deduplicação
+    let textToAnalyze = ' ' + lowerIngredients + ' ';
+
+    // Proteção de escopo: cacau alcalinizado não é fraude
+    if (category === 'chocolate') {
+      textToAnalyze = textToAnalyze.replace(/cacaus+ems+p[oó]s+100%s+alcalinizado/gi, ' [cacau_puro_processado] ');
+      textToAnalyze = textToAnalyze.replace(/cacaus+alcalinizado/gi, ' [cacau_puro_processado] ');
+    }
+
+    // Proteção de escopo: blend de variedades de azeitona não é mistura com outros óleos vegetais
+    if (category === 'olive_oil') {
+      textToAnalyze = textToAnalyze.replace(/blends+des+(?:azeitonas|variedades|arbequina|koroneiki|picual|frantoio)/gi, ' [blend_azeitonas_legitimo] ');
+      textToAnalyze = textToAnalyze.replace(/blends+(?:arbequina|koroneiki|picual|frantoio)/gi, ' [blend_azeitonas_legitimo] ');
+    }
+
+    // Tratamento de negação: 'zero lactose', 'sem adição de açúcares', etc.
+    textToAnalyze = textToAnalyze.replace(/(?:zero|sem|isentos+de|livres+de)s+[p{L}p{N}_-]+/gui, ' [negated_claim] ');
+
+    for (const marker of spec.replacementMarkers) {
+      const rx = new RegExp('(^|[^\p{L}\p{N}])' + safeEscape(marker) + '([^\p{L}\p{N}]|$)', 'ui');
+
+      if (rx.test(textToAnalyze)) {
+        foundReplacements.push(marker);
+        findings.push({
+          ruleId: 'REPLACEMENT_INGREDIENT_DECLARED',
+          matchedText: marker,
+          explanation: 'Declaração de ingrediente extensor ou substituto: ' + marker + '.',
+          sourceField: 'ingredients'
+        });
+        // Consome a correspondência para evitar recontagem
+        textToAnalyze = textToAnalyze.replace(rx, '$1[matched]$2');
+      }
+    }
+
+    // Checar presença de marcadores genuínos
+    const hasGenuineMarkers = spec.genuineMarkers.some(marker => {
+      const rx = new RegExp('(^|[^\p{L}\p{N}])' + safeEscape(marker) + '([^\p{L}\p{N}]|$)', 'ui');
+      return rx.test(' ' + lowerIngredients + ' ');
+    });
+
+    let status: TransparencyStatus = 'not_assessed';
+    let level: AuthenticityLevel = 'unknown';
+
+    if (hasDivergentName) {
+      status = 'divergent_category';
+      level = 'misleading';
+    } else if (foundReplacements.length >= 2 || (foundReplacements.length >= 1 && !hasGenuineMarkers)) {
+      status = 'declared_substitutes';
+      level = 'misleading';
+    } else if (foundReplacements.length === 1 && hasGenuineMarkers) {
+      status = 'declared_substitutes';
+      level = 'suspect';
+    } else if (hasGenuineMarkers && foundReplacements.length === 0) {
+      status = 'standard_composition';
+      level = 'genuine';
+    } else {
+      status = 'not_assessed';
+      level = 'unknown';
+    }
+
+    let explanation = '';
+    if (status === 'standard_composition') {
+      explanation = '✅ ' + spec.name + ': ' + spec.explanationTemplates.standard;
+    } else if (status === 'divergent_category') {
+      explanation = 'ℹ️ ' + spec.name + ': ' + spec.explanationTemplates.divergent;
+    } else if (status === 'declared_substitutes') {
+      const termsList = foundReplacements.slice(0, 3).join(', ');
+      explanation = '⚠️ ' + spec.name + ': ' + spec.explanationTemplates.substitutes + ' (' + termsList + ').';
+    } else {
+      explanation = '🔍 ' + spec.name + ': Ingredientes declarados não são conclusivos para caracterização padrão. Consulte a embalagem física.';
+    }
 
     return {
       level,
+      status,
       category,
-      fraudTermsFound: foundFraudTerms,
+      findings,
+      fraudTermsFound: foundReplacements,
       explanation,
-      clinicalNote: level !== 'genuine' ? CLINICAL_NOTES[category] : '',
-      consumerRights: level !== 'genuine'
-        ? 'Você tem o direito de saber exatamente o que está consumindo (CDC Art. 6º, III e RDC 259/2002). Prefira produtos com lista de ingredientes curta e reconhecível.'
-        : ''
+      clinicalNote: status !== 'standard_composition'
+        ? 'Diferenças de formulação alteram a proporção de gorduras e a densidade de nutrientes. Acompanhe sua resposta digestiva após o consumo.'
+        : '',
+      consumerRights: 'O rótulo físico na embalagem é o documento legal soberano sobre a composição da unidade.',
+      regulatoryDisclaimer
     };
-  }
-
-  private static buildExplanation(
-    level: AuthenticityLevel,
-    category: AuthenticityCategory,
-    fraudTerms: string[],
-    hasMisleadingName: boolean
-  ): string {
-    const categoryLabel = this.categoryLabel(category);
-
-    if (level === 'genuine') {
-      return `✅ ${categoryLabel} com composição compatível com o produto genuíno. Ingredientes principais identificados sem extensores industriais relevantes.`;
-    }
-
-    if (level === 'suspect') {
-      const terms = fraudTerms.slice(0, 2).map(t => `"${t}"`).join(' e ');
-      return `⚠️ ${categoryLabel} com ingrediente suspeito: ${terms}. Pode ser um produto adulterado ou com extensores industriais. Analise o rótulo físico.`;
-    }
-
-    const terms = fraudTerms.slice(0, 3).map(t => `"${t}"`).join(', ');
-    const nameAlert = hasMisleadingName
-      ? ' O próprio nome do produto indica que não é o produto genuíno.'
-      : '';
-    return `🚫 ${categoryLabel} ADULTERADO ou análogo industrial. Ingredientes encontrados: ${terms}.${nameAlert} Este produto não oferece os benefícios nutricionais do ${categoryLabel.toLowerCase()} de verdade.`;
-  }
-
-  private static categoryLabel(category: AuthenticityCategory): string {
-    const labels: Record<AuthenticityCategory, string> = {
-      chocolate:      'Chocolate',
-      dairy_milk:     'Leite / Produto Lácteo',
-      dairy_cheese:   'Queijo / Requeijão',
-      dairy_yogurt:   'Iogurte / Bebida Fermentada',
-      juice:          'Suco / Bebida de Fruta',
-      honey:          'Mel',
-      olive_oil:      'Azeite de Oliva',
-      meat_processed: 'Produto de Carne Processada'
-    };
-    return labels[category] || category;
   }
 }
+
+export const FoodTransparencyGuard = AuthenticityGuard;

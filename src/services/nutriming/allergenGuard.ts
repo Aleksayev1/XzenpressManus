@@ -1,8 +1,8 @@
 import { FoodProduct, AllergenNotice } from '../../types/nutriming';
 
 export class AllergenGuard {
-  public static readonly DISCLAIMER = 
-    'Aviso de Segurança: Os dados de alérgenos baseiam-se na declaração de rotulagem do fabricante e base Open Food Facts. Em caso de alergias severas (como anafilaxia ou doença celíaca estrita), sempre verifique a embalagem física antes do consumo.';
+  public static readonly DISCLAIMER =
+    'Não é possível confirmar ausência de alérgenos com os dados disponíveis. Confira os ingredientes e as advertências na embalagem. Se você tem alergia e houver dúvida, não consuma.';
 
   /**
    * Avalia alérgenos e gera o parecer de segurança determinístico.
